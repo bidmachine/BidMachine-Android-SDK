@@ -5,7 +5,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name="io.bidmachine.test.app.BMTestApplication"
@@ -29,6 +29,7 @@
         </activity>
         <activity android:name=".BannerAutoLoadActivity" />
         <activity android:name=".BannerScrollableActivity" />
+        <activity android:name=".NativeActivity" />
     </application>
 
 </manifest>

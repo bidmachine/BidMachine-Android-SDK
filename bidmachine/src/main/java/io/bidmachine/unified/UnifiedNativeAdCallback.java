@@ -1,10 +1,11 @@
 package io.bidmachine.unified;
 
 import android.support.annotation.NonNull;
-import io.bidmachine.nativead.utils.NativeData;
+
+import io.bidmachine.nativead.NativeNetworkAdapter;
 
 public interface UnifiedNativeAdCallback extends UnifiedAdCallback {
 
-    void onAdLoaded(@NonNull NativeData nativeData);
+    void onAdLoaded(@NonNull NativeNetworkAdapter nativeNetworkAdapter);
 
 }

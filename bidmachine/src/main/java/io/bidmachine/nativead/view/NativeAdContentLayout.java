@@ -1,20 +1,21 @@
-package io.bidmachine.nativead;
+package io.bidmachine.nativead.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import io.bidmachine.R;
 import io.bidmachine.core.Logger;
-import io.bidmachine.nativead.view.NativeIconView;
-import io.bidmachine.nativead.view.NativeMediaView;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.bidmachine.nativead.NativeAd;
 
 public class NativeAdContentLayout extends NativeAdContainer {
 
@@ -23,7 +24,7 @@ public class NativeAdContentLayout extends NativeAdContainer {
     protected View ratingView;
     protected View descriptionView;
     protected View providerView;
-    protected NativeIconView iconView;
+    protected View iconView;
     protected NativeMediaView mediaView;
 
     private NativeAd currentAd;
@@ -47,14 +48,24 @@ public class NativeAdContentLayout extends NativeAdContainer {
     public NativeAdContentLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         if (attrs != null) {
-            final TypedArray attrsArray = context.obtainStyledAttributes(attrs, R.styleable.NativeAdContentLayout, defStyleAttr, 0);
-            titleViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_titleViewId, NO_ID);
-            callToActionViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_callToActionViewId, NO_ID);
-            ratingViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_ratingViewId, NO_ID);
-            descriptionViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_descriptionViewId, NO_ID);
-            providerViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_providerViewId, NO_ID);
-            iconViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_iconViewId, NO_ID);
-            mediaViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_mediaViewId, NO_ID);
+            final TypedArray attrsArray = context.obtainStyledAttributes(attrs,
+                                                                         R.styleable.NativeAdContentLayout,
+                                                                         defStyleAttr,
+                                                                         0);
+            titleViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_titleViewId,
+                                                   NO_ID);
+            callToActionViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_callToActionViewId,
+                                                          NO_ID);
+            ratingViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_ratingViewId,
+                                                    NO_ID);
+            descriptionViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_descriptionViewId,
+                                                         NO_ID);
+            providerViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_providerViewId,
+                                                      NO_ID);
+            iconViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_iconViewId,
+                                                  NO_ID);
+            mediaViewId = attrsArray.getResourceId(R.styleable.NativeAdContentLayout_mediaViewId,
+                                                   NO_ID);
             attrsArray.recycle();
         }
     }
@@ -67,7 +78,7 @@ public class NativeAdContentLayout extends NativeAdContainer {
         setRatingView(findViewById(ratingViewId));
         setDescriptionView(findViewById(descriptionViewId));
         setProviderView(findViewById(providerViewId));
-        setIconView((NativeIconView) findViewById(iconViewId));
+        setIconView(findViewById(iconViewId));
         setMediaView((NativeMediaView) findViewById(mediaViewId));
     }
 
@@ -91,8 +102,8 @@ public class NativeAdContentLayout extends NativeAdContainer {
         providerView = view;
     }
 
-    public void setIconView(NativeIconView view) {
-        iconView = view;
+    public void setIconView(View iconView) {
+        this.iconView = iconView;
     }
 
     public void setMediaView(NativeMediaView mediaView) {
@@ -127,27 +138,25 @@ public class NativeAdContentLayout extends NativeAdContainer {
         return mediaView;
     }
 
-    public List<View> getClickableViews() {
-        List<View> clickableViews = new ArrayList<>();
-        if (titleView != null) {
-            clickableViews.add(titleView);
-        }
-        if (descriptionView != null) {
-            clickableViews.add(descriptionView);
-        }
+    @NonNull
+    public Set<View> getClickableViews() {
+        Set<View> clickableViews = new HashSet<>();
         if (callToActionView != null) {
             clickableViews.add(callToActionView);
         }
-        if (ratingView != null) {
-            clickableViews.add(ratingView);
-        }
-        if (iconView != null) {
-            clickableViews.add(iconView);
-        }
-        if (mediaView != null) {
-            clickableViews.add(mediaView);
-        }
         return clickableViews;
+    }
+
+    private Set<View> collectClickableViews(@Nullable Set<View> clickableViews) {
+        Set<View> viewList = new HashSet<>(getClickableViews());
+        if (clickableViews != null) {
+            try {
+                viewList.addAll(clickableViews);
+            } catch (Exception e) {
+                Logger.log(e);
+            }
+        }
+        return viewList;
     }
 
     public void bind(@Nullable NativeAd ad) {
@@ -180,38 +189,34 @@ public class NativeAdContentLayout extends NativeAdContainer {
                         && providerContent.getParent() instanceof ViewGroup) {
                     ((ViewGroup) providerContent.getParent()).removeView(providerView);
                 }
-                ((ViewGroup) providerView).addView(providerContent,
-                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                ((ViewGroup) providerView).addView(providerContent, new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         }
     }
 
-    public void registerViewForInteraction(NativeAd ad) {
-        if (!ad.isLoaded()) {
+    public void registerViewForInteraction(@Nullable NativeAd nativeAd) {
+        registerViewForInteraction(nativeAd, null);
+    }
+
+    public void registerViewForInteraction(@Nullable NativeAd nativeAd,
+                                           @Nullable Set<View> clickableViews) {
+        if (nativeAd == null || !nativeAd.isLoaded()) {
             Logger.log("You using not loaded native ad, please load it first!");
             return;
         }
         unregisterViewForInteraction();
-        if (iconView != null) {
-            iconView.removeAllViews();
-        }
-        if (mediaView != null) {
-            mediaView.removeAllViews();
-        }
-        this.currentAd = ad;
-        if (iconView != null) {
-            currentAd.setNativeIconView(iconView);
-        }
-        if (mediaView != null) {
-            currentAd.setNativeMediaView(mediaView);
-        }
-        currentAd.registerViewForInteraction(this);
+        currentAd = nativeAd;
+        currentAd.registerView(this,
+                               getIconView(),
+                               getMediaView(),
+                               collectClickableViews(clickableViews));
     }
 
     public void unregisterViewForInteraction() {
         if (currentAd != null) {
-            currentAd.unregisterViewForInteraction();
+            currentAd.unregisterView();
         }
     }
 
@@ -222,7 +227,7 @@ public class NativeAdContentLayout extends NativeAdContainer {
     }
 
     public boolean isRegistered() {
-        return currentAd != null && currentAd.isRegisteredForInteraction();
+        return currentAd != null && currentAd.isViewRegistered();
     }
 
 }

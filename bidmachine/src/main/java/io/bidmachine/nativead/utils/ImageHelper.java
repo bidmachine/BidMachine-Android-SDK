@@ -24,8 +24,12 @@ public class ImageHelper {
         if (onImageHelperListener == null) {
             return;
         }
-        if (imageUri == null || TextUtils.isEmpty(imageUri.getPath()) || targetImageView == null) {
-            onImageHelperListener.onError("Target ImageView or ImagePath is invalid");
+        if (imageUri == null || TextUtils.isEmpty(imageUri.getPath())) {
+            onImageHelperListener.onError("ImagePath is invalid");
+            return;
+        }
+        if (targetImageView == null) {
+            onImageHelperListener.onError("Target ImageView is null");
             return;
         }
         NativeNetworkExecutor.getInstance().execute(new ImagePreparation(context, imageUri, targetImageView, onImageHelperListener));

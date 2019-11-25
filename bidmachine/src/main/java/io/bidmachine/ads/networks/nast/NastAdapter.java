@@ -16,7 +16,7 @@ public class NastAdapter extends NetworkAdapter {
 
     @Override
     public UnifiedNativeAd createNativeAd() {
-        return new NastNativeAdObject();
+        return new NastNative();
     }
 
 }

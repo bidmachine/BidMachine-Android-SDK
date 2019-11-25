@@ -65,6 +65,12 @@ public class BMError {
                 "Request Error", "Request error (" + message + ")");
     }
 
+    public static BMError catchError(String message) {
+        return new BMError(ErrorReason.ERROR_REASON_HANDLED_EXCEPTION_VALUE,
+                           "Catch error",
+                           message);
+    }
+
     private int code;
     private String brief;
     private String message;

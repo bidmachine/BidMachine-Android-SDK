@@ -1,4 +1,4 @@
-package io.bidmachine.nativead.utils;
+package io.bidmachine.nativead;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -20,7 +20,5 @@ public interface NativeMediaPublicData {
 
     @Nullable
     Uri getVideoUri();
-
-    boolean hasVideo();
 
 }

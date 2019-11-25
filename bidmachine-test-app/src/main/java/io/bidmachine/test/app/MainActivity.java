@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -52,7 +53,6 @@ import io.bidmachine.AdsFormat;
 import io.bidmachine.BidMachine;
 import io.bidmachine.BuildConfig;
 import io.bidmachine.InitializationCallback;
-import io.bidmachine.MediaAssetType;
 import io.bidmachine.ads.networks.AmazonConfig;
 import io.bidmachine.ads.networks.adcolony.AdColonyConfig;
 import io.bidmachine.ads.networks.criteo.CriteoConfig;
@@ -63,10 +63,7 @@ import io.bidmachine.ads.networks.tapjoy.TapjoyConfig;
 import io.bidmachine.banner.BannerSize;
 import io.bidmachine.banner.BannerView;
 import io.bidmachine.nativead.NativeAd;
-import io.bidmachine.nativead.NativeAdContentLayout;
-import io.bidmachine.nativead.NativeListener;
-import io.bidmachine.nativead.NativeRequest;
-import io.bidmachine.nativead.view.NativeIconView;
+import io.bidmachine.nativead.view.NativeAdContentLayout;
 import io.bidmachine.nativead.view.NativeMediaView;
 import io.bidmachine.test.app.params.AdsParamsFragment;
 import io.bidmachine.test.app.params.AppParamsFragment;
@@ -74,7 +71,6 @@ import io.bidmachine.test.app.params.ExtraParamsFragment;
 import io.bidmachine.test.app.params.TargetingParamsFragment;
 import io.bidmachine.test.app.params.UserRestrictionsParamsFragment;
 import io.bidmachine.test.app.utils.TestActivityWrapper;
-import io.bidmachine.utils.BMError;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -352,48 +348,32 @@ public class MainActivity extends AppCompatActivity {
     Native
      */
 
+    public void loadNative(View view) {
+        requestHelper.loadNative();
+    }
+
     public void showNative(View view) {
         hideNative(null);
-        final NativeRequest request = ParamsHelper.getInstance(this, ParamsHelper.AdsType.Native)
-                .createParams(new NativeRequest.Builder()
-                                      .setMediaAssetTypes(
-                                              MediaAssetType.All))
-                .build();
-        new NativeAd(this)
-                .setListener(new NativeListener() {
-                    @Override
-                    public void onAdLoaded(@NonNull NativeAd ad) {
-                        Utils.showToast(MainActivity.this, "onAdLoaded");
-//                        inflateNativeAd(ad);
-                        inflateNativeAdWithBind(ad);
-                    }
 
-                    @Override
-                    public void onAdShown(@NonNull NativeAd ad) {
-                        Utils.showToast(MainActivity.this, "onAdShown");
-                    }
+        NativeAd nativeAd = requestHelper.getLastNative();
+        if (nativeAd != null) {
+            if (nativeAd.isLoaded() && nativeAd.canShow()) {
+                inflateNativeAdWithBind(nativeAd);
+            } else {
+                Utils.showToast(this, "Can't show native: isLoaded - " + nativeAd.isLoaded()
+                        + ", canShow - " + nativeAd.canShow());
+            }
+        } else {
+            Utils.showToast(this, "NativeAd is null");
+        }
+    }
 
-                    @Override
-                    public void onAdImpression(@NonNull NativeAd ad) {
-                        Utils.showToast(MainActivity.this, "onAdImpression");
-                    }
+    public void requestNative(View view) {
+        requestHelper.requestNative();
+    }
 
-                    @Override
-                    public void onAdLoadFailed(@NonNull NativeAd ad, @NonNull BMError error) {
-                        Utils.showToast(MainActivity.this, "onAdLoadFailed: " + error.getMessage());
-                    }
-
-                    @Override
-                    public void onAdClicked(@NonNull NativeAd ad) {
-                        Utils.showToast(MainActivity.this, "onAdClicked");
-                    }
-
-                    @Override
-                    public void onAdExpired(@NonNull NativeAd ad) {
-                        Utils.showToast(MainActivity.this, "onAdExpired");
-                    }
-                })
-                .load(request);
+    public void loadRequestedNative(View view) {
+        requestHelper.loadPendingNative();
     }
 
     private void inflateNativeAd(NativeAd ad) {
@@ -426,10 +406,9 @@ public class MainActivity extends AppCompatActivity {
         ctaButton.setText(ad.getCallToAction());
         nativeAdContentLayout.setCallToActionView(ctaButton);
 
-        final NativeIconView icon = nativeAdContentLayout.findViewById(R.id.icon);
+        final ImageView icon = nativeAdContentLayout.findViewById(R.id.icon);
         nativeAdContentLayout.setIconView(icon);
 
-        //TOOD: it's should be ViewGroup?
         final View providerView = ad.getProviderView(nativeAdParent.getContext());
         if (providerView != null) {
             if (providerView.getParent() != null && providerView.getParent() instanceof ViewGroup) {
@@ -441,14 +420,6 @@ public class MainActivity extends AppCompatActivity {
             providerViewContainer.addView(providerView, layoutParams);
         }
         nativeAdContentLayout.setProviderView(providerView);
-
-        TextView tvAgeRestrictions = nativeAdContentLayout.findViewById(R.id.txtAgeRestriction);
-        if (ad.getAgeRestrictions() != null) {
-            tvAgeRestrictions.setText(ad.getAgeRestrictions());
-            tvAgeRestrictions.setVisibility(View.VISIBLE);
-        } else {
-            tvAgeRestrictions.setVisibility(View.GONE);
-        }
 
         NativeMediaView nativeMediaView = nativeAdContentLayout.findViewById(R.id.mediaView);
         nativeAdContentLayout.setMediaView(nativeMediaView);
@@ -464,16 +435,8 @@ public class MainActivity extends AppCompatActivity {
         if (ad == null) {
             return;
         }
-        final NativeAdContentLayout nativeAdContentLayout =
-                (NativeAdContentLayout) getLayoutInflater().inflate(
-                        R.layout.include_native_ads, nativeAdParent, false);
-        final TextView tvAgeRestrictions = nativeAdContentLayout.findViewById(R.id.txtAgeRestriction);
-        if (ad.getAgeRestrictions() != null) {
-            tvAgeRestrictions.setText(ad.getAgeRestrictions());
-            tvAgeRestrictions.setVisibility(View.VISIBLE);
-        } else {
-            tvAgeRestrictions.setVisibility(View.GONE);
-        }
+        final NativeAdContentLayout nativeAdContentLayout = (NativeAdContentLayout) getLayoutInflater()
+                .inflate(R.layout.include_native_ads, nativeAdParent, false);
         nativeAdContentLayout.bind(ad);
         nativeAdContentLayout.registerViewForInteraction(ad);
         nativeAdContentLayout.setVisibility(View.VISIBLE);
@@ -498,6 +461,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Utils.showToast(this, String.valueOf(isRegistered));
+    }
+
+    public void openNativeActivity(View view) {
+        if (!BidMachine.isInitialized()) {
+            Utils.showToast(this, "Initialize BidMachine first");
+            return;
+        }
+        Intent intent = new Intent(this, NativeActivity.class);
+        startActivity(intent);
     }
 
     private SpannableStringBuilder appendBold(SpannableStringBuilder builder, Object text) {

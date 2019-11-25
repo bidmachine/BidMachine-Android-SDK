@@ -4,48 +4,56 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import com.explorestack.iab.vast.VastRequest;
-import io.bidmachine.*;
+
+import java.io.File;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
+import io.bidmachine.AdObjectImpl;
+import io.bidmachine.AdProcessCallback;
+import io.bidmachine.ContextProvider;
+import io.bidmachine.MediaAssetType;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.core.VisibilityTracker;
 import io.bidmachine.models.AdObjectParams;
-import io.bidmachine.nativead.utils.*;
+import io.bidmachine.nativead.utils.ImageHelper;
+import io.bidmachine.nativead.utils.NativeNetworkExecutor;
 import io.bidmachine.nativead.view.MediaView;
-import io.bidmachine.nativead.view.NativeIconView;
 import io.bidmachine.nativead.view.NativeMediaView;
 import io.bidmachine.unified.UnifiedNativeAd;
 import io.bidmachine.unified.UnifiedNativeAdCallback;
 import io.bidmachine.unified.UnifiedNativeAdRequestParams;
 import io.bidmachine.utils.BMError;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.bidmachine.utils.ViewHelper;
 
 public final class NativeAdObject
         extends AdObjectImpl<NativeRequest, AdObjectParams, UnifiedNativeAd, UnifiedNativeAdCallback, UnifiedNativeAdRequestParams>
         implements NativeData, NativeMediaPrivateData, NativeContainer, NativeInteractor, View.OnClickListener {
 
+    static final float DEFAULT_RATING = -1;
+    private static final int ICON_VIEW_ID = 100;
+    private static final int MEDIA_VIEW_ID = 200;
     private static final String INSTALL = "Install";
-    private static final float DEFAULT_RATING = 5;
 
-    private NativeAdContentLayout container;
+    private static final WeakHashMap<ViewGroup, WeakHashMap<View, View.OnClickListener>> clickStorage =
+            new WeakHashMap<>(3);
+
+    private ViewGroup container;
     private MediaView mediaView;
     private ProgressDialog progressDialog;
 
@@ -53,7 +61,7 @@ public final class NativeAdObject
     private Runnable progressRunnable;
 
     private boolean impressionTracked;
-    private boolean isRegisteredForInteraction;
+    private boolean viewRegistered;
 
     @Nullable
     private Bitmap iconBitmap;
@@ -68,7 +76,7 @@ public final class NativeAdObject
     @Nullable
     private VastRequest vastRequest;
     @Nullable
-    private NativeData nativeData;
+    private NativeNetworkAdapter nativeNetworkAdapter;
 
     NativeAdObject(@NonNull ContextProvider contextProvider,
                    @NonNull AdProcessCallback processCallback,
@@ -81,70 +89,57 @@ public final class NativeAdObject
     @Nullable
     @Override
     public String getTitle() {
-        return nativeData != null ? nativeData.getTitle() : null;
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getTitle() : null;
     }
 
     @Nullable
     @Override
     public String getDescription() {
-        return nativeData != null ? nativeData.getDescription() : null;
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getDescription() : null;
     }
 
     @Nullable
     @Override
     public String getCallToAction() {
-        String callToAction = nativeData != null ? nativeData.getCallToAction() : null;
+        String callToAction = nativeNetworkAdapter != null
+                ? nativeNetworkAdapter.getCallToAction()
+                : null;
         return TextUtils.isEmpty(callToAction) ? INSTALL : callToAction;
-    }
-
-    @Nullable
-    @Override
-    public String getSponsored() {
-        return nativeData != null ? nativeData.getSponsored() : null;
-    }
-
-    @Nullable
-    @Override
-    public String getAgeRestrictions() {
-        return nativeData != null ? nativeData.getAgeRestrictions() : null;
     }
 
     @Override
     public float getRating() {
-        if (nativeData == null || nativeData.getRating() == 0) {
-            return DEFAULT_RATING;
-        }
-        return nativeData.getRating();
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getRating() : DEFAULT_RATING;
     }
 
     @Nullable
     @Override
     public String getIconUrl() {
-        return nativeData != null ? nativeData.getIconUrl() : null;
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getIconUrl() : null;
     }
 
     @Nullable
     @Override
     public String getImageUrl() {
-        return nativeData != null ? nativeData.getImageUrl() : null;
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getImageUrl() : null;
     }
 
     @Nullable
     @Override
     public String getClickUrl() {
-        return nativeData != null ? nativeData.getClickUrl() : null;
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getClickUrl() : null;
     }
 
     @Nullable
     @Override
     public String getVideoUrl() {
-        return nativeData != null ? nativeData.getVideoUrl() : null;
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getVideoUrl() : null;
     }
 
     @Nullable
     @Override
     public String getVideoAdm() {
-        return nativeData != null ? nativeData.getVideoAdm() : null;
+        return nativeNetworkAdapter != null ? nativeNetworkAdapter.getVideoAdm() : null;
     }
 
     @Override
@@ -216,8 +211,7 @@ public final class NativeAdObject
     @Override
     public boolean hasVideo() {
         return videoUri != null
-                || !TextUtils.isEmpty(getVideoUrl())
-                || !TextUtils.isEmpty(getVideoAdm());
+                || nativeNetworkAdapter != null && nativeNetworkAdapter.hasVideo();
     }
 
     @NonNull
@@ -226,135 +220,227 @@ public final class NativeAdObject
         return new UnifiedNativeAdCallbackImpl(processCallback);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterViewForInteraction();
-        if (iconBitmap != null) {
-            if (!iconBitmap.isRecycled()) {
-                iconBitmap.recycle();
-            }
-            iconBitmap = null;
-        }
-        if (imageBitmap != null) {
-            if (!imageBitmap.isRecycled()) {
-                imageBitmap.recycle();
-            }
-            imageBitmap = null;
-        }
-        if (videoUri != null && videoUri.getPath() != null) {
-            File file = new File(videoUri.getPath());
-            if (file.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                file.delete();
-            }
-            videoUri = null;
-        }
-    }
-
-    @Override
-    public void registerViewForInteraction(final NativeAdContentLayout view) {
-        if (container != null) {
-            container.setOnClickListener(null);
-        }
-        view.setOnClickListener(this);
-        processChildViews(view);
-        container = view;
-        if (!impressionTracked) {
-            VisibilityTracker.startTracking(
-                    container,
-                    getParams().getViewabilityTimeThresholdMs(),
-                    getParams().getViewabilityPixelThreshold(),
-                    new VisibilityTracker.VisibilityChangeCallback() {
-                        @Override
-                        public void onViewShown() {
-                            impressionTracked = true;
-                            getProcessCallback().processShown();
-                            checkRequiredAssets(container);
-                        }
-
-                        @Override
-                        public void onViewTrackingFinished() {
-                            getProcessCallback().processImpression();
-                        }
-                    });
-        }
-        if (mediaView != null) {
-            mediaView.onViewAppearOnScreen();
-            mediaView.startVideoVisibilityCheckerTimer();
-        }
-        isRegisteredForInteraction = true;
-    }
-
-    private void processChildViews(ViewGroup view) {
-        for (int i = 0; i < view.getChildCount(); i++) {
-            View v = view.getChildAt(i);
-            if (!(v instanceof MediaView)) {
-                if (v instanceof Button) {
-                    Button b = (Button) v;
-                    b.setOnClickListener(this);
-                }
-                if (v instanceof ViewGroup) {
-                    processChildViews((ViewGroup) v);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void unregisterViewForInteraction() {
-        if (container != null) {
-            container.setOnClickListener(null);
-            VisibilityTracker.stopTracking(container);
-        }
-        if (mediaView != null) {
-            mediaView.stopVideoVisibilityCheckerTimer();
-        }
-        isRegisteredForInteraction = false;
-    }
-
+    @Nullable
     @Override
     public View getProviderView(Context context) {
-        return null;
+        return nativeNetworkAdapter != null
+                ? nativeNetworkAdapter.configureProviderView()
+                : null;
     }
 
     @Override
-    public void setNativeIconView(@NonNull NativeIconView nativeIconView) {
-        Context context = nativeIconView.getContext();
-        View iconView = obtainIconView(context);
-        Utils.removeViewFromParent(iconView);
-        nativeIconView.removeAllViews();
-        nativeIconView.addView(iconView, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT)
-        );
+    public void registerView(@Nullable ViewGroup nativeAdView,
+                             @Nullable View imageView,
+                             @Nullable NativeMediaView nativeMediaView,
+                             @Nullable Set<View> clickableViews) {
+        try {
+            if (!isNativeAdViewValid(nativeAdView, imageView, nativeMediaView, clickableViews)) {
+                getProcessCallback().processShowFail(BMError.NoContent);
+                return;
+            }
+            assert nativeAdView != null;
+            configureClickableView(nativeAdView, clickableViews);
+            ImageView iconView = configureIconView(imageView);
+            configureMediaView(nativeMediaView);
+            container = nativeAdView;
+            if (!impressionTracked) {
+                VisibilityTracker.startTracking(
+                        container,
+                        getParams().getViewabilityTimeThresholdMs(),
+                        getParams().getViewabilityPixelThreshold(),
+                        new VisibilityTracker.VisibilityChangeCallback() {
+                            @Override
+                            public void onViewShown() {
+                                impressionTracked = true;
+                                dispatchShown();
+                            }
+
+                            @Override
+                            public void onViewTrackingFinished() {
+                                dispatchImpression();
+                            }
+                        });
+            }
+            if (mediaView != null) {
+                mediaView.onViewAppearOnScreen();
+                mediaView.startVideoVisibilityCheckerTimer();
+            }
+            if (nativeNetworkAdapter != null) {
+                nativeNetworkAdapter.registerNative(nativeAdView,
+                                                    iconView,
+                                                    nativeMediaView,
+                                                    clickableViews);
+            }
+            viewRegistered = true;
+        } catch (Throwable t) {
+            getProcessCallback().processShowFail(BMError.catchError("Error during registerView"));
+            Logger.log(t);
+        }
     }
 
-    private View obtainIconView(Context context) {
-        return createIconView(context);
+    @Override
+    public void unregisterView() {
+        try {
+            if (container != null) {
+                deConfigureClickableView(container);
+                VisibilityTracker.stopTracking(container);
+            }
+            if (mediaView != null) {
+                mediaView.stopVideoVisibilityCheckerTimer();
+                mediaView.release();
+            }
+            if (nativeNetworkAdapter != null) {
+                nativeNetworkAdapter.unregisterNative();
+            }
+            viewRegistered = false;
+        } catch (Throwable t) {
+            Logger.log(t);
+        }
     }
 
-    private View createIconView(Context context) {
-        final ImageView iconView = new ImageView(context);
-        iconView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        if (getAdRequest().containsAssetType(MediaAssetType.Icon)) {
-            ImageHelper.fillImageView(context, iconView, iconUri, iconBitmap);
+    @Override
+    public void onDestroy() {
+        try {
+            super.onDestroy();
+            unregisterView();
+            if (iconBitmap != null) {
+                if (!iconBitmap.isRecycled()) {
+                    iconBitmap.recycle();
+                }
+                iconBitmap = null;
+            }
+            if (imageBitmap != null) {
+                if (!imageBitmap.isRecycled()) {
+                    imageBitmap.recycle();
+                }
+                imageBitmap = null;
+            }
+            if (videoUri != null && videoUri.getPath() != null) {
+                File file = new File(videoUri.getPath());
+                if (file.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    file.delete();
+                }
+                videoUri = null;
+            }
+            if (nativeNetworkAdapter != null) {
+                nativeNetworkAdapter.destroy();
+            }
+        } catch (Throwable t) {
+            Logger.log(t);
+        }
+    }
+
+    @VisibleForTesting
+    boolean isNativeAdViewValid(@Nullable ViewGroup nativeAdView,
+                                @Nullable View imageView,
+                                @Nullable NativeMediaView nativeMediaView,
+                                @Nullable Set<View> clickableViews) {
+        if (nativeAdView == null) {
+            Logger.log("NativeAdView can't be null. NativeAd NOT registered!");
+            return false;
+        }
+        if (imageView == null && nativeMediaView == null) {
+            Logger.log("ImageView or NativeMediaView must be non null. NativeAd NOT registered!");
+            return false;
+        } else {
+            if (imageView != null && !ViewHelper.belongTo(nativeAdView, imageView)) {
+                Logger.log("ImageView must belong to NativeAdView. NativeAd NOT registered!");
+                return false;
+            }
+            if (nativeMediaView != null && !ViewHelper.belongTo(nativeAdView, nativeMediaView)) {
+                Logger.log("NativeMediaView must belong to NativeAdView. NativeAd NOT registered!");
+                return false;
+            }
+        }
+        if (clickableViews != null) {
+            for (View view : clickableViews) {
+                if (view != null && !ViewHelper.belongTo(nativeAdView, view)) {
+                    Logger.log(
+                            "All clickable views must belong to NativeAdView. NativeAd NOT registered!");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void configureClickableView(@NonNull ViewGroup nativeAdView,
+                                        @Nullable Set<View> clickableViews) {
+        deConfigureClickableView(nativeAdView);
+        if (clickableViews == null || clickableViews.size() == 0) {
+            return;
+        }
+        WeakHashMap<View, View.OnClickListener> weakClickableMap = new WeakHashMap<>();
+        clickStorage.put(nativeAdView, weakClickableMap);
+        for (View view : clickableViews) {
+            if (view != null) {
+                view.setOnClickListener(this);
+                weakClickableMap.put(view, this);
+            }
+        }
+    }
+
+    private void deConfigureClickableView(@NonNull ViewGroup nativeAdView) {
+        WeakHashMap<View, View.OnClickListener> weakClickableMap = clickStorage.get(nativeAdView);
+        if (weakClickableMap != null) {
+            for (Map.Entry<View, View.OnClickListener> entry : weakClickableMap.entrySet()) {
+                if (entry != null && entry.getKey() != null) {
+                    entry.getKey().setOnClickListener(null);
+                }
+            }
+            clickStorage.remove(nativeAdView);
+        }
+    }
+
+    @Nullable
+    private ImageView configureIconView(@Nullable View view) {
+        ImageView iconView = null;
+        if (view instanceof ImageView) {
+            iconView = (ImageView) view;
+        } else if (view instanceof ViewGroup) {
+            iconView = new ImageView(view.getContext());
+            iconView.setId(ICON_VIEW_ID);
+            iconView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+            ViewGroup viewGroup = ((ViewGroup) view);
+            viewGroup.removeAllViews();
+            viewGroup.addView(iconView, new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT)
+            );
+        }
+        if (iconView != null) {
+            ImageHelper.fillImageView(iconView.getContext(),
+                                      iconView,
+                                      iconUri,
+                                      iconBitmap);
         }
         return iconView;
     }
 
-    @Override
-    public void setNativeMediaView(@NonNull NativeMediaView nativeMediaView) {
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        mediaView = new MediaView(nativeMediaView.getContext());
-        final NativeRequest request = getAdRequest();
-        if (request.containsAssetType(MediaAssetType.Image) || request.containsAssetType(MediaAssetType.Video)) {
-            mediaView.setNativeAdObject(this);
+    private void configureMediaView(@Nullable NativeMediaView nativeMediaView) {
+        if (nativeMediaView != null) {
+            nativeMediaView.removeAllViews();
+            if (nativeNetworkAdapter != null
+                    && !nativeNetworkAdapter.configureMediaView(nativeMediaView)) {
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+                layoutParams.addRule(
+                        RelativeLayout.CENTER_IN_PARENT,
+                        RelativeLayout.TRUE);
+                mediaView = new MediaView(nativeMediaView.getContext());
+                mediaView.setId(MEDIA_VIEW_ID);
+
+                final NativeRequest request = getAdRequest();
+                if (request.containsAssetType(MediaAssetType.Image)
+                        || request.containsAssetType(MediaAssetType.Video)) {
+                    mediaView.setNativeAdObject(this);
+                }
+                nativeMediaView.addView(mediaView, layoutParams);
+            }
         }
-        nativeMediaView.removeAllViews();
-        nativeMediaView.addView(mediaView, layoutParams);
     }
 
     /* progress dialog */
@@ -405,83 +491,14 @@ public final class NativeAdObject
         }
     }
 
-    private void checkRequiredAssets(NativeAdContentLayout nativeAdContentLayout) {
-        Map<View, String> requiredViews = new HashMap<>();
-        List<String> nonNecessaryView = new ArrayList<>();
-        List<String> notAddedViews = new ArrayList<>();
-
-        if (nativeAdContentLayout.getTitleView() == null) {
-            notAddedViews.add("Title");
-        } else {
-            requiredViews.put(nativeAdContentLayout.getTitleView(), "Title");
-        }
-
-        if (nativeAdContentLayout.getCallToActionView() == null) {
-            notAddedViews.add("CallToAction");
-        } else {
-            requiredViews.put(nativeAdContentLayout.getCallToActionView(), "CallToAction");
-        }
-
-        if (nativeAdContentLayout.getIconView() == null && nativeAdContentLayout.getMediaView() == null) {
-            notAddedViews.add("NativeIconView/NativeMediaView");
-        } else {
-            final NativeRequest request = getAdRequest();
-            if (request.containsAssetType(MediaAssetType.Icon)) {
-                requiredViews.put(nativeAdContentLayout.getIconView(), "NativeIconView");
-            } else if (nativeAdContentLayout.getIconView() != null) {
-                nonNecessaryView.add("NativeIconView");
-            }
-            if (request.containsAssetType(MediaAssetType.Image) || request.containsAssetType(MediaAssetType.Video)) {
-                requiredViews.put(nativeAdContentLayout.getMediaView(), "NativeMediaView");
-            } else if (nativeAdContentLayout.getMediaView() != null) {
-                nonNecessaryView.add("NativeMediaView");
-            }
-        }
-
-        if (getProviderView(nativeAdContentLayout.getContext()) != null) {
-            if (nativeAdContentLayout.getProviderView() == null) {
-                notAddedViews.add("ProviderView");
-            } else {
-                requiredViews.put(nativeAdContentLayout.getProviderView(), "ProviderView");
-            }
-        }
-
-        if (!notAddedViews.isEmpty()) {
-            Logger.log(new BMException(String.format("Required assets: %s are not added to NativeAdView", notAddedViews.toString())));
-        }
-
-        if (!nonNecessaryView.isEmpty()) {
-            Logger.log(new BMException(String.format("Non necessary assets: %s are not added to NativeAdView", nonNecessaryView.toString())));
-        }
-
-        Map<View, String> notFoundViews = findRequiredViews(Utils.getViewRectangle(nativeAdContentLayout), nativeAdContentLayout, requiredViews);
-        if (!notFoundViews.isEmpty()) {
-            Logger.log(new BMException(String.format("Required assets: %s are not visible or not found", notFoundViews.values().toString())));
-        }
-    }
-
-    private static Map<View, String> findRequiredViews(Rect parentRect, View view, Map<View, String> requiredViews) {
-        if (requiredViews.containsKey(view)) {
-            if (Utils.isViewHaveSize(view) && view.isShown() && !Utils.isViewTransparent(view) && Utils.isViewInsideParentRect(parentRect, view)) {
-                requiredViews.remove(view);
-            }
-        } else if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
-            for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                findRequiredViews(parentRect, viewGroup.getChildAt(i), requiredViews);
-            }
-        }
-        return requiredViews;
-    }
-
     private void loadAsset(@NonNull Context context, @NonNull NativeData nativeData) {
-        (new AssetLoader(context, getAdRequest(), getProcessCallback(), nativeData, this))
-                .downloadNativeAdsImages();
+        (new AssetLoader(getAdRequest(), getProcessCallback(), nativeData, this))
+                .downloadNativeAdsImages(context);
     }
 
     @Override
-    public boolean isRegisteredForInteraction() {
-        return isRegisteredForInteraction;
+    public boolean isViewRegistered() {
+        return viewRegistered;
     }
 
     @Override
@@ -491,7 +508,7 @@ public final class NativeAdObject
 
     @Override
     public void onClick(View view) {
-        getProcessCallback().processClicked();
+        dispatchClick();
     }
 
     @Override
@@ -502,13 +519,15 @@ public final class NativeAdObject
             return;
         }
         showProgressDialog(getContext());
-        Utils.openBrowser(getContext(), clickUrl, NativeNetworkExecutor.getInstance(),
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        hideProgressDialog();
-                    }
-                });
+        Utils.openBrowser(getContext(),
+                          clickUrl,
+                          NativeNetworkExecutor.getInstance(),
+                          new Runnable() {
+                              @Override
+                              public void run() {
+                                  hideProgressDialog();
+                              }
+                          });
     }
 
     @Override
@@ -532,10 +551,10 @@ public final class NativeAdObject
         }
 
         @Override
-        public void onAdLoaded(@NonNull NativeData nativeData) {
-            NativeAdObject.this.nativeData = nativeData;
+        public void onAdLoaded(@NonNull NativeNetworkAdapter nativeNetworkAdapter) {
+            NativeAdObject.this.nativeNetworkAdapter = nativeNetworkAdapter;
             try {
-                loadAsset(getContext(), nativeData);
+                loadAsset(getContext(), nativeNetworkAdapter);
             } catch (Exception e) {
                 Logger.log(e);
                 processCallback.processLoadFail(BMError.Internal);
