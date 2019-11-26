@@ -14,7 +14,7 @@ public interface AdListener<AdType extends IAd> {
     void onAdLoaded(@NonNull AdType ad);
 
     /**
-     * Called when Ad load failed
+     * Called when Ad failed to load
      *
      * @param ad    - Ad type {@link IAd}
      * @param error - Ad load error {@link BMError}
@@ -22,21 +22,21 @@ public interface AdListener<AdType extends IAd> {
     void onAdLoadFailed(@NonNull AdType ad, @NonNull BMError error);
 
     /**
-     * Called when Ad shown
+     * Called when Ad has been shown
      *
      * @param ad - Ad type {@link IAd}
      */
     void onAdShown(@NonNull AdType ad);
 
     /**
-     * Called when Ad Impression was tracked
+     * Called when Ad Impression has been tracked
      *
      * @param ad - Ad type {@link IAd}
      */
     void onAdImpression(@NonNull AdType ad);
 
     /**
-     * Called when Ad was clicked
+     * Called when Ad has been clicked
      *
      * @param ad - Ad type {@link IAd}
      */

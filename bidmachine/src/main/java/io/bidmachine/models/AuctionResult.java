@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 public interface AuctionResult {
 
     /**
-     * @return Winner Bid Id which was provided in request
+     * @return Winner Bid Id provided in request
      */
     @NonNull
     String getId();
@@ -18,12 +18,12 @@ public interface AuctionResult {
     String getDemandSource();
 
     /**
-     * @return Winner price expressed as CPM
+     * @return Winner price as CPM
      */
     double getPrice();
 
     /**
-     * @return ID of the buyer seat on whose behalf this bid is made.
+     * @return ID of the buyer seat who made a bid
      */
     String getSeat();
 
@@ -34,13 +34,13 @@ public interface AuctionResult {
     String getCreativeId();
 
     /**
-     * @return Winner Campaign ID or other similar grouping of brand-related ads.
+     * @return Winner Campaign ID or other identifier of brand-related ads.
      */
     @Nullable
     String getCid();
 
     /**
-     * @return Winner Advertiser domain; top two levels only (e.g., "ford.com").
+     * @return Winner Advertiser domain; top two levels only (e.g.: "ford.com").
      */
     @Nullable
     String[] getAdDomains();

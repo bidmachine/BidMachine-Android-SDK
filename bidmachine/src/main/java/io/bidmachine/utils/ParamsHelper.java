@@ -90,7 +90,7 @@ public class ParamsHelper {
                 if (Utils.isYearValid(birthdayYear)) {
                     targetingParams.setBirthdayYear(birthdayYear);
                 } else {
-                    Logger.log("Wrong Birthday Year data: should be 4-digit integer, more or equal 1900 and less or equal than current year");
+                    Logger.log("Wrong Birthday Year: should be 4-digit integer, more or equal 1900 and less or equal than current year");
                 }
             }
             if (params.hasValue(R.styleable.TargetParams_targetCountry))

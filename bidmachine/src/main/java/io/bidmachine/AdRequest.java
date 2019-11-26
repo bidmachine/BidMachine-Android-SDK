@@ -315,7 +315,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     /**
-     * @return true if Ads was expired
+     * @return true if Ads is expired
      */
     @SuppressWarnings("WeakerAccess")
     public boolean isExpired() {
@@ -449,7 +449,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     public interface AdRequestListener<AdRequestType extends AdRequest> {
         /**
-         * Called when AdRequest was requested successfully
+         * Called when AdRequest was obtained successfully
          *
          * @param request       - AdRequest instance
          * @param auctionResult - AuctionResult info
@@ -457,7 +457,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         void onRequestSuccess(@NonNull AdRequestType request, @NonNull AuctionResult auctionResult);
 
         /**
-         * Called when AdRequest request failed
+         * Called when AdRequest failed to load
          *
          * @param request - AdRequest instance
          * @param error   - BMError with additional info about error

@@ -1,7 +1,7 @@
 package io.bidmachine.utils;
 
 /**
- * Enum contains of supported user genders variants
+ * Enum contains of supported user genders options
  */
 public enum Gender {
     Female("F", 1), Male("M", 2), Omitted("O", 0);

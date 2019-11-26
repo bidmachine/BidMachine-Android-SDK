@@ -7,7 +7,7 @@ public interface NativeInteractor {
     void dispatchShown();
 
     /**
-     * Should be called when Native Ads match display credentials
+     * Should be called when Native Ads matches viewability requirements
      */
     void dispatchImpression();
 
@@ -17,7 +17,7 @@ public interface NativeInteractor {
     void dispatchClick();
 
     /**
-     * Should be called when Native Ads video playing finished (optional)
+     * Should be called when Native Ads video was finished (optional)
      */
     void dispatchVideoPlayFinished();
 }

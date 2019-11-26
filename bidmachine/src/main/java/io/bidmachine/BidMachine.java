@@ -17,7 +17,7 @@ public class BidMachine {
     }
 
     /**
-     * Initialize BidMachine SDK
+     * Initializes BidMachine SDK
      *
      * @param context  - your application context
      * @param sellerId - your Seller Id
@@ -27,7 +27,7 @@ public class BidMachine {
     }
 
     /**
-     * Initialize BidMachine SDK
+     * Initializes BidMachine SDK
      *
      * @param context  - your application context
      * @param sellerId - your Seller Id
@@ -40,7 +40,7 @@ public class BidMachine {
     }
 
     /**
-     * Check if BidMachine SDK was initialized
+     * Checks if BidMachine SDK was initialized
      *
      * @return - {@code true} if BidMachine SDK was already initialized
      */
@@ -49,7 +49,7 @@ public class BidMachine {
     }
 
     /**
-     * Set BidMachine SDK endpoint
+     * Sets BidMachine SDK endpoint
      *
      * @param url - BidMachine endpoint URL
      */
@@ -58,7 +58,7 @@ public class BidMachine {
     }
 
     /**
-     * Set BidMachine SDK logs enabled
+     * Sets BidMachine SDK logs enabled
      *
      * @param enabled - if {@code true} SDK will print all information about ad requests
      */
@@ -68,7 +68,7 @@ public class BidMachine {
     }
 
     /**
-     * Set BidMachine SDK test mode
+     * Sets BidMachine SDK test mode
      *
      * @param testMode = if {@code true} SDK will run in test mode
      */
@@ -77,14 +77,14 @@ public class BidMachine {
     }
 
     /**
-     * Set default {@link TargetingParams} for all advertising requests
+     * Sets default {@link TargetingParams} for all ad requests
      */
     public static void setTargetingParams(@Nullable TargetingParams targetingParams) {
         BidMachineImpl.get().setTargetingParams(targetingParams);
     }
 
     /**
-     * Set consent config
+     * Sets consent config
      *
      * @param hasConsent    - user has given consent to the processing of personal data relating to him or her. https://www.eugdpr.org/
      * @param consentString - GDPR consent string if applicable, complying with the comply with the IAB standard
@@ -96,25 +96,25 @@ public class BidMachine {
     }
 
     /**
-     * Set subject to GDPR
+     * Sets subject to GDPR
      *
-     * @param subject - Flag indicating if GDPR regulations apply. <a href="https://wikipedia.org/wiki/General_Data_Protection_Regulation">The  General Data Protection Regulation (GDPR)</a> is a regulation of the European Union
+     * @param subject - Flag indicating if GDPR regulations should be applied. <a href="https://wikipedia.org/wiki/General_Data_Protection_Regulation">The  General Data Protection Regulation (GDPR)</a> is a regulation of the European Union
      */
     public static void setSubjectToGDPR(@Nullable Boolean subject) {
         BidMachineImpl.get().getUserRestrictionParams().setSubjectToGDPR(subject);
     }
 
     /**
-     * Set coppa
+     * Sets coppa
      *
-     * @param coppa - Flag indicating if COPPA regulations apply. <a href="https://wikipedia.org/wiki/Children%27s_Online_Privacy_Protection_Act">The Children's Online Privacy Protection Act (COPPA)</a> was established by the U.S. Federal Trade Commission
+     * @param coppa - Flag indicating if COPPA regulations should be applied. <a href="https://wikipedia.org/wiki/Children%27s_Online_Privacy_Protection_Act">The Children's Online Privacy Protection Act (COPPA)</a> was established by the U.S. Federal Trade Commission
      */
     public static void setCoppa(@Nullable Boolean coppa) {
         BidMachineImpl.get().getUserRestrictionParams().setCoppa(coppa);
     }
 
     /**
-     * Add 3rd party network configuration, which will be used for mediation, loading and displaying ads
+     * Adds 3rd party network configuration, which will be used for mediation, loading and displaying ads
      *
      * @param networkConfigs - Custom configuration object per network
      */
@@ -123,7 +123,7 @@ public class BidMachine {
     }
 
     /**
-     * Add 3rd party network configuration, which will be used for mediation, loading and displaying ads
+     * Adds 3rd party network configuration, which will be used for mediation, loading and displaying ads
      *
      * @param jsonData - Json array which contains info about required networks
      */

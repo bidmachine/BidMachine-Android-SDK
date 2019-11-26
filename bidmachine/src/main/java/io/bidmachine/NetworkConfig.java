@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class for store and provide Network specific configuration.
- * Inherits should implement at least constructor with {@link Map<String, String>} argument, which is required for load
+ * Class to store and provide Network specific configuration.
+ * Inheritors should implement at least constructor with {@link Map<String, String>} argument, which is required to load
  * config from json.
  */
 public abstract class NetworkConfig {
@@ -96,9 +96,9 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Set Network global configuration (will be used for {@link NetworkAdapter#initialize(ContextProvider, UnifiedAdRequestParams, NetworkConfigParams)})
+     * Sets Network global configuration (will be used for {@link NetworkAdapter#initialize(ContextProvider, UnifiedAdRequestParams, NetworkConfigParams)})
      *
-     * @param config map of parameters which will be used for Network initialization
+     * @param config map of parameters which will be used to initialize Network
      */
     @SuppressWarnings({"unchecked", "WeakerAccess"})
     public <T extends NetworkConfig> T withNetworkParams(@Nullable Map<String, String> config) {
@@ -107,7 +107,7 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Set specific Network global parameter (see {@link #withNetworkParams(Map)})
+     * Sets global parameter specific for current Network (see {@link #withNetworkParams(Map)})
      *
      * @param key   parameter key
      * @param value parameter value
@@ -122,10 +122,10 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Set `base` Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
-     * Will be merged with config provided for specific {@link AdsFormat}
+     * Sets `base` Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
+     * Will be merged with config provided for certain {@link AdsFormat}
      *
-     * @param config map of parameters which will be used for Network mediation process
+     * @param config map of parameters which will be used for Network mediation
      */
     @SuppressWarnings({"unchecked", "WeakerAccess", "unused"})
     public <T extends NetworkConfig> T withBaseMediationConfig(@Nullable Map<String, String> config) {
@@ -134,7 +134,7 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Set specific `base` Network mediation configuration parameter (see {@link #withBaseMediationConfig(Map)})
+     * Sets specific `base` Network mediation configuration parameter (see {@link #withBaseMediationConfig(Map)})
      *
      * @param key   parameter key
      * @param value parameter value
@@ -149,11 +149,11 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Set Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
+     * Sets Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
      * Will be used only for provided {@link AdsFormat}
      *
-     * @param adsFormat specific {@link AdsFormat} for which should be used provide {@param config}
-     * @param config    map of parameters which will be used for Network mediation process
+     * @param adsFormat certain {@link AdsFormat} that should use provided {@param config}
+     * @param config    map of parameters to be used with Network Mediation
      */
     @SuppressWarnings({"unchecked", "WeakerAccess"})
     public <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
@@ -172,7 +172,7 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Set {@link AdsType}s for which Network can be used
+     * Sets supported {@link AdsType}s for Network
      *
      * @param adsType required {@link AdsType}s
      */
@@ -182,12 +182,12 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Method which return parameters which should be used for mediation process.
-     * If no specific parameters was provided will return default set by {@link NetworkConfig#withBaseMediationConfig(Map)}
+     * Method which returns parameters to be used for mediation process.
+     * If no specific parameters were provided - will return default values set by {@link NetworkConfig#withBaseMediationConfig(Map)}
      *
      * @param adsType         required {@link AdsType}
      * @param adRequestParams provided typed {@link UnifiedAdRequestParams}
-     * @return map of parameters for provided {@link AdsType} and {@link AdContentType} which will be used for mediation process
+     * @return map of parameters for provided {@link AdsType} and {@link AdContentType} to be used for mediation process
      */
     @Nullable
     public <T extends UnifiedAdRequestParams> Map<String, String> peekMediationConfig(@NonNull AdsType adsType,
@@ -210,7 +210,7 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Method which return array of merged {@link NetworkAdapter#getSupportedTypes()} and {@link NetworkConfig#getSupportedAdsTypes()}.
+     * Method which returns array of merged {@link NetworkAdapter#getSupportedTypes()} and {@link NetworkConfig#getSupportedAdsTypes()}.
      * Will be called only once per app session.
      *
      * @return array of supported {@link AdsType}s

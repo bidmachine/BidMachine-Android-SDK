@@ -17,7 +17,7 @@ import static android.support.v7.widget.RecyclerView.AdapterDataObserver;
 import static android.support.v7.widget.RecyclerView.ViewHolder;
 
 /**
- * Wrapper adapter to show Native Ad in recycler view with fixed step
+ * Wrapper adapter that used to show Native Ad in recycler view with fixed step
  */
 public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
 
@@ -31,7 +31,7 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     /**
      * @param userAdapter user adapter
-     * @param nativeStep  step show {@link NativeAd}
+     * @param nativeStep  show step {@link NativeAd}
      */
     NativeWrapperAdapter(RecyclerView.Adapter<ViewHolder> userAdapter, int nativeStep) {
         this.userAdapter = userAdapter;
@@ -117,7 +117,7 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     /**
-     * Destroy all used native ads
+     * Destroys all used native ads
      */
     void destroyNativeAds() {
         for (int i = 0; i < nativeAdList.size(); i++) {
@@ -152,14 +152,14 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     /**
      * @param position index in wrapper adapter
-     * @return {@code true} if item by position is {@link io.bidmachine.nativead.NativeAd}
+     * @return {@code true} if item's position is {@link io.bidmachine.nativead.NativeAd}
      */
     private boolean isNativeAdPosition(int position) {
         return nativeAdList.get(position) != null;
     }
 
     /**
-     * Method for searching position in user adapter
+     * Method to search position in user adapter
      *
      * @param position index in wrapper adapter
      * @return index in user adapter
@@ -170,7 +170,7 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     /**
-     * Method for finding next position suitable for {@link io.bidmachine.nativead.NativeAd}
+     * Method to find next suitable position for {@link io.bidmachine.nativead.NativeAd}
      *
      * @return position for next native ad view
      */
@@ -213,7 +213,6 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     static class NativeContentStreamHolder extends NativeAdViewHolder {
 
-        private static boolean qwe = false;
         private View iconView;
         private TextView titleView;
         private NativeMediaView nativeMediaView;
@@ -231,29 +230,19 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
         void fillNative(NativeAd nativeAd) {
             titleView.setText(nativeAd.getTitle());
             callToActionView.setText(nativeAd.getCallToAction());
-            if (qwe) {
-                nativeAd.registerView((ViewGroup) itemView,
-                                      iconView,
-                                      nativeMediaView,
-                                      new HashSet<View>() {{
-                                          add(callToActionView);
-                                      }});
-            } else {
-                nativeAd.registerView((ViewGroup) itemView,
-                                      iconView,
-                                      nativeMediaView,
-                                      new HashSet<View>() {{
-                                          add(iconView);
-                                          add(callToActionView);
-                                      }});
-            }
-            qwe = !qwe;
+            nativeAd.registerView((ViewGroup) itemView,
+                                  iconView,
+                                  nativeMediaView,
+                                  new HashSet<View>() {{
+                                      add(iconView);
+                                      add(callToActionView);
+                                  }});
         }
 
     }
 
     /**
-     * Abstract view holders for create NativeAdView
+     * Abstract view holders to create NativeAdView
      */
     abstract static class NativeAdViewHolder extends ViewHolder {
 
