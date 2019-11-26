@@ -12,7 +12,7 @@ import io.bidmachine.nativead.view.NativeMediaView;
 public interface NativeContainer {
 
     /**
-     * Get provider view, that must be shown with ad
+     * Gets provider view, that should be shown with ad
      *
      * @return provider view
      */
@@ -20,12 +20,12 @@ public interface NativeContainer {
     View getProviderView(Context context);
 
     /**
-     * Register native ad for interaction
+     * Registers native ad for interaction
      *
-     * @param nativeAdView    container that contains all views necessary for show native ad
-     * @param iconView        {@link ViewGroup} or {@link android.widget.ImageView} to fill in with a icon asset
-     * @param nativeMediaView {@link NativeMediaView} to fill in with a image or video assets
-     * @param clickableViews  set of views that must be clickable
+     * @param nativeAdView    container that contains all necessary views to show native ad
+     * @param iconView        {@link ViewGroup} or {@link android.widget.ImageView} to fill in with an icon asset
+     * @param nativeMediaView {@link NativeMediaView} to fill in with an image asset or video asset
+     * @param clickableViews  set of views that should be clickable
      */
     void registerView(@Nullable ViewGroup nativeAdView,
                       @Nullable View iconView,
@@ -33,13 +33,13 @@ public interface NativeContainer {
                       @Nullable Set<View> clickableViews);
 
     /**
-     * Unregister registered view from receive Ad interactions
+     * Unregisters registered view from receiving Ad interactions
      * (see {@link NativeContainer#registerView(ViewGroup, View, NativeMediaView, Set)}
      */
     void unregisterView();
 
     /**
-     * @return {@code true} if Ad has registered view for handle interactions
+     * @return {@code true} if Ad has registered view to handle interactions
      */
     boolean isViewRegistered();
 

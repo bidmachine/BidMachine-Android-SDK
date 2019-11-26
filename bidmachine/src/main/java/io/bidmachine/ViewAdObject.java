@@ -51,7 +51,7 @@ public final class ViewAdObject<
             return;
         }
         if (getWidth() == 0 || getHeight() == 0) {
-            Logger.log("Width or height not provided");
+            Logger.log("Width or height are not provided");
             getUnifiedAdCallback().onAdShowFailed(BMError.Internal);
             return;
         }

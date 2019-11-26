@@ -73,7 +73,7 @@ public abstract class AdView<
                     currentAdRequest = request;
                     loadIfAuto();
                 } else {
-                    Logger.log("Request params not valid for handle \"autoLoad\" params!");
+                    Logger.log("Request parameters are not valid to handle \"autoLoad\" params!");
                 }
             }
         }
@@ -94,7 +94,7 @@ public abstract class AdView<
     @SuppressWarnings("unchecked")
     private SelfType setRefreshRate(long refreshRateMs) {
         if (refreshRateMs != -1 && refreshRateMs < MIN_REFRESH_RATE_MS) {
-            Logger.log("Min refresh rate for banner is 15sec");
+            Logger.log("Minimal refresh rate for banner is 15 seconds");
             refreshRate = MIN_REFRESH_RATE_MS;
         } else {
             refreshRate = refreshRateMs;

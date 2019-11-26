@@ -203,7 +203,7 @@ public class NativeAdContentLayout extends NativeAdContainer {
     public void registerViewForInteraction(@Nullable NativeAd nativeAd,
                                            @Nullable Set<View> clickableViews) {
         if (nativeAd == null || !nativeAd.isLoaded()) {
-            Logger.log("You using not loaded native ad, please load it first!");
+            Logger.log("Native ad is not loaded. Please load it before registering");
             return;
         }
         unregisterViewForInteraction();

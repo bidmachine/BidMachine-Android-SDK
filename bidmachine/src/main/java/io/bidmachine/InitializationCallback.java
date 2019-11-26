@@ -1,12 +1,12 @@
 package io.bidmachine;
 
 /**
- * Callback for notify SDK initialization state
+ * Callback with SDK initialization notification
  */
 public interface InitializationCallback {
 
     /**
-     * Method will called when SDK initialization process finished
+     * Method will be called when SDK was successfully initialized
      */
     void onInitialized();
 }

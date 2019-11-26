@@ -86,7 +86,7 @@ abstract class SessionTracker {
         if (urls == null) {
             return;
         }
-        Logger.log("dispatch event to server: " + eventType);
+        Logger.log("dispatching event to server: " + eventType);
         for (String url : urls) {
             executeNotify(replaceMacros(url, eventInfo, eventType.getOrtbActionValue(), -1),
                     new NetworkRequest.Callback<String, BMError>() {
@@ -116,7 +116,7 @@ abstract class SessionTracker {
         if (error.getCode() == BMError.NOT_SET) {
             return;
         }
-        Logger.log("dispatch error event to server: (" + processCode + "-" + error.getCode() + ") - " + error.getMessage());
+        Logger.log("dispatching error event to server: (" + processCode + "-" + error.getCode() + ") - " + error.getMessage());
         for (String url : urls) {
             executeNotify(replaceMacros(url, info, processCode, error.getCode()), new NetworkRequest.Callback<String, BMError>() {
                 @Override
@@ -143,7 +143,7 @@ abstract class SessionTracker {
         if (error.getCode() == BMError.NOT_SET) {
             return;
         }
-        Logger.log("dispatch tracking fail to server: (" + error.getCode() + ")" + error.getMessage());
+        Logger.log("dispatching tracking fail to server: (" + error.getCode() + ")" + error.getMessage());
         for (String url : urls) {
             executeNotify(replaceMacros(url, eventInfo, processCode, error.getCode()), null);
         }

@@ -58,7 +58,7 @@ public abstract class NetworkAdapter {
     }
 
     /**
-     * Call for initialize Network
+     * Calls to initialize Network
      */
     public final void initialize(@NonNull ContextProvider contextProvider,
                                  @NonNull UnifiedAdRequestParams adRequestParams,
@@ -75,35 +75,35 @@ public abstract class NetworkAdapter {
     }
 
     /**
-     * Method for create specific per Network Banner Ads
+     * Method to create Banner Ad for Network
      */
     public UnifiedBannerAd createBanner() {
-        throw new IllegalArgumentException(getKey() + " adapter not supported banner");
+        throw new IllegalArgumentException(getKey() + " adapter does not support banner");
     }
 
     /**
-     * Method for create specific per Network Interstitial Ads
+     * Method for create Interstitial Ad for Network
      */
     public UnifiedFullscreenAd createInterstitial() {
-        throw new IllegalArgumentException(getKey() + " adapter not supported static interstitial");
+        throw new IllegalArgumentException(getKey() + " adapter does not support static interstitial");
     }
 
     /**
-     * Method for create specific per Network Rewarded Ads
+     * Method for create Rewarded Ad for Network
      */
     public UnifiedFullscreenAd createRewarded() {
-        throw new IllegalArgumentException(getKey() + " adapter not supported rewarded interstitial");
+        throw new IllegalArgumentException(getKey() + " adapter does not support rewarded interstitial");
     }
 
     /**
-     * Method for create specific per Network Native Ads
+     * Method for create Native Ad for Network
      */
     public UnifiedNativeAd createNativeAd() {
-        throw new IllegalArgumentException(getKey() + " adapter not supported native");
+        throw new IllegalArgumentException(getKey() + " adapter does not support native ads");
     }
 
     /**
-     * Enable logging in adapter. Will be called after this parameter was changed via {@link BidMachine#setLoggingEnabled(boolean)}
+     * Enables logging in adapter. Will be called after this parameter was changed via {@link BidMachine#setLoggingEnabled(boolean)}
      *
      * @param enabled {@code true} to enable logging
      */

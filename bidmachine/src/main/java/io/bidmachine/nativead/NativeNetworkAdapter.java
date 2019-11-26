@@ -12,11 +12,11 @@ import io.bidmachine.nativead.view.NativeMediaView;
 public abstract class NativeNetworkAdapter implements NativeData {
 
     /**
-     * Method for configure {@link NativeMediaView} to display media view from the AdNetwork.
-     * At start {@link NativeMediaView} is empty.
+     * Method to configure {@link NativeMediaView} to display media view from the AdNetwork.
+     * Initially {@link NativeMediaView} is empty.
      *
      * @param nativeMediaView {@link NativeMediaView} that should be filled by image or video assets
-     * @return {@code true} if configureMediaView was override, otherwise false and
+     * @return {@code true} if configureMediaView was overriden, otherwise false and
      * {@link NativeMediaView} will be configured by default.
      */
     public boolean configureMediaView(@NonNull NativeMediaView nativeMediaView) {
@@ -24,7 +24,7 @@ public abstract class NativeNetworkAdapter implements NativeData {
     }
 
     /**
-     * @return {@link View} that provide DAA(Digital Advertising Alliances) from the AdNetwork
+     * @return {@link View} that provides DAA(Digital Advertising Alliances) from the AdNetwork
      */
     @Nullable
     public View configureProviderView() {
@@ -32,11 +32,11 @@ public abstract class NativeNetworkAdapter implements NativeData {
     }
 
     /**
-     * Method for registering user interaction with native ad
+     * Method to register user interaction to native ad
      *
-     * @param container       container that contains all views necessary for show native ad
-     * @param iconView        {@link android.widget.ImageView} which is filled with a icon asset
-     * @param nativeMediaView {@link NativeMediaView} which is filled with a image or video assets
+     * @param container       container that contains all necessary views to show native ad
+     * @param iconView        {@link android.widget.ImageView} which is filled with an icon asset
+     * @param nativeMediaView {@link NativeMediaView} which is filled with an image or video asset
      * @param clickableViews  set of views that are clickable
      */
     public void registerNative(@NonNull View container,
@@ -47,14 +47,14 @@ public abstract class NativeNetworkAdapter implements NativeData {
     }
 
     /**
-     * Method for unregistering user interaction with native ad
+     * Method to unregister user interaction from native ad
      */
     public void unregisterNative() {
 
     }
 
     /**
-     * Method for destroy the AdNetwork components
+     * Method to destroy AdNetwork components
      */
     public void destroy() {
 

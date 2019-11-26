@@ -115,7 +115,7 @@ public class DownloadVideoTask implements Runnable {
                 handler.sendMessage(message);
                 return;
             } else {
-                Logger.log("Video file not supported");
+                Logger.log("Video file is not supported");
             }
         } catch (Exception e) {
             Logger.log(e);

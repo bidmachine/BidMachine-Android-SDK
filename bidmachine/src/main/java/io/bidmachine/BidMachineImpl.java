@@ -127,11 +127,11 @@ final class BidMachineImpl {
             return;
         }
         if (context == null) {
-            Logger.log("Initialization fail: Context not provided");
+            Logger.log("Initialization fail: Context is not provided");
             return;
         }
         if (TextUtils.isEmpty(sellerId)) {
-            Logger.log("Initialization fail: Seller id not provided");
+            Logger.log("Initialization fail: Seller id is not provided");
             return;
         }
         this.sellerId = sellerId;
@@ -365,11 +365,11 @@ final class BidMachineImpl {
 
     void setEndpoint(@NonNull String url) {
         if (isInitialized) {
-            Logger.log("Can't change endpoint url after initialization was triggered");
+            Logger.log("Can't change endpoint url after initialization");
             return;
         }
         if (TextUtils.isEmpty(url)) {
-            Logger.log("Endpoint empty or null, skip setting...");
+            Logger.log("Endpoint is empty or null, skipping setting new endpoint...");
             return;
         }
         currentInitUrl = url + "/init";

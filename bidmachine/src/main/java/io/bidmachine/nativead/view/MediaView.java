@@ -179,7 +179,7 @@ public class MediaView extends RelativeLayout implements
                         if (nativeMediaData == null || nativeMediaData.getVideoUri() == null) {
                             return;
                         }
-                        Logger.log("Video clicked");
+                        Logger.log("Video has been clicked");
                         listener = MediaView.this;
                         finishedOrExpanded = true;
                         int currentPosition = 0;
@@ -208,14 +208,14 @@ public class MediaView extends RelativeLayout implements
                         DownloadVideoTask.OnLoadedListener listener = new DownloadVideoTask.OnLoadedListener() {
                             @Override
                             public void onVideoLoaded(DownloadVideoTask task, Uri videoFileUri) {
-                                Logger.log("MediaView video has been loaded");
+                                Logger.log("MediaView video is loaded");
                                 nativeMediaData.setVideoUri(videoFileUri);
                                 prepareMediaPlayer();
                             }
 
                             @Override
                             public void onVideoLoadingError(DownloadVideoTask task) {
-                                Logger.log("MediaView video hasn't been loaded");
+                                Logger.log("MediaView video is not loaded");
                                 updateViewState(NativeState.IMAGE);
                                 hasVideo = false;
                             }
@@ -229,7 +229,7 @@ public class MediaView extends RelativeLayout implements
                             public void onVideoLoaded(DownloadVastVideoTask task,
                                                       Uri videoFileUri,
                                                       VastRequest vastRequest) {
-                                Logger.log("MediaView video has been loaded");
+                                Logger.log("MediaView video is loaded");
                                 nativeMediaData.setVideoUri(videoFileUri);
                                 nativeMediaData.setVastRequest(vastRequest);
                                 prepareMediaPlayer();
@@ -237,7 +237,7 @@ public class MediaView extends RelativeLayout implements
 
                             @Override
                             public void onVideoLoadingError(DownloadVastVideoTask task) {
-                                Logger.log("MediaView video hasn't been loaded");
+                                Logger.log("MediaView video is not loaded");
                                 updateViewState(NativeState.IMAGE);
                                 hasVideo = false;
                             }
@@ -509,7 +509,7 @@ public class MediaView extends RelativeLayout implements
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        Logger.log("MediaView onError");
+        Logger.log("MediaView: onError");
         clearPlayerOnError();
         return true;
     }
@@ -526,7 +526,7 @@ public class MediaView extends RelativeLayout implements
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        Logger.log("MediaView onPrepared");
+        Logger.log("MediaView: onPrepared");
         mediaPlayerPrepared = true;
         if (startPlayVideoWhenReady) {
             tryPlayVideo();
@@ -567,7 +567,7 @@ public class MediaView extends RelativeLayout implements
     }
 
     public void onViewAppearOnScreen() {
-        Logger.log("MediaView onViewAppearOnScreen");
+        Logger.log("MediaView: onViewAppearOnScreen");
         viewOnScreen = true;
         if (startPlayVideoWhenReady) {
             tryPlayVideo();
@@ -586,7 +586,7 @@ public class MediaView extends RelativeLayout implements
         if (!isVideoStartNotified) {
             processImpressions();
             isVideoStartNotified = true;
-            Logger.log("MediaView video started");
+            Logger.log("MediaView: video started");
         }
     }
 
@@ -594,7 +594,7 @@ public class MediaView extends RelativeLayout implements
         if (!isVideoFinishNotified) {
             processEvent(TrackingEvent.complete);
             isVideoFinishNotified = true;
-            Logger.log("MediaView video finished");
+            Logger.log("MediaView: video finished");
         }
     }
 
@@ -712,7 +712,7 @@ public class MediaView extends RelativeLayout implements
                                     }
                                 }
                             }
-                            Logger.log("MediaView on screen");
+                            Logger.log("MediaView is on screen");
                             Utils.onUiThread(new Runnable() {
                                 public void run() {
                                     tryPlayVideo();

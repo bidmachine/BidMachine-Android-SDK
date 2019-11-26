@@ -337,19 +337,19 @@ public final class NativeAdObject
                                 @Nullable NativeMediaView nativeMediaView,
                                 @Nullable Set<View> clickableViews) {
         if (nativeAdView == null) {
-            Logger.log("NativeAdView can't be null. NativeAd NOT registered!");
+            Logger.log("NativeAdView cannot be null. NativeAd is NOT registered");
             return false;
         }
         if (imageView == null && nativeMediaView == null) {
-            Logger.log("ImageView or NativeMediaView must be non null. NativeAd NOT registered!");
+            Logger.log("ImageView or NativeMediaView cannot be null. NativeAd is NOT registered");
             return false;
         } else {
             if (imageView != null && !ViewHelper.belongTo(nativeAdView, imageView)) {
-                Logger.log("ImageView must belong to NativeAdView. NativeAd NOT registered!");
+                Logger.log("ImageView should belong to NativeAdView. NativeAd is NOT registered");
                 return false;
             }
             if (nativeMediaView != null && !ViewHelper.belongTo(nativeAdView, nativeMediaView)) {
-                Logger.log("NativeMediaView must belong to NativeAdView. NativeAd NOT registered!");
+                Logger.log("NativeMediaView should belong to NativeAdView. NativeAd is NOT registered");
                 return false;
             }
         }
@@ -357,7 +357,7 @@ public final class NativeAdObject
             for (View view : clickableViews) {
                 if (view != null && !ViewHelper.belongTo(nativeAdView, view)) {
                     Logger.log(
-                            "All clickable views must belong to NativeAdView. NativeAd NOT registered!");
+                            "All clickable views should belong to NativeAdView. NativeAd is NOT registered");
                     return false;
                 }
             }
