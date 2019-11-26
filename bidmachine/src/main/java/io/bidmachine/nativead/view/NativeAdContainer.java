@@ -1,4 +1,4 @@
-package io.bidmachine.nativead;
+package io.bidmachine.nativead.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -28,7 +28,10 @@ class NativeAdContainer extends FrameLayout {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public NativeAdContainer(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public NativeAdContainer(Context context,
+                             AttributeSet attrs,
+                             int defStyleAttr,
+                             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context);
     }

@@ -5,7 +5,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
 import com.explorestack.iab.vast.VastRequest;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import io.bidmachine.AdProcessCallback;
 import io.bidmachine.MediaAssetType;
 import io.bidmachine.core.Logger;
@@ -13,44 +19,36 @@ import io.bidmachine.core.Utils;
 import io.bidmachine.nativead.tasks.DownloadImageTask;
 import io.bidmachine.nativead.tasks.DownloadVastVideoTask;
 import io.bidmachine.nativead.tasks.DownloadVideoTask;
-import io.bidmachine.nativead.utils.NativeMediaPrivateData;
 import io.bidmachine.nativead.utils.NativeNetworkExecutor;
-import io.bidmachine.nativead.utils.NativeData;
 import io.bidmachine.utils.BMError;
-
-import java.io.File;
-import java.util.ArrayList;
 
 class AssetLoader {
 
     private static final String DIR_NAME = "native_cache_image";
 
-    private final ArrayList<Runnable> pendingTasks = new ArrayList<>();
+    private final List<Runnable> pendingTasks = new CopyOnWriteArrayList<>();
 
-    private Context context;
     private NativeRequest adRequest;
     private AdProcessCallback callback;
     private NativeData nativeData;
     private NativeMediaPrivateData nativeMediaData;
 
-    AssetLoader(@NonNull Context context,
-                @NonNull NativeRequest request,
+    AssetLoader(@NonNull NativeRequest request,
                 @NonNull AdProcessCallback callback,
                 @NonNull NativeData nativeData,
                 @NonNull NativeMediaPrivateData nativeMediaData) {
-        this.context = context;
         this.adRequest = request;
         this.callback = callback;
         this.nativeData = nativeData;
         this.nativeMediaData = nativeMediaData;
     }
 
-    void downloadNativeAdsImages() {
-        startDownloadTask();
+    void downloadNativeAdsImages(@NonNull Context context) {
+        startDownloadTask(context);
         checkTasksCount();
     }
 
-    private void startDownloadTask() {
+    private void startDownloadTask(@NonNull Context context) {
         final String iconUrl = nativeData.getIconUrl();
         final String imageUrl = nativeData.getImageUrl();
         final String videoUrl = nativeData.getVideoUrl();
@@ -58,9 +56,10 @@ class AssetLoader {
         if (adRequest.containsAssetType(MediaAssetType.Icon)) {
             createIconTask(context, iconUrl);
         }
-        if (adRequest.containsAssetType(MediaAssetType.Image)
-                || adRequest.containsAssetType(MediaAssetType.Video)) {
+        if (adRequest.containsAssetType(MediaAssetType.Image)) {
             createImageTask(context, imageUrl);
+        }
+        if (adRequest.containsAssetType(MediaAssetType.Video)) {
             if (!TextUtils.isEmpty(videoUrl)) {
                 createVideoTask(context, videoUrl);
             } else if (!TextUtils.isEmpty(videoAdm)) {
@@ -77,103 +76,111 @@ class AssetLoader {
     }
 
     private void createIconTask(final Context context, String url) {
-        if (url != null && !url.isEmpty()) {
+        if (!TextUtils.isEmpty(url)) {
+            DownloadImageTask.OnCacheImageListener listener = new DownloadImageTask.OnCacheImageListener() {
+                @Override
+                public void onPathSuccess(DownloadImageTask task, Uri imagePath) {
+                    nativeMediaData.setIconUri(imagePath);
+                    removePendingTask(task);
+                }
+
+                @Override
+                public void onImageSuccess(DownloadImageTask task, Bitmap imageBitmap) {
+                    nativeMediaData.setIconBitmap(imageBitmap);
+                    removePendingTask(task);
+                }
+
+                @Override
+                public void onFail(DownloadImageTask task) {
+                    removePendingTask(task);
+                }
+            };
             pendingTasks.add(DownloadImageTask.newBuilder(context, url)
-                    .setOnCacheImageListener(new DownloadImageTask.OnCacheImageListener() {
-                        @Override
-                        public void onPathSuccess(DownloadImageTask task, Uri imagePath) {
-                            nativeMediaData.setIconUri(imagePath);
-                            removePendingTask(task);
-
-                        }
-
-                        @Override
-                        public void onImageSuccess(DownloadImageTask task, Bitmap imageBitmap) {
-                            nativeMediaData.setIconBitmap(imageBitmap);
-                            removePendingTask(task);
-                        }
-
-                        @Override
-                        public void onFail(DownloadImageTask task) {
-                            removePendingTask(task);
-                        }
-                    })
-                    .build());
+                                     .setOnCacheImageListener(listener)
+                                     .build());
         }
     }
 
     private void createImageTask(final Context context, String url) {
-        if (url != null && !url.isEmpty()) {
+        if (!TextUtils.isEmpty(url)) {
+            DownloadImageTask.OnCacheImageListener listener = new DownloadImageTask.OnCacheImageListener() {
+                @Override
+                public void onPathSuccess(DownloadImageTask task, Uri imagePath) {
+                    nativeMediaData.setImageUri(imagePath);
+                    removePendingTask(task);
+                }
+
+                @Override
+                public void onImageSuccess(DownloadImageTask task, Bitmap imageBitmap) {
+                    nativeMediaData.setImageBitmap(imageBitmap);
+                    removePendingTask(task);
+                }
+
+                @Override
+                public void onFail(DownloadImageTask task) {
+                    removePendingTask(task);
+                }
+            };
             pendingTasks.add(DownloadImageTask.newBuilder(context, url)
-                    .setCheckAspectRatio(true)
-                    .setOnCacheImageListener(new DownloadImageTask.OnCacheImageListener() {
-                        @Override
-                        public void onPathSuccess(DownloadImageTask task, Uri imagePath) {
-                            nativeMediaData.setImageUri(imagePath);
-                            removePendingTask(task);
-                        }
-
-                        @Override
-                        public void onImageSuccess(DownloadImageTask task, Bitmap imageBitmap) {
-                            nativeMediaData.setImageBitmap(imageBitmap);
-                            removePendingTask(task);
-                        }
-
-                        @Override
-                        public void onFail(DownloadImageTask task) {
-                            removePendingTask(task);
-                        }
-                    })
-                    .build());
+                                     .setCheckAspectRatio(true)
+                                     .setOnCacheImageListener(listener)
+                                     .build());
         }
     }
 
     private void createVideoTask(final Context context, String url) {
-        pendingTasks.add(new DownloadVideoTask(context,
-                new DownloadVideoTask.OnLoadedListener() {
-                    @Override
-                    public void onVideoLoaded(DownloadVideoTask task, Uri videoFileUri) {
-                        nativeMediaData.setVideoUri(videoFileUri);
-                        if (TextUtils.isEmpty(nativeData.getImageUrl())
-                                && videoFileUri != null
-                                && videoFileUri.getPath() != null
-                                && new File(videoFileUri.getPath()).exists()) {
-                            nativeMediaData.setImageUri(
-                                    Uri.parse(Utils.retrieveAndSaveFrame(context, videoFileUri, DIR_NAME)));
-                        }
-                        removePendingTask(task);
-                    }
+        DownloadVideoTask.OnLoadedListener listener = new DownloadVideoTask.OnLoadedListener() {
+            @Override
+            public void onVideoLoaded(DownloadVideoTask task, Uri videoFileUri) {
+                nativeMediaData.setVideoUri(videoFileUri);
+                if (TextUtils.isEmpty(nativeData.getImageUrl())
+                        && videoFileUri != null
+                        && videoFileUri.getPath() != null
+                        && new File(videoFileUri.getPath()).exists()) {
+                    nativeMediaData.setImageUri(
+                            Uri.parse(Utils.retrieveAndSaveFrame(
+                                    context,
+                                    videoFileUri,
+                                    DIR_NAME)));
+                }
+                removePendingTask(task);
+            }
 
-                    @Override
-                    public void onVideoLoadingError(DownloadVideoTask task) {
-                        removePendingTask(task);
-                    }
-                }, url));
+            @Override
+            public void onVideoLoadingError(DownloadVideoTask task) {
+                removePendingTask(task);
+            }
+        };
+        pendingTasks.add(new DownloadVideoTask(context, listener, url));
     }
 
     private void createVastVideoTask(final Context context, String vastVideoAdm) {
-        pendingTasks.add(new DownloadVastVideoTask(context,
-                new DownloadVastVideoTask.OnLoadedListener() {
-                    @Override
-                    public void onVideoLoaded(DownloadVastVideoTask task, Uri videoFileUri, VastRequest vastRequest) {
-                        nativeMediaData.setVideoUri(videoFileUri);
-                        nativeMediaData.setVastRequest(vastRequest);
+        DownloadVastVideoTask.OnLoadedListener listener = new DownloadVastVideoTask.OnLoadedListener() {
+            @Override
+            public void onVideoLoaded(DownloadVastVideoTask task,
+                                      Uri videoFileUri,
+                                      VastRequest vastRequest) {
+                nativeMediaData.setVideoUri(videoFileUri);
+                nativeMediaData.setVastRequest(vastRequest);
+                if (TextUtils.isEmpty(nativeData.getImageUrl())
+                        && videoFileUri != null
+                        && videoFileUri.getPath() != null
+                        && new File(videoFileUri.getPath()).exists()) {
+                    nativeMediaData.setImageUri(
+                            Uri.parse(Utils.retrieveAndSaveFrame(
+                                    context,
+                                    videoFileUri,
+                                    DIR_NAME)));
+                }
+                removePendingTask(task);
+            }
 
-                        if (TextUtils.isEmpty(nativeData.getImageUrl())
-                                && videoFileUri != null
-                                && videoFileUri.getPath() != null
-                                && new File(videoFileUri.getPath()).exists()) {
-                            nativeMediaData.setImageUri(
-                                    Uri.parse(Utils.retrieveAndSaveFrame(context, videoFileUri, DIR_NAME)));
-                        }
-                        removePendingTask(task);
-                    }
-
-                    @Override
-                    public void onVideoLoadingError(DownloadVastVideoTask task) {
-                        removePendingTask(task);
-                    }
-                }, vastVideoAdm));
+            @Override
+            public void onVideoLoadingError(DownloadVastVideoTask task) {
+                removePendingTask(task);
+            }
+        };
+        pendingTasks.add(new DownloadVastVideoTask(context, listener, vastVideoAdm));
     }
 
     private void removePendingTask(Runnable task) {
@@ -207,25 +214,23 @@ class AssetLoader {
 
     private boolean isIconValid() {
         if (adRequest.containsAssetType(MediaAssetType.Icon)) {
-            return !TextUtils.isEmpty(nativeData.getIconUrl())
+            return nativeMediaData.getIconUri() != null
                     || nativeMediaData.getIconBitmap() != null;
         }
         return true;
     }
 
     private boolean isImageValid() {
-        if (adRequest.containsAssetType(MediaAssetType.Image)
-                && !adRequest.containsAssetType(MediaAssetType.Video)) {
-            return !TextUtils.isEmpty(nativeData.getImageUrl())
+        if (adRequest.containsAssetType(MediaAssetType.Image)) {
+            return nativeMediaData.getImageUri() != null
                     || nativeMediaData.getImageBitmap() != null;
         }
         return true;
     }
 
     private boolean isVideoValid() {
-        if (adRequest.containsAssetType(MediaAssetType.Video)
-                && !adRequest.containsAssetType(MediaAssetType.Image)) {
-            return nativeMediaData.hasVideo() && nativeMediaData.getVideoUri() != null;
+        if (adRequest.containsAssetType(MediaAssetType.Video)) {
+            return nativeData.hasVideo();
         }
         return true;
     }

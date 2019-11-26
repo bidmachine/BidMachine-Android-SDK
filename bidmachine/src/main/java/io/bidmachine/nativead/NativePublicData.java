@@ -1,4 +1,4 @@
-package io.bidmachine.nativead.utils;
+package io.bidmachine.nativead;
 
 /**
  * Interface for working with native ads
@@ -27,24 +27,15 @@ public interface NativePublicData {
     String getCallToAction();
 
     /**
-     * Get sponsored text
-     *
-     * @return sponsored string
-     */
-    String getSponsored();
-
-    /**
-     * Get age restrictions of native ad
-     *
-     * @return age restrictions
-     */
-    String getAgeRestrictions();
-
-    /**
      * Get native ad rating
      *
      * @return ad rating
      */
     float getRating();
+
+    /**
+     * @return {@code true} if native ad has video
+     */
+    boolean hasVideo();
 
 }

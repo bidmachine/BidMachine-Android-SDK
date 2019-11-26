@@ -1,26 +1,27 @@
 package io.bidmachine.nativead;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-import io.bidmachine.*;
+import android.view.ViewGroup;
+
+import java.util.Set;
+
+import io.bidmachine.AdProcessCallback;
+import io.bidmachine.AdsType;
+import io.bidmachine.BidMachineAd;
+import io.bidmachine.ContextProvider;
+import io.bidmachine.NetworkAdapter;
 import io.bidmachine.core.Logger;
 import io.bidmachine.models.AdObjectParams;
-import io.bidmachine.nativead.utils.NativeContainer;
-import io.bidmachine.nativead.utils.NativeInteractor;
-import io.bidmachine.nativead.utils.NativeMediaPublicData;
-import io.bidmachine.nativead.utils.NativePublicData;
-import io.bidmachine.nativead.view.NativeIconView;
 import io.bidmachine.nativead.view.NativeMediaView;
 import io.bidmachine.unified.UnifiedNativeAd;
 import io.bidmachine.unified.UnifiedNativeAdRequestParams;
 
 public final class NativeAd
         extends BidMachineAd<NativeAd, NativeRequest, NativeAdObject, AdObjectParams, UnifiedNativeAdRequestParams, NativeListener>
-        implements NativePublicData, NativeMediaPublicData, NativeContainer, NativeInteractor {
+        implements NativePublicData, NativeContainer {
 
     public NativeAd(@NonNull Context context) {
         super(context, AdsType.Native);
@@ -36,7 +37,11 @@ public final class NativeAd
         if (unifiedNativeAd == null) {
             return null;
         }
-        return new NativeAdObject(contextProvider, processCallback, adRequest, adObjectParams, unifiedNativeAd);
+        return new NativeAdObject(contextProvider,
+                                  processCallback,
+                                  adRequest,
+                                  adObjectParams,
+                                  unifiedNativeAd);
     }
 
     @Nullable
@@ -57,49 +62,9 @@ public final class NativeAd
         return hasLoadedObject() ? getLoadedObject().getCallToAction() : null;
     }
 
-    @Nullable
-    @Override
-    public String getSponsored() {
-        return hasLoadedObject() ? getLoadedObject().getSponsored() : null;
-    }
-
-    @Nullable
-    @Override
-    public String getAgeRestrictions() {
-        return hasLoadedObject() ? getLoadedObject().getAgeRestrictions() : null;
-    }
-
     @Override
     public float getRating() {
-        return hasLoadedObject() ? getLoadedObject().getRating() : 0.0f;
-    }
-
-    @Nullable
-    @Override
-    public Uri getIconUri() {
-        return hasLoadedObject() ? getLoadedObject().getIconUri() : null;
-    }
-
-    @Override
-    public Bitmap getIconBitmap() {
-        return hasLoadedObject() ? getLoadedObject().getIconBitmap() : null;
-    }
-
-    @Nullable
-    @Override
-    public Uri getImageUri() {
-        return hasLoadedObject() ? getLoadedObject().getImageUri() : null;
-    }
-
-    @Override
-    public Bitmap getImageBitmap() {
-        return hasLoadedObject() ? getLoadedObject().getImageBitmap() : null;
-    }
-
-    @Nullable
-    @Override
-    public Uri getVideoUri() {
-        return hasLoadedObject() ? getLoadedObject().getVideoUri() : null;
+        return hasLoadedObject() ? getLoadedObject().getRating() : NativeAdObject.DEFAULT_RATING;
     }
 
     @Override
@@ -107,70 +72,32 @@ public final class NativeAd
         return hasLoadedObject() && getLoadedObject().hasVideo();
     }
 
+    @Nullable
     @Override
     public View getProviderView(Context context) {
         return hasLoadedObject() ? getLoadedObject().getProviderView(context) : null;
     }
 
     @Override
-    public void setNativeIconView(NativeIconView nativeIconView) {
+    public void registerView(@Nullable ViewGroup nativeAdView,
+                             @Nullable View iconView,
+                             @Nullable NativeMediaView nativeMediaView,
+                             @Nullable Set<View> clickableViews) {
         if (hasLoadedObject()) {
-            getLoadedObject().setNativeIconView(nativeIconView);
+            getLoadedObject().registerView(nativeAdView, iconView, nativeMediaView, clickableViews);
         }
     }
 
     @Override
-    public void setNativeMediaView(NativeMediaView nativeMediaView) {
+    public void unregisterView() {
         if (hasLoadedObject()) {
-            getLoadedObject().setNativeMediaView(nativeMediaView);
+            getLoadedObject().unregisterView();
         }
     }
 
     @Override
-    public void registerViewForInteraction(NativeAdContentLayout contentLayout) {
-        if (hasLoadedObject()) {
-            getLoadedObject().registerViewForInteraction(contentLayout);
-        }
-    }
-
-    @Override
-    public void unregisterViewForInteraction() {
-        if (hasLoadedObject()) {
-            getLoadedObject().unregisterViewForInteraction();
-        }
-    }
-
-    @Override
-    public boolean isRegisteredForInteraction() {
-        return hasLoadedObject() && getLoadedObject().isRegisteredForInteraction();
-    }
-
-    @Override
-    public void dispatchShown() {
-        if (hasLoadedObject()) {
-            getLoadedObject().dispatchShown();
-        }
-    }
-
-    @Override
-    public void dispatchImpression() {
-        if (hasLoadedObject()) {
-            getLoadedObject().dispatchImpression();
-        }
-    }
-
-    @Override
-    public void dispatchClick() {
-        if (hasLoadedObject()) {
-            getLoadedObject().dispatchClick();
-        }
-    }
-
-    @Override
-    public void dispatchVideoPlayFinished() {
-        if (hasLoadedObject()) {
-            getLoadedObject().dispatchVideoPlayFinished();
-        }
+    public boolean isViewRegistered() {
+        return hasLoadedObject() && getLoadedObject().isViewRegistered();
     }
 
     private boolean hasLoadedObject() {

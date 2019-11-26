@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Surface;
 import android.view.TextureView;
@@ -19,22 +20,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
 import com.explorestack.iab.utils.Assets;
 import com.explorestack.iab.vast.TrackingEvent;
 import com.explorestack.iab.vast.VastError;
 import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.view.CircleCountdownView;
-import io.bidmachine.core.Logger;
-import io.bidmachine.core.Utils;
-import io.bidmachine.nativead.NativeAdObject;
-import io.bidmachine.nativead.tasks.DownloadVastVideoTask;
-import io.bidmachine.nativead.tasks.DownloadVideoTask;
-import io.bidmachine.nativead.utils.ImageHelper;
-import io.bidmachine.nativead.utils.NativeInteractor;
-import io.bidmachine.nativead.utils.NativeMediaPrivateData;
-import io.bidmachine.nativead.utils.NativeNetworkExecutor;
-import io.bidmachine.nativead.utils.NativeData;
-import io.bidmachine.nativead.utils.*;
 
 import java.io.File;
 import java.util.List;
@@ -42,11 +33,26 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.bidmachine.core.Logger;
+import io.bidmachine.core.Utils;
+import io.bidmachine.nativead.NativeAdObject;
+import io.bidmachine.nativead.NativeData;
+import io.bidmachine.nativead.NativeInteractor;
+import io.bidmachine.nativead.NativeMediaPrivateData;
+import io.bidmachine.nativead.tasks.DownloadVastVideoTask;
+import io.bidmachine.nativead.tasks.DownloadVideoTask;
+import io.bidmachine.nativead.utils.ImageHelper;
+import io.bidmachine.nativead.utils.NativeNetworkExecutor;
+
 import static io.bidmachine.core.Utils.getScreenDensity;
 
-public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnVideoSizeChangedListener,
-        TextureView.SurfaceTextureListener, VideoPlayerActivity.VideoPlayerActivityListener {
+public class MediaView extends RelativeLayout implements
+        MediaPlayer.OnCompletionListener,
+        MediaPlayer.OnErrorListener,
+        MediaPlayer.OnPreparedListener,
+        MediaPlayer.OnVideoSizeChangedListener,
+        TextureView.SurfaceTextureListener,
+        VideoPlayerActivity.VideoPlayerActivityListener {
 
     private static final float ASPECT_MULTIPLIER_WIDTH_TO_HEIGHT = 9f / 16;
     private static final float ASPECT_MULTIPLIER_HEIGHT_TO_WIDTH = 16f / 9;
@@ -76,15 +82,15 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
     private boolean hasVideo;
     private volatile boolean error;
     private boolean finishedOrExpanded;
-    private VastRequest vastRequest;
     private int videoDuration;
     private int quartile;
+    private int videoWidth = 0;
+    private int videoHeight = 0;
+    private boolean videoSizeWasChanged = true;
 
     public static VideoPlayerActivity.VideoPlayerActivityListener listener;
 
-    private enum State {IMAGE, PLAYING, LOADING, PAUSED}
-
-    private State state = State.IMAGE;
+    private NativeState state = NativeState.IMAGE;
 
     public MediaView(Context context) {
         super(context);
@@ -114,12 +120,10 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         this.nativeMediaData = nativeMediaData;
         this.nativeInteractor = nativeInteractor;
 
-        if ((nativeData.getVideoUrl() != null && !nativeData.getVideoUrl().isEmpty())
-                || (nativeData.getVideoAdm() != null && !nativeData.getVideoAdm().isEmpty())) {
+        if (nativeMediaData.getVideoUri() != null
+                || !TextUtils.isEmpty(nativeData.getVideoUrl())
+                || !TextUtils.isEmpty(nativeData.getVideoAdm())) {
             hasVideo = true;
-            if (nativeMediaData.getVastRequest() != null) {
-                vastRequest = nativeMediaData.getVastRequest();
-            }
         }
         createView();
     }
@@ -128,26 +132,31 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         if (!isInitialized) {
             isInitialized = true;
             imageView = new ImageView(getContext());
-            LayoutParams imageViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT);
-            imageView.setLayoutParams(imageViewParams);
+            imageView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                       ViewGroup.LayoutParams.MATCH_PARENT));
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             imageView.setAdjustViewBounds(true);
             this.addView(imageView);
+
             if (hasVideo) {
                 int playAndProgressViewSize = Math.round(50 * getScreenDensity(getContext()));
-                progressBarView = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleLarge);
-                LayoutParams progressBarViewParams = new LayoutParams(playAndProgressViewSize, playAndProgressViewSize);
+                progressBarView = new ProgressBar(getContext(),
+                                                  null,
+                                                  android.R.attr.progressBarStyleLarge);
+                LayoutParams progressBarViewParams = new LayoutParams(playAndProgressViewSize,
+                                                                      playAndProgressViewSize);
                 progressBarViewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                 progressBarView.setLayoutParams(progressBarViewParams);
                 progressBarView.setBackgroundColor(Color.parseColor("#6b000000"));
+                progressBarView.setVisibility(INVISIBLE);
                 this.addView(progressBarView);
+
                 playButton = new ImageView(getContext());
                 playButton.setImageResource(android.R.drawable.ic_media_play);
-                LayoutParams playButtonParams = new LayoutParams(playAndProgressViewSize, playAndProgressViewSize);
+                LayoutParams playButtonParams = new LayoutParams(playAndProgressViewSize,
+                                                                 playAndProgressViewSize);
                 playButtonParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                 playButton.setLayoutParams(playButtonParams);
-                playButton.setBackgroundColor(Color.parseColor("#6b000000"));
                 playButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -155,11 +164,13 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
                         tryPlayVideo();
                     }
                 });
+                playButton.setVisibility(INVISIBLE);
                 this.addView(playButton);
+
                 textureView = new TextureView(getContext());
                 textureView.setSurfaceTextureListener(this);
                 LayoutParams textureViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT);
+                                                                  ViewGroup.LayoutParams.MATCH_PARENT);
                 textureViewParams.addRule(RelativeLayout.CENTER_IN_PARENT);
                 textureView.setLayoutParams(textureViewParams);
                 textureView.setOnClickListener(new OnClickListener() {
@@ -177,7 +188,9 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
                         }
                         pausePlayer();
                         Intent intent = VideoPlayerActivity.getIntent(getContext(),
-                                nativeMediaData.getVideoUri().getPath(), currentPosition);
+                                                                      nativeMediaData.getVideoUri()
+                                                                              .getPath(),
+                                                                      currentPosition);
                         getContext().startActivity(intent);
                     }
                 });
@@ -190,63 +203,74 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
                         && new File(nativeMediaData.getVideoUri().getPath()).exists()) {
                     startPlayVideoWhenReady = true;
                 } else if (nativeData != null) {
-                    state = State.LOADING;
-                    updateViewState();
-                    if (nativeData.getVideoUrl() != null && !nativeData.getVideoUrl().isEmpty()) {
-                        final DownloadVideoTask downloadVideoTask = new DownloadVideoTask(getContext(),
-                                new DownloadVideoTask.OnLoadedListener() {
-                                    @Override
-                                    public void onVideoLoaded(DownloadVideoTask task, Uri videoFileUri) {
-                                        Logger.log("MediaView video has been loaded");
-                                        nativeMediaData.setVideoUri(videoFileUri);
-                                        prepareMediaPlayer();
-                                    }
+                    updateViewState(NativeState.LOADING);
+                    if (!TextUtils.isEmpty(nativeData.getVideoUrl())) {
+                        DownloadVideoTask.OnLoadedListener listener = new DownloadVideoTask.OnLoadedListener() {
+                            @Override
+                            public void onVideoLoaded(DownloadVideoTask task, Uri videoFileUri) {
+                                Logger.log("MediaView video has been loaded");
+                                nativeMediaData.setVideoUri(videoFileUri);
+                                prepareMediaPlayer();
+                            }
 
-                                    @Override
-                                    public void onVideoLoadingError(DownloadVideoTask task) {
-                                        Logger.log("MediaView video hasn't been loaded");
-                                        state = State.IMAGE;
-                                        updateViewState();
-                                        hasVideo = false;
-                                    }
-                                }, nativeData.getVideoUrl());
-                        executeTask(downloadVideoTask);
-                    } else if (nativeData.getVideoAdm() != null && !nativeData.getVideoAdm().isEmpty()) {
-                        final DownloadVastVideoTask downloadVideoVastTask = new DownloadVastVideoTask(getContext(),
-                                new DownloadVastVideoTask.OnLoadedListener() {
-                                    @Override
-                                    public void onVideoLoaded(DownloadVastVideoTask task, Uri videoFileUri, VastRequest vastRequest) {
-                                        MediaView.this.vastRequest = vastRequest;
-                                        nativeMediaData.setVideoUri(videoFileUri);
-                                        nativeMediaData.setVastRequest(vastRequest);
-                                        prepareMediaPlayer();
-                                    }
+                            @Override
+                            public void onVideoLoadingError(DownloadVideoTask task) {
+                                Logger.log("MediaView video hasn't been loaded");
+                                updateViewState(NativeState.IMAGE);
+                                hasVideo = false;
+                            }
+                        };
+                        executeTask(new DownloadVideoTask(getContext(),
+                                                          listener,
+                                                          nativeData.getVideoUrl()));
+                    } else if (!TextUtils.isEmpty(nativeData.getVideoAdm())) {
+                        DownloadVastVideoTask.OnLoadedListener listener = new DownloadVastVideoTask.OnLoadedListener() {
+                            @Override
+                            public void onVideoLoaded(DownloadVastVideoTask task,
+                                                      Uri videoFileUri,
+                                                      VastRequest vastRequest) {
+                                Logger.log("MediaView video has been loaded");
+                                nativeMediaData.setVideoUri(videoFileUri);
+                                nativeMediaData.setVastRequest(vastRequest);
+                                prepareMediaPlayer();
+                            }
 
-                                    @Override
-                                    public void onVideoLoadingError(DownloadVastVideoTask task) {
-                                        state = State.IMAGE;
-                                        updateViewState();
-                                        hasVideo = false;
-                                    }
-                                }, nativeData.getVideoAdm());
-                        executeTask(downloadVideoVastTask);
+                            @Override
+                            public void onVideoLoadingError(DownloadVastVideoTask task) {
+                                Logger.log("MediaView video hasn't been loaded");
+                                updateViewState(NativeState.IMAGE);
+                                hasVideo = false;
+                            }
+                        };
+                        executeTask(new DownloadVastVideoTask(getContext(),
+                                                              listener,
+                                                              nativeData.getVideoAdm()));
                     }
                 }
             } else {
-                state = State.IMAGE;
-                updateViewState();
-                imageView.bringToFront();
+                updateViewState(NativeState.IMAGE);
             }
         }
-        if (nativeData != null && nativeMediaData != null) {
-            ImageHelper.fillImageView(getContext(), imageView, nativeMediaData.getImageUri(),
+        if (nativeMediaData != null) {
+            ImageHelper.fillImageView(
+                    getContext(),
+                    imageView,
+                    nativeMediaData.getImageUri(),
                     nativeMediaData.getImageBitmap());
         }
     }
 
+    public void release() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                cleanUpMediaPlayer();
+            }
+        }).start();
+    }
+
     @Override
     protected void onWindowVisibilityChanged(int visibility) {
-        //Logger.log(String.format("onWindowVisibilityChanged: %s", visibility));
         if (visibility == VISIBLE) {
             if (startPlayVideoWhenReady) {
                 tryPlayVideo();
@@ -261,9 +285,8 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         if (isMediaPlayerAvailable() && mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
         }
-        if (state != State.LOADING) {
-            state = State.PAUSED;
-            updateViewState();
+        if (state != NativeState.LOADING) {
+            updateViewState(NativeState.PAUSED);
         }
     }
 
@@ -322,19 +345,25 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         if (!mediaPlayerPrepared) {
             prepareMediaPlayer();
         }
-        if (isMediaPlayerAvailable() && !mediaPlayer.isPlaying()
-                && mediaPlayerPrepared && viewOnScreen && isAdOnScreen()) {
-            state = State.PLAYING;
-            updateViewState();
-            mediaPlayer.start();
-            notifyVideoStarted();
-            if (videoVisibilityCheckerTimer == null) {
-                startVideoVisibilityCheckerTimer();
+        if (isMediaPlayerAvailable()
+                && mediaPlayerPrepared
+                && viewOnScreen
+                && isAdOnScreen()) {
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+                notifyVideoStarted();
+                if (videoVisibilityCheckerTimer == null) {
+                    startVideoVisibilityCheckerTimer();
+                }
+            }
+            if (mediaPlayer.getCurrentPosition() > 0 && state != NativeState.PLAYING) {
+                updateViewState(NativeState.PLAYING);
             }
         }
     }
 
-    private void updateViewState() {
+    private void updateViewState(NativeState state) {
+        this.state = state;
         switch (state) {
             case IMAGE:
                 if (imageView != null) {
@@ -422,13 +451,17 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         }
         if (Math.abs(finalHeight - curHeight) >= 2
                 || Math.abs(finalWidth - curWidth) >= 2) {
-//           Logger.log(String.format("Resetting mediaLayout size to w: %d h: %d", finalWidth, finalHeight));
             getLayoutParams().width = finalWidth;
             getLayoutParams().height = finalHeight;
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        updateTextureLayoutParams();
+    }
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
@@ -441,8 +474,7 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
             prepareMediaPlayer();
         } catch (Exception e) {
             Logger.log(e);
-            state = State.IMAGE;
-            updateViewState();
+            updateViewState(NativeState.IMAGE);
             hasVideo = false;
         }
     }
@@ -485,8 +517,7 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
     private void clearPlayerOnError() {
         startPlayVideoWhenReady = false;
         cleanUpMediaPlayer();
-        state = State.IMAGE;
-        updateViewState();
+        updateViewState(NativeState.IMAGE);
         stopVideoVisibilityCheckerTimer();
         error = true;
         hasVideo = false;
@@ -500,22 +531,37 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         if (startPlayVideoWhenReady) {
             tryPlayVideo();
         } else {
-            state = State.PAUSED;
-            updateViewState();
+            updateViewState(NativeState.PAUSED);
         }
     }
 
     @Override
     public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+        this.videoWidth = width;
+        this.videoHeight = height;
+        this.videoSizeWasChanged = true;
+
+        updateTextureLayoutParams();
+    }
+
+    private void updateTextureLayoutParams() {
+        int mediaViewWidth = getWidth();
+        int mediaViewHeight = getHeight();
+        if (mediaViewWidth == 0 || mediaViewHeight == 0) {
+            return;
+        }
+        if (!videoSizeWasChanged || videoWidth == 0 || videoHeight == 0) {
+            return;
+        }
+        videoSizeWasChanged = false;
+
         ViewGroup.LayoutParams videoParams = textureView.getLayoutParams();
-        int currentWidth = getWidth();
-        int currentHeight = getHeight();
-        if (width > height) {
-            videoParams.width = currentWidth;
-            videoParams.height = currentWidth * height / width;
+        if (videoWidth > videoHeight) {
+            videoParams.width = mediaViewWidth;
+            videoParams.height = mediaViewWidth * videoHeight / videoWidth;
         } else {
-            videoParams.width = currentHeight * width / height;
-            videoParams.height = currentHeight;
+            videoParams.width = mediaViewHeight * videoWidth / videoHeight;
+            videoParams.height = mediaViewHeight;
         }
         textureView.setLayoutParams(videoParams);
     }
@@ -526,9 +572,8 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         if (startPlayVideoWhenReady) {
             tryPlayVideo();
         } else {
-            if (state != State.LOADING) {
-                state = State.PAUSED;
-                updateViewState();
+            if (state != NativeState.LOADING) {
+                updateViewState(NativeState.PAUSED);
             }
         }
     }
@@ -554,7 +599,9 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
     }
 
     private void createMuteButton() {
-        muteButton = new CircleCountdownView(getContext(), Assets.mainAssetsColor, Assets.backgroundColor);
+        muteButton = new CircleCountdownView(getContext(),
+                                             Assets.mainAssetsColor,
+                                             Assets.backgroundColor);
         int muteButtonSize = Math.round(50 * getScreenDensity(getContext()));
         LayoutParams muteButtonParams = new LayoutParams(muteButtonSize, muteButtonSize);
         muteButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
@@ -616,65 +663,76 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
         videoVisibilityCheckerTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (error) {
+                try {
+                    if (error) {
+                        Utils.onUiThread(new Runnable() {
+                            public void run() {
+                                clearPlayerOnError();
+                            }
+                        });
+                        return;
+                    }
+                    if (!isAdOnScreen()) {
+                        Utils.onUiThread(new Runnable() {
+                            public void run() {
+                                pausePlayer();
+                                if (finishedOrExpanded) {
+                                    stopVideoVisibilityCheckerTimer();
+                                }
+                            }
+                        });
+                    } else {
+                        try {
+                            if (isMediaPlayerAvailable() && !error && mediaPlayer.isPlaying()) {
+                                if (videoDuration == 0) {
+                                    videoDuration = mediaPlayer.getDuration();
+                                }
+                                if (videoDuration != 0) {
+                                    int curPos = mediaPlayer.getCurrentPosition();
+                                    int percentage = 100 * curPos / videoDuration;
+                                    if (percentage >= 25 * quartile) {
+                                        if (quartile == 0) {
+                                            Logger.log(String.format("Video started: %s%%",
+                                                                     percentage));
+                                            processEvent(TrackingEvent.start);
+                                        } else if (quartile == 1) {
+                                            Logger.log(String.format("Video at first quartile: %s%%",
+                                                                     percentage));
+                                            processEvent(TrackingEvent.firstQuartile);
+                                        } else if (quartile == 2) {
+                                            Logger.log(String.format("Video at midpoint: %s%%",
+                                                                     percentage));
+                                            processEvent(TrackingEvent.midpoint);
+                                        } else if (quartile == 3) {
+                                            Logger.log(String.format("Video at third quartile: %s%%",
+                                                                     percentage));
+                                            processEvent(TrackingEvent.thirdQuartile);
+                                        }
+                                        quartile++;
+                                    }
+                                }
+                            }
+                            Logger.log("MediaView on screen");
+                            Utils.onUiThread(new Runnable() {
+                                public void run() {
+                                    tryPlayVideo();
+                                }
+                            });
+                        } catch (IllegalStateException e) {
+                            Utils.onUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    clearPlayerOnError();
+                                }
+                            });
+                        }
+                    }
+                } catch (Throwable t) {
                     Utils.onUiThread(new Runnable() {
                         public void run() {
                             clearPlayerOnError();
                         }
                     });
-                    return;
-                }
-                if (!isAdOnScreen()) {
-                    //Logger.log("MediaView out of screen");
-                    Utils.onUiThread(new Runnable() {
-                        public void run() {
-                            pausePlayer();
-                            if (finishedOrExpanded) {
-                                stopVideoVisibilityCheckerTimer();
-                            }
-                        }
-                    });
-                } else {
-                    try {
-                        if (isMediaPlayerAvailable() && !error && mediaPlayer.isPlaying()) {
-                            if (videoDuration == 0) {
-                                videoDuration = mediaPlayer.getDuration();
-                            }
-                            if (videoDuration != 0) {
-                                int curPos = mediaPlayer.getCurrentPosition();
-                                int percentage = 100 * curPos / videoDuration;
-                                if (percentage >= 25 * quartile) {
-                                    if (quartile == 0) {
-                                        Logger.log(String.format("Video started: %s%%", percentage));
-                                        processEvent(TrackingEvent.start);
-                                    } else if (quartile == 1) {
-                                        Logger.log(String.format("Video at first quartile: %s%%", percentage));
-                                        processEvent(TrackingEvent.firstQuartile);
-                                    } else if (quartile == 2) {
-                                        Logger.log(String.format("Video at midpoint: %s%%", percentage));
-                                        processEvent(TrackingEvent.midpoint);
-                                    } else if (quartile == 3) {
-                                        Logger.log(String.format("Video at third quartile: %s%%", percentage));
-                                        processEvent(TrackingEvent.thirdQuartile);
-                                    }
-                                    quartile++;
-                                }
-                            }
-                        }
-                        Logger.log("MediaView on screen");
-                        Utils.onUiThread(new Runnable() {
-                            public void run() {
-                                tryPlayVideo();
-                            }
-                        });
-                    } catch (IllegalStateException e) {
-                        Utils.onUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                clearPlayerOnError();
-                            }
-                        });
-                    }
                 }
             }
         }, 0, VIDEO_VISIBILITY_CHECKER_TIMER_INTERVAL);
@@ -692,16 +750,22 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
     }
 
     private void processImpressions() {
-        if (vastRequest != null && vastRequest.getVastAd() != null) {
-            List<String> impressions = vastRequest.getVastAd().getImpressionUrlList();
+        if (nativeMediaData != null
+                && nativeMediaData.getVastRequest() != null
+                && nativeMediaData.getVastRequest().getVastAd() != null) {
+            List<String> impressions = nativeMediaData.getVastRequest()
+                    .getVastAd()
+                    .getImpressionUrlList();
             fireUrls(impressions);
         }
     }
 
     private void processEvent(TrackingEvent eventName) {
-        if (vastRequest != null && vastRequest.getVastAd() != null) {
+        if (nativeMediaData != null
+                && nativeMediaData.getVastRequest() != null
+                && nativeMediaData.getVastRequest().getVastAd() != null) {
             Map<TrackingEvent, List<String>> trackingUrls =
-                    vastRequest.getVastAd().getTrackingEventListMap();
+                    nativeMediaData.getVastRequest().getVastAd().getTrackingEventListMap();
             List<String> urls = trackingUrls.get(eventName);
             fireUrls(urls);
         }
@@ -719,14 +783,16 @@ public class MediaView extends RelativeLayout implements MediaPlayer.OnCompletio
     }
 
     private void processErrorEvent() {
-        if (vastRequest != null) {
-            vastRequest.sendError(VastError.ERROR_CODE_ERROR_SHOWING);
+        if (nativeMediaData != null && nativeMediaData.getVastRequest() != null) {
+            nativeMediaData.getVastRequest().sendError(VastError.ERROR_CODE_ERROR_SHOWING);
         }
     }
 
     @Override
     public void videoPlayerActivityClosed(int position, boolean finished) {
-        Logger.log(String.format("MediaView videoPlayerActivityClosed, position: %s, finished: %s", position, finished));
+        Logger.log(String.format("MediaView videoPlayerActivityClosed, position: %s, finished: %s",
+                                 position,
+                                 finished));
         try {
             if (finished) {
                 videoFinished();

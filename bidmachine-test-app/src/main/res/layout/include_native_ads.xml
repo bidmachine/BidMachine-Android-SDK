@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.bidmachine.nativead.NativeAdContentLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<io.bidmachine.nativead.view.NativeAdContentLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/native_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="gone"
-    app:ageRestrictionViewId="@+id/txtAgeRestriction"
     app:callToActionViewId="@+id/btnCta"
     app:descriptionViewId="@+id/txtDescription"
     app:iconViewId="@+id/icon"
-    app:providerViewId="@+id/providerView"
     app:mediaViewId="@+id/mediaView"
+    app:providerViewId="@+id/providerView"
     app:ratingViewId="@+id/ratingBar"
     app:titleViewId="@+id/txtTitle">
 
@@ -24,7 +23,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <io.bidmachine.nativead.view.NativeIconView
+            <ImageView
                 android:id="@+id/icon"
                 android:layout_width="90dp"
                 android:layout_height="90dp"
@@ -49,14 +48,6 @@
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/txtAgeRestriction"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="#ca774b"
-                        android:padding="5dp" />
 
                     <TextView
                         android:id="@+id/tv_ad"
@@ -113,9 +104,9 @@
             android:id="@+id/providerView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/native_ad"
+            android:layout_alignStart="@id/native_ad"
             android:layout_alignLeft="@id/native_ad"
-            android:layout_alignStart="@id/native_ad" />
+            android:layout_alignBottom="@id/native_ad" />
 
         <io.bidmachine.nativead.view.NativeMediaView
             android:id="@+id/mediaView"
@@ -125,4 +116,4 @@
 
     </RelativeLayout>
 
-</io.bidmachine.nativead.NativeAdContentLayout>
+</io.bidmachine.nativead.view.NativeAdContentLayout>

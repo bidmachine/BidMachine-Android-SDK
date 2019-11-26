@@ -13,7 +13,7 @@ android {
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
         versionCode 100100029
-        versionName "1.3.3"
+        versionName "1.4.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         consumerProguardFiles 'proguard-rules.pro'
@@ -22,7 +22,7 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "BM_API_URL", "\"https://staging.appodealx.com\""
+            buildConfigField "String", "BM_API_URL", "\"https://api.appodealx.com\""
         }
         release {
             minifyEnabled false

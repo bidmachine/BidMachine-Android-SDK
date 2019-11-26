@@ -1,137 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:id="@+id/parent"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             tools:context="io.bidmachine.test.app.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="io.bidmachine.test.app.MainActivity">
 
     <ScrollView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-                android:id="@+id/contentParent"
+            android:id="@+id/contentParent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:divider="?android:attr/dividerHorizontal"
+            android:orientation="vertical"
+            android:showDividers="middle">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:divider="?android:attr/dividerHorizontal"
-                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:divider="?android:dividerVertical"
+                android:gravity="center_vertical"
+                android:minHeight="36dp"
+                android:orientation="horizontal"
                 android:showDividers="middle">
 
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:showDividers="middle"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:minHeight="36dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:gravity="center_vertical"
-                    android:divider="?android:dividerVertical">
-
                 <TextView
-                        android:id="@+id/txtAppInfo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"/>
+                    android:id="@+id/txtAppInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp" />
 
                 <android.support.v7.widget.SwitchCompat
-                        android:id="@+id/switchTestMode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:text="Test mode"
-                        tools:ignore="HardcodedText"/>
+                    android:id="@+id/switchTestMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:text="Test mode"
+                    tools:ignore="HardcodedText" />
 
             </LinearLayout>
 
             <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:divider="?android:attr/dividerVertical"
-                    android:orientation="horizontal"
-                    android:showDividers="middle">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="?android:attr/dividerVertical"
+                android:orientation="horizontal"
+                android:showDividers="middle">
 
                 <Button
-                        android:id="@+id/btnInitSdk"
-                        style="@style/MainActionButtonStyle"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:onClick="initSdk"
-                        android:text="Init SDK"
-                        tools:ignore="HardcodedText"/>
+                    android:id="@+id/btnInitSdk"
+                    style="@style/MainActionButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:onClick="initSdk"
+                    android:text="Init SDK"
+                    tools:ignore="HardcodedText" />
 
                 <Button
-                        android:id="@+id/btnConfigureNetworks"
-                        style="@style/MainActionButtonStyle"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:onClick="configureNetworks"
-                        android:text="Configure Networks"
-                        android:ellipsize="end"
-                        tools:ignore="HardcodedText"/>
+                    android:id="@+id/btnConfigureNetworks"
+                    style="@style/MainActionButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:onClick="configureNetworks"
+                    android:text="Configure Networks"
+                    tools:ignore="HardcodedText" />
 
                 <android.support.v7.widget.SwitchCompat
-                        android:id="@+id/switchUseNetworksJson"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:minHeight="48dp"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:text="Use json networks"
-                        tools:ignore="HardcodedText"/>
+                    android:id="@+id/switchUseNetworksJson"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:minHeight="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:text="Use json networks"
+                    tools:ignore="HardcodedText" />
 
             </LinearLayout>
 
             <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <Button
-                        android:id="@+id/btnAppParams"
-                        style="@style/MainRegularButtonStyle"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/ic_app"
-                        android:onClick="showAppParams"
-                        android:text="App Params"
-                        tools:ignore="HardcodedText"/>
+                    android:id="@+id/btnAppParams"
+                    style="@style/MainRegularButtonStyle"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_app"
+                    android:onClick="showAppParams"
+                    android:text="App Params"
+                    tools:ignore="HardcodedText" />
 
                 <Button
-                        android:id="@+id/btnTargetingParams"
-                        style="@style/MainRegularButtonStyle"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/ic_targeting"
-                        android:onClick="showTargetingParams"
-                        android:text="Targeting Params"
-                        tools:ignore="HardcodedText"/>
+                    android:id="@+id/btnTargetingParams"
+                    style="@style/MainRegularButtonStyle"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_targeting"
+                    android:onClick="showTargetingParams"
+                    android:text="Targeting Params"
+                    tools:ignore="HardcodedText" />
 
                 <Button
-                        android:id="@+id/btnUserRestrictionsParams"
-                        style="@style/MainRegularButtonStyle"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/ic_restrictions"
-                        android:onClick="showUserRestrictionsParams"
-                        android:text="Restriction Params"
-                        tools:ignore="HardcodedText"/>
+                    android:id="@+id/btnUserRestrictionsParams"
+                    style="@style/MainRegularButtonStyle"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_restrictions"
+                    android:onClick="showUserRestrictionsParams"
+                    android:text="Restriction Params"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
-                        android:id="@+id/txtLocation"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="?attr/listChoiceBackgroundIndicator"
-                        android:gravity="center"/>
+                    android:id="@+id/txtLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="?attr/listChoiceBackgroundIndicator"
+                    android:gravity="center" />
 
                 <!--<Button-->
                 <!--android:id="@+id/btnExtraParams"-->
@@ -145,210 +145,234 @@
             </LinearLayout>
 
             <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchStaticMode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="48dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:text="Static mode (ad will be processed independently from activity and device state)"
-                    tools:ignore="HardcodedText"/>
+                android:id="@+id/switchStaticMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="Static mode (ad will be processed independently from activity and device state)"
+                tools:ignore="HardcodedText" />
 
             <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <RadioGroup
-                        android:id="@+id/bannerSizesParent"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="8dp"/>
+                    android:id="@+id/bannerSizesParent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp" />
 
                 <com.wefika.flowlayout.FlowLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <Button
-                            style="@style/MainActionButtonStyle"
-                            android:onClick="loadBanner"
-                            android:text="Load Banner"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle"
+                        android:onClick="loadBanner"
+                        android:text="Load Banner"
+                        tools:ignore="HardcodedText" />
 
                     <Button
-                            style="@style/MainActionButtonStyle"
-                            android:onClick="showBanner"
-                            android:text="Show Banner"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle"
+                        android:onClick="showBanner"
+                        android:text="Show Banner"
+                        tools:ignore="HardcodedText" />
 
                     <Button
-                            style="@style/MainActionButtonStyle.Secondary"
-                            android:onClick="hideBanner"
-                            android:text="Hide Banner"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="hideBanner"
+                        android:text="Hide Banner"
+                        tools:ignore="HardcodedText" />
 
                     <ImageButton
-                            android:id="@+id/btnBannerParams"
-                            style="@style/MainSettingButtonStyle"
-                            android:onClick="showBannerParams"
-                            tools:ignore="ContentDescription"/>
+                        android:id="@+id/btnBannerParams"
+                        style="@style/MainSettingButtonStyle"
+                        android:onClick="showBannerParams"
+                        tools:ignore="ContentDescription" />
 
                     <Button
-                            style="@style/MainActionButtonStyle.Secondary"
-                            android:onClick="showBannerAutoLoad"
-                            android:text="Show AutoLoad"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="showBannerAutoLoad"
+                        android:text="Show AutoLoad"
+                        tools:ignore="HardcodedText" />
 
                     <Button
-                            style="@style/MainActionButtonStyle.Secondary"
-                            android:onClick="showBannerScrollable"
-                            android:text="Show Scrollable"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="showBannerScrollable"
+                        android:text="Show Scrollable"
+                        tools:ignore="HardcodedText" />
 
                     <Button
-                            style="@style/MainActionButtonStyle.Secondary"
-                            android:onClick="requestBanner"
-                            android:text="Request Banner"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="requestBanner"
+                        android:text="Request Banner"
+                        tools:ignore="HardcodedText" />
 
                     <Button
-                            style="@style/MainActionButtonStyle.Secondary"
-                            android:onClick="showRequestedBanner"
-                            android:text="Show Requested Banner"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="showRequestedBanner"
+                        android:text="Show Requested Banner"
+                        tools:ignore="HardcodedText" />
 
                 </com.wefika.flowlayout.FlowLayout>
 
             </LinearLayout>
 
             <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <RadioGroup
-                        android:id="@+id/interstitialFormatParent"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="8dp"/>
+                    android:id="@+id/interstitialFormatParent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp" />
 
                 <com.wefika.flowlayout.FlowLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                     <Button
-                            style="@style/MainActionButtonStyle"
-                            android:onClick="loadInterstitial"
-                            android:text="Load Interstitial"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle"
+                        android:onClick="loadInterstitial"
+                        android:text="Load Interstitial"
+                        tools:ignore="HardcodedText" />
 
                     <Button
-                            style="@style/MainActionButtonStyle"
-                            android:onClick="showInterstitial"
-                            android:text="Show Interstitial"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle"
+                        android:onClick="showInterstitial"
+                        android:text="Show Interstitial"
+                        tools:ignore="HardcodedText" />
 
                     <ImageButton
-                            android:id="@+id/btnInterstitialSettings"
-                            style="@style/MainSettingButtonStyle"
-                            android:onClick="showInterstitialParams"
-                            tools:ignore="ContentDescription"/>
+                        android:id="@+id/btnInterstitialSettings"
+                        style="@style/MainSettingButtonStyle"
+                        android:onClick="showInterstitialParams"
+                        tools:ignore="ContentDescription" />
 
                     <Button
-                            style="@style/MainActionButtonStyle.Secondary"
-                            android:onClick="requestInterstitial"
-                            android:text="Request Interstitial"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="requestInterstitial"
+                        android:text="Request Interstitial"
+                        tools:ignore="HardcodedText" />
 
                     <Button
-                            style="@style/MainActionButtonStyle.Secondary"
-                            android:onClick="showRequestedInterstitial"
-                            android:text="Show Requested Interstitial"
-                            tools:ignore="HardcodedText"/>
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="showRequestedInterstitial"
+                        android:text="Show Requested Interstitial"
+                        tools:ignore="HardcodedText" />
 
                 </com.wefika.flowlayout.FlowLayout>
 
             </LinearLayout>
 
             <com.wefika.flowlayout.FlowLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
                 <Button
-                        style="@style/MainActionButtonStyle"
-                        android:onClick="loadRewarded"
-                        android:text="Load Rewarded"
-                        tools:ignore="HardcodedText"/>
+                    style="@style/MainActionButtonStyle"
+                    android:onClick="loadRewarded"
+                    android:text="Load Rewarded"
+                    tools:ignore="HardcodedText" />
 
                 <Button
-                        style="@style/MainActionButtonStyle"
-                        android:onClick="showRewarded"
-                        android:text="Show Rewarded"
-                        tools:ignore="HardcodedText"/>
+                    style="@style/MainActionButtonStyle"
+                    android:onClick="showRewarded"
+                    android:text="Show Rewarded"
+                    tools:ignore="HardcodedText" />
 
                 <ImageButton
-                        android:id="@+id/btnRewardedSettings"
-                        style="@style/MainSettingButtonStyle"
-                        android:onClick="showRewardedParams"
-                        tools:ignore="ContentDescription"/>
+                    android:id="@+id/btnRewardedSettings"
+                    style="@style/MainSettingButtonStyle"
+                    android:onClick="showRewardedParams"
+                    tools:ignore="ContentDescription" />
 
                 <Button
-                        style="@style/MainActionButtonStyle.Secondary"
-                        android:onClick="requestRewarded"
-                        android:text="Request Rewarded"
-                        tools:ignore="HardcodedText"/>
+                    style="@style/MainActionButtonStyle.Secondary"
+                    android:onClick="requestRewarded"
+                    android:text="Request Rewarded"
+                    tools:ignore="HardcodedText" />
 
                 <Button
-                        style="@style/MainActionButtonStyle.Secondary"
-                        android:onClick="showRequestedRewarded"
-                        android:text="Show Requested Rewarded"
-                        tools:ignore="HardcodedText"/>
+                    style="@style/MainActionButtonStyle.Secondary"
+                    android:onClick="showRequestedRewarded"
+                    android:text="Show Requested Rewarded"
+                    tools:ignore="HardcodedText" />
 
             </com.wefika.flowlayout.FlowLayout>
 
             <com.wefika.flowlayout.FlowLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <Button
-                        style="@style/MainActionButtonStyle"
-                        android:onClick="showNative"
-                        android:text="Show Native"
-                        tools:ignore="HardcodedText"/>
+                    style="@style/MainActionButtonStyle"
+                    android:onClick="loadNative"
+                    android:text="Load Native"
+                    tools:ignore="HardcodedText" />
 
                 <Button
-                        style="@style/MainActionButtonStyle.Secondary"
-                        android:onClick="hideNative"
-                        android:text="Hide Native"
-                        tools:ignore="HardcodedText"/>
+                    style="@style/MainActionButtonStyle"
+                    android:onClick="showNative"
+                    android:text="Show Native"
+                    tools:ignore="HardcodedText" />
 
                 <Button
-                        style="@style/MainActionButtonStyle.Secondary"
-                        android:onClick="isRegisteredNative"
-                        android:text="Is registered"
-                        tools:ignore="HardcodedText"/>
+                    style="@style/MainActionButtonStyle.Secondary"
+                    android:onClick="hideNative"
+                    android:text="Hide Native"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    style="@style/MainActionButtonStyle.Secondary"
+                    android:onClick="requestNative"
+                    android:text="Request Native"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    style="@style/MainActionButtonStyle.Secondary"
+                    android:onClick="loadRequestedNative"
+                    android:text="Load Requested Native"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    style="@style/MainActionButtonStyle.Secondary"
+                    android:onClick="isRegisteredNative"
+                    android:text="Is registered"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    style="@style/MainActionButtonStyle.Secondary"
+                    android:onClick="openNativeActivity"
+                    android:text="Open Native Activity"
+                    tools:ignore="HardcodedText" />
 
                 <ImageButton
-                        android:id="@+id/btnNativeSettings"
-                        style="@style/MainSettingButtonStyle"
-                        android:onClick="showNativeParams"
-                        tools:ignore="ContentDescription"/>
+                    android:id="@+id/btnNativeSettings"
+                    style="@style/MainSettingButtonStyle"
+                    android:onClick="showNativeParams"
+                    tools:ignore="ContentDescription" />
 
             </com.wefika.flowlayout.FlowLayout>
 
             <FrameLayout
-                    android:id="@+id/bannerFrame"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                android:id="@+id/bannerFrame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <LinearLayout
-                    android:id="@+id/nativeAdParent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"/>
+                android:id="@+id/nativeAdParent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
         </LinearLayout>
 

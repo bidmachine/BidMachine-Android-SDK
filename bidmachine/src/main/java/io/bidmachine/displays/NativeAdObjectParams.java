@@ -1,7 +1,6 @@
 package io.bidmachine.displays;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
 import io.bidmachine.TrackEventType;
@@ -58,10 +57,6 @@ final class NativeAdObjectParams
                     getData().put(KEY_RATING, Float.valueOf(asset.getData().getValue()));
                     break;
                 }
-                case NativePlacementBuilder.SPONSORED_ASSET_ID: {
-                    getData().put(KEY_SPONSORED, asset.getData().getValue());
-                    break;
-                }
                 case NativePlacementBuilder.VIDEO_ASSET_ID: {
                     if (!asset.getVideo().getCurl()
                             .equals(Ad.Display.Native.Asset.VideoAsset.getDefaultInstance().getCurl())) {
@@ -77,12 +72,6 @@ final class NativeAdObjectParams
         }
     }
 
-    @Override
-    public boolean isValid() {
-        Object title = params.get(KEY_TITLE);
-        return title instanceof CharSequence && !TextUtils.isEmpty((CharSequence) title);
-    }
-
     @NonNull
     @Override
     public Map<String, Object> getData() {
@@ -96,6 +85,11 @@ final class NativeAdObjectParams
     @Override
     public UnifiedMediationParams toMediationParams() {
         return mediationParams;
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
     }
 
 }

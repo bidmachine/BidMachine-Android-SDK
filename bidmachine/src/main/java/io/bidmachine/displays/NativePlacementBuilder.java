@@ -14,21 +14,19 @@ import java.util.Collection;
 
 public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequestParams> {
 
-    static final int TITLE_ASSET_ID = 0;
-    static final int ICON_ASSET_ID = 1;
-    static final int IMAGE_ASSET_ID = 2;
-    static final int DESC_ASSET_ID = 3;
-    static final int CTA_ASSET_ID = 4;
-    static final int RATING_ASSET_ID = 5;
-    static final int SPONSORED_ASSET_ID = 6;
-    static final int VIDEO_ASSET_ID = 7;
+    static final int TITLE_ASSET_ID = 123;
+    static final int ICON_ASSET_ID = 124;
+    static final int IMAGE_ASSET_ID = 128;
+    static final int DESC_ASSET_ID = 127;
+    static final int CTA_ASSET_ID = 8;
+    static final int RATING_ASSET_ID = 7;
+    static final int VIDEO_ASSET_ID = 4;
 
     private static final Placement.DisplayPlacement.NativeFormat.AssetFormat.Builder titleAsset;
     private static final Placement.DisplayPlacement.NativeFormat.AssetFormat.Builder iconAsset;
     private static final Placement.DisplayPlacement.NativeFormat.AssetFormat.Builder descAsset;
     private static final Placement.DisplayPlacement.NativeFormat.AssetFormat.Builder ctaAsset;
     private static final Placement.DisplayPlacement.NativeFormat.AssetFormat.Builder ratingAsset;
-    private static final Placement.DisplayPlacement.NativeFormat.AssetFormat.Builder sponsoredAsset;
 
     static {
         //Title
@@ -70,14 +68,6 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
         ratingAsset.setReq(false);
         ratingAsset.setData(Placement.DisplayPlacement.NativeFormat.AssetFormat.DataAssetFormat.newBuilder()
                 .setType(NativeDataAssetType.NATIVE_DATA_ASSET_TYPE_RATING)
-                .build());
-
-        //Sponsored
-        sponsoredAsset = Placement.DisplayPlacement.NativeFormat.AssetFormat.newBuilder();
-        sponsoredAsset.setId(SPONSORED_ASSET_ID);
-        sponsoredAsset.setReq(false);
-        sponsoredAsset.setData(Placement.DisplayPlacement.NativeFormat.AssetFormat.DataAssetFormat.newBuilder()
-                .setType(NativeDataAssetType.NATIVE_DATA_ASSET_TYPE_SPONSORED)
                 .build());
     }
 
@@ -134,7 +124,6 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
         formatBuilder.addAsset(descAsset);
         formatBuilder.addAsset(ctaAsset);
         formatBuilder.addAsset(ratingAsset);
-        formatBuilder.addAsset(sponsoredAsset);
         if (adRequestParams.containsAssetType(MediaAssetType.Icon)) {
             formatBuilder.addAsset(iconAsset);
         }

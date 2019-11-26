@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import io.bidmachine.AdContentType;
+import io.bidmachine.MediaAssetType;
 import io.bidmachine.banner.BannerListener;
 import io.bidmachine.banner.BannerRequest;
 import io.bidmachine.banner.BannerSize;
@@ -14,6 +15,9 @@ import io.bidmachine.interstitial.InterstitialAd;
 import io.bidmachine.interstitial.InterstitialListener;
 import io.bidmachine.interstitial.InterstitialRequest;
 import io.bidmachine.models.AuctionResult;
+import io.bidmachine.nativead.NativeAd;
+import io.bidmachine.nativead.NativeListener;
+import io.bidmachine.nativead.NativeRequest;
 import io.bidmachine.rewarded.RewardedAd;
 import io.bidmachine.rewarded.RewardedListener;
 import io.bidmachine.rewarded.RewardedRequest;
@@ -282,7 +286,7 @@ public class RequestHelper {
 
     public void showPendingRewarded() {
         if (pendingRewardedRequest == null) {
-            Utils.showToast(peekContext(), "Pending Interstitial not requested");
+            Utils.showToast(peekContext(), "Pending Rewarded not requested");
         } else {
             loadRewarded(pendingRewardedRequest, true);
             pendingRewardedRequest = null;
@@ -375,6 +379,109 @@ public class RequestHelper {
         pendingRewardedRequest.request(peekContext());
     }
 
+    /*
+    Native
+     */
+
+    private NativeAd currentNativeAd;
+    private NativeRequest pendingNativeRequest;
+
+    public void loadNative() {
+        final NativeRequest request = ParamsHelper.getInstance(activity,
+                                                               ParamsHelper.AdsType.Native)
+                .createParams(new NativeRequest.Builder().setMediaAssetTypes(MediaAssetType.All))
+                .build();
+        loadNative(request);
+    }
+
+    public void loadNative(NativeRequest request) {
+        hideNative();
+
+        currentNativeAd = new NativeAd(peekContext())
+                .setListener(new NativeListener() {
+                    @Override
+                    public void onAdLoaded(@NonNull NativeAd ad) {
+                        Utils.showToast(peekContext(), "onAdLoaded");
+                    }
+
+                    @Override
+                    public void onAdLoadFailed(@NonNull NativeAd ad, @NonNull BMError error) {
+                        Utils.showToast(peekContext(), "onAdLoadFailed: " + error.getMessage());
+                    }
+
+                    @Override
+                    public void onAdShown(@NonNull NativeAd ad) {
+                        Utils.showToast(peekContext(), "onAdShown");
+                    }
+
+                    @Override
+                    public void onAdImpression(@NonNull NativeAd ad) {
+                        Utils.showToast(peekContext(), "onAdImpression");
+                    }
+
+                    @Override
+                    public void onAdClicked(@NonNull NativeAd ad) {
+                        Utils.showToast(peekContext(), "onAdClicked");
+                    }
+
+                    @Override
+                    public void onAdExpired(@NonNull NativeAd ad) {
+                        Utils.showToast(peekContext(), "onAdExpired");
+                    }
+                }).load(request);
+    }
+
+    public void loadPendingNative() {
+        if (pendingNativeRequest == null) {
+            Utils.showToast(peekContext(), "Pending Native not requested");
+        } else {
+            loadNative(pendingNativeRequest);
+        }
+    }
+
+    public void requestNative() {
+        pendingNativeRequest = ParamsHelper.getInstance(activity, ParamsHelper.AdsType.Native)
+                .createParams(new NativeRequest.Builder()
+                                      .setListener(new NativeRequest.AdRequestListener() {
+                                          @Override
+                                          public void onRequestSuccess(@NonNull NativeRequest request,
+                                                                       @NonNull AuctionResult auctionResult) {
+                                              Utils.showToast(peekContext(),
+                                                              "onRequestSuccess: " + auctionResult);
+                                          }
+
+                                          @Override
+                                          public void onRequestFailed(@NonNull NativeRequest request,
+                                                                      @NonNull BMError error) {
+                                              Utils.showToast(peekContext(),
+                                                              "onRequestFailed: "
+                                                                      + error.getMessage());
+                                              pendingNativeRequest = null;
+                                          }
+
+                                          @Override
+                                          public void onRequestExpired(@NonNull NativeRequest request) {
+                                              Utils.showToast(peekContext(),
+                                                              "onRequestExpired: " + request);
+                                          }
+                                      }))
+                .build();
+
+        pendingNativeRequest.request(peekContext());
+    }
+
+    public NativeAd getLastNative() {
+        return currentNativeAd;
+    }
+
+    public void hideNative() {
+        if (currentNativeAd != null) {
+            currentNativeAd.unregisterView();
+            currentNativeAd.destroy();
+        }
+    }
+
+
     public void destroy() {
         if (bannerView != null) {
             bannerView.destroy();
@@ -386,6 +493,10 @@ public class RequestHelper {
         if (currentRewardedAd != null) {
             currentRewardedAd.destroy();
             currentRewardedAd = null;
+        }
+        if (currentNativeAd != null) {
+            currentNativeAd.destroy();
+            currentNativeAd = null;
         }
     }
 

@@ -18,8 +18,7 @@ public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeA
 
     private List<MediaAssetType> mediaAssetTypes = new ArrayList<>(MediaAssetType.values().length);
 
-    @SuppressWarnings("WeakerAccess")
-    public NativeRequest() {
+    private NativeRequest() {
         super(AdsType.Native);
     }
 
@@ -53,6 +52,9 @@ public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeA
             return this;
         }
 
+    }
+
+    public interface AdRequestListener extends AdRequest.AdRequestListener<NativeRequest> {
     }
 
     private class NativeUnifiedAdRequestParams extends BaseUnifiedAdRequestParams
