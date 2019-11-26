@@ -10,11 +10,7 @@ public class DeviceInfo {
 
     public static DeviceInfo obtain(Context context) {
         if (cachedInfo == null) {
-            synchronized (DeviceInfo.class) {
-                if (cachedInfo == null) {
-                    cachedInfo = new DeviceInfo(context);
-                }
-            }
+            cachedInfo = new DeviceInfo(context);
         }
         return cachedInfo;
     }
