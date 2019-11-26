@@ -261,7 +261,12 @@ public class MediaView extends RelativeLayout implements
     }
 
     public void release() {
-        cleanUpMediaPlayer();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                cleanUpMediaPlayer();
+            }
+        }).start();
     }
 
     @Override

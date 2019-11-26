@@ -22,7 +22,7 @@ import io.bidmachine.utils.BMError;
 
 public class NativeActivity extends AppCompatActivity implements NativeListener {
 
-    private static final int DEFAULT_PACK_SIZE = 10;
+    private static final int DEFAULT_PACK_SIZE = 20;
     private static final int DEFAULT_NATIVE_COUNT = 4;
 
     private RecyclerView rvNative;
