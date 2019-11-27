@@ -273,6 +273,7 @@ public final class NativeAdObject
             }
             viewRegistered = true;
         } catch (Throwable t) {
+            unregisterView();
             getProcessCallback().processShowFail(BMError.catchError("Error during registerView"));
             Logger.log(t);
         }
