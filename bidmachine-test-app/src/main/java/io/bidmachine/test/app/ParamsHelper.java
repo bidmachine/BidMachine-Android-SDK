@@ -77,7 +77,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     private Boolean subjectToGDPR;
     private Boolean hasCoppa;
 
-    private String sellerId = "1";
+    private String sellerId = "5";
     private String initUrl = null;
 
     //Only testers params
