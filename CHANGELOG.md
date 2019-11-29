@@ -1,3 +1,7 @@
+## Version 1.4.0 (November 28, 2019)
+**Features**:
+* Added Native Ad type
+
 ## Version 1.3.3 (September 20, 2019)
 **Features**:
 * Added Amazon network adapter for Header-Bidding
