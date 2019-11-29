@@ -47,7 +47,7 @@ public class BMError {
                     origin);
         }
         return new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
-                "No fill", "No ads fill");
+                "No fill", "No ads fill", origin);
     }
 
     public static BMError paramError(String message) {

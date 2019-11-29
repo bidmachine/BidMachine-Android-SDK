@@ -4,14 +4,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
-import io.bidmachine.core.Logger;
-import io.bidmachine.core.NetworkRequest;
-import io.bidmachine.utils.BMError;
 
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import io.bidmachine.core.Logger;
+import io.bidmachine.core.NetworkRequest;
+import io.bidmachine.protobuf.ErrorReason;
+import io.bidmachine.utils.BMError;
 
 abstract class SessionTracker {
 
@@ -41,12 +43,14 @@ abstract class SessionTracker {
                             @Nullable TrackEventInfo eventInfo,
                             @Nullable BMError error) {
         if (error != null) {
-            notifyError(
-                    collectTrackingUrls(trackingObject, TrackEventType.Error),
-                    collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
-                    eventInfo,
-                    eventType.getOrtbActionValue(),
-                    error);
+            if (canSendError(error)) {
+                notifyError(
+                        collectTrackingUrls(trackingObject, TrackEventType.Error),
+                        collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
+                        eventInfo,
+                        eventType.getOrtbActionValue(),
+                        error);
+            }
         } else {
             notifyTrack(
                     collectTrackingUrls(trackingObject, eventType),
@@ -54,6 +58,14 @@ abstract class SessionTracker {
                     eventInfo,
                     eventType);
         }
+    }
+
+    @VisibleForTesting
+    static boolean canSendError(@NonNull BMError error) {
+        BMError originalError = error.getOriginError();
+        return originalError == null
+                || originalError.getCode() != ErrorReason.ERROR_REASON_NO_CONTENT_VALUE
+                || error.getCode() != ErrorReason.ERROR_REASON_NO_CONTENT_VALUE;
     }
 
     @Nullable

@@ -1,17 +1,21 @@
 package io.bidmachine;
 
-import io.bidmachine.banner.BannerBridge;
-import io.bidmachine.interstitial.InterstitialAd;
-import io.bidmachine.nativead.NativeAd;
-import io.bidmachine.rewarded.RewardedAd;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
+import io.bidmachine.banner.BannerBridge;
+import io.bidmachine.interstitial.InterstitialAd;
+import io.bidmachine.nativead.NativeAd;
+import io.bidmachine.rewarded.RewardedAd;
+import io.bidmachine.utils.BMError;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -178,6 +182,37 @@ public class SessionTrackerTest {
                         trackEventInfo,
                         100,
                         500));
+    }
+
+    @Test
+    public void canSendError() {
+        assertTrue(SessionTracker.canSendError(BMError.NoContent));
+        assertTrue(SessionTracker.canSendError(BMError.Internal));
+        assertTrue(SessionTracker.canSendError(BMError.NotLoaded));
+        assertTrue(SessionTracker.canSendError(BMError.IncorrectAdUnit));
+        assertTrue(SessionTracker.canSendError(BMError.Connection));
+        assertTrue(SessionTracker.canSendError(BMError.TimeoutError));
+        assertTrue(SessionTracker.canSendError(BMError.AlreadyShown));
+        assertTrue(SessionTracker.canSendError(BMError.Destroyed));
+        assertTrue(SessionTracker.canSendError(BMError.Expired));
+        assertTrue(SessionTracker.canSendError(BMError.NotInitialized));
+        assertTrue(SessionTracker.canSendError(BMError.Server));
+        assertTrue(SessionTracker.canSendError(BMError.catchError(null)));
+        assertTrue(SessionTracker.canSendError(BMError.paramError(null)));
+        assertTrue(SessionTracker.canSendError(BMError.requestError(null)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(null)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.Internal)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.NotLoaded)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.IncorrectAdUnit)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.Connection)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.TimeoutError)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.AlreadyShown)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.Destroyed)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.Expired)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.NotInitialized)));
+        assertTrue(SessionTracker.canSendError(BMError.noFillError(BMError.Server)));
+
+        assertFalse(SessionTracker.canSendError(BMError.noFillError(BMError.NoContent)));
     }
 
 }
