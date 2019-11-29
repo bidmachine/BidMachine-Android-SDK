@@ -14,25 +14,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
 
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.nativead.utils.ImageHelper;
 import io.bidmachine.nativead.utils.NativeConstants;
-import io.bidmachine.nativead.utils.NoSSLv3SocketFactory;
 
 public class DownloadImageTask implements Runnable {
 
     private static final String DIR_NAME = "native_cache_image";
-    private static final int TIME_OUT = 20000;
+    private static final int SERVER_TIME_OUT = 20000;
     private static final int RESULT_FAIL = 0;
     private static final int RESULT_PATH_SUCCESS = 1;
     private static final int RESULT_IMAGE_SUCCESS = 2;
@@ -155,8 +147,7 @@ public class DownloadImageTask implements Runnable {
         InputStream inputStream = null;
         ByteArrayOutputStream byteBuffer = null;
         try {
-            HttpURLConnection httpURLConnection = setupConnection(url);
-            inputStream = httpURLConnection.getInputStream();
+            inputStream = ConnectionUtils.getInputStream(url, SERVER_TIME_OUT);
             byteBuffer = new ByteArrayOutputStream(inputStream.available());
 
             byte[] buffer = new byte[8192];
@@ -179,7 +170,9 @@ public class DownloadImageTask implements Runnable {
             } else {
                 int reqWidth = ImageHelper.calculateReqWidth(context);
                 int reqHeight = ImageHelper.calculateReqHeight(reqWidth, checkAspectRatio);
-                options.inSampleSize = ImageHelper.calculateInSamplesSize(options, reqWidth, reqHeight);
+                options.inSampleSize = ImageHelper.calculateInSamplesSize(options,
+                                                                          reqWidth,
+                                                                          reqHeight);
                 Bitmap imageBitmap = convert(imageByte, options);
                 if (imageBitmap != null) {
                     sendImageSuccess(imageBitmap);
@@ -196,40 +189,6 @@ public class DownloadImageTask implements Runnable {
             Utils.close(byteBuffer);
 
             Utils.close(inputStream);
-        }
-    }
-
-    private HttpURLConnection setupConnection(String url) throws IOException {
-        try {
-            URL urlConnection = new URL(url);
-            HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection.openConnection();
-            httpURLConnection.setConnectTimeout(TIME_OUT);
-            httpURLConnection.setReadTimeout(TIME_OUT);
-            setupNoSSLv3(httpURLConnection);
-            httpURLConnection.connect();
-            return httpURLConnection;
-        } catch (Exception e) {
-            Uri.Builder builder = Uri.parse(url).buildUpon();
-            builder.scheme("http");
-            URL urlConnection = new URL(builder.build().toString());
-
-            HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection.openConnection();
-            httpURLConnection.setConnectTimeout(TIME_OUT);
-            httpURLConnection.setReadTimeout(TIME_OUT);
-            httpURLConnection.connect();
-            return httpURLConnection;
-        }
-    }
-
-    private void setupNoSSLv3(URLConnection connection) {
-        try {
-            if (connection instanceof HttpsURLConnection) {
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) connection;
-                SSLSocketFactory delegate = httpsURLConnection.getSSLSocketFactory();
-                httpsURLConnection.setSSLSocketFactory(new NoSSLv3SocketFactory(delegate));
-            }
-        } catch (Exception e) {
-            Logger.log(e);
         }
     }
 
