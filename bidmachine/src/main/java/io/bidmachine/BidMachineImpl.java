@@ -87,6 +87,8 @@ final class BidMachineImpl {
     private String iabGDPRConsentString;
     private Boolean iabSubjectToGDPR;
 
+    private Publisher publisher;
+
     private boolean isTestMode;
     private boolean isInitialized;
 
@@ -337,6 +339,15 @@ final class BidMachineImpl {
     @NonNull
     TargetingParams getTargetingParams() {
         return targetingParams;
+    }
+
+    @Nullable
+    Publisher getPublisher() {
+        return publisher;
+    }
+
+    void setPublisher(@Nullable Publisher publisher) {
+        this.publisher = publisher;
     }
 
     void setExtraParams(@Nullable ExtraParams extraParams) {

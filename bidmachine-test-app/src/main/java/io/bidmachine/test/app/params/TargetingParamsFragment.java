@@ -229,22 +229,4 @@ public class TargetingParamsFragment extends BaseParamsFragment {
                             }
                         }));
     }
-
-    private ListItemContainer[] listToContainers(List<String> source) {
-        if (source == null || source.size() == 0) return new ListItemContainer[0];
-        ListItemContainer[] out = new ListItemContainer[source.size()];
-        for (int i = 0; i < source.size(); i++) {
-            out[i] = new ListItemContainer(null, source.get(i));
-        }
-        return out;
-    }
-
-    private List<String> containersToList(ListItemContainer[] containers) {
-        if (containers == null || containers.length == 0) return new ArrayList<>();
-        final ArrayList<String> out = new ArrayList<>();
-        for (ListItemContainer container : containers) {
-            out.add(container.getValue());
-        }
-        return out;
-    }
 }

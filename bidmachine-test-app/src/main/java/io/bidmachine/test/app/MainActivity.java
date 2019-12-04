@@ -68,6 +68,7 @@ import io.bidmachine.nativead.view.NativeMediaView;
 import io.bidmachine.test.app.params.AdsParamsFragment;
 import io.bidmachine.test.app.params.AppParamsFragment;
 import io.bidmachine.test.app.params.ExtraParamsFragment;
+import io.bidmachine.test.app.params.PublisherParamsFragment;
 import io.bidmachine.test.app.params.TargetingParamsFragment;
 import io.bidmachine.test.app.params.UserRestrictionsParamsFragment;
 import io.bidmachine.test.app.utils.TestActivityWrapper;
@@ -531,6 +532,10 @@ public class MainActivity extends AppCompatActivity {
         showParamsFragment(new AppParamsFragment(), "AppParamsFragment");
     }
 
+    public void showPublisherParams(View view) {
+        showParamsFragment(new PublisherParamsFragment(), "PublisherParamsFragment");
+    }
+
     public void showBannerParams(View view) {
         showParamsFragment(AdsParamsFragment.create(ParamsHelper.AdsType.Banner),
                            "BannerAdsFragment");
@@ -557,8 +562,9 @@ public class MainActivity extends AppCompatActivity {
         Location location = Utils.getLocation(this);
         if (location != null) {
             txtLocation.setText(new StringBuilder()
+                                        .append("Latitude: ")
                                         .append(df.format(location.getLatitude()))
-                                        .append("\n")
+                                        .append(", Longitude: ")
                                         .append(df.format(location.getLongitude())));
         } else {
             txtLocation.setText("Location not available");
