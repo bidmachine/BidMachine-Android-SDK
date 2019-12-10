@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import io.bidmachine.test.app.ParamsHelper;
 import io.bidmachine.test.app.R;
@@ -115,6 +116,24 @@ public abstract class BaseParamsFragment extends RootParamsFragment implements P
 
     private View createParamView(Context context, ViewGroup widgetParent, ParamWidget widget) {
         return widget.createView(context, widgetParent);
+    }
+
+    ListItemContainer[] listToContainers(List<String> source) {
+        if (source == null || source.size() == 0) return new ListItemContainer[0];
+        ListItemContainer[] out = new ListItemContainer[source.size()];
+        for (int i = 0; i < source.size(); i++) {
+            out[i] = new ListItemContainer(null, source.get(i));
+        }
+        return out;
+    }
+
+    List<String> containersToList(ListItemContainer[] containers) {
+        if (containers == null || containers.length == 0) return new ArrayList<>();
+        final ArrayList<String> out = new ArrayList<>();
+        for (ListItemContainer container : containers) {
+            out.add(container.getValue());
+        }
+        return out;
     }
 
     /*

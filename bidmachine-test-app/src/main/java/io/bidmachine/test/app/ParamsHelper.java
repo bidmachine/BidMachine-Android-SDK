@@ -5,20 +5,34 @@ import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+
 import io.bidmachine.BidMachine;
 import io.bidmachine.ExtraParams;
 import io.bidmachine.PriceFloorParams;
+import io.bidmachine.Publisher;
 import io.bidmachine.TargetingParams;
-import io.bidmachine.models.*;
+import io.bidmachine.models.IExtraParams;
+import io.bidmachine.models.IPriceFloorParams;
+import io.bidmachine.models.ITargetingParams;
+import io.bidmachine.models.IUserRestrictionsParams;
+import io.bidmachine.models.RequestBuilder;
 import io.bidmachine.utils.Gender;
-
-import java.lang.reflect.Type;
-import java.util.*;
 
 public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         IUserRestrictionsParams<ParamsHelper>, IExtraParams<ParamsHelper>, IPriceFloorParams<ParamsHelper> {
@@ -85,6 +99,11 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     private String appName;
     private String appVersion;
 
+    private String publisherId;
+    private String publisherName;
+    private String publisherDomain;
+    private List<String> publisherCategories;
+
     public ParamsHelper() {
     }
 
@@ -105,6 +124,12 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
             BidMachine.setConsentConfig(hasConsent == Boolean.TRUE, consentString);
             BidMachine.setSubjectToGDPR(subjectToGDPR == Boolean.TRUE);
             BidMachine.setCoppa(hasCoppa == Boolean.TRUE);
+            BidMachine.setPublisher(new Publisher.Builder()
+                                            .setId(publisherId)
+                                            .setName(publisherName)
+                                            .setDomain(publisherDomain)
+                                            .addCategories(publisherCategories)
+                                            .build());
         }
     }
 
@@ -457,7 +482,8 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         if (!TextUtils.isEmpty(storedParams)) {
             Type listType = new TypeToken<List<ParamsHelper>>() {
             }.getType();
-            List<ParamsHelper> helpers = new GsonBuilder().create().fromJson(storedParams, listType);
+            List<ParamsHelper> helpers = new GsonBuilder().create()
+                    .fromJson(storedParams, listType);
             if (helpers != null) {
                 for (ParamsHelper helper : helpers) {
                     instances.put(helper.adsType, helper);
@@ -518,6 +544,38 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
 
     public String getAppVersion() {
         return appVersion;
+    }
+
+    public String getPublisherId() {
+        return publisherId;
+    }
+
+    public void setPublisherId(String publisherId) {
+        this.publisherId = publisherId;
+    }
+
+    public String getPublisherName() {
+        return publisherName;
+    }
+
+    public void setPublisherName(String publisherName) {
+        this.publisherName = publisherName;
+    }
+
+    public String getPublisherDomain() {
+        return publisherDomain;
+    }
+
+    public void setPublisherDomain(String publisherDomain) {
+        this.publisherDomain = publisherDomain;
+    }
+
+    public List<String> getPublisherCategories() {
+        return publisherCategories;
+    }
+
+    public void setPublisherCategories(List<String> publisherCategories) {
+        this.publisherCategories = publisherCategories;
     }
 
     private static final ArrayList<OnClearedListener> clearListeners = new ArrayList<>();

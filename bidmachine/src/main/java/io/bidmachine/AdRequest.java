@@ -161,6 +161,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
         //Context -> App
         final Context.App.Builder appBuilder = Context.App.newBuilder();
+        Publisher publisher = bidMachine.getPublisher();
+        if (publisher != null) {
+            publisher.build(appBuilder);
+        }
         targetingParams.build(context, appBuilder);
 
         contextBuilder.setApp(appBuilder);

@@ -114,6 +114,15 @@ public class BidMachine {
     }
 
     /**
+     * Sets publisher information
+     *
+     * @param publisher instance of {@link Publisher} which contains all information about publisher
+     */
+    public static void setPublisher(@Nullable Publisher publisher) {
+        BidMachineImpl.get().setPublisher(publisher);
+    }
+
+    /**
      * Adds 3rd party network configuration, which will be used for mediation, loading and displaying ads
      *
      * @param networkConfigs - Custom configuration object per network
