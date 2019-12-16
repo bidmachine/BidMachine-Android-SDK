@@ -13,6 +13,12 @@ public interface RequestBuilder<SelfType extends RequestBuilder,
     @SuppressWarnings("UnusedReturnValue")
     SelfType setTargetingParams(TargetingParams targetingParams);
 
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType disableHeaderBidding();
+
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType enableHeaderBidding();
+
 //    SelfType setExtraParams(ExtraParams extraParams);
 
     @SuppressWarnings("UnusedReturnValue")
