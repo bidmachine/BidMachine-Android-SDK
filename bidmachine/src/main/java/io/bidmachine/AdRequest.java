@@ -26,6 +26,7 @@ import io.bidmachine.models.AuctionResult;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.RequestBuilder;
 import io.bidmachine.models.RequestParams;
+import io.bidmachine.protobuf.HeaderBiddingType;
 import io.bidmachine.protobuf.RequestExtension;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.utils.BMError;
@@ -44,6 +45,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     PriceFloorParams priceFloorParams;
     TargetingParams targetingParams;
+    boolean headerBiddingEnabled = true;
 
     @VisibleForTesting
     UserRestrictionParams userRestrictionParams;
@@ -205,6 +207,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         //Request
         final RequestExtension.Builder requestExtensionBuilder = RequestExtension.newBuilder();
         requestExtensionBuilder.setSellerId(sellerId);
+        requestExtensionBuilder.setHeaderBiddingType(
+                headerBiddingEnabled
+                        ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
+                        : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
 
         requestBuilder.addExt(Any.pack(requestExtensionBuilder.build()));
 
@@ -504,6 +510,22 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
         @Override
         @SuppressWarnings("unchecked")
+        public SelfType disableHeaderBidding() {
+            prepareRequest();
+            params.headerBiddingEnabled = false;
+            return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public SelfType enableHeaderBidding() {
+            prepareRequest();
+            params.headerBiddingEnabled = true;
+            return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
         public SelfType setListener(AdRequestListener<ReturnType> listener) {
             prepareRequest();
             params.addListener(listener);
@@ -522,6 +544,12 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public ReturnType build() {
             try {
                 prepareRequest();
+                if (params != null
+                        && params.priceFloorParams != null
+                        && params.headerBiddingEnabled) {
+                    Logger.log(
+                            "You haven't disabled header bidding. Are you sure you want to use it with predefined price floor?");
+                }
                 return params;
             } finally {
                 params = null;
@@ -541,7 +569,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     protected static class BaseUnifiedAdRequestParams extends UnifiedAdRequestParamsImpl {
 
         public BaseUnifiedAdRequestParams(@NonNull TargetingParams targetingParams,
-                                   @NonNull DataRestrictions dataRestrictions) {
+                                          @NonNull DataRestrictions dataRestrictions) {
             super(targetingParams, dataRestrictions);
         }
     }

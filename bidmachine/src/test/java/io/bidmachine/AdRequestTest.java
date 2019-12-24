@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.bidmachine.models.DataRestrictions;
+import io.bidmachine.protobuf.HeaderBiddingType;
+import io.bidmachine.protobuf.RequestExtension;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 
 import static org.junit.Assert.assertEquals;
@@ -160,6 +162,43 @@ public class AdRequestTest {
                      protoPublisher.getCatList());
     }
 
+    @Test
+    public void headerBidding() throws Exception {
+        //Default HeaderBidding
+        Request request = (Request) adRequest.build(context, adRequest.getType());
+        RequestExtension requestExtension = request.getExt(0).unpack(RequestExtension.class);
+        assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED_VALUE,
+                     requestExtension.getHeaderBiddingTypeValue());
+
+        //Disabled HeaderBidding
+        adRequest.headerBiddingEnabled = false;
+        request = (Request) adRequest.build(context, adRequest.getType());
+        requestExtension = request.getExt(0).unpack(RequestExtension.class);
+        assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED_VALUE,
+                     requestExtension.getHeaderBiddingTypeValue());
+
+        //Enabled HeaderBidding
+        adRequest.headerBiddingEnabled = true;
+        request = (Request) adRequest.build(context, adRequest.getType());
+        requestExtension = request.getExt(0).unpack(RequestExtension.class);
+        assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED_VALUE,
+                     requestExtension.getHeaderBiddingTypeValue());
+    }
+
+    @Test
+    public void headerBiddingBuilder() {
+        //Default HeaderBidding
+        TestAdRequestBuilder builder = new TestAdRequestBuilder();
+        assertTrue(builder.build().headerBiddingEnabled);
+
+        //Disabled HeaderBidding
+        builder.disableHeaderBidding();
+        assertFalse(builder.build().headerBiddingEnabled);
+
+        //Enabled HeaderBidding
+        builder.enableHeaderBidding();
+        assertTrue(builder.build().headerBiddingEnabled);
+    }
 
     private static class TestAdRequest extends AdRequest {
 
@@ -172,6 +211,15 @@ public class AdRequestTest {
         protected UnifiedAdRequestParams createUnifiedAdRequestParams(@NonNull TargetingParams targetingParams,
                                                                       @NonNull DataRestrictions dataRestrictions) {
             return new BaseUnifiedAdRequestParams(targetingParams, dataRestrictions);
+        }
+
+    }
+
+    private static class TestAdRequestBuilder extends AdRequest.AdRequestBuilderImpl<TestAdRequestBuilder, TestAdRequest> {
+
+        @Override
+        protected TestAdRequest createRequest() {
+            return new TestAdRequest(AdsType.Interstitial);
         }
 
     }
