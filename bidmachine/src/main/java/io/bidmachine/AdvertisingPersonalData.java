@@ -2,9 +2,12 @@ package io.bidmachine;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
+import java.util.concurrent.CountDownLatch;
+
+import io.bidmachine.core.AdvertisingIdClientInfo;
+import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 
 class AdvertisingPersonalData {
@@ -47,6 +50,23 @@ class AdvertisingPersonalData {
 
     public static boolean isDeviceAdvertisingIdWasGenerated() {
         return deviceAdvertisingIdWasGenerated;
+    }
+
+    static void syncUpdateInfo(Context context) {
+        try {
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            AdvertisingIdClientInfo.executeTask(context, new AdvertisingIdClientInfo.Closure() {
+                @Override
+                public void executed(@NonNull AdvertisingIdClientInfo.AdvertisingProfile advertisingProfile) {
+                    setLimitAdTrackingEnabled(advertisingProfile.isLimitAdTrackingEnabled());
+                    setDeviceAdvertisingId(advertisingProfile.getId());
+                    countDownLatch.countDown();
+                }
+            });
+            countDownLatch.await();
+        } catch (Exception e) {
+            Logger.log(e);
+        }
     }
 
 }
