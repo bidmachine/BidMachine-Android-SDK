@@ -25,6 +25,7 @@ import io.bidmachine.core.Utils;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.protobuf.InitRequest;
 import io.bidmachine.protobuf.InitResponse;
+import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.utils.ActivityHelper;
 import io.bidmachine.utils.BMError;
 
@@ -139,7 +140,6 @@ final class BidMachineImpl {
         this.sellerId = sellerId;
         appContext = context.getApplicationContext();
         sessionTracker = new SessionTrackerImpl();
-        loadStoredInitResponse(context);
         initializeIab(context);
         AdvertisingIdClientInfo.executeTask(context, new AdvertisingIdClientInfo.Closure() {
             @Override
@@ -157,6 +157,7 @@ final class BidMachineImpl {
                                 AdRequestExecutor.get().enable();
                             }
                         });
+                loadStoredInitResponse(context);
                 requestInitData(context, sellerId, callback);
             }
         });
@@ -278,8 +279,15 @@ final class BidMachineImpl {
         if (!TextUtils.isEmpty(response.getEndpoint())) {
             currentAuctionUrl = response.getEndpoint();
         }
+        initNetworkService(response);
         trackingEventTypes.clear();
         OrtbUtils.prepareEvents(trackingEventTypes, response.getEventList());
+    }
+
+    private void initNetworkService(@NonNull InitResponse response) {
+        UnifiedAdRequestParams params = new UnifiedAdRequestParamsImpl(getTargetingParams(),
+                                                                       getUserRestrictionParams());
+        NetworkServiceRegistry.notifyInitSuccess("Data", params);
     }
 
     private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {

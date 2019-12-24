@@ -1,6 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.bidmachine.ads.networks.criteo">
+    package="io.bidmachine.ads.networks.criteo">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+
+        <provider
+            android:name=".CriteoNetworkService"
+            android:authorities="${applicationId}.CriteoInitializer"
+            android:exported="false" />
+
+    </application>
 
 </manifest>

@@ -55,7 +55,6 @@ import io.bidmachine.BuildConfig;
 import io.bidmachine.InitializationCallback;
 import io.bidmachine.ads.networks.AmazonConfig;
 import io.bidmachine.ads.networks.adcolony.AdColonyConfig;
-import io.bidmachine.ads.networks.criteo.CriteoConfig;
 import io.bidmachine.ads.networks.facebook.FacebookConfig;
 import io.bidmachine.ads.networks.mintegral.MintegralConfig;
 import io.bidmachine.ads.networks.my_target.MyTargetConfig;
@@ -813,12 +812,6 @@ public class MainActivity extends AppCompatActivity {
                             + "            \"slot_uuid\":\"4acc26e6-3ada-4ee8-bae0-753c1e0ad278\"\n"
                             + "        }\n"
                             + "    ]\n"
-                            + "}"),
-            new OptionalNetwork(7, "Criteo",
-                                new CriteoConfig("3703"),
-                                "{\n"
-                                        + "    \"network\":\"criteo\",\n"
-                                        + "    \"sender_id\":\"3703\"\n"
-                                        + "}")
+                            + "}")
     };
 }

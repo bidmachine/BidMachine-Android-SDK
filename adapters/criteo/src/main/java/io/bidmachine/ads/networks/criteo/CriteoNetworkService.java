@@ -16,24 +16,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import io.bidmachine.AdsType;
 import io.bidmachine.BMLog;
-import io.bidmachine.ContextProvider;
-import io.bidmachine.NetworkAdapter;
-import io.bidmachine.NetworkConfigParams;
+import io.bidmachine.NetworkService;
 import io.bidmachine.models.DeviceInfo;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 
-class CriteoAdapter extends NetworkAdapter {
+public final class CriteoNetworkService extends NetworkService {
 
-    private static final String TAG = "CriteoAdapter";
+    private static final String TAG = "CriteoNetworkService";
 
+    private static final String CRITEO_URL = "https://gum.criteo.com/appevent/v1/%s?gaid=%s&appId=%s&eventType=%s&limitedAdTracking=%d";
     private static final String EVENT_LAUNCH = "Launch";
     private static final String EVENT_ACTIVE = "Active";
     private static final String EVENT_INACTIVE = "Inactive";
@@ -46,26 +43,36 @@ class CriteoAdapter extends NetworkAdapter {
     private DeviceInfo deviceInfo;
     private volatile long nextValidRequestTime;
 
-    CriteoAdapter() {
-        super("criteo", BuildConfig.VERSION_NAME, BuildConfig.VERSION_NAME, new AdsType[]{});
+    @Override
+    public String getName() {
+        return "criteo";
     }
 
     @Override
-    protected void onInitialize(@NonNull ContextProvider contextProvider,
-                                @NonNull UnifiedAdRequestParams adRequestParams,
-                                @NonNull NetworkConfigParams networkConfigParams) {
-        super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
-        Map<String, String> params = networkConfigParams.obtainNetworkParams();
-        if (params != null) {
-            senderId = params.get(CriteoConfig.SENDER_ID);
+    public void onCreated() {
+        Context context = getContext();
+        if (context == null) {
+            return;
+        }
+        Context applicationContext = context.getApplicationContext();
+        if (applicationContext instanceof Application) {
+            Application application = (Application) applicationContext;
+            application.registerActivityLifecycleCallbacks(lifecycleCallbacks);
+        }
+    }
+
+    @Override
+    public void initialize(@Nullable String data, @NonNull UnifiedAdRequestParams adRequestParams) {
+        super.initialize(data, adRequestParams);
+        Context context = getContext();
+        if (context != null && data != null) {
+            senderId = data;
             if (senderId == null) {
                 Log.e(TAG, "Initialize failed: sender_id not provided");
                 return;
             }
             deviceInfo = adRequestParams.getDeviceInfo();
-            ((Application) contextProvider.getContext().getApplicationContext())
-                    .registerActivityLifecycleCallbacks(lifecycleCallbacks);
-            sendRequest(contextProvider.getContext(), EVENT_LAUNCH);
+            sendRequest(getContext(), EVENT_LAUNCH);
         }
     }
 
@@ -81,7 +88,7 @@ class CriteoAdapter extends NetworkAdapter {
                        @NonNull String eventType,
                        @NonNull DeviceInfo deviceInfo) throws Exception {
         String url = String.format(Locale.ENGLISH,
-                                   "https://gum.criteo.com/appevent/v1/%s?gaid=%s&appId=%s&eventType=%s&limitedAdTracking=%d",
+                                   CRITEO_URL,
                                    senderId,
                                    deviceInfo.getIfa(context),
                                    context.getPackageName(),
@@ -214,4 +221,5 @@ class CriteoAdapter extends NetworkAdapter {
             //ignore
         }
     };
+
 }
