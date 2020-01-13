@@ -26,9 +26,6 @@ final class DeviceParams extends RequestParams {
         final DeviceInfo deviceInfo = DeviceInfo.obtain(context);
         builder.setType(deviceInfo.isTablet ? DeviceType.DEVICE_TYPE_TABLET :
                 DeviceType.DEVICE_TYPE_PHONE_DEVICE);
-        if (deviceInfo.httpAgent != null) {
-            builder.setUa(deviceInfo.httpAgent);
-        }
         builder.setOs(OS.OS_ANDROID);
         builder.setOsv(Build.VERSION.RELEASE);
 
@@ -46,6 +43,9 @@ final class DeviceParams extends RequestParams {
             builder.setContype(OrtbUtils.getConnectionType(context));
             builder.setMake(Build.MANUFACTURER);
 
+            if (deviceInfo.httpAgent != null) {
+                builder.setUa(deviceInfo.httpAgent);
+            }
             if (deviceInfo.model != null) {
                 builder.setModel(deviceInfo.model);
                 builder.setHwv(deviceInfo.deviceModel);

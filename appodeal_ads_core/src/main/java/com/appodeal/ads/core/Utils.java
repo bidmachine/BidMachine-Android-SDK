@@ -97,6 +97,7 @@ public class Utils {
         backgroundHandler = new Handler(thread.getLooper());
     }
 
+    private static String defaultHttpAgentString = "";
     private static String httpAgentString;
 
     public static void onUiThread(Runnable runnable) {
@@ -255,6 +256,8 @@ public class Utils {
                     } else {
                         httpAgentString = WebSettings.getDefaultUserAgent(context);
                     }
+                } catch (Throwable t) {
+                    Logger.log(t);
                 } finally {
                     latch.countDown();
                 }
@@ -265,7 +268,20 @@ public class Utils {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return httpAgentString;
+        return TextUtils.isEmpty(httpAgentString)
+                ? obtainDefaultHttpAgentString()
+                : httpAgentString;
+    }
+
+    private static String obtainDefaultHttpAgentString() {
+        if (TextUtils.isEmpty(defaultHttpAgentString)) {
+            try {
+                defaultHttpAgentString = System.getProperty("http.agent", "");
+            } catch (Throwable t) {
+                Logger.log(t);
+            }
+        }
+        return defaultHttpAgentString;
     }
 
     public static String getLocalIpAddress() {
