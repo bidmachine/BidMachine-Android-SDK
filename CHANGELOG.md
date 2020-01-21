@@ -1,3 +1,8 @@
+## Version 1.4.1 (January 21, 2020)
+**Features**:
+* Added API method ```BidMachine.setPublisher``` to set publisher information
+* Added API methods ```Builder#disableHeaderBidding``` and ```Builder#enableHeaderBidding``` to AdRequest to disable/enable header bidding on server side
+
 ## Version 1.4.0 (November 28, 2019)
 **Features**:
 * Added Native Ad type
