@@ -249,13 +249,13 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
         if (contentEncoders != null) {
             for (RequestDataEncoder<RequestDataType, RequestResultType, ErrorResultType> encoder
                     : contentEncoders) {
-                responseData = encoder.decode(this, connection, responseData);
+                result = encoder.decode(this, connection, result);
             }
         }
         if (dataEncoders != null) {
             for (RequestDataEncoder<RequestDataType, RequestResultType, ErrorResultType> encoder
                     : dataEncoders) {
-                responseData = encoder.decode(this, connection, responseData);
+                result = encoder.decode(this, connection, result);
             }
         }
         return result;
