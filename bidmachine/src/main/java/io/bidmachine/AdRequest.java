@@ -59,7 +59,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     Response.Seatbid.Bid bidResult;
 
     @Nullable
-    private AuctionResult auctionResult;
+    @VisibleForTesting
+    AuctionResult auctionResult;
     @Nullable
     private ApiRequest<Request, Response> currentApiRequest;
     @Nullable
@@ -316,7 +317,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     @SuppressWarnings("unchecked")
-    private void processExpired() {
+    @VisibleForTesting
+    void processExpired() {
         isExpired = true;
         unsubscribeExpireTracker();
         if (adRequestListeners != null) {
