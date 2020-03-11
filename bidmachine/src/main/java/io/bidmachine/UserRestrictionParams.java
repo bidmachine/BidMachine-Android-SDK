@@ -1,13 +1,15 @@
 package io.bidmachine;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
+import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.adcom.Context;
 
-import io.bidmachine.core.DeviceInfo;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.IUserRestrictionsParams;
 import io.bidmachine.models.RequestParams;
+import io.bidmachine.protobuf.RegsCcpaExtension;
 
 import static io.bidmachine.core.Utils.oneOf;
 
@@ -31,12 +33,21 @@ final class UserRestrictionParams
     void build(@NonNull Context.Regs.Builder builder) {
         builder.setGdpr(subjectToGDPR());
         builder.setCoppa(hasCoppa != null && hasCoppa);
+
+        String iabUsPrivacyString = BidMachineImpl.get().getIabSharedPreference().getUSPrivacyString();
+        if (!TextUtils.isEmpty(iabUsPrivacyString)) {
+            assert iabUsPrivacyString != null;
+            RegsCcpaExtension regsCcpaExtension = RegsCcpaExtension.newBuilder()
+                    .setUsPrivacy(iabUsPrivacyString)
+                    .build();
+            builder.addExt(Any.pack(regsCcpaExtension));
+        }
     }
 
     void build(@NonNull Context.User.Builder builder) {
         String consentString = oneOf(
                 gdprConsentString,
-                BidMachineImpl.get().getIabGDPRConsentString());
+                BidMachineImpl.get().getIabSharedPreference().getGDPRConsentString());
         if (consentString != null) {
             builder.setConsent(consentString);
         }
@@ -62,7 +73,7 @@ final class UserRestrictionParams
     }
 
     private boolean subjectToGDPR() {
-        Boolean subject = oneOf(subjectToGDPR, BidMachineImpl.get().getIabSubjectToGDPR());
+        Boolean subject = oneOf(subjectToGDPR, BidMachineImpl.get().getIabSharedPreference().getSubjectToGDPR());
         return subject != null && subject;
     }
 

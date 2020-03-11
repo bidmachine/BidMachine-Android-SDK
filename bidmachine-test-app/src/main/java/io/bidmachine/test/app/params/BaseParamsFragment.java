@@ -85,7 +85,7 @@ public abstract class BaseParamsFragment extends RootParamsFragment implements P
     public void onDestroyView() {
         super.onDestroyView();
         ParamsHelper.removeOnClearListener(this);
-        ParamsHelper.getInstance(getContext(), obtainAdsType()).syncGlobalParams();
+        ParamsHelper.getInstance(getContext(), obtainAdsType()).syncGlobalParams(getContext());
     }
 
     protected View bindParamWidget(Context context, ViewGroup parent, String title, ParamWidget... widgets) {

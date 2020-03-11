@@ -46,6 +46,15 @@ public class UserRestrictionsParamsFragment extends BaseParamsFragment {
                                 paramsHelper.setCoppa(param);
                             }
                         }));
+        bindParamWidget(context, parent, "US Privacy",
+                new TextInputParamWidget("US Privacy String",
+                        paramsHelper.getUsPrivacyString(),
+                        new ParamWidget.ChangeTracker<String>() {
+                            @Override
+                            public void onChanged(ParamWidget widget, String param) {
+                                paramsHelper.setUSPrivacyString(param);
+                            }
+                        }));
     }
 
 }

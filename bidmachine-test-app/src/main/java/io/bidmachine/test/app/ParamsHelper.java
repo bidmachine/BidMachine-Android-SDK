@@ -1,6 +1,7 @@
 package io.bidmachine.test.app;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -90,6 +91,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     private String consentString;
     private Boolean subjectToGDPR;
     private Boolean hasCoppa;
+    private String usPrivacyString;
 
     private String sellerId = "5";
     private String initUrl = null;
@@ -116,7 +118,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         return adsType;
     }
 
-    public void syncGlobalParams() {
+    public void syncGlobalParams(Context context) {
         if (adsType == AdsType.Global) {
             BidMachine.setTargetingParams(obtainTargetingParams());
 //            BidMachine.setExtraParams(obtainExtraParams());
@@ -130,6 +132,8 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                                             .setDomain(publisherDomain)
                                             .addCategories(publisherCategories)
                                             .build());
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            sharedPreferences.edit().putString("IABUSPrivacy_String", usPrivacyString).apply();
         }
     }
 
@@ -308,6 +312,15 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
 
     public Boolean getHasConsent() {
         return hasConsent;
+    }
+
+    public ParamsHelper setUSPrivacyString(String usPrivacyString) {
+        this.usPrivacyString = usPrivacyString;
+        return this;
+    }
+
+    public String getUsPrivacyString() {
+        return usPrivacyString;
     }
 
     /*
