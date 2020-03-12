@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -62,9 +61,6 @@ final class BidMachineImpl {
     private static final String DEF_AUCTION_URL = BuildConfig.BM_API_URL + "/openrtb3/auction";
     private static final String PREF_INIT_DATA = "initData";
 
-    private static final String IAB_CONSENT_STRING = "IABConsent_ConsentString";
-    private static final String IAB_SUBJECT_TO_GDPR = "IABConsent_SubjectToGDPR";
-
     @Nullable
     private Context appContext;
     @Nullable
@@ -83,9 +79,8 @@ final class BidMachineImpl {
                     .addPriceFloor(UUID.randomUUID().toString(), 0.01);
     @NonNull
     private DeviceParams deviceParams = new DeviceParams();
-
-    private String iabGDPRConsentString;
-    private Boolean iabSubjectToGDPR;
+    @NonNull
+    private final IABSharedPreference iabSharedPreference = new IABSharedPreference();
 
     private Publisher publisher;
 
@@ -140,7 +135,7 @@ final class BidMachineImpl {
         appContext = context.getApplicationContext();
         sessionTracker = new SessionTrackerImpl();
         loadStoredInitResponse(context);
-        initializeIab(context);
+        iabSharedPreference.initialize(context);
         AdvertisingIdClientInfo.executeTask(context, new AdvertisingIdClientInfo.Closure() {
             @Override
             public void executed(@NonNull AdvertisingIdClientInfo.AdvertisingProfile advertisingProfile) {
@@ -164,49 +159,6 @@ final class BidMachineImpl {
         ((Application) context.getApplicationContext())
                 .registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks());
         isInitialized = true;
-    }
-
-    @VisibleForTesting
-    void initializeIab(@NonNull Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(
-                new SharedPreferences.OnSharedPreferenceChangeListener() {
-                    @Override
-                    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                                                          String key) {
-                        if (IAB_CONSENT_STRING.equals(key)) {
-                            updateIabConsentString(sharedPreferences);
-                        }
-                        if (IAB_SUBJECT_TO_GDPR.equals(key)) {
-                            updateIabGDPRSubject(sharedPreferences);
-                        }
-                    }
-                });
-        updateIabConsentString(sharedPreferences);
-        updateIabGDPRSubject(sharedPreferences);
-    }
-
-    String getIabGDPRConsentString() {
-        return iabGDPRConsentString;
-    }
-
-    private void updateIabConsentString(SharedPreferences sharedPreferences) {
-        iabGDPRConsentString = sharedPreferences.getString(
-                IAB_CONSENT_STRING,
-                null);
-    }
-
-    Boolean getIabSubjectToGDPR() {
-        return iabSubjectToGDPR;
-    }
-
-    private void updateIabGDPRSubject(SharedPreferences sharedPreferences) {
-        String iabConsentSubjectToGDPR = sharedPreferences.getString(
-                IAB_SUBJECT_TO_GDPR,
-                null);
-        iabSubjectToGDPR = iabConsentSubjectToGDPR != null
-                ? iabConsentSubjectToGDPR.equals("1")
-                : null;
     }
 
     private void requestInitData(@NonNull final Context context,
@@ -372,6 +324,11 @@ final class BidMachineImpl {
     @NonNull
     DeviceParams getDeviceParams() {
         return deviceParams;
+    }
+
+    @NonNull
+    IABSharedPreference getIabSharedPreference() {
+        return iabSharedPreference;
     }
 
     void setEndpoint(@NonNull String url) {
