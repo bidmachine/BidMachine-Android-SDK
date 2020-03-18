@@ -16,5 +16,5 @@ repositories {
 }
 
 dependencies {
-    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.3.1@aar'
+    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.4.2@aar'
 }
