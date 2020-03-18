@@ -57,7 +57,7 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     private static void configure(@NonNull UnifiedAdRequestParams adRequestParams) {
         DataRestrictions dataRestrictions = adRequestParams.getDataRestrictions();
         AdSettings.setMediationService(BidMachine.NAME);
-        AdSettings.setIsChildDirected(dataRestrictions.isUserAgeRestricted());
+        AdSettings.setMixedAudience(dataRestrictions.isUserAgeRestricted());
         if (adRequestParams.isTestMode()) {
             AdSettings.setTestAdType(AdSettings.TestAdType.DEFAULT);
         }

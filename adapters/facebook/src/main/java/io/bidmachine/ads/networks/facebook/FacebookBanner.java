@@ -3,9 +3,11 @@ package io.bidmachine.ads.networks.facebook;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdSize;
 import com.facebook.ads.AdView;
+
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
@@ -16,6 +18,7 @@ class FacebookBanner extends UnifiedBannerAd {
 
     @Nullable
     private AdView adView;
+    private FacebookListener facebookListener;
 
     @Override
     public void load(@NonNull ContextProvider context,
@@ -41,13 +44,17 @@ class FacebookBanner extends UnifiedBannerAd {
                 break;
             }
         }
+        facebookListener = new FacebookListener(callback);
         adView = new AdView(context.getContext(), params.placementId, adSize);
-        adView.setAdListener(new FacebookListener(callback));
-        adView.loadAdFromBid(params.bidPayload);
+        adView.loadAd(adView.buildLoadAdConfig()
+                              .withAdListener(facebookListener)
+                              .withBid(params.bidPayload)
+                              .build());
     }
 
     @Override
     public void onDestroy() {
+        facebookListener = null;
         if (adView != null) {
             adView.destroy();
             adView = null;
