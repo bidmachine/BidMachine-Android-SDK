@@ -17,5 +17,5 @@ rootProject.allprojects {
 }
 
 dependencies {
-    adapterDependency 'com.adcolony:sdk:3.3.11'
+    adapterDependency 'com.adcolony:sdk:4.1.0'
 }

@@ -6,20 +6,34 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import com.adcolony.sdk.*;
-import io.bidmachine.*;
+
+import com.adcolony.sdk.AdColony;
+import com.adcolony.sdk.AdColonyAdOptions;
+import com.adcolony.sdk.AdColonyAppOptions;
+import com.adcolony.sdk.AdColonyInterstitial;
+import com.adcolony.sdk.AdColonyInterstitialListener;
+import com.adcolony.sdk.AdColonyUserMetadata;
+import com.adcolony.sdk.AdColonyZone;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import io.bidmachine.AdsFormat;
+import io.bidmachine.AdsType;
+import io.bidmachine.ContextProvider;
+import io.bidmachine.HeaderBiddingAdRequestParams;
+import io.bidmachine.HeaderBiddingAdapter;
+import io.bidmachine.HeaderBiddingCollectParamsCallback;
+import io.bidmachine.NetworkAdapter;
+import io.bidmachine.NetworkConfigParams;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.TargetingInfo;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.utils.BMError;
 import io.bidmachine.utils.Gender;
-
-import java.lang.reflect.Field;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
@@ -135,7 +149,8 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         options.setOriginStore(storeId);
         try {
             options.setAppVersion(
-                    context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName);
+                    context.getPackageManager()
+                            .getPackageInfo(context.getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -179,13 +194,7 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     private static String obtainAdColonyVersion() {
         String version = AdColony.getSDKVersion();
         if (TextUtils.isEmpty(version)) {
-            try {
-                Class<?> versionClass = Class.forName("com.adcolony.sdk.j");
-                Field buildVersionField = versionClass.getDeclaredField("a");
-                buildVersionField.setAccessible(true);
-                version = (String) buildVersionField.get(versionClass);
-            } catch (Exception ignore) {
-            }
+            return "4.1.0";
         }
         return version;
     }
