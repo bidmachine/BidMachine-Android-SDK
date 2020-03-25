@@ -3,9 +3,11 @@ package io.bidmachine.ads.networks.facebook;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.facebook.ads.Ad;
 import com.facebook.ads.RewardedVideoAd;
 import com.facebook.ads.RewardedVideoAdListener;
+
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
@@ -17,6 +19,7 @@ class FacebookRewarded extends UnifiedFullscreenAd {
 
     @Nullable
     private RewardedVideoAd rewardedVideoAd;
+    private FacebookListener facebookListener;
 
     @Override
     public void load(@NonNull ContextProvider context,
@@ -27,14 +30,20 @@ class FacebookRewarded extends UnifiedFullscreenAd {
         if (!params.isValid(callback)) {
             return;
         }
+        facebookListener = new FacebookListener(callback);
         rewardedVideoAd = new RewardedVideoAd(context.getContext(), params.placementId);
-        rewardedVideoAd.setAdListener(new FacebookListener(callback));
-        rewardedVideoAd.loadAdFromBid(params.bidPayload, false);
+        rewardedVideoAd.loadAd(rewardedVideoAd.buildLoadAdConfig()
+                                       .withAdListener(facebookListener)
+                                       .withBid(params.bidPayload)
+                                       .withFailOnCacheFailureEnabled(false)
+                                       .build());
     }
 
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
-        if (rewardedVideoAd != null && rewardedVideoAd.isAdLoaded() && !rewardedVideoAd.isAdInvalidated()) {
+        if (rewardedVideoAd != null
+                && rewardedVideoAd.isAdLoaded()
+                && !rewardedVideoAd.isAdInvalidated()) {
             rewardedVideoAd.show();
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
@@ -43,6 +52,7 @@ class FacebookRewarded extends UnifiedFullscreenAd {
 
     @Override
     public void onDestroy() {
+        facebookListener = null;
         if (rewardedVideoAd != null) {
             rewardedVideoAd.destroy();
             rewardedVideoAd = null;

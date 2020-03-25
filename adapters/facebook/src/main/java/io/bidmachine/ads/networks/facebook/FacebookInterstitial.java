@@ -3,9 +3,11 @@ package io.bidmachine.ads.networks.facebook;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.facebook.ads.Ad;
 import com.facebook.ads.InterstitialAd;
 import com.facebook.ads.InterstitialAdListener;
+
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
@@ -17,6 +19,7 @@ class FacebookInterstitial extends UnifiedFullscreenAd {
 
     @Nullable
     private InterstitialAd interstitialAd;
+    private FacebookListener facebookListener;
 
     @Override
     public void load(@NonNull ContextProvider context,
@@ -27,14 +30,19 @@ class FacebookInterstitial extends UnifiedFullscreenAd {
         if (!params.isValid(callback)) {
             return;
         }
+        facebookListener = new FacebookListener(callback);
         interstitialAd = new InterstitialAd(context.getContext(), params.placementId);
-        interstitialAd.setAdListener(new FacebookListener(callback));
-        interstitialAd.loadAdFromBid(params.bidPayload);
+        interstitialAd.loadAd(interstitialAd.buildLoadAdConfig()
+                                      .withAdListener(facebookListener)
+                                      .withBid(params.bidPayload)
+                                      .build());
     }
 
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
-        if (interstitialAd != null && interstitialAd.isAdLoaded() && !interstitialAd.isAdInvalidated()) {
+        if (interstitialAd != null
+                && interstitialAd.isAdLoaded()
+                && !interstitialAd.isAdInvalidated()) {
             interstitialAd.show();
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
@@ -43,6 +51,7 @@ class FacebookInterstitial extends UnifiedFullscreenAd {
 
     @Override
     public void onDestroy() {
+        facebookListener = null;
         if (interstitialAd != null) {
             interstitialAd.destroy();
             interstitialAd = null;
