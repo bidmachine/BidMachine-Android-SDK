@@ -10,8 +10,10 @@ import io.bidmachine.unified.UnifiedFullscreenAd;
 
 public class VastAdapter extends NetworkAdapter {
 
+    public static final String KEY = "vast";
+
     public VastAdapter() {
-        super("vast",
+        super(KEY,
                 "2.0",
                 BuildConfig.VERSION_NAME + ".1",
                 new AdsType[]{AdsType.Interstitial, AdsType.Rewarded});

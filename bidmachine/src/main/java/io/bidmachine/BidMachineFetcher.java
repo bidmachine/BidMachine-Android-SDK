@@ -19,6 +19,8 @@ public class BidMachineFetcher {
 
     public static final String KEY_ID = "bm_id";
     public static final String KEY_PRICE = "bm_pf";
+    public static final String KEY_AD_TYPE = "bm_ad_type";
+    public static final String KEY_NETWORK_KEY = "bm_network_key";
 
     private static final BigDecimal DEF_PRICE_ROUNDING = new BigDecimal("0.01");
     private static final RoundingMode DEF_PRICE_ROUNDING_MODE = RoundingMode.CEILING;
@@ -46,11 +48,12 @@ public class BidMachineFetcher {
     @Nullable
     @SuppressWarnings({"unchecked"})
     public static Map<String, String> fetch(@NonNull AdRequest adRequest) {
-        AuctionResult auctionResult = adRequest.getAuctionResult();
-        if (auctionResult == null) {
+        final Map<String, String> result = BidMachineHelper.toMap(adRequest);
+        final String id = result.get(KEY_ID);
+        if (TextUtils.isEmpty(id)) {
             return null;
         }
-        final String id = auctionResult.getId();
+        assert id != null;
         final AdsType adsType = adRequest.getType();
         adRequest.addListener(new AdRequestListener() {
             @Override
@@ -77,9 +80,6 @@ public class BidMachineFetcher {
             }
             cached.put(id, adRequest);
         }
-        Map<String, String> result = new HashMap<>();
-        result.put(KEY_ID, id);
-        result.put(KEY_PRICE, roundPrice(auctionResult.getPrice()));
         return result;
     }
 

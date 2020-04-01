@@ -3,6 +3,8 @@ package io.bidmachine.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import io.bidmachine.CreativeFormat;
+
 public interface AuctionResult {
 
     /**
@@ -21,6 +23,12 @@ public interface AuctionResult {
      * @return Winner price as CPM
      */
     double getPrice();
+
+    /**
+     * @return ID of Price Floor
+     */
+    @Nullable
+    String getDeal();
 
     /**
      * @return ID of the buyer seat who made a bid
@@ -44,5 +52,17 @@ public interface AuctionResult {
      */
     @Nullable
     String[] getAdDomains();
+
+    /**
+     * @return Key of winner network. This network would be loaded.
+     */
+    @NonNull
+    String getNetworkKey();
+
+    /**
+     * @return {@link CreativeFormat} of winner ad
+     */
+    @Nullable
+    CreativeFormat getCreativeFormat();
 
 }
