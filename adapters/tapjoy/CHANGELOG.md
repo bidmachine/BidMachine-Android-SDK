@@ -1,3 +1,6 @@
+## Version 1.4.3.3
+* Updated Tapjoy version to 12.4.2
+
 ## Version 1.4.0.2
 * Minimum BidMachine SDK version was changed to v1.4.0
 

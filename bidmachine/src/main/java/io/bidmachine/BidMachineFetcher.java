@@ -84,28 +84,38 @@ public class BidMachineFetcher {
     }
 
     @Nullable
-    public static AdRequest release(@NonNull AdRequest adRequest) {
+    public static <T extends AdRequest> T release(@NonNull T adRequest) {
         AuctionResult auctionResult = adRequest.getAuctionResult();
-        return auctionResult != null
-                ? release(adRequest.getType(), auctionResult.getId())
-                : null;
+        if (auctionResult != null) {
+            return release(adRequest.getType(), auctionResult.getId());
+        }
+        return null;
     }
 
     @Nullable
-    public static AdRequest release(@NonNull AdsType adsType,
-                                    @NonNull Map<String, String> fetchedParams) {
+    public static <T extends AdRequest> T release(@NonNull AdsType adsType,
+                                                  @NonNull Map<String, String> fetchedParams) {
         String requestId = fetchedParams.get(KEY_ID);
         return release(adsType, requestId);
     }
 
     @Nullable
-    public static AdRequest release(@NonNull AdsType adsType, @Nullable String requestId) {
+    @SuppressWarnings("unchecked")
+    public static <T extends AdRequest> T release(@NonNull AdsType adsType,
+                                                  @Nullable String requestId) {
         if (TextUtils.isEmpty(requestId)) {
             return null;
         }
         synchronized (BidMachineFetcher.class) {
             Map<String, AdRequest> cached = cachedRequests.get(adsType);
-            return cached != null ? cached.remove(requestId) : null;
+            if (cached != null) {
+                try {
+                    return (T) cached.remove(requestId);
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+            return null;
         }
     }
 
