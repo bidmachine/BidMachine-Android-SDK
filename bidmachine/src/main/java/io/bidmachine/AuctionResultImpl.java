@@ -5,10 +5,15 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
+import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.bidmachine.models.AuctionResult;
+import io.bidmachine.protobuf.AdExtension;
 
 final class AuctionResultImpl implements AuctionResult {
 
@@ -31,6 +36,8 @@ final class AuctionResultImpl implements AuctionResult {
     private final String networkKey;
     @Nullable
     private final CreativeFormat creativeFormat;
+    @NonNull
+    private final Map<String, String> customParams;
 
     AuctionResultImpl(@NonNull Response.Seatbid seatbid,
                       @NonNull Response.Seatbid.Bid bid,
@@ -48,6 +55,7 @@ final class AuctionResultImpl implements AuctionResult {
         } else {
             adDomains = null;
         }
+        customParams = createCustomParams(ad);
         networkKey = networkConfig.getKey();
         creativeFormat = identifyCreativeFormat(ad);
     }
@@ -113,10 +121,31 @@ final class AuctionResultImpl implements AuctionResult {
 
     @NonNull
     @Override
+    public Map<String, String> getCustomParams() {
+        return customParams;
+    }
+
+    @NonNull
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "[@" + Integer.toHexString(hashCode()) + "]: "
                 + "id=" + id + ", demandSource=" + demandSource + ", price: " + price
                 + ", creativeId: " + creativeId + ", cid: " + cid;
+    }
+
+    @NonNull
+    private Map<String, String> createCustomParams(@NonNull Ad ad) {
+        Map<String,String> customParams = new HashMap<>();
+        for (Any any : ad.getExtList()) {
+            if (any.is(AdExtension.class)) {
+                try {
+                    AdExtension adExtension = any.unpack(AdExtension.class);
+                    customParams.putAll(adExtension.getCustomParamsMap());
+                } catch (Exception ignore) {
+                }
+            }
+        }
+        return customParams;
     }
 
     @Nullable

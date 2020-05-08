@@ -3,6 +3,8 @@ package io.bidmachine.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Map;
+
 import io.bidmachine.CreativeFormat;
 
 public interface AuctionResult {
@@ -64,5 +66,11 @@ public interface AuctionResult {
      */
     @Nullable
     CreativeFormat getCreativeFormat();
+
+    /**
+     * @return Map that contains additional information of response
+     */
+    @NonNull
+    Map<String, String> getCustomParams();
 
 }

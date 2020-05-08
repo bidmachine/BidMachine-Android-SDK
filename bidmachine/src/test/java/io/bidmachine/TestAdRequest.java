@@ -3,6 +3,9 @@ package io.bidmachine;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.unified.UnifiedAdRequestParams;
@@ -70,6 +73,12 @@ public class TestAdRequest extends AdRequest {
                 return builder.auctionCreativeFormat;
             }
 
+            @NonNull
+            @Override
+            public Map<String, String> getCustomParams() {
+                return builder.customParams;
+            }
+
         };
     }
 
@@ -99,6 +108,7 @@ public class TestAdRequest extends AdRequest {
         String[] auctionAdDomains;
         String auctionNetworkName = "test_network";
         CreativeFormat auctionCreativeFormat;
+        Map<String, String> customParams = new HashMap<>();
 
         public Builder(@NonNull AdsType adsType) {
             this.adsType = adsType;
@@ -151,6 +161,11 @@ public class TestAdRequest extends AdRequest {
 
         public Builder setAuctionCreativeFormat(CreativeFormat auctionCreativeFormat) {
             this.auctionCreativeFormat = auctionCreativeFormat;
+            return this;
+        }
+
+        public Builder setCustomParams(Map<String, String> customParams) {
+            this.customParams = customParams;
             return this;
         }
 
