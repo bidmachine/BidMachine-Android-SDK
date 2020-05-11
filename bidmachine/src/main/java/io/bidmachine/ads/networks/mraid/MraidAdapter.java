@@ -10,10 +10,8 @@ import io.bidmachine.unified.UnifiedFullscreenAd;
 
 public class MraidAdapter extends NetworkAdapter {
 
-    public static final String KEY = "mraid";
-
     public MraidAdapter() {
-        super(KEY,
+        super("mraid",
                 "2.0",
                 BuildConfig.VERSION_NAME + ".1",
                 new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});

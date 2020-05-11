@@ -9,14 +9,13 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.bidmachine.ads.networks.mraid.MraidAdapter;
-import io.bidmachine.ads.networks.vast.VastAdapter;
 import io.bidmachine.models.AuctionResult;
 
 public class BidMachineHelper {
 
     public static final String AD_TYPE_DISPLAY = "display";
     public static final String AD_TYPE_VIDEO = "video";
+    public static final String AD_TYPE_NATIVE = "native";
 
     public static final class AdManager {
 
@@ -72,7 +71,7 @@ public class BidMachineHelper {
         result.put(BidMachineFetcher.KEY_PRICE,
                    BidMachineFetcher.roundPrice(auctionResult.getPrice()));
         result.put(BidMachineFetcher.KEY_NETWORK_KEY, auctionResult.getNetworkKey());
-        String adType = identifyAdType(auctionResult.getNetworkKey());
+        String adType = identifyAdType(auctionResult.getCreativeFormat());
         if (adType != null) {
             result.put(BidMachineFetcher.KEY_AD_TYPE, adType);
         }
@@ -82,14 +81,20 @@ public class BidMachineHelper {
 
     @Nullable
     @VisibleForTesting
-    static String identifyAdType(@NonNull String networkName) {
-        switch (networkName) {
-            case MraidAdapter.KEY:
-                return AD_TYPE_DISPLAY;
-            case VastAdapter.KEY:
-                return AD_TYPE_VIDEO;
+    static String identifyAdType(@Nullable CreativeFormat creativeFormat) {
+        if (creativeFormat == null) {
+            return null;
         }
-        return null;
+        switch (creativeFormat) {
+            case Banner:
+                return AD_TYPE_DISPLAY;
+            case Video:
+                return AD_TYPE_VIDEO;
+            case Native:
+                return AD_TYPE_NATIVE;
+            default:
+                return null;
+        }
     }
 
 }
