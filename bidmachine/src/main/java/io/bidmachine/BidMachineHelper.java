@@ -76,6 +76,7 @@ public class BidMachineHelper {
         if (adType != null) {
             result.put(BidMachineFetcher.KEY_AD_TYPE, adType);
         }
+        result.putAll(auctionResult.getCustomParams());
         return result;
     }
 

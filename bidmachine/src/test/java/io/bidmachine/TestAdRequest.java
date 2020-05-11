@@ -76,7 +76,7 @@ public class TestAdRequest extends AdRequest {
             @NonNull
             @Override
             public Map<String, String> getCustomParams() {
-                return builder.customParams;
+                return builder.auctionCustomParams;
             }
 
         };
@@ -108,7 +108,7 @@ public class TestAdRequest extends AdRequest {
         String[] auctionAdDomains;
         String auctionNetworkName = "test_network";
         CreativeFormat auctionCreativeFormat;
-        Map<String, String> customParams = new HashMap<>();
+        Map<String, String> auctionCustomParams = new HashMap<>();
 
         public Builder(@NonNull AdsType adsType) {
             this.adsType = adsType;
@@ -164,8 +164,8 @@ public class TestAdRequest extends AdRequest {
             return this;
         }
 
-        public Builder setCustomParams(Map<String, String> customParams) {
-            this.customParams = customParams;
+        public Builder setAuctionCustomParams(Map<String, String> auctionCustomParams) {
+            this.auctionCustomParams = auctionCustomParams;
             return this;
         }
 
