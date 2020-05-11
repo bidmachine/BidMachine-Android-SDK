@@ -400,10 +400,16 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             try {
                 Ad ad = bid.getMedia().unpack(Ad.class);
                 if (ad != null) {
+                    NetworkConfig networkConfig = getType().obtainNetworkConfig(ad);
+                    if (networkConfig == null) {
+                        Logger.log(toString() + ": NetworkConfig not found");
+                        processRequestFail(BMError.requestError("NetworkConfig not found"));
+                        return;
+                    }
                     adResult = ad;
                     bidResult = bid;
                     seatBidResult = seatbid;
-                    auctionResult = new AuctionResultImpl(seatbid, bid, ad);
+                    auctionResult = new AuctionResultImpl(seatbid, bid, ad, networkConfig);
                     expirationTime = getOrDefault(bid.getExp(),
                             Response.Seatbid.Bid.getDefaultInstance().getExp(),
                             DEF_EXPIRATION_TIME);
