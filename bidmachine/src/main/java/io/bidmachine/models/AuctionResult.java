@@ -12,6 +12,11 @@ public interface AuctionResult {
     String getId();
 
     /**
+     * @return Winner network name
+     */
+    String getNetworkName();
+
+    /**
      * @return Winner advertising source name
      */
     @Nullable

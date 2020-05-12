@@ -10,6 +10,8 @@ final class AuctionResultImpl implements AuctionResult {
 
     @NonNull
     private final String id;
+    @NonNull
+    private final String networkName;
     @Nullable
     private final String demandSource;
     private final double price;
@@ -22,10 +24,12 @@ final class AuctionResultImpl implements AuctionResult {
     @Nullable
     private final String[] adDomains;
 
-    AuctionResultImpl(@NonNull Response.Seatbid seatbid,
+    AuctionResultImpl(@NonNull NetworkConfig networkConfig,
+                      @NonNull Response.Seatbid seatbid,
                       @NonNull Response.Seatbid.Bid bid,
                       @NonNull Ad ad) {
         id = bid.getId();
+        networkName = networkConfig.getKey();
         demandSource = seatbid.getSeat();
         seat = seatbid.getSeat();
         price = bid.getPrice();
@@ -42,6 +46,12 @@ final class AuctionResultImpl implements AuctionResult {
     @Override
     public String getId() {
         return id;
+    }
+
+    @NonNull
+    @Override
+    public String getNetworkName() {
+        return networkName;
     }
 
     @Nullable

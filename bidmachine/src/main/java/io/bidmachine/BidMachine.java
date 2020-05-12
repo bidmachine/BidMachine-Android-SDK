@@ -140,4 +140,12 @@ public class BidMachine {
         NetworkRegistry.registerNetworks(jsonData);
     }
 
+    public static void registerAdRequestListener(@NonNull AdRequest.AdRequestListener adRequestListener) {
+        BidMachineImpl.get().registerAdRequestListener(adRequestListener);
+    }
+
+    public static void unregisterAdRequestListener(@NonNull AdRequest.AdRequestListener adRequestListener) {
+        BidMachineImpl.get().unregisterAdRequestListener(adRequestListener);
+    }
+
 }

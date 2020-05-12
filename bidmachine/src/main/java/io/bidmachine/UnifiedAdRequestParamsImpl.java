@@ -1,6 +1,7 @@
 package io.bidmachine;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.DeviceInfo;
@@ -21,6 +22,12 @@ class UnifiedAdRequestParamsImpl implements UnifiedAdRequestParams {
         this.targetingInfo = new TargetingInfoImpl(dataRestrictions, targetingParams);
         this.deviceInfo = new DeviceInfoImpl(dataRestrictions);
         this.dataRestrictions = dataRestrictions;
+    }
+
+    @Nullable
+    @Override
+    public AdRequest getAdRequest() {
+        return null;
     }
 
     @NonNull

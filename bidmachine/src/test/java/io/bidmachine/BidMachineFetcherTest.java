@@ -283,6 +283,11 @@ public class BidMachineFetcherTest {
                 return id;
             }
 
+            @Override
+            public String getNetworkName() {
+                return "TestNetwork";
+            }
+
             @Nullable
             @Override
             public String getDemandSource() {

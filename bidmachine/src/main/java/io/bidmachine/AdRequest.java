@@ -326,6 +326,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 listener.onRequestExpired((SelfType) this);
             }
         }
+        for (AdRequestListener adRequestListener : BidMachineImpl.get().getAdRequestListeners()) {
+            adRequestListener.onRequestExpired(this);
+        }
     }
 
     /**
@@ -400,10 +403,16 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             try {
                 Ad ad = bid.getMedia().unpack(Ad.class);
                 if (ad != null) {
+                    NetworkConfig networkConfig = getType().obtainNetworkConfig(ad);
+                    if (networkConfig == null) {
+                        Logger.log(toString() + ": NetworkConfig not found");
+                        processRequestFail(BMError.requestError("NetworkConfig not found"));
+                        return;
+                    }
                     adResult = ad;
                     bidResult = bid;
                     seatBidResult = seatbid;
-                    auctionResult = new AuctionResultImpl(seatbid, bid, ad);
+                    auctionResult = new AuctionResultImpl(networkConfig, seatbid, bid, ad);
                     expirationTime = getOrDefault(bid.getExp(),
                             Response.Seatbid.Bid.getDefaultInstance().getExp(),
                             DEF_EXPIRATION_TIME);
@@ -413,6 +422,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                         for (AdRequestListener listener : adRequestListeners) {
                             listener.onRequestSuccess(this, auctionResult);
                         }
+                    }
+                    for (AdRequestListener listener : BidMachineImpl.get().getAdRequestListeners()) {
+                        listener.onRequestSuccess(this, auctionResult);
                     }
                     BidMachineEvents.eventFinish(
                             trackingObject,
@@ -438,6 +450,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             for (AdRequestListener listener : adRequestListeners) {
                 listener.onRequestFailed(this, error);
             }
+        }
+        for (AdRequestListener adRequestListener : BidMachineImpl.get().getAdRequestListeners()) {
+            adRequestListener.onRequestFailed(this, error);
         }
         BidMachineEvents.eventFinish(
                 trackingObject,
@@ -570,11 +585,17 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     }
 
-    protected static class BaseUnifiedAdRequestParams extends UnifiedAdRequestParamsImpl {
+    protected class BaseUnifiedAdRequestParams extends UnifiedAdRequestParamsImpl {
 
         public BaseUnifiedAdRequestParams(@NonNull TargetingParams targetingParams,
                                           @NonNull DataRestrictions dataRestrictions) {
             super(targetingParams, dataRestrictions);
+        }
+
+        @Nullable
+        @Override
+        public AdRequest getAdRequest() {
+            return AdRequest.this;
         }
     }
 
