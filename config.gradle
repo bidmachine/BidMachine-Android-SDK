@@ -1,6 +1,6 @@
 ext {
     androidCompileSdkVersion = 28
-    androidMinSdkVersion = 15
+    androidMinSdkVersion = 16
     androidTargetSdkVersion = 28
     playServicesVersion = '15.0.0'
     supportVersion = '25.3.1'

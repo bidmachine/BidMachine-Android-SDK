@@ -12,7 +12,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 def libGroupId = "io.bidmachine"
-def libArtifactId = "ads"
+def libArtifactId = "ads-beta"
 
 artifactory {
     contextUrl = 'https://artifactory.bidmachine.io/artifactory'
