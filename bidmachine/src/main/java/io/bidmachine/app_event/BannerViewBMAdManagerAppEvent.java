@@ -1,73 +1,81 @@
 package io.bidmachine.app_event;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.View;
 
 import com.google.ads.mediation.bidmachine.BidMachineBundleBuilder;
-import com.google.ads.mediation.bidmachine.BidMachineCustomEventInterstitial;
+import com.google.ads.mediation.bidmachine.BidMachineCustomEventBanner;
 import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
-import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
+import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
 
 import java.util.Map;
 
 import io.bidmachine.AdRequest;
 import io.bidmachine.BidMachineFetcher;
 import io.bidmachine.BidMachineHelper;
+import io.bidmachine.banner.BannerRequest;
+import io.bidmachine.banner.BannerSize;
 import io.bidmachine.core.Utils;
-import io.bidmachine.interstitial.InterstitialRequest;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.utils.BMError;
 
-public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
+class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
-    private InterstitialRequest interstitialRequest;
+    private static final AdSize adSize = AdSize.BANNER;
+
+    private BannerRequest bannerRequest;
     private Bundle localExtras;
-    private PublisherInterstitialAd interstitialAd;
-    private BidMachineCustomEventInterstitial bidMachineCustomEventInterstitial;
+    private PublisherAdView publisherAdView;
+    private BidMachineCustomEventBanner bidMachineCustomEventBanner;
+    private View bannerView;
+    private BMPopupWindow bmPopupWindow;
 
-    public InterstitialBMAdManagerAppEvent(String adUnitId) {
+    BannerViewBMAdManagerAppEvent(String adUnitId) {
         super(adUnitId);
     }
 
     @Override
     public void load(@NonNull final Context context) {
-        destroy();
-
-        interstitialRequest = new InterstitialRequest.Builder()
-                .setListener(new InterstitialRequest.AdRequestListener() {
+        bannerRequest = new BannerRequest.Builder()
+                .setSize(BannerSize.Size_320x50)
+                .setListener(new BannerRequest.AdRequestListener() {
                     @Override
-                    public void onRequestSuccess(final @NonNull InterstitialRequest interstitialRequest,
+                    public void onRequestSuccess(@NonNull final BannerRequest bannerRequest,
                                                  @NonNull AuctionResult auctionResult) {
                         Utils.onUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                loadPublisherAd(context, interstitialRequest);
+                                loadPublisherAd(context, bannerRequest);
                             }
                         });
                     }
 
                     @Override
-                    public void onRequestFailed(@NonNull InterstitialRequest interstitialRequest,
-                                                @NonNull BMError bmError) {
+                    public void onRequestFailed(@NonNull BannerRequest request,
+                                                @NonNull BMError error) {
                         if (listener != null) {
                             listener.onAdFailToLoad();
                         }
                     }
 
                     @Override
-                    public void onRequestExpired(@NonNull InterstitialRequest interstitialRequest) {
+                    public void onRequestExpired(@NonNull BannerRequest request) {
                         if (listener != null) {
                             listener.onAdExpired();
                         }
                     }
                 })
                 .build();
-        interstitialRequest.request(context);
+        bannerRequest.request(context);
     }
 
     private void loadPublisherAd(@NonNull final Context context, @NonNull AdRequest adRequest) {
@@ -85,9 +93,10 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
                 .createPublisherAdRequestBuilder(adRequest)
                 .build();
 
-        interstitialAd = new PublisherInterstitialAd(context);
-        interstitialAd.setAdUnitId(adUnitId);
-        interstitialAd.setAdListener(new AdListener() {
+        publisherAdView = new PublisherAdView(context);
+        publisherAdView.setAdUnitId(adUnitId);
+        publisherAdView.setAdSizes(adSize);
+        publisherAdView.setAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(int i) {
                 if (listener != null) {
@@ -95,13 +104,13 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
                 }
             }
         });
-        interstitialAd.setAppEventListener(new AppEventListener() {
+        publisherAdView.setAppEventListener(new AppEventListener() {
             @Override
             public void onAppEvent(String key, String value) {
                 loadCustomAdapter(context);
             }
         });
-        interstitialAd.loadAd(publisherAdRequest);
+        publisherAdView.loadAd(publisherAdRequest);
     }
 
     @Nullable
@@ -111,8 +120,8 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             return null;
         }
         double price = auctionResult.getPrice();
-        if (price <= 10) {
-            BidMachineFetcher.setPriceRounding(1);
+        if (price <= 1) {
+            BidMachineFetcher.setPriceRounding(0.2);
         } else {
             BidMachineFetcher.setPriceRounding(1000);
         }
@@ -126,46 +135,69 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             }
             return;
         }
-        bidMachineCustomEventInterstitial = new BidMachineCustomEventInterstitial();
-        bidMachineCustomEventInterstitial.requestInterstitialAd(
+        bidMachineCustomEventBanner = new BidMachineCustomEventBanner();
+        bidMachineCustomEventBanner.requestBannerAd(
                 context,
-                new CustomAdapterListener(),
+                new BannerViewBMAdManagerAppEvent.CustomAdapterListener(),
                 null,
+                adSize,
                 BMAdManagerMediationAdRequest.instance,
                 localExtras);
     }
 
     @Override
     public boolean isLoaded() {
-        return bidMachineCustomEventInterstitial != null && isLoaded;
+        return bannerView != null && isLoaded;
     }
 
     @Override
     public void show(@NonNull final Context context) {
-        if (isLoaded()) {
-            bidMachineCustomEventInterstitial.showInterstitial();
+        if (context instanceof Activity && isLoaded()) {
+            bmPopupWindow.showView((Activity) context,
+                                   bannerView,
+                                   adSize.getWidth(),
+                                   adSize.getHeight());
+        } else {
+            Log.e(TAG, "Activity needed to display banner");
+        }
+    }
+
+    @Override
+    public void hide() {
+        if (bmPopupWindow != null) {
+            bmPopupWindow.hide();
         }
     }
 
     @Override
     public void destroy() {
-        if (bidMachineCustomEventInterstitial != null) {
-            bidMachineCustomEventInterstitial.onDestroy();
-            bidMachineCustomEventInterstitial = null;
+        hide();
+        if (bmPopupWindow != null) {
+            bmPopupWindow = null;
         }
-        interstitialAd = null;
+        bannerView = null;
+        if (bidMachineCustomEventBanner != null) {
+            bidMachineCustomEventBanner.onDestroy();
+            bidMachineCustomEventBanner = null;
+        }
+        if (publisherAdView != null) {
+            publisherAdView.destroy();
+            publisherAdView = null;
+        }
         localExtras = null;
-        if (interstitialRequest != null) {
-            BidMachineFetcher.release(interstitialRequest);
-            interstitialRequest = null;
+        if (bannerRequest != null) {
+            BidMachineFetcher.release(bannerRequest);
+            bannerRequest = null;
         }
         isLoaded = false;
     }
 
-    private final class CustomAdapterListener implements CustomEventInterstitialListener {
+    private final class CustomAdapterListener implements CustomEventBannerListener {
 
         @Override
-        public void onAdLoaded() {
+        public void onAdLoaded(View view) {
+            bannerView = view;
+            bmPopupWindow = new BMPopupWindow();
             isLoaded = true;
             if (listener != null) {
                 listener.onAdLoaded();
@@ -181,9 +213,7 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdOpened() {
-            if (listener != null) {
-                listener.onAdShown();
-            }
+
         }
 
         @Override
@@ -195,9 +225,7 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdClosed() {
-            if (listener != null) {
-                listener.onAdClosed();
-            }
+
         }
 
         @Override

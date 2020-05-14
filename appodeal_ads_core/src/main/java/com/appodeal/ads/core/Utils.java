@@ -764,7 +764,7 @@ public class Utils {
             boolean isAdVisible = view.getGlobalVisibleRect(viewRect);
             boolean isAdShown = view.isShown();
             boolean isAdTransparent = isViewTransparent(view);
-            boolean isAdOnScreen = isAdVisible && isAdShown && view.hasWindowFocus() && !isAdTransparent;
+            boolean isAdOnScreen = isAdVisible && isAdShown && !isAdTransparent;
             if (!isAdOnScreen) {
                 Logger.log("Ad View is out of screen, show wasn't tracked");
                 return false;

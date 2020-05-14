@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 
 public abstract class BMAdManagerAppEvent {
 
+    static final String TAG = "BMAdManagerAppEvent";
+
     final String adUnitId;
 
     @Nullable
@@ -28,7 +30,11 @@ public abstract class BMAdManagerAppEvent {
 
     public abstract boolean isLoaded();
 
-    public abstract void show();
+    public abstract void show(@NonNull final Context context);
+
+    public void hide() {
+
+    }
 
     public abstract void destroy();
 

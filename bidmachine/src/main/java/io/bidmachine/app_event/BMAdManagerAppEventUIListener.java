@@ -4,11 +4,11 @@ import android.support.annotation.NonNull;
 
 import io.bidmachine.core.Utils;
 
-public class BMAdManagerAppEventUIListener implements BMAdManagerAppEventListener {
+class BMAdManagerAppEventUIListener implements BMAdManagerAppEventListener {
 
     private final BMAdManagerAppEventListener bmAdManagerAppEventListener;
 
-    public BMAdManagerAppEventUIListener(@NonNull BMAdManagerAppEventListener bmAdManagerAppEventListener) {
+    BMAdManagerAppEventUIListener(@NonNull BMAdManagerAppEventListener bmAdManagerAppEventListener) {
         this.bmAdManagerAppEventListener = bmAdManagerAppEventListener;
     }
 

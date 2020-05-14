@@ -7,7 +7,7 @@ import com.google.android.gms.ads.mediation.MediationAdRequest;
 import java.util.Date;
 import java.util.Set;
 
-public class BMAdManagerMediationAdRequest implements MediationAdRequest {
+class BMAdManagerMediationAdRequest implements MediationAdRequest {
 
     static final BMAdManagerMediationAdRequest instance = new BMAdManagerMediationAdRequest();
 
