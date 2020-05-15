@@ -54,8 +54,12 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     @Override
     public void show(@NonNull final Context context) {
+        show(context, true);
+    }
+
+    private void show(Context context, boolean showInitiated) {
         hide();
-        showInitiated = true;
+        this.showInitiated = showInitiated;
         if (notShownBannerViewIsLoaded()) {
             isHidden = false;
             refreshTimeReached = false;
@@ -80,7 +84,7 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
             public void run() {
                 if (notShownBannerView.isLoaded()) {
                     if (!isHidden) {
-                        show(context);
+                        show(context, false);
                     }
                 } else {
                     refreshTimeReached = true;
@@ -115,11 +119,11 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdLoaded() {
-            if (refreshTimeReached && !isHidden || showInitiated) {
+            if (refreshTimeReached && (!isHidden || showInitiated)) {
                 showInitiated = false;
                 Context context = contextWeakReference.get();
                 if (context != null) {
-                    show(context);
+                    show(context, false);
                 } else {
                     Log.d(TAG, "Context is null");
                 }
