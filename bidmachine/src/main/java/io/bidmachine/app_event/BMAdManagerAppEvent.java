@@ -12,7 +12,6 @@ public abstract class BMAdManagerAppEvent {
 
     @Nullable
     BMAdManagerAppEventListener listener;
-    boolean isLoaded;
 
     BMAdManagerAppEvent(String adUnitId) {
         this.adUnitId = adUnitId;

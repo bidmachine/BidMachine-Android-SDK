@@ -1,34 +1,32 @@
 package io.bidmachine.app_event;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
-import com.google.ads.mediation.bidmachine.BidMachineBundleBuilder;
-import com.google.ads.mediation.bidmachine.BidMachineCustomEventInterstitial;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
-import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
-
-import java.util.Map;
 
 import io.bidmachine.AdRequest;
 import io.bidmachine.BidMachineFetcher;
 import io.bidmachine.BidMachineHelper;
 import io.bidmachine.core.Utils;
+import io.bidmachine.interstitial.InterstitialAd;
+import io.bidmachine.interstitial.InterstitialListener;
 import io.bidmachine.interstitial.InterstitialRequest;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.utils.BMError;
 
 public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
+    private static final String APP_EVENT_KEY = "bidmachine-interstitial";
+
     private InterstitialRequest interstitialRequest;
-    private Bundle localExtras;
-    private PublisherInterstitialAd interstitialAd;
-    private BidMachineCustomEventInterstitial bidMachineCustomEventInterstitial;
+    private PublisherInterstitialAd publisherInterstitialAd;
+    private InterstitialAd interstitialAd;
 
     public InterstitialBMAdManagerAppEvent(String adUnitId) {
         super(adUnitId);
@@ -71,44 +69,12 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
     }
 
     private void loadPublisherAd(@NonNull final Context context, @NonNull AdRequest adRequest) {
-        Map<String, String> fetchParams = prepareFetchParams(adRequest);
-        if (fetchParams == null) {
+        AuctionResult auctionResult = adRequest.getAuctionResult();
+        if (auctionResult == null) {
             if (listener != null) {
                 listener.onAdFailToLoad();
             }
             return;
-        }
-        localExtras = new BidMachineBundleBuilder()
-                .setFetchParams(fetchParams)
-                .build();
-        PublisherAdRequest publisherAdRequest = BidMachineHelper.AdManager
-                .createPublisherAdRequestBuilder(adRequest)
-                .build();
-
-        interstitialAd = new PublisherInterstitialAd(context);
-        interstitialAd.setAdUnitId(adUnitId);
-        interstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdFailedToLoad(int i) {
-                if (listener != null) {
-                    listener.onAdFailToLoad();
-                }
-            }
-        });
-        interstitialAd.setAppEventListener(new AppEventListener() {
-            @Override
-            public void onAppEvent(String key, String value) {
-                loadCustomAdapter(context);
-            }
-        });
-        interstitialAd.loadAd(publisherAdRequest);
-    }
-
-    @Nullable
-    private Map<String, String> prepareFetchParams(@NonNull AdRequest adRequest) {
-        AuctionResult auctionResult = adRequest.getAuctionResult();
-        if (auctionResult == null) {
-            return null;
         }
         double price = auctionResult.getPrice();
         if (price <= 10) {
@@ -116,93 +82,126 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
         } else {
             BidMachineFetcher.setPriceRounding(1000);
         }
-        return BidMachineFetcher.fetch(adRequest);
+
+        PublisherAdRequest publisherAdRequest = BidMachineHelper.AdManager
+                .createPublisherAdRequestBuilder(adRequest)
+                .addCustomTargeting("bm_platform", "android")
+                .build();
+
+        publisherInterstitialAd = new PublisherInterstitialAd(context);
+        publisherInterstitialAd.setAdUnitId(adUnitId);
+        publisherInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                if (listener != null) {
+                    listener.onAdFailToLoad();
+                }
+            }
+        });
+        publisherInterstitialAd.setAppEventListener(new AppEventListener() {
+            @Override
+            public void onAppEvent(String key, String value) {
+                if (isBidMachine(key)) {
+                    loadAd(context);
+                } else {
+                    if (listener != null) {
+                        listener.onAdFailToLoad();
+                    }
+                }
+            }
+        });
+        publisherInterstitialAd.loadAd(publisherAdRequest);
     }
 
-    private void loadCustomAdapter(@NonNull Context context) {
-        if (localExtras == null) {
-            if (listener != null) {
-                listener.onAdFailToLoad();
-            }
-            return;
-        }
-        bidMachineCustomEventInterstitial = new BidMachineCustomEventInterstitial();
-        bidMachineCustomEventInterstitial.requestInterstitialAd(
-                context,
-                new CustomAdapterListener(),
-                null,
-                BMAdManagerMediationAdRequest.instance,
-                localExtras);
+    private boolean isBidMachine(@Nullable String key) {
+        return TextUtils.equals(key, APP_EVENT_KEY);
+    }
+
+    private void loadAd(@NonNull Context context) {
+        interstitialAd = new InterstitialAd(context);
+        interstitialAd.setListener(new Listener());
+        interstitialAd.load(interstitialRequest);
     }
 
     @Override
     public boolean isLoaded() {
-        return bidMachineCustomEventInterstitial != null && isLoaded;
+        return interstitialAd != null && interstitialAd.isLoaded() && interstitialAd.canShow();
     }
 
     @Override
     public void show(@NonNull final Context context) {
         if (isLoaded()) {
-            bidMachineCustomEventInterstitial.showInterstitial();
+            interstitialAd.show();
         }
     }
 
     @Override
     public void destroy() {
-        if (bidMachineCustomEventInterstitial != null) {
-            bidMachineCustomEventInterstitial.onDestroy();
-            bidMachineCustomEventInterstitial = null;
+        if (interstitialAd != null) {
+            interstitialAd.destroy();
+            interstitialAd = null;
         }
-        interstitialAd = null;
-        localExtras = null;
-        if (interstitialRequest != null) {
-            BidMachineFetcher.release(interstitialRequest);
-            interstitialRequest = null;
-        }
-        isLoaded = false;
+        publisherInterstitialAd = null;
+        interstitialRequest = null;
     }
 
-    private final class CustomAdapterListener implements CustomEventInterstitialListener {
+    private final class Listener implements InterstitialListener {
 
         @Override
-        public void onAdLoaded() {
-            isLoaded = true;
+        public void onAdLoaded(@NonNull InterstitialAd ad) {
             if (listener != null) {
                 listener.onAdLoaded();
             }
         }
 
         @Override
-        public void onAdFailedToLoad(int i) {
+        public void onAdLoadFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
             if (listener != null) {
                 listener.onAdFailToLoad();
             }
         }
 
         @Override
-        public void onAdOpened() {
+        public void onAdShown(@NonNull InterstitialAd ad) {
             if (listener != null) {
                 listener.onAdShown();
             }
         }
 
         @Override
-        public void onAdClicked() {
+        public void onAdShowFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
+
+        }
+
+        @Override
+        public void onAdImpression(@NonNull InterstitialAd ad) {
+
+        }
+
+        @Override
+        public void onAdClicked(@NonNull InterstitialAd ad) {
             if (listener != null) {
                 listener.onAdClicked();
             }
         }
 
         @Override
-        public void onAdClosed() {
+        public void onAdClosed(@NonNull InterstitialAd ad, boolean finished) {
             if (listener != null) {
                 listener.onAdClosed();
             }
         }
 
         @Override
-        public void onAdLeftApplication() {
-
+        public void onAdExpired(@NonNull InterstitialAd ad) {
+            if (listener != null) {
+                listener.onAdExpired();
+            }
         }
 
     }
