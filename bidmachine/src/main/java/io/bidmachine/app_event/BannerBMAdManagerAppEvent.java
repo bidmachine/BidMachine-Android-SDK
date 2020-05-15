@@ -16,7 +16,8 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
     private BannerViewBMAdManagerAppEvent notShownBannerView;
     private WeakReference<Context> contextWeakReference;
     private boolean isHidden = true;
-    private boolean showAfterLoad = false;
+    private boolean refreshTimeReached = true;
+    private boolean showInitiated = false;
 
     public BannerBMAdManagerAppEvent(String adUnitId) {
         super(adUnitId);
@@ -54,14 +55,18 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
     @Override
     public void show(@NonNull final Context context) {
         hide();
+        showInitiated = true;
         if (notShownBannerViewIsLoaded()) {
             isHidden = false;
+            refreshTimeReached = false;
             notShownBannerView.show(context);
             setShownBannerView(notShownBannerView);
             loadNextAd(context);
         } else if (shownBannerViewIsLoaded()) {
             isHidden = false;
             shownBannerView.show(context);
+        } else if (refreshTimeReached) {
+            Log.e(TAG, "Banner will be shown after load");
         } else {
             Log.e(TAG, "Could not find loaded banner");
         }
@@ -69,7 +74,6 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     private void loadNextAd(@NonNull final Context context) {
         contextWeakReference = new WeakReference<>(context);
-        showAfterLoad = false;
         load(context);
         Utils.onUiThread(new Runnable() {
             @Override
@@ -79,7 +83,7 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
                         show(context);
                     }
                 } else {
-                    showAfterLoad = true;
+                    refreshTimeReached = true;
                 }
             }
         }, REFRESH_TIME);
@@ -87,6 +91,7 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     @Override
     public void hide() {
+        showInitiated = false;
         isHidden = true;
         if (notShownBannerView != null) {
             notShownBannerView.hide();
@@ -110,7 +115,8 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdLoaded() {
-            if (showAfterLoad && !isHidden) {
+            if (refreshTimeReached && !isHidden || showInitiated) {
+                showInitiated = false;
                 Context context = contextWeakReference.get();
                 if (context != null) {
                     show(context);
