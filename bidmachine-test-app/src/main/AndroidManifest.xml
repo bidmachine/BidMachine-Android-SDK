@@ -30,6 +30,11 @@
         <activity android:name=".BannerAutoLoadActivity" />
         <activity android:name=".BannerScrollableActivity" />
         <activity android:name=".NativeActivity" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true"/>
+
     </application>
 
 </manifest>

@@ -61,6 +61,7 @@ dependencies {
         exclude module: 'support-v4'
         exclude module: 'support-v7'
     }
+    implementation "com.google.android.gms:play-services-ads:$playServicesVersion"
 
     //for play service < 15
     //    implementation("com.google.android.gms:play-services-basement:15.0.0") {
@@ -90,8 +91,8 @@ dependencies {
     localImplementation project(':bidmachine')
     localImplementation project(':appodeal_ads_core')
 
-    remoteImplementation "io.bidmachine:ads:${project(':bidmachine').android.defaultConfig.versionName}"
-    localRemoteImplementation "io.bidmachine:ads:${project(':bidmachine').android.defaultConfig.versionName}"
+//    remoteImplementation "io.bidmachine:ads:${project(':bidmachine').android.defaultConfig.versionName}"
+//    localRemoteImplementation "io.bidmachine:ads:${project(':bidmachine').android.defaultConfig.versionName}"
 }
 
 gradle.projectsEvaluated {

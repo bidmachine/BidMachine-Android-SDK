@@ -39,7 +39,7 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
         interstitialRequest = new InterstitialRequest.Builder()
                 .setListener(new InterstitialRequest.AdRequestListener() {
                     @Override
-                    public void onRequestSuccess(final @NonNull InterstitialRequest interstitialRequest,
+                    public void onRequestSuccess(@NonNull final InterstitialRequest interstitialRequest,
                                                  @NonNull AuctionResult auctionResult) {
                         Utils.onUiThread(new Runnable() {
                             @Override
