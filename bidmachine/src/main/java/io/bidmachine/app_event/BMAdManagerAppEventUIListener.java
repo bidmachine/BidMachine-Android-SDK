@@ -6,7 +6,7 @@ import io.bidmachine.core.Utils;
 
 class BMAdManagerAppEventUIListener implements BMAdManagerAppEventListener {
 
-    private final BMAdManagerAppEventListener bmAdManagerAppEventListener;
+    final BMAdManagerAppEventListener bmAdManagerAppEventListener;
 
     BMAdManagerAppEventUIListener(@NonNull BMAdManagerAppEventListener bmAdManagerAppEventListener) {
         this.bmAdManagerAppEventListener = bmAdManagerAppEventListener;

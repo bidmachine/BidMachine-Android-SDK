@@ -44,10 +44,15 @@ class BMPopupWindow {
     }
 
     void hide() {
-        if (popUpWindow != null) {
-            popUpWindow.dismiss();
-            popUpWindow = null;
-        }
+        Utils.onUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (popUpWindow != null) {
+                    popUpWindow.dismiss();
+                    popUpWindow = null;
+                }
+            }
+        });
     }
 
     private void setPopUpWindowLayoutType(@NonNull PopupWindow popupWindow, int layoutType) {

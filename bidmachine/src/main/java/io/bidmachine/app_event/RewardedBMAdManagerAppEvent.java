@@ -33,6 +33,15 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
     }
 
     @Override
+    public void setListener(@Nullable BMAdManagerAppEventListener adManagerAppEventListener) {
+        if (adManagerAppEventListener instanceof RewardedBMAdManagerAppEventListener) {
+            this.listener = new RewardedBMAdManagerAppEventUIListener(adManagerAppEventListener);
+        } else {
+            super.setListener(adManagerAppEventListener);
+        }
+    }
+
+    @Override
     public void load(@NonNull final Context context) {
         destroy();
 
@@ -210,7 +219,9 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdRewarded(@NonNull io.bidmachine.rewarded.RewardedAd ad) {
-
+            if (listener instanceof RewardedBMAdManagerAppEventListener) {
+                ((RewardedBMAdManagerAppEventListener) listener).onAdRewarded();
+            }
         }
 
         @Override
