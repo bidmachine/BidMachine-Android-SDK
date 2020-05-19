@@ -412,7 +412,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     adResult = ad;
                     bidResult = bid;
                     seatBidResult = seatbid;
-                    auctionResult = new AuctionResultImpl(networkConfig, seatbid, bid, ad);
+                    auctionResult = new AuctionResultImpl(seatbid, bid, ad, networkConfig);
                     expirationTime = getOrDefault(bid.getExp(),
                             Response.Seatbid.Bid.getDefaultInstance().getExp(),
                             DEF_EXPIRATION_TIME);

@@ -1,8 +1,5 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.bidmachine.models.AuctionResult;
-import io.bidmachine.models.DataRestrictions;
-import io.bidmachine.unified.UnifiedAdRequestParams;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -53,7 +48,10 @@ public class BidMachineFetcherTest {
 
     @Test
     public void fetch() {
-        AdRequest adRequest = createAdRequest(AdsType.Banner, "test_banner_id_1", 0.001);
+        AdRequest adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_1")
+                .setAuctionPrice(0.001)
+                .build();
         Map<String, String> params = BidMachineFetcher.fetch(adRequest);
         assertNotNull(params);
         assertEquals("test_banner_id_1", params.get(BidMachineFetcher.KEY_ID));
@@ -63,7 +61,10 @@ public class BidMachineFetcherTest {
         assertNotNull(requestMap);
         assertEquals(1, requestMap.size());
 
-        adRequest = createAdRequest(AdsType.Banner, "test_banner_id_2", 0.002);
+        adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_2")
+                .setAuctionPrice(0.002)
+                .build();
         params = BidMachineFetcher.fetch(adRequest);
         assertNotNull(params);
         assertEquals("test_banner_id_2", params.get(BidMachineFetcher.KEY_ID));
@@ -73,7 +74,10 @@ public class BidMachineFetcherTest {
         assertNotNull(requestMap);
         assertEquals(2, requestMap.size());
 
-        adRequest = createAdRequest(AdsType.Interstitial, "test_interstitial_id_1", 0.003);
+        adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
+                .setAuctionId("test_interstitial_id_1")
+                .setAuctionPrice(0.003)
+                .build();
         params = BidMachineFetcher.fetch(adRequest);
         assertNotNull(params);
         assertEquals("test_interstitial_id_1", params.get(BidMachineFetcher.KEY_ID));
@@ -86,8 +90,14 @@ public class BidMachineFetcherTest {
 
     @Test
     public void fetch_expired() throws Exception {
-        AdRequest adRequest1 = createAdRequest(AdsType.Banner, "test_banner_id", 0.01);
-        AdRequest adRequest2 = createAdRequest(AdsType.Banner, "test_banner_id", 0.01);
+        AdRequest adRequest1 = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id")
+                .setAuctionPrice(0.01)
+                .build();
+        AdRequest adRequest2 = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id")
+                .setAuctionPrice(0.01)
+                .build();
         BidMachineFetcher.fetch(adRequest1);
         Map<String, AdRequest> requestMap = BidMachineFetcher.cachedRequests.get(AdsType.Banner);
         assertNotNull(requestMap);
@@ -106,11 +116,20 @@ public class BidMachineFetcherTest {
 
     @Test
     public void release1() {
-        AdRequest adRequest = createAdRequest(AdsType.Banner, "test_banner_id_1", 0.001);
+        AdRequest adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_1")
+                .setAuctionPrice(0.001)
+                .build();
         BidMachineFetcher.fetch(adRequest);
-        adRequest = createAdRequest(AdsType.Banner, "test_banner_id_2", 0.002);
+        adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_2")
+                .setAuctionPrice(0.002)
+                .build();
         BidMachineFetcher.fetch(adRequest);
-        adRequest = createAdRequest(AdsType.Interstitial, "test_interstitial_id_1", 0.003);
+        adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
+                .setAuctionId("test_interstitial_id_1")
+                .setAuctionPrice(0.003)
+                .build();
         BidMachineFetcher.fetch(adRequest);
 
         adRequest = BidMachineFetcher.release(AdsType.Banner, (String) null);
@@ -140,28 +159,46 @@ public class BidMachineFetcherTest {
 
     @Test
     public void release2() {
-        AdRequest adRequest1 = createAdRequest(AdsType.Banner, "test_banner_id_1", 0.001);
+        AdRequest adRequest1 = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_1")
+                .setAuctionPrice(0.001)
+                .build();
         BidMachineFetcher.fetch(adRequest1);
-        AdRequest adRequest2 = createAdRequest(AdsType.Banner, "test_banner_id_2", 0.002);
+        AdRequest adRequest2 = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_2")
+                .setAuctionPrice(0.002)
+                .build();
         BidMachineFetcher.fetch(adRequest2);
-        AdRequest adRequest3 = createAdRequest(AdsType.Interstitial,
-                                               "test_interstitial_id_1",
-                                               0.003);
+        AdRequest adRequest3 = new TestAdRequest.Builder(AdsType.Interstitial)
+                .setAuctionId("test_interstitial_id_1")
+                .setAuctionPrice(0.003)
+                .build();
         BidMachineFetcher.fetch(adRequest3);
 
-        AdRequest adRequest = createAdRequest(AdsType.Banner, null, 0.001);
+        AdRequest adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionPrice(0.001)
+                .build();
         AdRequest adRequestReleased = BidMachineFetcher.release(adRequest);
         assertNull(adRequestReleased);
 
-        adRequest = createAdRequest(AdsType.Banner, "", 0.001);
+        adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("")
+                .setAuctionPrice(0.001)
+                .build();
         adRequestReleased = BidMachineFetcher.release(adRequest);
         assertNull(adRequestReleased);
 
-        adRequest = createAdRequest(AdsType.Banner, "test_id_0", 0.001);
+        adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_id_0")
+                .setAuctionPrice(0.001)
+                .build();
         adRequestReleased = BidMachineFetcher.release(adRequest);
         assertNull(adRequestReleased);
 
-        adRequest = createAdRequest(AdsType.Native, "test_banner_id_1", 0.001);
+        adRequest = new TestAdRequest.Builder(AdsType.Native)
+                .setAuctionId("test_banner_id_1")
+                .setAuctionPrice(0.001)
+                .build();
         adRequestReleased = BidMachineFetcher.release(adRequest);
         assertNull(adRequestReleased);
 
@@ -180,11 +217,20 @@ public class BidMachineFetcherTest {
 
     @Test
     public void release3() {
-        AdRequest adRequest = createAdRequest(AdsType.Banner, "test_banner_id_1", 0.001);
+        AdRequest adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_1")
+                .setAuctionPrice(0.001)
+                .build();
         BidMachineFetcher.fetch(adRequest);
-        adRequest = createAdRequest(AdsType.Banner, "test_banner_id_2", 0.002);
+        adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAuctionId("test_banner_id_2")
+                .setAuctionPrice(0.002)
+                .build();
         BidMachineFetcher.fetch(adRequest);
-        adRequest = createAdRequest(AdsType.Interstitial, "test_interstitial_id_1", 0.003);
+        adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
+                .setAuctionId("test_interstitial_id_1")
+                .setAuctionPrice(0.003)
+                .build();
         BidMachineFetcher.fetch(adRequest);
 
         adRequest = BidMachineFetcher.release(AdsType.Banner, createMapWithId(null));
@@ -266,64 +312,6 @@ public class BidMachineFetcherTest {
         assertEquals("1.58", result);
     }
 
-
-    private AdRequest createAdRequest(AdsType adsType, final String id, final double price) {
-        AdRequest adRequest = new AdRequest(adsType) {
-            @NonNull
-            @Override
-            protected UnifiedAdRequestParams createUnifiedAdRequestParams(@NonNull TargetingParams targetingParams,
-                                                                          @NonNull DataRestrictions dataRestrictions) {
-                return null;
-            }
-        };
-        adRequest.auctionResult = new AuctionResult() {
-            @NonNull
-            @Override
-            public String getId() {
-                return id;
-            }
-
-            @Override
-            public String getNetworkName() {
-                return "TestNetwork";
-            }
-
-            @Nullable
-            @Override
-            public String getDemandSource() {
-                return null;
-            }
-
-            @Override
-            public double getPrice() {
-                return price;
-            }
-
-            @Override
-            public String getSeat() {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public String getCreativeId() {
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public String getCid() {
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public String[] getAdDomains() {
-                return new String[0];
-            }
-        };
-        return adRequest;
-    }
 
     private Map<String, String> createMapWithId(final String id) {
         return new HashMap<String, String>() {{
