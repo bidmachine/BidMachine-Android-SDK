@@ -326,6 +326,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 listener.onRequestExpired((SelfType) this);
             }
         }
+        for (AdRequestListener adRequestListener : BidMachineImpl.get().getAdRequestListeners()) {
+            adRequestListener.onRequestExpired(this);
+        }
     }
 
     /**
@@ -420,6 +423,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             listener.onRequestSuccess(this, auctionResult);
                         }
                     }
+                    for (AdRequestListener listener : BidMachineImpl.get().getAdRequestListeners()) {
+                        listener.onRequestSuccess(this, auctionResult);
+                    }
                     BidMachineEvents.eventFinish(
                             trackingObject,
                             TrackEventType.AuctionRequest,
@@ -444,6 +450,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             for (AdRequestListener listener : adRequestListeners) {
                 listener.onRequestFailed(this, error);
             }
+        }
+        for (AdRequestListener adRequestListener : BidMachineImpl.get().getAdRequestListeners()) {
+            adRequestListener.onRequestFailed(this, error);
         }
         BidMachineEvents.eventFinish(
                 trackingObject,
@@ -576,11 +585,17 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     }
 
-    protected static class BaseUnifiedAdRequestParams extends UnifiedAdRequestParamsImpl {
+    protected class BaseUnifiedAdRequestParams extends UnifiedAdRequestParamsImpl {
 
         public BaseUnifiedAdRequestParams(@NonNull TargetingParams targetingParams,
                                           @NonNull DataRestrictions dataRestrictions) {
             super(targetingParams, dataRestrictions);
+        }
+
+        @Nullable
+        @Override
+        public AdRequest getAdRequest() {
+            return AdRequest.this;
         }
     }
 

@@ -1,53 +1,74 @@
 package io.bidmachine.ads.networks.criteo;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.os.Bundle;
+import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.json.JSONObject;
+import com.criteo.publisher.BidResponse;
+import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoErrorCode;
+import com.criteo.publisher.model.AdUnit;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import io.bidmachine.AdRequest;
 import io.bidmachine.AdsType;
-import io.bidmachine.BMLog;
+import io.bidmachine.BidMachine;
 import io.bidmachine.ContextProvider;
+import io.bidmachine.HeaderBiddingAdRequestParams;
+import io.bidmachine.HeaderBiddingAdapter;
+import io.bidmachine.HeaderBiddingCollectParamsCallback;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
-import io.bidmachine.models.DeviceInfo;
+import io.bidmachine.models.AuctionResult;
 import io.bidmachine.unified.UnifiedAdRequestParams;
+import io.bidmachine.unified.UnifiedBannerAd;
+import io.bidmachine.unified.UnifiedFullscreenAd;
+import io.bidmachine.utils.BMError;
 
-class CriteoAdapter extends NetworkAdapter {
+class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     private static final String TAG = "CriteoAdapter";
 
-    private static final String EVENT_LAUNCH = "Launch";
-    private static final String EVENT_ACTIVE = "Active";
-    private static final String EVENT_INACTIVE = "Inactive";
-
-    private static final Executor networkExecutor = Executors.newFixedThreadPool(2);
-
-    @Nullable
-    private String senderId;
-    @Nullable
-    private DeviceInfo deviceInfo;
-    private volatile long nextValidRequestTime;
-
     CriteoAdapter() {
-        super("criteo", BuildConfig.VERSION_NAME, BuildConfig.VERSION_NAME, new AdsType[]{});
+        super("criteo",
+              "3.5.0",
+              BuildConfig.VERSION_NAME,
+              new AdsType[]{AdsType.Banner, AdsType.Interstitial});
+        BidMachine.registerAdRequestListener(new AdRequest.AdRequestListener() {
+            @Override
+            public void onRequestSuccess(@NonNull AdRequest adRequest,
+                                         @NonNull AuctionResult auctionResult) {
+                if (!getKey().equals(auctionResult.getNetworkKey())) {
+                    CriteoBidTokenController.takeBidToken(adRequest);
+                }
+            }
+
+            @Override
+            public void onRequestFailed(@NonNull AdRequest adRequest, @NonNull BMError error) {
+                CriteoBidTokenController.takeBidToken(adRequest);
+            }
+
+            @Override
+            public void onRequestExpired(@NonNull AdRequest adRequest) {
+                CriteoBidTokenController.takeBidToken(adRequest);
+            }
+        });
+    }
+
+    @Override
+    public UnifiedBannerAd createBanner() {
+        return new CriteoBanner();
+    }
+
+    @Override
+    public UnifiedFullscreenAd createInterstitial() {
+        return new CriteoInterstitial();
     }
 
     @Override
@@ -55,163 +76,105 @@ class CriteoAdapter extends NetworkAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
-        Map<String, String> params = networkConfigParams.obtainNetworkParams();
-        if (params != null) {
-            senderId = params.get(CriteoConfig.SENDER_ID);
-            if (senderId == null) {
-                Log.e(TAG, "Initialize failed: sender_id not provided");
-                return;
-            }
-            deviceInfo = adRequestParams.getDeviceInfo();
-            ((Application) contextProvider.getContext().getApplicationContext())
-                    .registerActivityLifecycleCallbacks(lifecycleCallbacks);
-            sendRequest(contextProvider.getContext(), EVENT_LAUNCH);
-        }
-    }
-
-    private boolean maySendRequest(@NonNull Context context, @NonNull DeviceInfo deviceInfo) {
-        boolean mayByThrottle = nextValidRequestTime == 0
-                || System.currentTimeMillis() > nextValidRequestTime;
-        return !TextUtils.isEmpty(senderId)
-                && !TextUtils.isEmpty(deviceInfo.getHttpAgent(context))
-                && mayByThrottle;
-    }
-
-    private URL getUrl(@NonNull Context context,
-                       @NonNull String eventType,
-                       @NonNull DeviceInfo deviceInfo) throws Exception {
-        String url = String.format(Locale.ENGLISH,
-                                   "https://gum.criteo.com/appevent/v1/%s?gaid=%s&appId=%s&eventType=%s&limitedAdTracking=%d",
-                                   senderId,
-                                   deviceInfo.getIfa(context),
-                                   context.getPackageName(),
-                                   eventType,
-                                   deviceInfo.isLimitAdTrackingEnabled() ? 1 : 0);
-        return new URL(url);
-    }
-
-    private void sendRequest(@NonNull final Context context, @NonNull final String eventType) {
-        BMLog.log(TAG, String.format("Sending event: %s", eventType));
-        if (deviceInfo == null || !maySendRequest(context, deviceInfo)) {
-            BMLog.log(TAG, "Event sending consumed");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            Log.e(TAG, "Initialize failed: minSdkVersion for Criteo is 16");
             return;
         }
-        networkExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                HttpsURLConnection urlConnection = null;
-                InputStream inputStream = null;
-                try {
-                    urlConnection = (HttpsURLConnection) getUrl(context,
-                                                                eventType,
-                                                                deviceInfo).openConnection();
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.setRequestProperty("User-Agent",
-                                                     deviceInfo.getHttpAgent(context));
-                    urlConnection.setConnectTimeout(10000);
-                    urlConnection.setReadTimeout(10000);
-
-                    int responseCode = urlConnection.getResponseCode();
-                    if (responseCode == HttpsURLConnection.HTTP_OK) {
-                        long time = 0;
-                        inputStream = urlConnection.getInputStream();
-                        JSONObject response = getResponse(inputStream);
-                        if (response != null && response.has("throttleSec")) {
-                            int throttleSec = response.getInt("throttleSec");
-                            time = System.currentTimeMillis() + throttleSec * 1000;
-                        }
-                        nextValidRequestTime = time;
-                    } else if (responseCode == HttpsURLConnection.HTTP_BAD_REQUEST) {
-                        inputStream = urlConnection.getErrorStream();
-                        JSONObject response = getResponse(inputStream);
-                        if (response != null && response.has("error")) {
-                            BMLog.log(TAG,
-                                      String.format(Locale.ENGLISH,
-                                                    "Error: %s",
-                                                    response.getString("error")));
-                        }
-                    }
-                } catch (Exception e) {
-                    BMLog.log(e);
-                } finally {
-                    try {
-                        if (urlConnection != null) {
-                            urlConnection.disconnect();
-                        }
-                    } catch (Exception ignore) {
-                    }
-                    try {
-                        if (inputStream != null) {
-                            inputStream.close();
-                        }
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
-        });
+        if (isInitialized()) {
+            return;
+        }
+        Map<String, String> networkParams = networkConfigParams.obtainNetworkParams();
+        if (networkParams == null) {
+            Log.e(TAG, "Initialize failed: network parameters not found");
+            return;
+        }
+        String publisherId = networkParams.get(CriteoConfig.PUBLISHER_ID);
+        if (TextUtils.isEmpty(publisherId)) {
+            Log.e(TAG, "Initialize failed: publisher_id not provided");
+            return;
+        }
+        assert publisherId != null;
+        List<AdUnit> adUnitList = CriteoAdUnitController.extractAdUnits(networkConfigParams);
+        if (adUnitList == null || adUnitList.size() == 0) {
+            Log.e(TAG, "Initialize failed: adUnits not found");
+            return;
+        }
+        configure(contextProvider.getContext(), publisherId, adUnitList);
     }
 
-    private JSONObject getResponse(InputStream inputStream) {
-        BufferedReader reader = null;
+    @Override
+    public void collectHeaderBiddingParams(@NonNull ContextProvider contextProvider,
+                                           @NonNull UnifiedAdRequestParams adRequestParams,
+                                           @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
+                                           @NonNull HeaderBiddingCollectParamsCallback collectCallback,
+                                           @NonNull Map<String, String> mediationConfig) {
+        if (!isInitialized()) {
+            collectCallback.onCollectFail(BMError.NotInitialized);
+        }
+        String adUnitId = mediationConfig.get(CriteoConfig.AD_UNIT_ID);
+        if (TextUtils.isEmpty(adUnitId)) {
+            collectCallback.onCollectFail(BMError.IncorrectAdUnit);
+        }
+        assert adUnitId != null;
+
+        Criteo criteo = Criteo.getInstance();
+        AdUnit adUnit = CriteoAdUnitController.getAdUnit(adUnitId);
+        if (adUnit == null) {
+            collectCallback.onCollectFail(BMError.requestError("AdUnit not found"));
+            return;
+        }
+        BidResponse bidResponse = criteo.getBidResponse(adUnit);
+        if (bidResponse != null
+                && bidResponse.isBidSuccess()
+                && bidResponse.getBidToken() != null) {
+            CriteoBidTokenController.storeBidToken(
+                    adRequestParams.getAdRequest(),
+                    bidResponse.getBidToken());
+            Map<String, String> params = new HashMap<>();
+            params.put(CriteoConfig.AD_UNIT_ID, adUnitId);
+            params.put(CriteoConfig.PRICE, String.valueOf(bidResponse.getPrice()));
+            collectCallback.onCollectFinished(params);
+        } else {
+            collectCallback.onCollectFail(BMError.NotLoaded);
+        }
+    }
+
+    private boolean isInitialized() {
         try {
-            StringBuilder builder = new StringBuilder(inputStream.available());
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line).append('\n');
-            }
-            if (builder.length() > 0) {
-                builder.setLength(builder.length() - 1);
-            }
-            return new JSONObject(builder.toString());
-        } catch (Exception e) {
-            BMLog.log(e);
-            return null;
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (Exception ignore) {
-            }
+            return Criteo.getInstance() != null;
+        } catch (Throwable t) {
+            return false;
         }
     }
 
-    private final Application.ActivityLifecycleCallbacks lifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
-
-        @Override
-        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-            //ignore
+    private void configure(@NonNull Context context,
+                           @NonNull String publisherId,
+                           @NonNull List<AdUnit> adUnitList) {
+        try {
+            Application application = (Application) context.getApplicationContext();
+            if (application != null) {
+                new Criteo.Builder(application, publisherId)
+                        .adUnits(adUnitList)
+                        .init();
+            } else {
+                Log.e(TAG, "Criteo failed to initialize");
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "Criteo failed to initialize");
         }
+    }
 
-        @Override
-        public void onActivityStarted(Activity activity) {
-            //ignore
+    static BMError mapError(CriteoErrorCode criteoErrorCode) {
+        switch (criteoErrorCode) {
+            case ERROR_CODE_NO_FILL:
+            case ERROR_CODE_INTERNAL_ERROR:
+            case ERROR_CODE_INVALID_REQUEST:
+                return BMError.NoContent;
+            case ERROR_CODE_NETWORK_ERROR:
+                return BMError.Connection;
+            default:
+                return BMError.Internal;
         }
+    }
 
-        @Override
-        public void onActivityResumed(Activity activity) {
-            sendRequest(activity, EVENT_ACTIVE);
-        }
-
-        @Override
-        public void onActivityPaused(Activity activity) {
-            sendRequest(activity, EVENT_INACTIVE);
-        }
-
-        @Override
-        public void onActivityStopped(Activity activity) {
-            //ignore
-        }
-
-        @Override
-        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-            //ignore
-        }
-
-        @Override
-        public void onActivityDestroyed(Activity activity) {
-            //ignore
-        }
-    };
 }

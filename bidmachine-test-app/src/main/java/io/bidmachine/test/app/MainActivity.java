@@ -815,10 +815,12 @@ public class MainActivity extends AppCompatActivity {
                             + "    ]\n"
                             + "}"),
             new OptionalNetwork(7, "Criteo",
-                                new CriteoConfig("3703"),
+                                new CriteoConfig("B-057601")
+                                        .withMediationConfig(AdsFormat.Banner_320x50, "30s6zt3ayypfyemwjvmp")
+                                        .withMediationConfig(AdsFormat.Interstitial, "6yws53jyfjgoq1ghnuqb"),
                                 "{\n"
                                         + "    \"network\":\"criteo\",\n"
-                                        + "    \"sender_id\":\"3703\"\n"
+                                        + "    \"publisher_id\":\"B-057601\"\n"
                                         + "}")
     };
 }

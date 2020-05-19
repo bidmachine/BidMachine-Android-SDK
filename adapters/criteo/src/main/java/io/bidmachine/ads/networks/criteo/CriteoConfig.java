@@ -6,16 +6,19 @@ import android.support.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.bidmachine.AdsFormat;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfig;
 
 public class CriteoConfig extends NetworkConfig {
 
-    static final String SENDER_ID = "sender_id";
+    static final String PUBLISHER_ID = "publisher_id";
+    static final String AD_UNIT_ID = "ad_unit_id";
+    static final String PRICE = "price";
 
-    public CriteoConfig(final String senderId) {
+    public CriteoConfig(final String publisherId) {
         super(new HashMap<String, String>() {{
-            put(SENDER_ID, senderId);
+            put(PUBLISHER_ID, publisherId);
         }});
     }
 
@@ -28,4 +31,12 @@ public class CriteoConfig extends NetworkConfig {
     protected NetworkAdapter createNetworkAdapter() {
         return new CriteoAdapter();
     }
+
+    public CriteoConfig withMediationConfig(@NonNull AdsFormat adsFormat,
+                                            @NonNull final String adUnitId) {
+        return withMediationConfig(adsFormat, new HashMap<String, String>() {{
+            put(AD_UNIT_ID, adUnitId);
+        }});
+    }
+
 }

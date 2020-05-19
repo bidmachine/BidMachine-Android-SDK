@@ -8,4 +8,16 @@ android {
 
 apply from: '../adapters.gradle'
 
-dependencies {}
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url "https://pubsdk-bin.criteo.com/publishersdk/android"
+        }
+    }
+}
+
+dependencies {
+    adapterDependency 'com.criteo.publisher:criteo-publisher-sdk:3.5.0'
+}

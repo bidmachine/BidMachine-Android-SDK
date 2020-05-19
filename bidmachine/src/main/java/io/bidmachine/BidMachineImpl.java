@@ -11,6 +11,7 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,8 @@ final class BidMachineImpl {
             return BidMachineImpl.class.getSimpleName();
         }
     };
+
+    private List<AdRequest.AdRequestListener> adRequestListeners = new ArrayList<>();
 
     synchronized void initialize(@NonNull final Context context,
                                  @NonNull final String sellerId,
@@ -350,6 +353,24 @@ final class BidMachineImpl {
 
     static Activity getTopActivity() {
         return get().topActivity;
+    }
+
+    void registerAdRequestListener(@Nullable AdRequest.AdRequestListener adRequestListener) {
+        if (adRequestListener == null) {
+            return;
+        }
+        adRequestListeners.add(adRequestListener);
+    }
+
+    void unregisterAdRequestListener(@Nullable AdRequest.AdRequestListener adRequestListener) {
+        if (adRequestListener == null) {
+            return;
+        }
+        adRequestListeners.remove(adRequestListener);
+    }
+
+    List<AdRequest.AdRequestListener> getAdRequestListeners() {
+        return adRequestListeners;
     }
 
 }

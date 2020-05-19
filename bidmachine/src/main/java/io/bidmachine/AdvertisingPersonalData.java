@@ -53,8 +53,8 @@ class AdvertisingPersonalData {
     }
 
     static void syncUpdateInfo(Context context) {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         try {
-            final CountDownLatch countDownLatch = new CountDownLatch(1);
             AdvertisingIdClientInfo.executeTask(context, new AdvertisingIdClientInfo.Closure() {
                 @Override
                 public void executed(@NonNull AdvertisingIdClientInfo.AdvertisingProfile advertisingProfile) {
@@ -66,6 +66,7 @@ class AdvertisingPersonalData {
             countDownLatch.await();
         } catch (Exception e) {
             Logger.log(e);
+            countDownLatch.countDown();
         }
     }
 
