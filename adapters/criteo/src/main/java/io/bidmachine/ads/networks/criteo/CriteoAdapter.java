@@ -44,7 +44,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             @Override
             public void onRequestSuccess(@NonNull AdRequest adRequest,
                                          @NonNull AuctionResult auctionResult) {
-                if (!getKey().equals(auctionResult.getNetworkName())) {
+                if (!getKey().equals(auctionResult.getNetworkKey())) {
                     CriteoBidTokenController.takeBidToken(adRequest);
                 }
             }
