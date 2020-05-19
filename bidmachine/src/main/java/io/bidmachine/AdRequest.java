@@ -563,12 +563,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public ReturnType build() {
             try {
                 prepareRequest();
-                if (params != null
-                        && params.priceFloorParams != null
-                        && params.headerBiddingEnabled) {
-                    Logger.log(
-                            "You haven't disabled header bidding. Are you sure you want to use it with predefined price floor?");
-                }
                 return params;
             } finally {
                 params = null;
