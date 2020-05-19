@@ -41,8 +41,7 @@ final class AuctionResultImpl implements AuctionResult {
     @NonNull
     private final Map<String, String> customParams;
 
-    AuctionResultImpl(@NonNull NetworkConfig networkConfig,
-                      @NonNull Response.Seatbid seatbid,
+    AuctionResultImpl(@NonNull Response.Seatbid seatbid,
                       @NonNull Response.Seatbid.Bid bid,
                       @NonNull Ad ad,
                       @NonNull NetworkConfig networkConfig) {
