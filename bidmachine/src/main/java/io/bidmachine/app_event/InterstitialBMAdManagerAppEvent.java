@@ -146,7 +146,10 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             interstitialAd.destroy();
             interstitialAd = null;
         }
-        publisherInterstitialAd = null;
+        if (publisherInterstitialAd != null) {
+            publisherInterstitialAd.setAppEventListener(null);
+            publisherInterstitialAd = null;
+        }
         interstitialRequest = null;
     }
 

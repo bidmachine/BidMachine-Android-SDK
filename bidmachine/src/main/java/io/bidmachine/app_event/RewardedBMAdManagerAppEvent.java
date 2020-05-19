@@ -93,6 +93,9 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
         rewardedAd.setOnAdMetadataChangedListener(new OnAdMetadataChangedListener() {
             @Override
             public void onAdMetadataChanged() {
+                if (rewardedAd == null) {
+                    return;
+                }
                 if (isBidMachine(rewardedAd.getAdMetadata())) {
                     loadAd(context);
                 } else {
@@ -149,7 +152,10 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
             bmRewardedAd.destroy();
             bmRewardedAd = null;
         }
-        rewardedAd = null;
+        if (rewardedAd != null) {
+            rewardedAd.setOnAdMetadataChangedListener(null);
+            rewardedAd = null;
+        }
         rewardedRequest = null;
     }
 
