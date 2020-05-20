@@ -123,8 +123,7 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
         assert appKey != null;
         AdRegistration.getInstance(appKey, contextProvider.getContext().getApplicationContext());
-//        AdRegistration.enableTesting(adRequestParams.isTestMode());
-        AdRegistration.enableTesting(true);
+        AdRegistration.enableTesting(adRequestParams.isTestMode());
         DataRestrictions dataRestrictions = adRequestParams.getDataRestrictions();
         if (dataRestrictions != null) {
             AdRegistration.useGeoLocation(dataRestrictions.canSendGeoPosition());
