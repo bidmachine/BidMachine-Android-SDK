@@ -9,7 +9,7 @@ android {
 apply from: '../adapters.gradle'
 
 dependencies {
-    adapterDependency 'com.explorestack.amazon:sdk.dtb:8.0.0'
+    adapterDependency 'com.amazon.android:aps-sdk:8.3.0@aar'
     adapterDependency("com.google.android.gms:play-services-ads:15.0.0") {
         exclude module: 'support-v4'
         exclude module: 'support-v7'

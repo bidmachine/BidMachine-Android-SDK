@@ -110,10 +110,12 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull Map<String, String> mediationConfig) {
         if (!isInitialized()) {
             collectCallback.onCollectFail(BMError.NotInitialized);
+            return;
         }
         String adUnitId = mediationConfig.get(CriteoConfig.AD_UNIT_ID);
         if (TextUtils.isEmpty(adUnitId)) {
             collectCallback.onCollectFail(BMError.IncorrectAdUnit);
+            return;
         }
         assert adUnitId != null;
 

@@ -1,9 +1,11 @@
 package io.bidmachine.ads.networks;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdRegistration;
@@ -27,11 +29,14 @@ import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
 import io.bidmachine.ads.networks.amazon.BuildConfig;
 import io.bidmachine.banner.BannerSize;
+import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;
 import io.bidmachine.utils.BMError;
 
 class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
+
+    private static final String TAG = "AmazonAdapter";
 
     AmazonAdapter() {
         super("amazon",
@@ -51,6 +56,10 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            Log.e(TAG, "Initialize failed: minSdkVersion for Amazon is 16");
+            return;
+        }
         initialize(contextProvider, adRequestParams, networkConfigParams.obtainNetworkParams());
         AdRegistration.setMRAIDSupportedVersions(new String[]{"1.0", "2.0"});
         AdRegistration.setMRAIDPolicy(MRAIDPolicy.CUSTOM);
@@ -62,6 +71,10 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
                                            @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
                                            @NonNull Map<String, String> mediationConfig) {
+        if (!isInitialized()) {
+            collectCallback.onCollectFail(BMError.NotInitialized);
+            return;
+        }
         final String slotUuid = mediationConfig.get(AmazonConfig.SLOT_UUID);
         if (TextUtils.isEmpty(slotUuid)) {
             collectCallback.onCollectFail(
@@ -75,9 +88,11 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
         final AdsType adsType = hbAdRequestParams.getAdsType();
         final AdContentType adContentType = hbAdRequestParams.getAdContentType();
+        String usPrivacy = adRequestParams.getDataRestrictions().getUsPrivacy();
         if (adsType == AdsType.Banner) {
             BannerSize bannerSize = ((UnifiedBannerAdRequestParams) adRequestParams).getBannerSize();
             AmazonLoader.forDisplay(collectCallback)
+                    .withUsPrivacy(usPrivacy)
                     .load(new DTBAdSize(bannerSize.width, bannerSize.height, slotUuid));
         } else if (adsType == AdsType.Interstitial || adsType == AdsType.Rewarded) {
             if (adContentType == AdContentType.Video) {
@@ -85,11 +100,13 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                         .getResources()
                         .getDisplayMetrics();
                 AmazonLoader.forVideo(collectCallback)
+                        .withUsPrivacy(usPrivacy)
                         .load(new DTBAdSize.DTBVideo(metrics.widthPixels,
                                                      metrics.heightPixels,
                                                      slotUuid));
             } else {
                 AmazonLoader.forDisplay(collectCallback)
+                        .withUsPrivacy(usPrivacy)
                         .load(new DTBAdSize.DTBInterstitialAdSize(slotUuid));
             }
         } else {
@@ -106,8 +123,17 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
         assert appKey != null;
         AdRegistration.getInstance(appKey, contextProvider.getContext().getApplicationContext());
-        AdRegistration.enableTesting(adRequestParams.isTestMode());
+//        AdRegistration.enableTesting(adRequestParams.isTestMode());
+        AdRegistration.enableTesting(true);
+        DataRestrictions dataRestrictions = adRequestParams.getDataRestrictions();
+        if (dataRestrictions != null) {
+            AdRegistration.useGeoLocation(dataRestrictions.canSendGeoPosition());
+        }
         return true;
+    }
+
+    private boolean isInitialized() {
+        return AdRegistration.isInitialized();
     }
 
     private static abstract class AmazonLoader {
@@ -148,14 +174,23 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
 
         private HeaderBiddingCollectParamsCallback collectCallback;
+        private String usPrivacy;
 
         private AmazonLoader(HeaderBiddingCollectParamsCallback collectCallback) {
             this.collectCallback = collectCallback;
         }
 
+        AmazonLoader withUsPrivacy(@Nullable String usPrivacy) {
+            this.usPrivacy = usPrivacy;
+            return this;
+        }
+
         void load(@NonNull DTBAdSize size) {
             DTBAdRequest request = new DTBAdRequest();
             request.setSizes(size);
+            if (!TextUtils.isEmpty(usPrivacy)) {
+                request.putCustomTarget("us_privacy", usPrivacy);
+            }
             request.loadAd(new DTBAdCallback() {
                 @Override
                 public void onFailure(@NonNull AdError adError) {
@@ -195,4 +230,5 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                 return BMError.Internal;
         }
     }
+
 }
