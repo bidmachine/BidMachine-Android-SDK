@@ -1,5 +1,7 @@
 package io.bidmachine.models;
 
+import android.support.annotation.Nullable;
+
 public interface DataRestrictions {
 
     boolean canSendGeoPosition();
@@ -17,4 +19,8 @@ public interface DataRestrictions {
     boolean isUserGdprProtected();
 
     boolean isUserAgeRestricted();
+
+    @Nullable
+    String getUsPrivacy();
+
 }
