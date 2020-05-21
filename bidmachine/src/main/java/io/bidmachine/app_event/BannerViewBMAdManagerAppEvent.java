@@ -13,6 +13,9 @@ import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.bidmachine.AdRequest;
 import io.bidmachine.BidMachineFetcher;
 import io.bidmachine.BidMachineHelper;
@@ -40,12 +43,19 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     @Override
     public void load(@NonNull final Context context) {
+        super.load(context);
+        eventParams.put("ad_type", "banner");
+
         bannerRequest = new BannerRequest.Builder()
                 .setSize(BannerSize.Size_320x50)
                 .setListener(new BannerRequest.AdRequestListener() {
                     @Override
                     public void onRequestSuccess(@NonNull final BannerRequest bannerRequest,
                                                  @NonNull AuctionResult auctionResult) {
+                        eventParams.put("bm_pf_clear", String.valueOf(auctionResult.getPrice()));
+                        eventParams.putAll(BidMachineHelper.toMap(bannerRequest));
+                        Event.BMRequestSuccess.send(eventParams);
+
                         Utils.onUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -71,6 +81,8 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
                 })
                 .build();
         bannerRequest.request(context);
+
+        Event.BMRequestStart.send(eventParams);
     }
 
     private void loadPublisherAd(@NonNull final Context context, @NonNull AdRequest adRequest) {
@@ -99,11 +111,16 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
         publisherAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-
+                Event.GAMLoaded.send(eventParams);
             }
 
             @Override
-            public void onAdFailedToLoad(int i) {
+            public void onAdFailedToLoad(int errorCode) {
+                Map<String, String> params = new HashMap<>(eventParams);
+                params.put("error_code", String.valueOf(errorCode));
+                params.put("error_code_message", BMAdManager.decryptGAMErrorCode(errorCode));
+                Event.GAMFailToLoad.send(params);
+
                 if (listener != null) {
                     listener.onAdFailToLoad();
                 }
@@ -112,6 +129,11 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
         publisherAdView.setAppEventListener(new AppEventListener() {
             @Override
             public void onAppEvent(String key, String value) {
+                Map<String, String> params = new HashMap<>(eventParams);
+                params.put("app_event_key", String.valueOf(key));
+                params.put("app_event_value", String.valueOf(value));
+                Event.GAMAppEvent.send(params);
+
                 if (isBidMachine(key)) {
                     loadAd(context);
                 } else {
@@ -122,6 +144,9 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
             }
         });
         publisherAdView.loadAd(publisherAdRequest);
+
+        eventParams.putAll(BidMachineHelper.toMap(adRequest));
+        Event.GAMLoadStart.send(eventParams);
     }
 
     private boolean isBidMachine(@Nullable String key) {
@@ -132,21 +157,33 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
         bannerView = new BannerView(context);
         bannerView.setListener(new Listener());
         bannerView.load(bannerRequest);
+
+        Event.BMLoadStart.send(eventParams);
     }
 
     @Override
     public boolean isLoaded() {
+        Event.BMIsLoaded.send(eventParams);
+
         return bannerView != null && bannerView.isLoaded() && bannerView.canShow();
     }
 
     @Override
     public void show(@NonNull final Context context) {
-        if (context instanceof Activity && isLoaded()) {
-            bmPopupWindow.showView((Activity) context,
-                                   bannerView,
-                                   adSize.getWidth(),
-                                   adSize.getHeight());
+        if (context instanceof Activity) {
+            if (isLoaded()) {
+                Event.BMShow.send(eventParams);
+
+                bmPopupWindow.showView((Activity) context,
+                                       bannerView,
+                                       adSize.getWidth(),
+                                       adSize.getHeight());
+            }
         } else {
+            Map<String, String> params = new HashMap<>(eventParams);
+            params.put("show_error_message", "WRONG_CONTEXT");
+            Event.BMFailToShow.send(params);
+
             Log.e(TAG, "Activity needed to display banner");
         }
     }
@@ -179,6 +216,8 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdLoaded(@NonNull BannerView ad) {
+            Event.BMLoaded.send(eventParams);
+
             bmPopupWindow = new BMPopupWindow();
             if (listener != null) {
                 listener.onAdLoaded();
@@ -187,6 +226,10 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdLoadFailed(@NonNull BannerView ad, @NonNull BMError error) {
+            Map<String, String> params = new HashMap<>(eventParams);
+            params.put("bm_error", String.valueOf(error.getCode()));
+            Event.BMFailToLoad.send(params);
+
             if (listener != null) {
                 listener.onAdFailToLoad();
             }
@@ -194,6 +237,8 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdShown(@NonNull BannerView ad) {
+            Event.BMShown.send(eventParams);
+
             if (listener != null) {
                 listener.onAdShown();
             }
@@ -213,6 +258,8 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdExpired(@NonNull BannerView ad) {
+            Event.BMExpired.send(eventParams);
+
             if (listener != null) {
                 listener.onAdExpired();
             }

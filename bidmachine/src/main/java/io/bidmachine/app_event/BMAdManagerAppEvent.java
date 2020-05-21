@@ -4,10 +4,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class BMAdManagerAppEvent {
 
     static final String TAG = "BMAdManagerAppEvent";
 
+    final Map<String, String> eventParams = new HashMap<>();
     final String adUnitId;
 
     @Nullable
@@ -25,7 +29,10 @@ public abstract class BMAdManagerAppEvent {
         this.listener = new BMAdManagerAppEventUIListener(adManagerAppEventListener);
     }
 
-    public abstract void load(@NonNull final Context context);
+    public void load(@NonNull final Context context) {
+        Event.newRequest();
+        eventParams.clear();
+    }
 
     public abstract boolean isLoaded();
 

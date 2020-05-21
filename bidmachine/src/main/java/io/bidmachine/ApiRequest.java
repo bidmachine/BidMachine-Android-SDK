@@ -20,7 +20,7 @@ import java.net.SocketTimeoutException;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 
-class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDataType, ResponseType, BMError> {
+public class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDataType, ResponseType, BMError> {
 
     @VisibleForTesting
     static int REQUEST_TIMEOUT = 10 * 1000;

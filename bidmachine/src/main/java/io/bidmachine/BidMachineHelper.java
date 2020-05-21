@@ -61,7 +61,7 @@ public class BidMachineHelper {
     }
 
     @NonNull
-    static Map<String, String> toMap(@NonNull AdRequest adRequest) {
+    public static Map<String, String> toMap(@NonNull AdRequest adRequest) {
         Map<String, String> result = new HashMap<>();
         AuctionResult auctionResult = adRequest.getAuctionResult();
         if (auctionResult == null) {
