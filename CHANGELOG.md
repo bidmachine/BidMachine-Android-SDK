@@ -1,9 +1,14 @@
+## Version 1.4.4 (May 22, 2020)
+**Features**:
+* Updated Amazon version to 8.3.0
+* Updated Criteo version to 3.5.0
+
 ## Version 1.4.3 (April 9, 2020)
 **Features**:
 * Added support CCPA based on IAB. More info [here](https://github.com/InteractiveAdvertisingBureau/USPrivacy/blob/master/CCPA/Version%201.0/USP%20API.md)
-* Updated AdColony to 4.1.0
-* Updated Facebook to 5.7.1
-* Updated Tapjoy to 12.4.2
+* Updated AdColony version to 4.1.0
+* Updated Facebook version to 5.7.1
+* Updated Tapjoy version to 12.4.2
 
 ## Version 1.4.1 (January 21, 2020)
 **Features**:

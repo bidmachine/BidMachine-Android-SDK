@@ -12,8 +12,8 @@ android {
     defaultConfig {
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
-        versionCode 100100031
-        versionName "1.4.3"
+        versionCode 100100032
+        versionName "1.4.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         consumerProguardFiles 'proguard-rules.pro'
