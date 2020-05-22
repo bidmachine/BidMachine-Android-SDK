@@ -37,18 +37,23 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     @Override
     public void load(@NonNull final Context context) {
-        super.load(context);
-        eventParams.put("ad_type", "interstitial");
         destroy();
+        super.load(context);
+        if (eventTracker != null) {
+            eventTracker.addParam("ad_type", "interstitial");
+        }
 
         interstitialRequest = new InterstitialRequest.Builder()
                 .setListener(new InterstitialRequest.AdRequestListener() {
                     @Override
                     public void onRequestSuccess(@NonNull final InterstitialRequest interstitialRequest,
                                                  @NonNull AuctionResult auctionResult) {
-                        eventParams.put("bm_pf_clear", String.valueOf(auctionResult.getPrice()));
-                        eventParams.putAll(BidMachineHelper.toMap(interstitialRequest));
-                        Event.BMRequestSuccess.send(eventParams);
+                        if (eventTracker != null) {
+                            eventTracker.addParam("bm_pf_clear",
+                                                  String.valueOf(auctionResult.getPrice()));
+                            eventTracker.addParams(BidMachineHelper.toMap(interstitialRequest));
+                            eventTracker.send(Event.BMRequestSuccess);
+                        }
 
                         Utils.onUiThread(new Runnable() {
                             @Override
@@ -76,7 +81,9 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
                 .build();
         interstitialRequest.request(context);
 
-        Event.BMRequestStart.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.send(Event.BMRequestStart);
+        }
     }
 
     private void loadPublisherAd(@NonNull final Context context, @NonNull AdRequest adRequest) {
@@ -104,15 +111,19 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
         publisherInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-                Event.GAMLoaded.send(eventParams);
+                if (eventTracker != null) {
+                    eventTracker.send(Event.GAMLoaded);
+                }
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Map<String, String> params = new HashMap<>(eventParams);
-                params.put("error_code", String.valueOf(errorCode));
-                params.put("error_code_message", BMAdManager.decryptGAMErrorCode(errorCode));
-                Event.GAMFailToLoad.send(params);
+                if (eventTracker != null) {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("error_code", String.valueOf(errorCode));
+                    params.put("error_code_message", BMAdManager.decryptGAMErrorCode(errorCode));
+                    eventTracker.send(Event.GAMFailToLoad, params);
+                }
 
                 if (listener != null) {
                     listener.onAdFailToLoad();
@@ -122,10 +133,12 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
         publisherInterstitialAd.setAppEventListener(new AppEventListener() {
             @Override
             public void onAppEvent(String key, String value) {
-                Map<String, String> params = new HashMap<>(eventParams);
-                params.put("app_event_key", String.valueOf(key));
-                params.put("app_event_value", String.valueOf(value));
-                Event.GAMAppEvent.send(params);
+                if (eventTracker != null) {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("app_event_key", String.valueOf(key));
+                    params.put("app_event_value", String.valueOf(value));
+                    eventTracker.send(Event.GAMAppEvent, params);
+                }
 
                 if (isBidMachine(key)) {
                     loadAd(context);
@@ -138,8 +151,10 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
         });
         publisherInterstitialAd.loadAd(publisherAdRequest);
 
-        eventParams.putAll(BidMachineHelper.toMap(adRequest));
-        Event.GAMLoadStart.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.addParams(BidMachineHelper.toMap(adRequest));
+            eventTracker.send(Event.GAMLoadStart);
+        }
     }
 
     private boolean isBidMachine(@Nullable String key) {
@@ -151,12 +166,16 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
         interstitialAd.setListener(new Listener());
         interstitialAd.load(interstitialRequest);
 
-        Event.BMLoadStart.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.send(Event.BMLoadStart);
+        }
     }
 
     @Override
     public boolean isLoaded() {
-        Event.BMIsLoaded.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.send(Event.BMIsLoaded);
+        }
 
         return interstitialAd != null && interstitialAd.isLoaded() && interstitialAd.canShow();
     }
@@ -164,7 +183,9 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
     @Override
     public void show(@NonNull final Context context) {
         if (isLoaded()) {
-            Event.BMShow.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMShow);
+            }
 
             interstitialAd.show();
         }
@@ -172,6 +193,7 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     @Override
     public void destroy() {
+        super.destroy();
         if (interstitialAd != null) {
             interstitialAd.destroy();
             interstitialAd = null;
@@ -187,7 +209,9 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdLoaded(@NonNull InterstitialAd ad) {
-            Event.BMLoaded.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMLoaded);
+            }
 
             if (listener != null) {
                 listener.onAdLoaded();
@@ -196,9 +220,11 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdLoadFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
-            Map<String, String> params = new HashMap<>(eventParams);
-            params.put("bm_error", String.valueOf(error.getCode()));
-            Event.BMFailToLoad.send(params);
+            if (eventTracker != null) {
+                Map<String, String> params = new HashMap<>();
+                params.put("bm_error", String.valueOf(error.getCode()));
+                eventTracker.send(Event.BMFailToLoad, params);
+            }
 
             if (listener != null) {
                 listener.onAdFailToLoad();
@@ -207,7 +233,9 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdShown(@NonNull InterstitialAd ad) {
-            Event.BMShown.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMShown);
+            }
 
             if (listener != null) {
                 listener.onAdShown();
@@ -216,9 +244,11 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdShowFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
-            Map<String, String> params = new HashMap<>(eventParams);
-            params.put("bm_error", String.valueOf(error.getCode()));
-            Event.BMFailToShow.send(params);
+            if (eventTracker != null) {
+                Map<String, String> params = new HashMap<>();
+                params.put("bm_error", String.valueOf(error.getCode()));
+                eventTracker.send(Event.BMFailToShow, params);
+            }
         }
 
         @Override
@@ -242,7 +272,9 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdExpired(@NonNull InterstitialAd ad) {
-            Event.BMExpired.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMExpired);
+            }
 
             if (listener != null) {
                 listener.onAdExpired();

@@ -46,18 +46,23 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     @Override
     public void load(@NonNull final Context context) {
-        super.load(context);
-        eventParams.put("ad_type", "rewarded");
         destroy();
+        super.load(context);
+        if (eventTracker != null) {
+            eventTracker.addParam("ad_type", "rewarded");
+        }
 
         rewardedRequest = new RewardedRequest.Builder()
                 .setListener(new RewardedRequest.AdRequestListener() {
                     @Override
                     public void onRequestSuccess(@NonNull final RewardedRequest rewardedRequest,
                                                  @NonNull AuctionResult auctionResult) {
-                        eventParams.put("bm_pf_clear", String.valueOf(auctionResult.getPrice()));
-                        eventParams.putAll(BidMachineHelper.toMap(rewardedRequest));
-                        Event.BMRequestSuccess.send(eventParams);
+                        if (eventTracker != null) {
+                            eventTracker.addParam("bm_pf_clear",
+                                                  String.valueOf(auctionResult.getPrice()));
+                            eventTracker.addParams(BidMachineHelper.toMap(rewardedRequest));
+                            eventTracker.send(Event.BMRequestSuccess);
+                        }
 
                         Utils.onUiThread(new Runnable() {
                             @Override
@@ -85,7 +90,9 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
                 .build();
         rewardedRequest.request(context);
 
-        Event.BMRequestStart.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.send(Event.BMRequestStart);
+        }
     }
 
     private void loadPublisherAd(@NonNull final Context context,
@@ -119,18 +126,20 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
                 Bundle metadata = rewardedAd.getAdMetadata();
 
-                Map<String, String> params = new HashMap<>(eventParams);
-                if (metadata != null) {
-                    for (String key : metadata.keySet()) {
-                        String value = metadata.getString(key);
-                        if (!TextUtils.isEmpty(value)) {
-                            params.put("metadata_" + key, String.valueOf(metadata.get(key)));
+                if (eventTracker != null) {
+                    Map<String, String> params = new HashMap<>();
+                    if (metadata != null) {
+                        for (String key : metadata.keySet()) {
+                            String value = metadata.getString(key);
+                            if (!TextUtils.isEmpty(value)) {
+                                params.put("metadata_" + key, String.valueOf(metadata.get(key)));
+                            }
                         }
+                    } else {
+                        params.put("metadata", "null");
                     }
-                } else {
-                    params.put("metadata", "null");
+                    eventTracker.send(Event.GAMMetadata, params);
                 }
-                Event.GAMMetadata.send(params);
 
                 if (isBidMachine(metadata)) {
                     loadAd(context);
@@ -144,15 +153,19 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
         rewardedAd.loadAd(publisherAdRequest, new RewardedAdLoadCallback() {
             @Override
             public void onRewardedAdLoaded() {
-                Event.GAMLoaded.send(eventParams);
+                if (eventTracker != null) {
+                    eventTracker.send(Event.GAMLoaded);
+                }
             }
 
             @Override
             public void onRewardedAdFailedToLoad(int errorCode) {
-                Map<String, String> params = new HashMap<>(eventParams);
-                params.put("error_code", String.valueOf(errorCode));
-                params.put("error_code_message", BMAdManager.decryptGAMErrorCode(errorCode));
-                Event.GAMFailToLoad.send(params);
+                if (eventTracker != null) {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("error_code", String.valueOf(errorCode));
+                    params.put("error_code_message", BMAdManager.decryptGAMErrorCode(errorCode));
+                    eventTracker.send(Event.GAMFailToLoad, params);
+                }
 
                 if (listener != null) {
                     listener.onAdFailToLoad();
@@ -160,8 +173,10 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
             }
         });
 
-        eventParams.putAll(BidMachineHelper.toMap(adRequest));
-        Event.GAMLoadStart.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.addParams(BidMachineHelper.toMap(adRequest));
+            eventTracker.send(Event.GAMLoadStart);
+        }
     }
 
     private boolean isBidMachine(@Nullable Bundle metadata) {
@@ -177,12 +192,16 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
         bmRewardedAd.setListener(new Listener());
         bmRewardedAd.load(rewardedRequest);
 
-        Event.BMLoadStart.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.send(Event.BMLoadStart);
+        }
     }
 
     @Override
     public boolean isLoaded() {
-        Event.BMIsLoaded.send(eventParams);
+        if (eventTracker != null) {
+            eventTracker.send(Event.BMIsLoaded);
+        }
 
         return bmRewardedAd != null && bmRewardedAd.isLoaded() && bmRewardedAd.canShow();
     }
@@ -190,7 +209,9 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
     @Override
     public void show(@NonNull Context context) {
         if (isLoaded()) {
-            Event.BMShow.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMShow);
+            }
 
             bmRewardedAd.show();
         }
@@ -198,6 +219,7 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     @Override
     public void destroy() {
+        super.destroy();
         if (bmRewardedAd != null) {
             bmRewardedAd.destroy();
             bmRewardedAd = null;
@@ -213,7 +235,9 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdLoaded(@NonNull io.bidmachine.rewarded.RewardedAd ad) {
-            Event.BMLoaded.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMLoaded);
+            }
 
             if (listener != null) {
                 listener.onAdLoaded();
@@ -223,9 +247,11 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
         @Override
         public void onAdLoadFailed(@NonNull io.bidmachine.rewarded.RewardedAd ad,
                                    @NonNull BMError error) {
-            Map<String, String> params = new HashMap<>(eventParams);
-            params.put("bm_error", String.valueOf(error.getCode()));
-            Event.BMFailToLoad.send(params);
+            if (eventTracker != null) {
+                Map<String, String> params = new HashMap<>();
+                params.put("bm_error", String.valueOf(error.getCode()));
+                eventTracker.send(Event.BMFailToLoad, params);
+            }
 
             if (listener != null) {
                 listener.onAdFailToLoad();
@@ -234,7 +260,9 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdShown(@NonNull io.bidmachine.rewarded.RewardedAd ad) {
-            Event.BMShown.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMShown);
+            }
 
             if (listener != null) {
                 listener.onAdShown();
@@ -244,9 +272,11 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
         @Override
         public void onAdShowFailed(@NonNull io.bidmachine.rewarded.RewardedAd ad,
                                    @NonNull BMError error) {
-            Map<String, String> params = new HashMap<>(eventParams);
-            params.put("bm_error", String.valueOf(error.getCode()));
-            Event.BMFailToShow.send(params);
+            if (eventTracker != null) {
+                Map<String, String> params = new HashMap<>();
+                params.put("bm_error", String.valueOf(error.getCode()));
+                eventTracker.send(Event.BMFailToShow, params);
+            }
         }
 
         @Override
@@ -277,7 +307,9 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdExpired(@NonNull io.bidmachine.rewarded.RewardedAd ad) {
-            Event.BMExpired.send(eventParams);
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMExpired);
+            }
 
             if (listener != null) {
                 listener.onAdExpired();
