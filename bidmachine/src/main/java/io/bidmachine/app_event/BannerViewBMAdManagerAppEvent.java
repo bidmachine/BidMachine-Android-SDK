@@ -32,6 +32,7 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
     private static final String APP_EVENT_KEY = "bidmachine-banner";
     private static final AdSize adSize = AdSize.BANNER;
 
+    private BannerRequest.AdRequestListener bannerRequestListener;
     private BannerRequest bannerRequest;
     private PublisherAdView publisherAdView;
     private BannerView bannerView;
@@ -48,42 +49,43 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
             eventTracker.addParam("ad_type", "banner");
         }
 
+        bannerRequestListener = new BannerRequest.AdRequestListener() {
+            @Override
+            public void onRequestSuccess(@NonNull final BannerRequest bannerRequest,
+                                         @NonNull AuctionResult auctionResult) {
+                if (eventTracker != null) {
+                    eventTracker.addParam("bm_pf_clear",
+                                          String.valueOf(auctionResult.getPrice()));
+                    eventTracker.addParams(BidMachineHelper.toMap(bannerRequest));
+                    eventTracker.send(Event.BMRequestSuccess);
+                }
+
+                Utils.onUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadPublisherAd(context, bannerRequest);
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestFailed(@NonNull BannerRequest request,
+                                        @NonNull BMError error) {
+                if (listener != null) {
+                    listener.onAdFailToLoad();
+                }
+            }
+
+            @Override
+            public void onRequestExpired(@NonNull BannerRequest request) {
+                if (listener != null) {
+                    listener.onAdExpired();
+                }
+            }
+        };
         bannerRequest = new BannerRequest.Builder()
                 .setSize(BannerSize.Size_320x50)
-                .setListener(new BannerRequest.AdRequestListener() {
-                    @Override
-                    public void onRequestSuccess(@NonNull final BannerRequest bannerRequest,
-                                                 @NonNull AuctionResult auctionResult) {
-                        if (eventTracker != null) {
-                            eventTracker.addParam("bm_pf_clear",
-                                                  String.valueOf(auctionResult.getPrice()));
-                            eventTracker.addParams(BidMachineHelper.toMap(bannerRequest));
-                            eventTracker.send(Event.BMRequestSuccess);
-                        }
-
-                        Utils.onUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadPublisherAd(context, bannerRequest);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onRequestFailed(@NonNull BannerRequest request,
-                                                @NonNull BMError error) {
-                        if (listener != null) {
-                            listener.onAdFailToLoad();
-                        }
-                    }
-
-                    @Override
-                    public void onRequestExpired(@NonNull BannerRequest request) {
-                        if (listener != null) {
-                            listener.onAdExpired();
-                        }
-                    }
-                })
+                .setListener(bannerRequestListener)
                 .build();
         bannerRequest.request(context);
 
@@ -233,7 +235,11 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
             publisherAdView.destroy();
             publisherAdView = null;
         }
-        bannerRequest = null;
+        if (bannerRequest != null) {
+            bannerRequest.removeListener(bannerRequestListener);
+            bannerRequest = null;
+        }
+        bannerRequestListener = null;
     }
 
     private final class Listener implements BannerListener {

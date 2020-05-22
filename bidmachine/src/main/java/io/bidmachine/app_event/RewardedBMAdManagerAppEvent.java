@@ -27,6 +27,7 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     private static final String APP_EVENT_KEY = "bidmachine-rewarded";
 
+    private RewardedRequest.AdRequestListener rewardedRequestListener;
     private RewardedRequest rewardedRequest;
     private RewardedAd rewardedAd;
     private io.bidmachine.rewarded.RewardedAd bmRewardedAd;
@@ -52,41 +53,42 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
             eventTracker.addParam("ad_type", "rewarded");
         }
 
+        rewardedRequestListener = new RewardedRequest.AdRequestListener() {
+            @Override
+            public void onRequestSuccess(@NonNull final RewardedRequest rewardedRequest,
+                                         @NonNull AuctionResult auctionResult) {
+                if (eventTracker != null) {
+                    eventTracker.addParam("bm_pf_clear",
+                                          String.valueOf(auctionResult.getPrice()));
+                    eventTracker.addParams(BidMachineHelper.toMap(rewardedRequest));
+                    eventTracker.send(Event.BMRequestSuccess);
+                }
+
+                Utils.onUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadPublisherAd(context, rewardedRequest);
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestFailed(@NonNull RewardedRequest request,
+                                        @NonNull BMError error) {
+                if (listener != null) {
+                    listener.onAdFailToLoad();
+                }
+            }
+
+            @Override
+            public void onRequestExpired(@NonNull RewardedRequest request) {
+                if (listener != null) {
+                    listener.onAdExpired();
+                }
+            }
+        };
         rewardedRequest = new RewardedRequest.Builder()
-                .setListener(new RewardedRequest.AdRequestListener() {
-                    @Override
-                    public void onRequestSuccess(@NonNull final RewardedRequest rewardedRequest,
-                                                 @NonNull AuctionResult auctionResult) {
-                        if (eventTracker != null) {
-                            eventTracker.addParam("bm_pf_clear",
-                                                  String.valueOf(auctionResult.getPrice()));
-                            eventTracker.addParams(BidMachineHelper.toMap(rewardedRequest));
-                            eventTracker.send(Event.BMRequestSuccess);
-                        }
-
-                        Utils.onUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadPublisherAd(context, rewardedRequest);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onRequestFailed(@NonNull RewardedRequest request,
-                                                @NonNull BMError error) {
-                        if (listener != null) {
-                            listener.onAdFailToLoad();
-                        }
-                    }
-
-                    @Override
-                    public void onRequestExpired(@NonNull RewardedRequest request) {
-                        if (listener != null) {
-                            listener.onAdExpired();
-                        }
-                    }
-                })
+                .setListener(rewardedRequestListener)
                 .build();
         rewardedRequest.request(context);
 
@@ -228,7 +230,11 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
             rewardedAd.setOnAdMetadataChangedListener(null);
             rewardedAd = null;
         }
-        rewardedRequest = null;
+        if (rewardedRequest != null) {
+            rewardedRequest.removeListener(rewardedRequestListener);
+            rewardedRequest = null;
+        }
+        rewardedRequestListener = null;
     }
 
     private final class Listener implements RewardedListener {

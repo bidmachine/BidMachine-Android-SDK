@@ -27,6 +27,7 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     private static final String APP_EVENT_KEY = "bidmachine-interstitial";
 
+    private InterstitialRequest.AdRequestListener interstitialRequestListener;
     private InterstitialRequest interstitialRequest;
     private PublisherInterstitialAd publisherInterstitialAd;
     private InterstitialAd interstitialAd;
@@ -43,41 +44,42 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             eventTracker.addParam("ad_type", "interstitial");
         }
 
+        interstitialRequestListener = new InterstitialRequest.AdRequestListener() {
+            @Override
+            public void onRequestSuccess(@NonNull final InterstitialRequest interstitialRequest,
+                                         @NonNull AuctionResult auctionResult) {
+                if (eventTracker != null) {
+                    eventTracker.addParam("bm_pf_clear",
+                                          String.valueOf(auctionResult.getPrice()));
+                    eventTracker.addParams(BidMachineHelper.toMap(interstitialRequest));
+                    eventTracker.send(Event.BMRequestSuccess);
+                }
+
+                Utils.onUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadPublisherAd(context, interstitialRequest);
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestFailed(@NonNull InterstitialRequest interstitialRequest,
+                                        @NonNull BMError bmError) {
+                if (listener != null) {
+                    listener.onAdFailToLoad();
+                }
+            }
+
+            @Override
+            public void onRequestExpired(@NonNull InterstitialRequest interstitialRequest) {
+                if (listener != null) {
+                    listener.onAdExpired();
+                }
+            }
+        };
         interstitialRequest = new InterstitialRequest.Builder()
-                .setListener(new InterstitialRequest.AdRequestListener() {
-                    @Override
-                    public void onRequestSuccess(@NonNull final InterstitialRequest interstitialRequest,
-                                                 @NonNull AuctionResult auctionResult) {
-                        if (eventTracker != null) {
-                            eventTracker.addParam("bm_pf_clear",
-                                                  String.valueOf(auctionResult.getPrice()));
-                            eventTracker.addParams(BidMachineHelper.toMap(interstitialRequest));
-                            eventTracker.send(Event.BMRequestSuccess);
-                        }
-
-                        Utils.onUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadPublisherAd(context, interstitialRequest);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onRequestFailed(@NonNull InterstitialRequest interstitialRequest,
-                                                @NonNull BMError bmError) {
-                        if (listener != null) {
-                            listener.onAdFailToLoad();
-                        }
-                    }
-
-                    @Override
-                    public void onRequestExpired(@NonNull InterstitialRequest interstitialRequest) {
-                        if (listener != null) {
-                            listener.onAdExpired();
-                        }
-                    }
-                })
+                .setListener(interstitialRequestListener)
                 .build();
         interstitialRequest.request(context);
 
@@ -202,7 +204,11 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             publisherInterstitialAd.setAppEventListener(null);
             publisherInterstitialAd = null;
         }
-        interstitialRequest = null;
+        if (interstitialRequest != null) {
+            interstitialRequest.removeListener(interstitialRequestListener);
+            interstitialRequest = null;
+        }
+        interstitialRequestListener = null;
     }
 
     private final class Listener implements InterstitialListener {
