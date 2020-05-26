@@ -164,6 +164,10 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
     }
 
     private void loadAd(@NonNull Context context) {
+        if (isDestroyed) {
+            return;
+        }
+
         interstitialAd = new InterstitialAd(context);
         interstitialAd.setListener(new Listener());
         interstitialAd.load(interstitialRequest);
@@ -201,7 +205,6 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             interstitialAd = null;
         }
         if (publisherInterstitialAd != null) {
-            publisherInterstitialAd.setAppEventListener(null);
             publisherInterstitialAd = null;
         }
         if (interstitialRequest != null) {

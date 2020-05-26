@@ -171,6 +171,10 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
     }
 
     private void loadAd(@NonNull Context context) {
+        if (isDestroyed) {
+            return;
+        }
+
         bannerView = new BannerView(context);
         bannerView.setListener(new Listener());
         bannerView.load(bannerRequest);

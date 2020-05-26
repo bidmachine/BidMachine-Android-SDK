@@ -190,6 +190,10 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
     }
 
     private void loadAd(@NonNull Context context) {
+        if (isDestroyed) {
+            return;
+        }
+
         bmRewardedAd = new io.bidmachine.rewarded.RewardedAd(context);
         bmRewardedAd.setListener(new Listener());
         bmRewardedAd.load(rewardedRequest);

@@ -8,12 +8,14 @@ public abstract class BMAdManagerAppEvent {
 
     static final String TAG = "BMAdManagerAppEvent";
 
-    @Nullable
-    EventTracker eventTracker;
     final String adUnitId;
 
     @Nullable
     BMAdManagerAppEventListener listener;
+    @Nullable
+    EventTracker eventTracker;
+
+    boolean isDestroyed = true;
 
     BMAdManagerAppEvent(String adUnitId) {
         this.adUnitId = adUnitId;
@@ -29,6 +31,7 @@ public abstract class BMAdManagerAppEvent {
 
     public void load(@NonNull final Context context) {
         eventTracker = new EventTracker();
+        isDestroyed = false;
     }
 
     public abstract boolean isLoaded();
@@ -41,6 +44,7 @@ public abstract class BMAdManagerAppEvent {
 
     public void destroy() {
         eventTracker = null;
+        isDestroyed = true;
     }
 
 }
