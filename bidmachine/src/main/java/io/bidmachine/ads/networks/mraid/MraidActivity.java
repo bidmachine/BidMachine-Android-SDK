@@ -70,15 +70,6 @@ public class MraidActivity extends Activity {
             if (mraidInterstitial != null) {
                 mraidInterstitial.setShowingActivity(this);
                 showMraidInterstitial();
-                if (!mraidInterstitial.canPreload()) {
-                    mraidInterstitial.getAdapterListener().setAfterStartShowRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            hideProgressBarWithCloseTime();
-                        }
-                    });
-                    showProgressBarWithCloseTime(mraidInterstitial.getSkipAfterTimeSec());
-                }
             }
         } catch (Exception e) {
             if (mraidInterstitial != null && mraidInterstitial.getCallback() != null) {

@@ -27,7 +27,6 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
     private UnifiedFullscreenAdCallback callback;
     @Nullable
     private MraidParams mraidParams;
-    private int skipAfterTimeSec;
 
     MraidFullScreenAd(VideoType videoType) {
         this.videoType = videoType;
@@ -48,7 +47,6 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
             return;
         }
         this.callback = callback;
-        skipAfterTimeSec = mediationParams.getInt("skipAfterTimeSec");
         adapterListener = new MraidFullScreenAdapterListener(this, callback);
         onUiThread(new Runnable() {
             @Override
@@ -58,7 +56,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                                     mraidParams.creativeAdm,
                                     mraidParams.width,
                                     mraidParams.height)
-                        .setPreload(mraidParams.canPreload)
+                        .setPreload(true)
                         .setListener(adapterListener)
                         .setNativeFeatureListener(adapterListener)
                         .build();
@@ -92,20 +90,8 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         return showingActivity;
     }
 
-    MraidFullScreenAdapterListener getAdapterListener() {
-        return adapterListener;
-    }
-
     void setShowingActivity(MraidActivity showingActivity) {
         this.showingActivity = showingActivity;
-    }
-
-    boolean canPreload() {
-        return mraidParams != null && mraidParams.canPreload;
-    }
-
-    int getSkipAfterTimeSec() {
-        return skipAfterTimeSec;
     }
 
     @Nullable
