@@ -17,6 +17,8 @@ public class IabUtils {
     public static final String KEY_WIDTH = "width";
     public static final String KEY_HEIGHT = "height";
     public static final String KEY_PRELOAD = "preload";
-    public static final String KEY_SKIP_AFTER_TIME_SEC = "skipAfterTimeSec";
+    public static final String KEY_LOAD_SKIP_OFFSET = "loadSkipOffset";
+    public static final String KEY_SKIP_OFFSET = "skipOffset";
+    public static final String KEY_COMPANION_SKIP_OFFSET = "companionSkipOffset";
 
 }
