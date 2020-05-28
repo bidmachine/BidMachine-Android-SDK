@@ -43,9 +43,9 @@ class MraidBannerAd extends UnifiedBannerAd {
                                                   mraidParams.creativeAdm,
                                                   mraidParams.width,
                                                   mraidParams.height)
+                        .setPreload(true)
                         .setListener(mraidBannerAdListener)
                         .setNativeFeatureListener(mraidBannerAdListener)
-                        .setPreload(mraidParams.canPreload)
                         .build();
                 mraidView.load();
             }
