@@ -14,8 +14,11 @@ import java.util.Map;
 import io.bidmachine.models.AuctionResult;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
@@ -310,6 +313,93 @@ public class BidMachineFetcherTest {
         assertEquals("1.40", result);
         result = BidMachineFetcher.roundPrice(1.58538483);
         assertEquals("1.58", result);
+    }
+
+    @Test
+    public void identifyAdType() {
+        String adType = BidMachineFetcher.identifyAdType(null);
+        assertNull(adType);
+        adType = BidMachineFetcher.identifyAdType(CreativeFormat.Banner);
+        assertEquals("display", adType);
+        adType = BidMachineFetcher.identifyAdType(CreativeFormat.Video);
+        assertEquals("video", adType);
+        adType = BidMachineFetcher.identifyAdType(CreativeFormat.Native);
+        assertEquals("native", adType);
+    }
+
+    @Test
+    public void toMap_minimumParameters() {
+        AdRequest adRequest = spy(new TestAdRequest.Builder(AdsType.Banner)
+                                          .setAuctionId("test_id")
+                                          .setAuctionPrice(0.25)
+                                          .build());
+        Map<String, String> map = BidMachineFetcher.toMap(adRequest);
+        assertEquals(3, map.size());
+        assertEquals("test_id", map.get(BidMachineFetcher.KEY_ID));
+        assertEquals("0.25", map.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("test_network", map.get(BidMachineFetcher.KEY_NETWORK_KEY));
+        assertFalse(map.containsKey(BidMachineFetcher.KEY_AD_TYPE));
+    }
+
+    @Test
+    public void toMap_maximumParameters() {
+        Map<String, String> customParams = new HashMap<>();
+        customParams.put("custom_key_1", "custom_value_1");
+        customParams.put("custom_key_2", "custom_value_2");
+        customParams.put("custom_key_3", "custom_value_3");
+        AdRequest adRequest = spy(new TestAdRequest.Builder(AdsType.Banner)
+                                          .setAuctionId("test_id")
+                                          .setAuctionPrice(0.25)
+                                          .setAuctionNetworkName("test_network_name")
+                                          .setAuctionCreativeFormat(CreativeFormat.Banner)
+                                          .setAuctionCustomParams(customParams)
+                                          .build());
+        Map<String, String> map = BidMachineFetcher.toMap(adRequest);
+        assertEquals(7, map.size());
+        assertEquals("test_id", map.get(BidMachineFetcher.KEY_ID));
+        assertEquals("0.25", map.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("test_network_name", map.get(BidMachineFetcher.KEY_NETWORK_KEY));
+        assertEquals("display", map.get(BidMachineFetcher.KEY_AD_TYPE));
+        assertEquals("custom_value_1", map.get("custom_key_1"));
+        assertEquals("custom_value_2", map.get("custom_key_2"));
+        assertEquals("custom_value_3", map.get("custom_key_3"));
+    }
+
+    @Test
+    public void moPub_toKeywordsWithAdRequestMinimumParameters() {
+        AdRequest adRequest = spy(new TestAdRequest.Builder(AdsType.Banner)
+                                          .setAuctionId("test_id")
+                                          .setAuctionPrice(0.25)
+                                          .build());
+        String moPubKeywords = BidMachineFetcher.MoPub.toKeywords(adRequest);
+        assertEquals(3, moPubKeywords.split(",").length);
+        assertTrue(moPubKeywords.contains("bm_id:test_id"));
+        assertTrue(moPubKeywords.contains("bm_pf:0.25"));
+        assertTrue(moPubKeywords.contains("bm_network_key:test_network"));
+    }
+
+    @Test
+    public void moPub_toKeywordsWithAdRequestMaximumParameters() {
+        Map<String, String> customParams = new HashMap<>();
+        customParams.put("custom_key_1", "custom_value_1");
+        customParams.put("custom_key_2", "custom_value_2");
+        customParams.put("custom_key_3", "custom_value_3");
+        AdRequest adRequest = spy(new TestAdRequest.Builder(AdsType.Banner)
+                                          .setAuctionId("test_id")
+                                          .setAuctionPrice(0.25)
+                                          .setAuctionNetworkName("test_network_name")
+                                          .setAuctionCreativeFormat(CreativeFormat.Banner)
+                                          .setAuctionCustomParams(customParams)
+                                          .build());
+        String moPubKeywords = BidMachineFetcher.MoPub.toKeywords(adRequest);
+        assertEquals(7, moPubKeywords.split(",").length);
+        assertTrue(moPubKeywords.contains("bm_id:test_id"));
+        assertTrue(moPubKeywords.contains("bm_pf:0.25"));
+        assertTrue(moPubKeywords.contains("bm_network_key:test_network_name"));
+        assertTrue(moPubKeywords.contains("bm_ad_type:display"));
+        assertTrue(moPubKeywords.contains("custom_key_1:custom_value_1"));
+        assertTrue(moPubKeywords.contains("custom_key_2:custom_value_2"));
+        assertTrue(moPubKeywords.contains("custom_key_3:custom_value_3"));
     }
 
 
