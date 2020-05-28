@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.EnumMap;
@@ -21,6 +23,10 @@ public class BidMachineFetcher {
     public static final String KEY_PRICE = "bm_pf";
     public static final String KEY_AD_TYPE = "bm_ad_type";
     public static final String KEY_NETWORK_KEY = "bm_network_key";
+
+    public static final String AD_TYPE_DISPLAY = "display";
+    public static final String AD_TYPE_VIDEO = "video";
+    public static final String AD_TYPE_NATIVE = "native";
 
     private static final BigDecimal DEF_PRICE_ROUNDING = new BigDecimal("0.01");
     private static final RoundingMode DEF_PRICE_ROUNDING_MODE = RoundingMode.CEILING;
@@ -48,7 +54,7 @@ public class BidMachineFetcher {
     @Nullable
     @SuppressWarnings({"unchecked"})
     public static Map<String, String> fetch(@NonNull AdRequest adRequest) {
-        final Map<String, String> result = BidMachineHelper.toMap(adRequest);
+        final Map<String, String> result = toMap(adRequest);
         final String id = result.get(KEY_ID);
         if (TextUtils.isEmpty(id)) {
             return null;
@@ -130,6 +136,86 @@ public class BidMachineFetcher {
     public static void resetPriceRounding() {
         priceRounding = DEF_PRICE_ROUNDING;
         priceRoundingMode = DEF_PRICE_ROUNDING_MODE;
+    }
+
+    @NonNull
+    static Map<String, String> toMap(@NonNull AdRequest adRequest) {
+        Map<String, String> result = new HashMap<>();
+        AuctionResult auctionResult = adRequest.getAuctionResult();
+        if (auctionResult == null) {
+            return result;
+        }
+        result.put(BidMachineFetcher.KEY_ID, auctionResult.getId());
+        result.put(BidMachineFetcher.KEY_PRICE,
+                   BidMachineFetcher.roundPrice(auctionResult.getPrice()));
+        result.put(BidMachineFetcher.KEY_NETWORK_KEY, auctionResult.getNetworkKey());
+        String adType = identifyAdType(auctionResult.getCreativeFormat());
+        if (adType != null) {
+            result.put(BidMachineFetcher.KEY_AD_TYPE, adType);
+        }
+        result.putAll(auctionResult.getCustomParams());
+        return result;
+    }
+
+    @Nullable
+    @VisibleForTesting
+    static String identifyAdType(@Nullable CreativeFormat creativeFormat) {
+        if (creativeFormat == null) {
+            return null;
+        }
+        switch (creativeFormat) {
+            case Banner:
+                return AD_TYPE_DISPLAY;
+            case Video:
+                return AD_TYPE_VIDEO;
+            case Native:
+                return AD_TYPE_NATIVE;
+            default:
+                return null;
+        }
+    }
+
+    public static final class AdManager {
+
+        @NonNull
+        public static PublisherAdRequest.Builder createPublisherAdRequestBuilder(@NonNull AdRequest adRequest) {
+            PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+            fillPublisherAdRequestBuilder(builder, adRequest);
+            return builder;
+        }
+
+        public static void fillPublisherAdRequestBuilder(@NonNull PublisherAdRequest.Builder builder,
+                                                         @NonNull AdRequest adRequest) {
+            Map<String, String> result = toMap(adRequest);
+            for (Map.Entry<String, String> entry : result.entrySet()) {
+                builder.addCustomTargeting(entry.getKey(), entry.getValue());
+            }
+        }
+
+    }
+
+    public static final class MoPub {
+
+        @NonNull
+        public static String toKeywords(@NonNull AdRequest adRequest) {
+            Map<String, String> result = toMap(adRequest);
+            return toKeywords(result);
+        }
+
+        @NonNull
+        public static String toKeywords(@NonNull Map<String, String> result) {
+            StringBuilder builder = new StringBuilder();
+            for (Map.Entry<String, ?> entry : result.entrySet()) {
+                if (builder.length() > 0) {
+                    builder.append(",");
+                }
+                builder.append(entry.getKey())
+                        .append(":")
+                        .append(entry.getValue());
+            }
+            return builder.toString();
+        }
+
     }
 
 }

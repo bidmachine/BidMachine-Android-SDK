@@ -56,7 +56,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                                     mraidParams.creativeAdm,
                                     mraidParams.width,
                                     mraidParams.height)
-                        .setPreload(mraidParams.canPreload)
+                        .setPreload(true)
                         .setCloseTime(mraidParams.skipOffset)
                         .setListener(adapterListener)
                         .setNativeFeatureListener(adapterListener)
@@ -92,20 +92,8 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         return showingActivity;
     }
 
-    MraidFullScreenAdapterListener getAdapterListener() {
-        return adapterListener;
-    }
-
     void setShowingActivity(MraidActivity showingActivity) {
         this.showingActivity = showingActivity;
-    }
-
-    boolean canPreload() {
-        return mraidParams != null && mraidParams.canPreload;
-    }
-
-    int getSkipAfterTimeSec() {
-        return mraidParams != null ? mraidParams.loadSkipOffset : 0;
     }
 
     @Nullable
