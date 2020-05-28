@@ -2,23 +2,29 @@ package io.bidmachine.displays;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
-import io.bidmachine.models.AdObjectParams;
-import io.bidmachine.protobuf.AdExtension;
-import io.bidmachine.unified.UnifiedMediationParams;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.bidmachine.Utils.getOrDefault;
-import static io.bidmachine.utils.IabUtils.*;
+import io.bidmachine.models.AdObjectParams;
+import io.bidmachine.protobuf.AdExtension;
+import io.bidmachine.unified.UnifiedMediationParams;
+
+import static io.bidmachine.utils.IabUtils.KEY_COMPANION_SKIP_OFFSET;
+import static io.bidmachine.utils.IabUtils.KEY_CREATIVE_ADM;
+import static io.bidmachine.utils.IabUtils.KEY_CREATIVE_ID;
+import static io.bidmachine.utils.IabUtils.KEY_HEIGHT;
+import static io.bidmachine.utils.IabUtils.KEY_LOAD_SKIP_OFFSET;
+import static io.bidmachine.utils.IabUtils.KEY_PRELOAD;
+import static io.bidmachine.utils.IabUtils.KEY_SKIP_OFFSET;
+import static io.bidmachine.utils.IabUtils.KEY_WIDTH;
 
 abstract class IabAdObjectParams
         extends AdObjectParams
         implements UnifiedMediationParams.MappedUnifiedMediationParams.DataProvider {
-
-    private static final int DEF_SKIP_AFTER_TIME_SEC = 2;
 
     private Map<String, Object> params;
     private UnifiedMediationParams mediationParams = new UnifiedMediationParams.MappedUnifiedMediationParams(this);
@@ -45,9 +51,9 @@ abstract class IabAdObjectParams
                                      @NonNull AdExtension extension) {
         super.prepareExtensions(seatbid, bid, extension);
         getData().put(KEY_PRELOAD, extension.getPreload());
-        getData().put(KEY_SKIP_AFTER_TIME_SEC, getOrDefault(extension.getSkipAfter(),
-                AdExtension.getDefaultInstance().getSkipAfter(),
-                DEF_SKIP_AFTER_TIME_SEC));
+        getData().put(KEY_LOAD_SKIP_OFFSET, extension.getLoadSkipoffset());
+        getData().put(KEY_SKIP_OFFSET, extension.getSkipoffset());
+        getData().put(KEY_COMPANION_SKIP_OFFSET, extension.getCompanionSkipoffset());
     }
 
     public void setWidth(int width) {

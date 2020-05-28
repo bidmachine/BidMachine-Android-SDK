@@ -65,6 +65,7 @@ class MraidBannerAd extends UnifiedBannerAd {
     public void onDestroy() {
         if (mraidView != null) {
             mraidView.destroy();
+            mraidView = null;
         }
     }
 

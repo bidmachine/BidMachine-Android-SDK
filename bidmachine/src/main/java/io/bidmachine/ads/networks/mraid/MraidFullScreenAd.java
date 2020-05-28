@@ -57,6 +57,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                                     mraidParams.width,
                                     mraidParams.height)
                         .setPreload(true)
+                        .setCloseTime(mraidParams.skipOffset)
                         .setListener(adapterListener)
                         .setNativeFeatureListener(adapterListener)
                         .build();
@@ -78,6 +79,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
     @Override
     public void onDestroy() {
         if (mraidInterstitial != null) {
+            mraidInterstitial.destroy();
             mraidInterstitial = null;
         }
     }

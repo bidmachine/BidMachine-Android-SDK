@@ -1,4 +1,4 @@
-package io.bidmachine.ads.networks.mraid;
+package io.bidmachine.ads.networks.vast;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -9,22 +9,16 @@ import io.bidmachine.unified.UnifiedParams;
 import io.bidmachine.utils.BMError;
 import io.bidmachine.utils.IabUtils;
 
-class MraidParams extends UnifiedParams {
+class VastParams extends UnifiedParams {
 
     final String creativeAdm;
-    final int width;
-    final int height;
-    final boolean canPreload;
     final int loadSkipOffset;
     final int skipOffset;
     final int companionSkipOffset;
 
-    MraidParams(@NonNull UnifiedMediationParams mediationParams) {
+    VastParams(@NonNull UnifiedMediationParams mediationParams) {
         super(mediationParams);
         creativeAdm = mediationParams.getString(IabUtils.KEY_CREATIVE_ADM);
-        width = mediationParams.getInt(IabUtils.KEY_WIDTH);
-        height = mediationParams.getInt(IabUtils.KEY_HEIGHT);
-        canPreload = mediationParams.getBool(IabUtils.KEY_PRELOAD);
         loadSkipOffset = mediationParams.getInt(IabUtils.KEY_LOAD_SKIP_OFFSET);
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);
         companionSkipOffset = mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET);
@@ -32,7 +26,7 @@ class MraidParams extends UnifiedParams {
 
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
-        if (TextUtils.isEmpty(creativeAdm) || width == 0 || height == 0) {
+        if (TextUtils.isEmpty(creativeAdm)) {
             callback.onAdLoadFailed(BMError.IncorrectAdUnit);
             return false;
         }

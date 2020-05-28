@@ -3,16 +3,16 @@ package io.bidmachine.ads.networks.vast;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
+
 import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.VideoType;
+
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
 import io.bidmachine.unified.UnifiedMediationParams;
 import io.bidmachine.utils.BMError;
-import io.bidmachine.utils.IabUtils;
 
 class VastFullScreenAd extends UnifiedFullscreenAd {
 
@@ -31,20 +31,21 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
                      @NonNull UnifiedFullscreenAdCallback callback,
                      @NonNull UnifiedFullscreenAdRequestParams requestParams,
                      @NonNull UnifiedMediationParams mediationParams) {
-        final String creativeAdm = mediationParams.getString(IabUtils.KEY_CREATIVE_ADM);
-        if (TextUtils.isEmpty(creativeAdm)) {
-            callback.onAdLoadFailed(BMError.IncorrectAdUnit);
+        VastParams vastParams = new VastParams(mediationParams);
+        if (!vastParams.isValid(callback)) {
             return;
         }
-        assert creativeAdm != null;
-        int skipAfterTimeSec = mediationParams.getInt(IabUtils.KEY_SKIP_AFTER_TIME_SEC);
+        assert vastParams.creativeAdm != null;
+
         vastListener = new VastFullScreenAdapterListener(callback);
         vastRequest = VastRequest.newBuilder()
                 .setPreCache(true)
-                .setCloseTime(skipAfterTimeSec)
+                .setCloseTime(vastParams.companionSkipOffset) // setCloseTime - set MRAID companion close time
                 .build();
         assert vastRequest != null;
-        vastRequest.loadVideoWithData(contextProvider.getContext(), creativeAdm, vastListener);
+        vastRequest.loadVideoWithData(contextProvider.getContext(),
+                                      vastParams.creativeAdm,
+                                      vastListener);
     }
 
     @Override
