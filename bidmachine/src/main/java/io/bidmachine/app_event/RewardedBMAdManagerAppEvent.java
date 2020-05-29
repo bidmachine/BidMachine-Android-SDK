@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.rewarded.OnAdMetadataChangedListener;
@@ -220,6 +221,8 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
             }
 
             bmRewardedAd.show();
+        } else {
+            Log.e(TAG, "Rewarded not loaded");
         }
     }
 
@@ -306,6 +309,8 @@ public class RewardedBMAdManagerAppEvent extends BMAdManagerAppEvent {
             if (listener != null) {
                 listener.onAdClosed();
             }
+
+            destroy();
         }
 
         @Override

@@ -12,8 +12,18 @@ import io.bidmachine.BidMachine;
 public class BMAdManager {
 
     static String sessionId = UUID.randomUUID().toString();
+    static String appPackageName;
+    static String appVersionName;
 
     public static void initialize(@NonNull Context context, @NonNull String sellerId) {
+        try {
+            appPackageName = context.getPackageName();
+            appVersionName = context.getPackageManager()
+                    .getPackageInfo(appPackageName, 0)
+                    .versionName;
+        } catch (Throwable ignore) {
+        }
+
         BidMachine.initialize(context, sellerId);
     }
 

@@ -37,6 +37,7 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
     private PublisherAdView publisherAdView;
     private BannerView bannerView;
     private BMPopupWindow bmPopupWindow;
+    private boolean isShown;
 
     BannerViewBMAdManagerAppEvent(String adUnitId) {
         super(adUnitId);
@@ -198,7 +199,11 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
         if (context instanceof Activity) {
             if (isLoaded()) {
                 if (eventTracker != null) {
-                    eventTracker.send(Event.BMShow);
+                    if (isShown) {
+                        eventTracker.send(Event.BMShowDuplicate);
+                    } else {
+                        eventTracker.send(Event.BMShow);
+                    }
                 }
 
                 bmPopupWindow.showView((Activity) context,
@@ -279,6 +284,7 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
                 eventTracker.send(Event.BMShown);
             }
 
+            isShown = true;
             if (listener != null) {
                 listener.onAdShown();
             }

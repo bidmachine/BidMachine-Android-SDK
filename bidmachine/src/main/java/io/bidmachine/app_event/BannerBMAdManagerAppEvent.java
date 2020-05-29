@@ -32,11 +32,12 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
         notShownBannerView.load(context);
     }
 
-    private void setShownBannerView(BannerViewBMAdManagerAppEvent bannerView) {
+    private void setShownBannerView() {
         if (shownBannerView != null) {
             shownBannerView.destroy();
         }
-        shownBannerView = bannerView;
+        shownBannerView = notShownBannerView;
+        notShownBannerView = null;
     }
 
     @Override
@@ -64,9 +65,10 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
             isHidden = false;
             refreshTimeReached = false;
             notShownBannerView.show(context);
-            setShownBannerView(notShownBannerView);
+            setShownBannerView();
             loadNextAd(context);
         } else if (shownBannerViewIsLoaded()) {
+            Log.e(TAG, "New banner don't loaded yet. Will be shown old banner");
             isHidden = false;
             shownBannerView.show(context);
         } else if (refreshTimeReached) {

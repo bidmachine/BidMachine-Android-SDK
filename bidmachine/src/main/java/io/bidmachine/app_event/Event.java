@@ -14,6 +14,7 @@ public enum Event {
     BMFailToLoad,
     BMIsLoaded,
     BMShow,
+    BMShowDuplicate,
     BMShown,
     BMFailToShow,
     BMExpired

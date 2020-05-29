@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
@@ -194,6 +195,8 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             }
 
             interstitialAd.show();
+        } else {
+            Log.e(TAG, "Interstitial not loaded");
         }
     }
 
@@ -277,6 +280,8 @@ public class InterstitialBMAdManagerAppEvent extends BMAdManagerAppEvent {
             if (listener != null) {
                 listener.onAdClosed();
             }
+
+            destroy();
         }
 
         @Override

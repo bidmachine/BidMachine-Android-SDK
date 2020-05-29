@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import io.bidmachine.ApiRequest;
+import io.bidmachine.BidMachine;
 import io.bidmachine.core.NetworkRequest;
 
 class EventTracker {
@@ -50,6 +51,9 @@ class EventTracker {
                 .appendQueryParameter("request_id", requestId)
                 .appendQueryParameter("event", event.name())
                 .appendQueryParameter("time_stamp", String.valueOf(System.currentTimeMillis()))
+                .appendQueryParameter("bm_version", BidMachine.VERSION)
+                .appendQueryParameter("bundle_id", BMAdManager.appPackageName)
+                .appendQueryParameter("app_version", BMAdManager.appVersionName)
                 .appendQueryParameter("bm_platform", "android");
         appendQueryParameter(builder, eventParams);
         appendQueryParameter(builder, parameters);
