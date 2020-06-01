@@ -150,7 +150,7 @@ public abstract class BidMachineAd<
 
     @Override
     public boolean canShow() {
-        return isLoaded();
+        return isLoaded() && !isShownTracked;
     }
 
     @Override
