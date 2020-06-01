@@ -21,7 +21,6 @@ public abstract class FullScreenAd<
     public void show() {
         final AdObjectType loadedObject = getLoadedObject();
         if (!prepareShow() || loadedObject == null) {
-            processCallback.processShowFail(BMError.NotLoaded);
             return;
         }
         if (!Utils.isNetworkAvailable(getContext())) {
