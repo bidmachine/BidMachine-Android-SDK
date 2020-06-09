@@ -11,6 +11,7 @@ import io.bidmachine.core.Utils;
 public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
     private final static long REFRESH_TIME = 15000;
+    private final static long FAIL_TO_LOAD_TIME_OUT = 2000;
 
     private BannerViewBMAdManagerAppEvent shownBannerView;
     private BannerViewBMAdManagerAppEvent notShownBannerView;
@@ -137,10 +138,15 @@ public class BannerBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdFailToLoad() {
-            Context context = contextWeakReference.get();
-            if (context != null) {
-                load(context);
-            }
+            Utils.onBackgroundThread(new Runnable() {
+                @Override
+                public void run() {
+                    Context context = contextWeakReference.get();
+                    if (context != null) {
+                        load(context);
+                    }
+                }
+            }, FAIL_TO_LOAD_TIME_OUT);
             if (listener != null) {
                 listener.onAdFailToLoad();
             }

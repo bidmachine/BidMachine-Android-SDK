@@ -61,12 +61,7 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
                     eventTracker.send(Event.BMRequestSuccess);
                 }
 
-                Utils.onUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadPublisherAd(context, bannerRequest);
-                    }
-                });
+                loadPublisherAd(context, bannerRequest);
             }
 
             @Override
@@ -110,7 +105,7 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
             BidMachineFetcher.setPriceRounding(1000);
         }
 
-        PublisherAdRequest publisherAdRequest = BidMachineHelper.AdManager
+        final PublisherAdRequest publisherAdRequest = BidMachineHelper.AdManager
                 .createPublisherAdRequestBuilder(adRequest)
                 .addCustomTargeting("bm_platform", "android")
                 .build();
@@ -159,7 +154,13 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
                 }
             }
         });
-        publisherAdView.loadAd(publisherAdRequest);
+
+        Utils.onUiThread(new Runnable() {
+            @Override
+            public void run() {
+                publisherAdView.loadAd(publisherAdRequest);
+            }
+        });
 
         if (eventTracker != null) {
             eventTracker.addParams(BidMachineHelper.toMap(adRequest));
@@ -171,14 +172,19 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
         return TextUtils.equals(key, APP_EVENT_KEY);
     }
 
-    private void loadAd(@NonNull Context context) {
+    private void loadAd(@NonNull final Context context) {
         if (isDestroyed) {
             return;
         }
 
-        bannerView = new BannerView(context);
-        bannerView.setListener(new Listener());
-        bannerView.load(bannerRequest);
+        Utils.onBackgroundThread(new Runnable() {
+            @Override
+            public void run() {
+                bannerView = new BannerView(context);
+                bannerView.setListener(new Listener());
+                bannerView.load(bannerRequest);
+            }
+        });
 
         if (eventTracker != null) {
             eventTracker.send(Event.BMLoadStart);
@@ -280,10 +286,6 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdShown(@NonNull BannerView ad) {
-            if (eventTracker != null) {
-                eventTracker.send(Event.BMShown);
-            }
-
             isShown = true;
             if (listener != null) {
                 listener.onAdShown();
@@ -292,7 +294,9 @@ class BannerViewBMAdManagerAppEvent extends BMAdManagerAppEvent {
 
         @Override
         public void onAdImpression(@NonNull BannerView ad) {
-
+            if (eventTracker != null) {
+                eventTracker.send(Event.BMShown);
+            }
         }
 
         @Override
