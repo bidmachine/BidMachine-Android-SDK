@@ -81,7 +81,7 @@ public class UserRestrictionParamsTest {
     }
 
     @Test
-    public void buildUser_bidMachineAndSharedPrefNotProvidedConsentString_returnDefaultConsentString() {
+    public void buildUser_bidMachineAndSharedPrefNotProvidedConsentString_returnDefaultConsentStringOneString() {
         BidMachine.setConsentConfig(true, null);
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
 
@@ -90,7 +90,20 @@ public class UserRestrictionParamsTest {
         BidMachineImpl.get()
                 .getUserRestrictionParams()
                 .build(builder);
+        assertEquals("1", builder.getConsent());
+    }
+
+    @Test
+    public void buildUser_bidMachineAndSharedPrefNotProvidedConsentString_returnDefaultConsentStringZeroString() {
+        BidMachine.setConsentConfig(false, null);
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+
+        Context.User.Builder builder = Context.User.newBuilder();
         assertEquals("", builder.getConsent());
+        BidMachineImpl.get()
+                .getUserRestrictionParams()
+                .build(builder);
+        assertEquals("0", builder.getConsent());
     }
 
     @Test
