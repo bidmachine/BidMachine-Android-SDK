@@ -214,6 +214,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 headerBiddingEnabled
                         ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
                         : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
+        requestExtensionBuilder.setIfv(bidMachine.obtainIFV(context));
 
         requestBuilder.addExt(Any.pack(requestExtensionBuilder.build()));
 
