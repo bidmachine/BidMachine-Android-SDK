@@ -49,6 +49,9 @@ final class UserRestrictionParams
         String consentString = oneOf(
                 gdprConsentString,
                 BidMachineImpl.get().getIabSharedPreference().getGDPRConsentString());
+        if (TextUtils.isEmpty(consentString)) {
+            consentString = hasConsent() ? "1" : "0";
+        }
         if (consentString != null) {
             builder.setConsent(consentString);
         }
