@@ -57,10 +57,12 @@ final class BidMachineImpl {
         });
     }
 
+    private static final String BID_MACHINE_SHARED_PREF = "BidMachinePref";
     @VisibleForTesting
     static String DEF_INIT_URL = BuildConfig.BM_API_URL + "/init";
     private static final String DEF_AUCTION_URL = BuildConfig.BM_API_URL + "/openrtb3/auction";
     private static final String PREF_INIT_DATA = "initData";
+    private static final String PREF_IFV = "bid_machine_ifv";
 
     @Nullable
     private Context appContext;
@@ -120,6 +122,9 @@ final class BidMachineImpl {
 
     private List<AdRequest.AdRequestListener> adRequestListeners = new ArrayList<>();
 
+    @VisibleForTesting
+    String ifv;
+
     synchronized void initialize(@NonNull final Context context,
                                  @NonNull final String sellerId,
                                  @Nullable final InitializationCallback callback) {
@@ -162,6 +167,24 @@ final class BidMachineImpl {
         ((Application) context.getApplicationContext())
                 .registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks());
         isInitialized = true;
+    }
+
+    @NonNull
+    String obtainIFV(@NonNull Context context) {
+        if (!TextUtils.isEmpty(ifv)) {
+            return ifv;
+        }
+        SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
+                                                                     Context.MODE_PRIVATE);
+        ifv = preferences.getString(PREF_IFV, null);
+        if (!TextUtils.isEmpty(ifv)) {
+            return ifv;
+        }
+        ifv = UUID.randomUUID().toString();
+        preferences.edit()
+                .putString(PREF_IFV, ifv)
+                .apply();
+        return ifv;
     }
 
     private void requestInitData(@NonNull final Context context,
@@ -238,7 +261,7 @@ final class BidMachineImpl {
     }
 
     private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {
-        SharedPreferences preferences = context.getSharedPreferences("BidMachinePref",
+        SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
                                                                      Context.MODE_PRIVATE);
         preferences.edit()
                 .putString(PREF_INIT_DATA,
@@ -247,7 +270,7 @@ final class BidMachineImpl {
     }
 
     private void loadStoredInitResponse(@NonNull Context context) {
-        SharedPreferences preferences = context.getSharedPreferences("BidMachinePref",
+        SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
                                                                      Context.MODE_PRIVATE);
         if (preferences.contains(PREF_INIT_DATA)) {
             try {
