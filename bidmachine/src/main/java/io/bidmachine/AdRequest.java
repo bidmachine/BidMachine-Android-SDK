@@ -146,6 +146,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         placementBuilder.setSsai(0);
         placementBuilder.setSdk(BidMachine.NAME);
         placementBuilder.setSdkver(BidMachine.VERSION);
+        placementBuilder.setSecure(!io.bidmachine.core.Utils.canUseCleartextTraffic());
         for (Message.Builder displayBuilder : placements) {
             if (displayBuilder instanceof Placement.DisplayPlacement.Builder) {
                 placementBuilder.setDisplay((Placement.DisplayPlacement.Builder) displayBuilder);
