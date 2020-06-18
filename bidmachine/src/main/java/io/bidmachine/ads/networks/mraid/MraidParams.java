@@ -16,6 +16,7 @@ class MraidParams extends UnifiedParams {
     final int height;
     final boolean canPreload;
     final int loadSkipOffset;
+    final boolean useNativeClose;
     final int skipOffset;
     final int companionSkipOffset;
 
@@ -28,6 +29,7 @@ class MraidParams extends UnifiedParams {
         loadSkipOffset = mediationParams.getInt(IabUtils.KEY_LOAD_SKIP_OFFSET);
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);
         companionSkipOffset = mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET);
+        useNativeClose = mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE);
     }
 
     @Override

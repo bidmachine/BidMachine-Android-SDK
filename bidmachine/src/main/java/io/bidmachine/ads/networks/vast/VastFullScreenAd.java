@@ -40,7 +40,9 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         vastListener = new VastFullScreenAdapterListener(callback);
         vastRequest = VastRequest.newBuilder()
                 .setPreCache(true)
-                .setCloseTime(vastParams.companionSkipOffset) // setCloseTime - set MRAID companion close time
+                .setVideoCloseTime(vastParams.skipOffset)
+                .setCompanionCloseTime(vastParams.companionSkipOffset)
+                .forceUseNativeCloseTime(vastParams.useNativeClose)
                 .build();
         assert vastRequest != null;
         vastRequest.loadVideoWithData(contextProvider.getContext(),
