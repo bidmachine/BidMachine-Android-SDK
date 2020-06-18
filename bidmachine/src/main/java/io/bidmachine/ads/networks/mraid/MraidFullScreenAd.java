@@ -25,8 +25,6 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
     private MraidFullScreenAdapterListener adapterListener;
     @Nullable
     private UnifiedFullscreenAdCallback callback;
-    @Nullable
-    private MraidParams mraidParams;
 
     MraidFullScreenAd(VideoType videoType) {
         this.videoType = videoType;
@@ -42,7 +40,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
             callback.onAdLoadFailed(BMError.requestError("Activity not provided"));
             return;
         }
-        mraidParams = new MraidParams(mediationParams);
+        final MraidParams mraidParams = new MraidParams(mediationParams);
         if (!mraidParams.isValid(callback)) {
             return;
         }
@@ -58,6 +56,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                                     mraidParams.height)
                         .setPreload(true)
                         .setCloseTime(mraidParams.skipOffset)
+                        .forceUseNativeCloseButton(mraidParams.useNativeClose)
                         .setListener(adapterListener)
                         .setNativeFeatureListener(adapterListener)
                         .build();

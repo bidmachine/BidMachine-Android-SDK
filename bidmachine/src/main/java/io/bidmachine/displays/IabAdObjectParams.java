@@ -20,6 +20,7 @@ import static io.bidmachine.utils.IabUtils.KEY_HEIGHT;
 import static io.bidmachine.utils.IabUtils.KEY_LOAD_SKIP_OFFSET;
 import static io.bidmachine.utils.IabUtils.KEY_PRELOAD;
 import static io.bidmachine.utils.IabUtils.KEY_SKIP_OFFSET;
+import static io.bidmachine.utils.IabUtils.KEY_USE_NATIVE_CLOSE;
 import static io.bidmachine.utils.IabUtils.KEY_WIDTH;
 
 abstract class IabAdObjectParams
@@ -52,6 +53,7 @@ abstract class IabAdObjectParams
         super.prepareExtensions(seatbid, bid, extension);
         getData().put(KEY_PRELOAD, extension.getPreload());
         getData().put(KEY_LOAD_SKIP_OFFSET, extension.getLoadSkipoffset());
+        getData().put(KEY_USE_NATIVE_CLOSE, extension.getUseNativeClose());
         getData().put(KEY_SKIP_OFFSET, extension.getSkipoffset());
         getData().put(KEY_COMPANION_SKIP_OFFSET, extension.getCompanionSkipoffset());
     }

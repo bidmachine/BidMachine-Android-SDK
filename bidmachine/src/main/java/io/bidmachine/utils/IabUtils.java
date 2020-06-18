@@ -18,6 +18,7 @@ public class IabUtils {
     public static final String KEY_HEIGHT = "height";
     public static final String KEY_PRELOAD = "preload";
     public static final String KEY_LOAD_SKIP_OFFSET = "loadSkipOffset";
+    public static final String KEY_USE_NATIVE_CLOSE = "useNativeClose";
     public static final String KEY_SKIP_OFFSET = "skipOffset";
     public static final String KEY_COMPANION_SKIP_OFFSET = "companionSkipOffset";
 
