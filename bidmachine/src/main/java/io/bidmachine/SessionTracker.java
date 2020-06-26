@@ -12,7 +12,6 @@ import java.util.Map;
 
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
-import io.bidmachine.protobuf.ErrorReason;
 import io.bidmachine.utils.BMError;
 
 abstract class SessionTracker {
@@ -43,7 +42,7 @@ abstract class SessionTracker {
                             @Nullable TrackEventInfo eventInfo,
                             @Nullable BMError error) {
         if (error != null) {
-            if (canSendError(error)) {
+            if (error.isTrackError()) {
                 notifyError(
                         collectTrackingUrls(trackingObject, TrackEventType.Error),
                         collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
@@ -58,14 +57,6 @@ abstract class SessionTracker {
                     eventInfo,
                     eventType);
         }
-    }
-
-    @VisibleForTesting
-    static boolean canSendError(@NonNull BMError error) {
-        BMError originalError = error.getOriginError();
-        return originalError == null
-                || originalError.getCode() != ErrorReason.ERROR_REASON_NO_CONTENT_VALUE
-                || error.getCode() != ErrorReason.ERROR_REASON_NO_CONTENT_VALUE;
     }
 
     @Nullable

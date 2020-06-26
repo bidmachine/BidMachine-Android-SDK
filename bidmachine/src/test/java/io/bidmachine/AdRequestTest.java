@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.openrtb.Request;
+import com.explorestack.protobuf.openrtb.Response;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,9 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.protobuf.HeaderBiddingType;
@@ -23,6 +26,7 @@ import io.bidmachine.unified.UnifiedAdRequestParams;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
@@ -198,6 +202,60 @@ public class AdRequestTest {
         //Enabled HeaderBidding
         builder.enableHeaderBidding();
         assertTrue(builder.build().headerBiddingEnabled);
+    }
+
+    @Test
+    public void putUrlForEventType() {
+        Map<TrackEventType, List<String>> trackUrls = new EnumMap<>(TrackEventType.class);
+        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationWin, null);
+        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationWin, "");
+        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationWin, "test_url_win");
+        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationLoss, "test_url_loss");
+
+        assertEquals(2, trackUrls.size());
+        List<String> urlList = trackUrls.get(TrackEventType.MediationWin);
+        assertNotNull(urlList);
+        assertEquals(1, urlList.size());
+        assertEquals("test_url_win", urlList.get(0));
+        urlList = trackUrls.get(TrackEventType.MediationLoss);
+        assertNotNull(urlList);
+        assertEquals(1, urlList.size());
+        assertEquals("test_url_loss", urlList.get(0));
+        urlList = trackUrls.get(TrackEventType.Load);
+        assertNull(urlList);
+    }
+
+    @Test
+    public void extractTrackUrls() {
+        Map<TrackEventType, List<String>> trackUrls = adRequest.trackUrls;
+        assertNull(trackUrls);
+
+        adRequest.extractTrackUrls(null);
+        trackUrls = adRequest.trackUrls;
+        assertNull(trackUrls);
+
+        Response.Seatbid.Bid bid = Response.Seatbid.Bid.newBuilder().build();
+        adRequest.extractTrackUrls(bid);
+        trackUrls = adRequest.trackUrls;
+        assertNotNull(trackUrls);
+        assertEquals(0, trackUrls.size());
+
+        bid = Response.Seatbid.Bid.newBuilder()
+                .setPurl("test_url_win")
+                .setLurl("test_url_loss")
+                .build();
+        adRequest.extractTrackUrls(bid);
+        trackUrls = adRequest.trackUrls;
+        assertNotNull(trackUrls);
+        assertEquals(2, trackUrls.size());
+        List<String> urlList = trackUrls.get(TrackEventType.MediationWin);
+        assertNotNull(urlList);
+        assertEquals(1, urlList.size());
+        assertEquals("test_url_win", urlList.get(0));
+        urlList = trackUrls.get(TrackEventType.MediationLoss);
+        assertNotNull(urlList);
+        assertEquals(1, urlList.size());
+        assertEquals("test_url_loss", urlList.get(0));
     }
 
     private static class TestAdRequest extends AdRequest {

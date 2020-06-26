@@ -74,6 +74,7 @@ public class BMError {
     private int code;
     private String brief;
     private String message;
+    private boolean trackError = true;
 
     @Nullable
     private BMError originError;
@@ -104,6 +105,14 @@ public class BMError {
     @Nullable
     public BMError getOriginError() {
         return originError;
+    }
+
+    public boolean isTrackError() {
+        return trackError;
+    }
+
+    public void setTrackError(boolean trackError) {
+        this.trackError = trackError;
     }
 
     @Override

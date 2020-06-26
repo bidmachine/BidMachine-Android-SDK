@@ -17,6 +17,9 @@ public enum TrackEventType {
             -1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_REQUEST_CANCELED_VALUE,
             ActionType.ACTION_TYPE_REQUEST_CANCELING_VALUE),
+    AuctionRequestExpired(-1,
+                          -1,
+                          -1), // TODO
     Load(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_LOADED_VALUE,
             ActionType.ACTION_TYPE_LOADING_VALUE),
@@ -32,7 +35,9 @@ public enum TrackEventType {
     Close(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_CLOSED_VALUE,
             ActionType.ACTION_TYPE_CLOSING_VALUE),
-    Expired(-1, -1, -1),
+    Expired(-1,
+            -1,
+            -1), // TODO
     Error(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_ERROR_VALUE,
             EventTypeExtended.EVENT_TYPE_EXTENDED_ERROR_VALUE),
@@ -50,7 +55,9 @@ public enum TrackEventType {
             ActionType.ACTION_TYPE_HB_INITIALIZING_VALUE),
     HeaderBiddingNetworkPrepare(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_HB_NETWORK_PREPARED_VALUE,
-            ActionType.ACTION_TYPE_HB_PREPARING_VALUE);
+            ActionType.ACTION_TYPE_HB_PREPARING_VALUE),
+    MediationWin(-1, -1, -1),
+    MediationLoss(-1, -1, -1);
 
     private int ortbValue;
     private int ortbExtValue;

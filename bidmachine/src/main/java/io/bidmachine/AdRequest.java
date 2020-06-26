@@ -15,6 +15,8 @@ import com.explorestack.protobuf.openrtb.Request;
 import com.explorestack.protobuf.openrtb.Response;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +47,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     PriceFloorParams priceFloorParams;
     TargetingParams targetingParams;
+    int timeOut = -1;
     boolean headerBiddingEnabled = true;
 
     @VisibleForTesting
@@ -67,6 +70,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     private ArrayList<AdRequestListener<SelfType>> adRequestListeners;
     @Nullable
     private UnifiedAdRequestParamsType unifiedAdRequestParams;
+    @Nullable
+    @VisibleForTesting
+    Map<TrackEventType, List<String>> trackUrls;
 
     private long expirationTime = -1;
 
@@ -84,6 +90,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         @Override
         public Object getTrackingKey() {
             return trackingId;
+        }
+
+        @Nullable
+        @Override
+        List<String> getTrackingUrls(@NonNull TrackEventType eventType) {
+            return trackUrls != null
+                    ? trackUrls.get(eventType)
+                    : super.getTrackingUrls(eventType);
         }
     };
 
@@ -267,6 +281,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                         currentApiRequest = new ApiRequest.Builder<Request, Response>()
                                 .url(BidMachineImpl.get().getAuctionUrl())
                                 .setRequestData((Request) requestBuildResult)
+                                .setLoadingTimeOut(timeOut)
                                 .setDataBinder(getType().getBinder())
                                 .setCallback(new NetworkRequest.Callback<Response, BMError>() {
                                     @Override
@@ -278,9 +293,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
                                     @Override
                                     public void onFail(@Nullable BMError result) {
-                                        result = BMError.noFillError(result);
                                         Logger.log(toString() + ": api request fail - " + result);
                                         currentApiRequest = null;
+                                        if (result == null) {
+                                            result = BMError.noFillError(null);
+                                            result.setTrackError(false);
+                                        } else {
+                                            result.setTrackError(result != BMError.NoContent);
+                                        }
                                         processRequestFail(result);
                                     }
                                 })
@@ -311,6 +331,20 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
     }
 
+    public void notifyMediationWin() {
+        if (auctionResult == null) {
+            return;
+        }
+        BidMachineEvents.eventFinish(trackingObject, TrackEventType.MediationWin, getType(), null);
+    }
+
+    public void notifyMediationLoss() {
+        if (auctionResult == null) {
+            return;
+        }
+        BidMachineEvents.eventFinish(trackingObject, TrackEventType.MediationLoss, getType(), null);
+    }
+
     void cancel() {
         if (currentApiRequest != null) {
             currentApiRequest.cancel();
@@ -331,6 +365,11 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         for (AdRequestListener adRequestListener : BidMachineImpl.get().getAdRequestListeners()) {
             adRequestListener.onRequestExpired(this);
         }
+        BidMachineEvents.eventFinish(
+                trackingObject,
+                TrackEventType.AuctionRequestExpired,
+                getType(),
+                null);
     }
 
     /**
@@ -364,6 +403,31 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     void onExpired() {
         unsubscribeExpireTracker();
+    }
+
+    @VisibleForTesting
+    void extractTrackUrls(@Nullable Response.Seatbid.Bid bid) {
+        if (bid == null) {
+            return;
+        }
+        trackUrls = new EnumMap<>(TrackEventType.class);
+        putUrlForEventType(trackUrls, TrackEventType.MediationWin, bid.getPurl());
+        putUrlForEventType(trackUrls, TrackEventType.MediationLoss, bid.getLurl());
+    }
+
+    @VisibleForTesting
+    void putUrlForEventType(@NonNull Map<TrackEventType, List<String>> trackUrls,
+                            @NonNull TrackEventType trackEventType,
+                            @Nullable String url) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
+        List<String> urlList = trackUrls.get(trackEventType);
+        if (urlList == null) {
+            urlList = new ArrayList<>(1);
+            trackUrls.put(trackEventType, urlList);
+        }
+        urlList.add(url);
     }
 
     private void subscribeExpireTracker() {
@@ -418,6 +482,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     expirationTime = getOrDefault(bid.getExp(),
                             Response.Seatbid.Bid.getDefaultInstance().getExp(),
                             DEF_EXPIRATION_TIME);
+                    extractTrackUrls(bid);
                     subscribeExpireTracker();
                     Logger.log(toString() + ": Request finished (" + auctionResult + ")");
                     if (adRequestListeners != null) {
@@ -447,7 +512,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     @SuppressWarnings("unchecked")
-    private void processRequestFail(BMError error) {
+    private void processRequestFail(@NonNull BMError error) {
         if (adRequestListeners != null) {
             for (AdRequestListener listener : adRequestListeners) {
                 listener.onRequestFailed(this, error);
@@ -526,6 +591,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public SelfType setTargetingParams(TargetingParams userParams) {
             prepareRequest();
             params.targetingParams = userParams;
+            return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public SelfType setLoadingTimeOut(int timeOut) {
+            prepareRequest();
+            params.timeOut = timeOut;
             return (SelfType) this;
         }
 
