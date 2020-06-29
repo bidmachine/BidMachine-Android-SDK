@@ -1,0 +1,2 @@
+-keep class com.criteo.publisher.** { *; }
+-dontwarn com.criteo.publisher.**
