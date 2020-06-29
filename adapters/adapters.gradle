@@ -28,7 +28,6 @@ dependencies {
     api "com.android.support:support-annotations:$supportVersion"
 
     api project(':bidmachine')
-    api project(':appodeal_ads_core')
 
     testImplementation "junit:junit:$jUnitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"

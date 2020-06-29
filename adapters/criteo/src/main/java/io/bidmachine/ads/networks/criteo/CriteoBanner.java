@@ -3,7 +3,6 @@ package io.bidmachine.ads.networks.criteo;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.appodeal.ads.core.Utils;
 import com.criteo.publisher.BidToken;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -11,6 +10,7 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.model.BannerAdUnit;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.core.Utils;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;
@@ -51,7 +51,6 @@ public class CriteoBanner extends UnifiedBannerAd {
     public void onDestroy() {
         if (criteoBannerView != null) {
             criteoBannerView.setCriteoBannerAdListener(null);
-            criteoBannerView.destroy();
             criteoBannerView = null;
         }
     }
