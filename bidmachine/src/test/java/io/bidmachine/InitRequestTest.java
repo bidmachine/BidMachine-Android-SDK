@@ -56,10 +56,10 @@ public class InitRequestTest {
 
     @Test
     public void initRequest_Success() throws Exception {
-        int eventCode = EventTypeExtended.EVENT_TYPE_EXTENDED_INIT_LOADED_VALUE;
+        int eventCode = EventTypeExtended.EVENT_TYPE_EXTENDED_SESSION_INITIALIZED_VALUE;
 
         Ad.Event loadEvent = Ad.Event.newBuilder()
-                .setTypeValue(EventTypeExtended.EVENT_TYPE_EXTENDED_INIT_LOADED_VALUE)
+                .setTypeValue(EventTypeExtended.EVENT_TYPE_EXTENDED_SESSION_INITIALIZED_VALUE)
                 .setUrl(mockWebServer.url(TRACKING_URL_FORMAT).toString())
                 .build();
 
@@ -124,8 +124,8 @@ public class InitRequestTest {
 
         String path = eventRequest.getPath();
 
-        assertEquals(ActionType.ACTION_TYPE_INITIALIZING_VALUE, getParamLongValue(path, "action_code"));
-        assertEquals(ActionType.ACTION_TYPE_INITIALIZING_VALUE, getParamLongValue(path, "action_code2"));
+        assertEquals(ActionType.ACTION_TYPE_SESSION_INITIALIZING_VALUE, getParamLongValue(path, "action_code"));
+        assertEquals(ActionType.ACTION_TYPE_SESSION_INITIALIZING_VALUE, getParamLongValue(path, "action_code2"));
         assertEquals(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE, getParamLongValue(path, "error_reason"));
         assertEquals(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE, getParamLongValue(path, "error_reason2"));
         assertNotEquals(0, getParamLongValue(path, "start"));

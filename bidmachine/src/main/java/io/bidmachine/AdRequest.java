@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
@@ -76,6 +77,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     private long expirationTime = -1;
 
+    private AtomicBoolean isApiRequestCanceled = new AtomicBoolean(false);
+    private AtomicBoolean isApiRequestCompleted = new AtomicBoolean(false);
     private boolean isExpired;
     private boolean isExpireTrackerSubscribed;
 
@@ -83,6 +86,16 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         @Override
         public void run() {
             processExpired();
+        }
+    };
+
+    private final Runnable timeOutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isApiRequestCompleted.get()) {
+                cancel();
+                processRequestFail(BMError.TimeoutError);
+            }
         }
     };
 
@@ -278,7 +291,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 public void run() {
                     Object requestBuildResult = build(context, getType());
                     if (requestBuildResult instanceof Request) {
-                        currentApiRequest = new ApiRequest.Builder<Request, Response>()
+                        ApiRequest.Builder<Request, Response> currentApiRequestBuilder = new ApiRequest.Builder<Request, Response>()
                                 .url(BidMachineImpl.get().getAuctionUrl())
                                 .setRequestData((Request) requestBuildResult)
                                 .setLoadingTimeOut(timeOut)
@@ -286,38 +299,24 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                 .setCallback(new NetworkRequest.Callback<Response, BMError>() {
                                     @Override
                                     public void onSuccess(@Nullable Response result) {
-                                        Logger.log(toString() + ": api request success");
-                                        currentApiRequest = null;
-                                        processRequestSuccess(result);
+                                        processApiRequestSuccess(result);
                                     }
 
                                     @Override
                                     public void onFail(@Nullable BMError result) {
-                                        Logger.log(toString() + ": api request fail - " + result);
-                                        currentApiRequest = null;
-                                        if (result == null) {
-                                            result = BMError.noFillError(null);
-                                            result.setTrackError(false);
-                                        } else {
-                                            result.setTrackError(result != BMError.NoContent);
-                                        }
-                                        processRequestFail(result);
+                                        processApiRequestFail(result);
                                     }
                                 })
                                 .setCancelCallback(new NetworkRequest.CancelCallback() {
                                     @Override
                                     public void onCanceled() {
-                                        BidMachineEvents.eventFinish(
-                                                trackingObject,
-                                                TrackEventType.AuctionRequestCancel,
-                                                getType(),
-                                                null);
-                                        BidMachineEvents.clearEvent(
-                                                trackingObject,
-                                                TrackEventType.AuctionRequest);
+                                        processApiRequestCancel();
                                     }
-                                })
-                                .request();
+                                });
+                        if (isApiRequestCanceled.get()) {
+                            return;
+                        }
+                        currentApiRequest = currentApiRequestBuilder.request();
                     } else {
                         processRequestFail(requestBuildResult instanceof BMError
                                 ? (BMError) requestBuildResult
@@ -325,6 +324,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     }
                 }
             });
+            if (timeOut > 0) {
+                io.bidmachine.core.Utils.onBackgroundThread(timeOutRunnable, timeOut);
+            }
         } catch (Exception e) {
             Logger.log(e);
             processRequestFail(BMError.Internal);
@@ -332,23 +334,28 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     public void notifyMediationWin() {
-        if (auctionResult == null) {
+        if (!isApiRequestCompleted.get()) {
             return;
         }
         BidMachineEvents.eventFinish(trackingObject, TrackEventType.MediationWin, getType(), null);
     }
 
     public void notifyMediationLoss() {
-        if (auctionResult == null) {
+        if (!isApiRequestCompleted.get()) {
             return;
         }
         BidMachineEvents.eventFinish(trackingObject, TrackEventType.MediationLoss, getType(), null);
     }
 
     void cancel() {
+        if (isApiRequestCompleted.get() || isApiRequestCanceled.get()) {
+            return;
+        }
         if (currentApiRequest != null) {
             currentApiRequest.cancel();
             currentApiRequest = null;
+        } else {
+            processApiRequestCancel();
         }
     }
 
@@ -411,23 +418,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             return;
         }
         trackUrls = new EnumMap<>(TrackEventType.class);
-        putUrlForEventType(trackUrls, TrackEventType.MediationWin, bid.getPurl());
-        putUrlForEventType(trackUrls, TrackEventType.MediationLoss, bid.getLurl());
-    }
-
-    @VisibleForTesting
-    void putUrlForEventType(@NonNull Map<TrackEventType, List<String>> trackUrls,
-                            @NonNull TrackEventType trackEventType,
-                            @Nullable String url) {
-        if (TextUtils.isEmpty(url)) {
-            return;
-        }
-        List<String> urlList = trackUrls.get(trackEventType);
-        if (urlList == null) {
-            urlList = new ArrayList<>(1);
-            trackUrls.put(trackEventType, urlList);
-        }
-        urlList.add(url);
+        OrtbUtils.addEvent(trackUrls, TrackEventType.MediationWin, bid.getPurl());
+        OrtbUtils.addEvent(trackUrls, TrackEventType.MediationLoss, bid.getLurl());
     }
 
     private void subscribeExpireTracker() {
@@ -446,7 +438,15 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     @SuppressWarnings("unchecked")
-    private void processRequestSuccess(@Nullable Response response) {
+    private void processApiRequestSuccess(@Nullable Response response) {
+        if (isApiRequestCanceled.get()) {
+            return;
+        }
+        isApiRequestCompleted.set(true);
+        currentApiRequest = null;
+        io.bidmachine.core.Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        Logger.log(toString() + ": api request success");
+
         if (response != null && response.getSeatbidCount() > 0) {
             final Response.Seatbid seatbid = response.getSeatbid(0);
             if (seatbid == null || seatbid.getBidCount() == 0) {
@@ -511,6 +511,24 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         processRequestFail(BMError.Internal);
     }
 
+    private void processApiRequestFail(@Nullable BMError error) {
+        if (isApiRequestCanceled.get()) {
+            return;
+        }
+        isApiRequestCompleted.set(true);
+        currentApiRequest = null;
+        io.bidmachine.core.Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        Logger.log(toString() + ": api request fail - " + error);
+
+        if (error == null) {
+            error = BMError.noFillError(null);
+            error.setTrackError(false);
+        } else {
+            error.setTrackError(error != BMError.NoContent);
+        }
+        processRequestFail(error);
+    }
+
     @SuppressWarnings("unchecked")
     private void processRequestFail(@NonNull BMError error) {
         if (adRequestListeners != null) {
@@ -526,6 +544,18 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 TrackEventType.AuctionRequest,
                 getType(),
                 error);
+    }
+
+    private void processApiRequestCancel() {
+        isApiRequestCanceled.set(true);
+        io.bidmachine.core.Utils.cancelBackgroundThreadTask(timeOutRunnable);
+
+        BidMachineEvents.eventFinish(
+                trackingObject,
+                TrackEventType.AuctionRequestCancel,
+                getType(),
+                null);
+        BidMachineEvents.clearEvent(trackingObject, TrackEventType.AuctionRequest);
     }
 
     @NonNull
@@ -596,9 +626,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
         @Override
         @SuppressWarnings("unchecked")
-        public SelfType setLoadingTimeOut(int timeOut) {
+        public SelfType setLoadingTimeOut(int timeOutMs) {
             prepareRequest();
-            params.timeOut = timeOut;
+            params.timeOut = timeOutMs;
             return (SelfType) this;
         }
 

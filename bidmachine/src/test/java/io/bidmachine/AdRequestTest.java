@@ -14,7 +14,6 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -202,27 +201,6 @@ public class AdRequestTest {
         //Enabled HeaderBidding
         builder.enableHeaderBidding();
         assertTrue(builder.build().headerBiddingEnabled);
-    }
-
-    @Test
-    public void putUrlForEventType() {
-        Map<TrackEventType, List<String>> trackUrls = new EnumMap<>(TrackEventType.class);
-        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationWin, null);
-        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationWin, "");
-        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationWin, "test_url_win");
-        adRequest.putUrlForEventType(trackUrls, TrackEventType.MediationLoss, "test_url_loss");
-
-        assertEquals(2, trackUrls.size());
-        List<String> urlList = trackUrls.get(TrackEventType.MediationWin);
-        assertNotNull(urlList);
-        assertEquals(1, urlList.size());
-        assertEquals("test_url_win", urlList.get(0));
-        urlList = trackUrls.get(TrackEventType.MediationLoss);
-        assertNotNull(urlList);
-        assertEquals(1, urlList.size());
-        assertEquals("test_url_loss", urlList.get(0));
-        urlList = trackUrls.get(TrackEventType.Load);
-        assertNull(urlList);
     }
 
     @Test

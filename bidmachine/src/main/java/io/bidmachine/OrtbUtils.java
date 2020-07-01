@@ -8,13 +8,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
-import com.explorestack.protobuf.adcom.Ad;
-import com.explorestack.protobuf.adcom.ConnectionType;
-import com.explorestack.protobuf.adcom.Context;
-import com.explorestack.protobuf.adcom.DeviceType;
-import com.explorestack.protobuf.adcom.LocationType;
-import com.explorestack.protobuf.adcom.OS;
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.ByteString;
 import com.explorestack.protobuf.Descriptors;
@@ -23,6 +18,12 @@ import com.explorestack.protobuf.MessageOrBuilder;
 import com.explorestack.protobuf.TextFormat;
 import com.explorestack.protobuf.UnknownFieldSet;
 import com.explorestack.protobuf.WireFormat;
+import com.explorestack.protobuf.adcom.Ad;
+import com.explorestack.protobuf.adcom.ConnectionType;
+import com.explorestack.protobuf.adcom.Context;
+import com.explorestack.protobuf.adcom.DeviceType;
+import com.explorestack.protobuf.adcom.LocationType;
+import com.explorestack.protobuf.adcom.OS;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -184,8 +185,12 @@ class OrtbUtils {
         }
     }
 
-    private static void addEvent(@NonNull Map<TrackEventType, List<String>> outMap,
-                                 @NonNull TrackEventType eventType, String url) {
+    static void addEvent(@NonNull Map<TrackEventType, List<String>> outMap,
+                         @NonNull TrackEventType eventType,
+                         @Nullable String url) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
         List<String> urlList = outMap.get(eventType);
         if (urlList == null) {
             urlList = new ArrayList<>(1);
