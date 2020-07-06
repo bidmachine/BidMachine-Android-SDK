@@ -33,10 +33,12 @@ import android.os.Looper;
 import android.security.NetworkSecurityPolicy;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
 import android.view.Surface;
@@ -151,12 +153,22 @@ public class Utils {
         }
     }
 
+    @Nullable
+    @SuppressLint("MissingPermission")
+    public static NetworkInfo getActiveNetworkInfo(@NonNull Context context) {
+        if (!Utils.isPermissionGranted(context, Manifest.permission.ACCESS_NETWORK_STATE)) {
+            Log.e("BidMachine", "Manifest permission not found: android.permission.ACCESS_NETWORK_STATE. Check the integration.");
+            return null;
+        }
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return connectivityManager.getActiveNetworkInfo();
+    }
+
     @NonNull
     @SuppressLint("MissingPermission")
     public static ConnectionInfo obtainConnectionInfo(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
+        NetworkInfo info = getActiveNetworkInfo(context);
         String connectionType = "unknown";
         String connectionSubtype = null;
         final boolean fast;
@@ -215,9 +227,7 @@ public class Utils {
 
     @SuppressLint("MissingPermission")
     public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = getActiveNetworkInfo(context);
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
@@ -461,17 +471,20 @@ public class Utils {
                 && isExternalStorageWritable();
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    private static boolean writePermissionGranted(Context context) {
+    public static boolean isPermissionGranted(@NonNull Context context,
+                                              @NonNull String permission) {
         try {
-            if (context != null) {
-                return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED;
-            }
+            return ContextCompat.checkSelfPermission(context, permission)
+                    == PackageManager.PERMISSION_GRANTED;
         } catch (Exception e) {
-            Logger.log(e);
+            return false;
         }
-        return false;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @VisibleForTesting
+    static boolean writePermissionGranted(Context context) {
+        return isPermissionGranted(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     private static boolean isExternalStorageWritable() {
