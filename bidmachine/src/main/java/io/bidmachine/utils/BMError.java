@@ -21,7 +21,7 @@ public class BMError {
     public static final BMError Connection = new BMError(ErrorReason.ERROR_REASON_NO_CONNECTION_VALUE,
             "Connection error", "BidMachine can't connect to server");
     public static final BMError TimeoutError = new BMError(ErrorReason.ERROR_REASON_TIMEOUT_VALUE,
-            "Timeout error", "BidMachine can't connect to server");
+            "Timeout error", "BidMachine timeout reached");
     public static final BMError NoContent = new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
             "No content", "No content");
     public static final BMError IncorrectAdUnit = new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,

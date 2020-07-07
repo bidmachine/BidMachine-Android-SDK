@@ -30,6 +30,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
 
     @VisibleForTesting
     String requiredUrl;
+    @VisibleForTesting
     int timeOut;
 
     private ApiRequest(@Nullable String path, @NonNull Method method, @Nullable RequestDataType requestData) {
@@ -120,7 +121,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         }
 
         public Builder<RequestDataType, ResponseDataType> setLoadingTimeOut(int timeOut) {
-            this.timeOut = timeOut <= 0 ? REQUEST_TIMEOUT : timeOut;
+            this.timeOut = timeOut > 0 ? timeOut : REQUEST_TIMEOUT;
             return this;
         }
 
