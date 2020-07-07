@@ -76,10 +76,8 @@ class OrtbUtils {
         }
     }
 
-    static ConnectionType getConnectionType(android.content.Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
+    static ConnectionType getConnectionType(@NonNull android.content.Context context) {
+        NetworkInfo info = Utils.getActiveNetworkInfo(context);
         ConnectionType connectionType;
         if (info == null) {
             connectionType = ConnectionType.CONNECTION_TYPE_INVALID;
