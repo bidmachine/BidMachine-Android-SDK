@@ -2,7 +2,6 @@ package com.appodeal.ads.core;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -481,7 +480,6 @@ public class Utils {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     @VisibleForTesting
     static boolean writePermissionGranted(Context context) {
         return isPermissionGranted(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
