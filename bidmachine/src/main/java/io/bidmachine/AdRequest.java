@@ -255,6 +255,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest, getType());
         try {
+            unsubscribeExpireTracker();
             if (currentApiRequest != null) {
                 currentApiRequest.cancel();
             }
