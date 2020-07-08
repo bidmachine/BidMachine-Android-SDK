@@ -140,7 +140,7 @@ class OrtbUtils {
         initRequest.setSdk(BidMachine.NAME);
         initRequest.setSdkver(BidMachine.VERSION);
         initRequest.setIfa(AdvertisingPersonalData.getAdvertisingId(context, !restrictions.canSendIfa()));
-        initRequest.setIfv(BidMachineImpl.get().obtainIFV(context));
+        initRequest.setBmIfv(BidMachineImpl.get().obtainIFV(context));
 
         final DeviceInfo deviceInfo = DeviceInfo.obtain(context);
         initRequest.setDeviceType(deviceInfo.isTablet
