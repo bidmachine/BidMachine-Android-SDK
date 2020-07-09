@@ -529,7 +529,7 @@ public abstract class BidMachineAd<
         public void processDestroy() {
             log("destroy requested");
             if (currentState == State.Loading) {
-                trackEvent(TrackEventType.Load, BMError.TimeoutError);
+                trackEvent(TrackEventType.Load, BMError.Destroyed);
             }
             trackEvent(TrackEventType.Destroy, null);
             currentState = State.Destroyed;
