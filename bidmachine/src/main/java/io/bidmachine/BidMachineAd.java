@@ -5,8 +5,12 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
+
+import java.util.List;
+
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.AdObject;
@@ -14,8 +18,6 @@ import io.bidmachine.models.AdObjectParams;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.utils.BMError;
-
-import java.util.List;
 
 public abstract class BidMachineAd<
         SelfType extends IAd,
@@ -526,6 +528,9 @@ public abstract class BidMachineAd<
         @Override
         public void processDestroy() {
             log("destroy requested");
+            if (currentState == State.Loading) {
+                trackEvent(TrackEventType.Load, BMError.Destroyed);
+            }
             trackEvent(TrackEventType.Destroy, null);
             currentState = State.Destroyed;
             if (adRequest != null) {

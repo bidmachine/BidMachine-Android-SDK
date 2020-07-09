@@ -8,8 +8,8 @@ import io.bidmachine.protobuf.EventTypeExtended;
 public enum TrackEventType {
 
     InitLoading(-1,
-            EventTypeExtended.EVENT_TYPE_EXTENDED_INIT_LOADED_VALUE,
-            ActionType.ACTION_TYPE_INITIALIZING_VALUE),
+            EventTypeExtended.EVENT_TYPE_EXTENDED_SESSION_INITIALIZED_VALUE,
+            ActionType.ACTION_TYPE_SESSION_INITIALIZING_VALUE),
     AuctionRequest(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_REQUEST_LOADED_VALUE,
             ActionType.ACTION_TYPE_REQUEST_LOADING_VALUE),
@@ -17,9 +17,12 @@ public enum TrackEventType {
             -1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_REQUEST_CANCELED_VALUE,
             ActionType.ACTION_TYPE_REQUEST_CANCELING_VALUE),
+    AuctionRequestExpired(-1,
+            EventTypeExtended.EVENT_TYPE_EXTENDED_REQUEST_EXPIRED_VALUE,
+            EventTypeExtended.EVENT_TYPE_EXTENDED_REQUEST_EXPIRED_VALUE),
     Load(-1,
-            EventTypeExtended.EVENT_TYPE_EXTENDED_LOADED_VALUE,
-            ActionType.ACTION_TYPE_LOADING_VALUE),
+            EventTypeExtended.EVENT_TYPE_EXTENDED_AD_LOADED_VALUE,
+            ActionType.ACTION_TYPE_AD_LOADING_VALUE),
     Impression(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_VIEWABLE_VALUE,
             ActionType.ACTION_TYPE_VIEWING_VALUE),
@@ -32,13 +35,15 @@ public enum TrackEventType {
     Close(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_CLOSED_VALUE,
             ActionType.ACTION_TYPE_CLOSING_VALUE),
-    Expired(-1, -1, -1),
+    Expired(-1,
+            EventTypeExtended.EVENT_TYPE_EXTENDED_AD_EXPIRED_VALUE,
+            EventTypeExtended.EVENT_TYPE_EXTENDED_AD_EXPIRED_VALUE),
     Error(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_ERROR_VALUE,
             EventTypeExtended.EVENT_TYPE_EXTENDED_ERROR_VALUE),
     Destroy(-1,
-            EventTypeExtended.EVENT_TYPE_EXTENDED_DESTROYED_VALUE,
-            ActionType.ACTION_TYPE_DESTROYING_VALUE),
+            EventTypeExtended.EVENT_TYPE_EXTENDED_AD_DESTROYED_VALUE,
+            ActionType.ACTION_TYPE_AD_DESTROYING_VALUE),
     TrackingError(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_TRACKING_ERROR_VALUE,
             EventTypeExtended.EVENT_TYPE_EXTENDED_TRACKING_ERROR_VALUE),
@@ -50,7 +55,9 @@ public enum TrackEventType {
             ActionType.ACTION_TYPE_HB_INITIALIZING_VALUE),
     HeaderBiddingNetworkPrepare(-1,
             EventTypeExtended.EVENT_TYPE_EXTENDED_HB_NETWORK_PREPARED_VALUE,
-            ActionType.ACTION_TYPE_HB_PREPARING_VALUE);
+            ActionType.ACTION_TYPE_HB_PREPARING_VALUE),
+    MediationWin(-1, -1, -1),
+    MediationLoss(-1, -1, -1);
 
     private int ortbValue;
     private int ortbExtValue;

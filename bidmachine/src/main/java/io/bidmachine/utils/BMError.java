@@ -21,7 +21,7 @@ public class BMError {
     public static final BMError Connection = new BMError(ErrorReason.ERROR_REASON_NO_CONNECTION_VALUE,
             "Connection error", "BidMachine can't connect to server");
     public static final BMError TimeoutError = new BMError(ErrorReason.ERROR_REASON_TIMEOUT_VALUE,
-            "Timeout error", "BidMachine can't connect to server");
+            "Timeout error", "BidMachine timeout reached");
     public static final BMError NoContent = new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
             "No content", "No content");
     public static final BMError IncorrectAdUnit = new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
@@ -74,6 +74,7 @@ public class BMError {
     private int code;
     private String brief;
     private String message;
+    private boolean trackError = true;
 
     @Nullable
     private BMError originError;
@@ -104,6 +105,14 @@ public class BMError {
     @Nullable
     public BMError getOriginError() {
         return originError;
+    }
+
+    public boolean isTrackError() {
+        return trackError;
+    }
+
+    public void setTrackError(boolean trackError) {
+        this.trackError = trackError;
     }
 
     @Override

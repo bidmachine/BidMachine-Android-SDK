@@ -4,14 +4,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
+
 import com.explorestack.protobuf.openrtb.Openrtb;
 import com.explorestack.protobuf.openrtb.Request;
 import com.explorestack.protobuf.openrtb.Response;
-import io.bidmachine.core.Logger;
-import io.bidmachine.core.NetworkRequest;
-import io.bidmachine.protobuf.InitRequest;
-import io.bidmachine.protobuf.InitResponse;
-import io.bidmachine.utils.BMError;
+
 import org.apache.http.conn.ConnectTimeoutException;
 
 import java.io.InputStream;
@@ -20,6 +17,12 @@ import java.net.SocketTimeoutException;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 
+import io.bidmachine.core.Logger;
+import io.bidmachine.core.NetworkRequest;
+import io.bidmachine.protobuf.InitRequest;
+import io.bidmachine.protobuf.InitResponse;
+import io.bidmachine.utils.BMError;
+
 class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDataType, ResponseType, BMError> {
 
     @VisibleForTesting
@@ -27,6 +30,8 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
 
     @VisibleForTesting
     String requiredUrl;
+    @VisibleForTesting
+    int timeOut;
 
     private ApiRequest(@Nullable String path, @NonNull Method method, @Nullable RequestDataType requestData) {
         super(path, method, requestData);
@@ -73,8 +78,8 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
     @Override
     protected void prepareRequestParams(URLConnection connection) {
         super.prepareRequestParams(connection);
-        connection.setConnectTimeout(REQUEST_TIMEOUT);
-        connection.setReadTimeout(REQUEST_TIMEOUT);
+        connection.setConnectTimeout(timeOut);
+        connection.setReadTimeout(timeOut);
     }
 
     private BMError getErrorFromCode(URLConnection connection, int responseCode) {
@@ -92,6 +97,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
 
         private String url;
         private RequestDataType requestData;
+        private int timeOut = REQUEST_TIMEOUT;
         private ApiDataBinder<RequestDataType, ResponseDataType> dataBinder;
         private NetworkRequest.Callback<ResponseDataType, BMError> callback;
         private NetworkRequest.CancelCallback cancelCallback;
@@ -111,6 +117,11 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
 
         public Builder<RequestDataType, ResponseDataType> setRequestData(RequestDataType requestData) {
             this.requestData = requestData;
+            return this;
+        }
+
+        public Builder<RequestDataType, ResponseDataType> setLoadingTimeOut(int timeOut) {
+            this.timeOut = timeOut > 0 ? timeOut : REQUEST_TIMEOUT;
             return this;
         }
 
@@ -136,6 +147,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
             request.setCancelCallback(cancelCallback);
             request.setDataBinder(dataBinder);
             request.requiredUrl = url;
+            request.timeOut = timeOut;
             return request;
         }
 

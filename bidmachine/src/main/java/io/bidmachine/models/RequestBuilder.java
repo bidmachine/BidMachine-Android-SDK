@@ -14,6 +14,9 @@ public interface RequestBuilder<SelfType extends RequestBuilder,
     SelfType setTargetingParams(TargetingParams targetingParams);
 
     @SuppressWarnings("UnusedReturnValue")
+    SelfType setLoadingTimeOut(int timeOutMs);
+
+    @SuppressWarnings("UnusedReturnValue")
     SelfType disableHeaderBidding();
 
     @SuppressWarnings("UnusedReturnValue")

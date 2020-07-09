@@ -7,7 +7,6 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +19,8 @@ import java.net.URLConnection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 16)
@@ -82,6 +83,33 @@ public class ApiRequestTest {
         performTest("Request", BMError.TimeoutError);
     }
 
+    @Test
+    public void setLoadingTimeOut_negativeNumber_defaultTimeOut() {
+        int timeOut = -10;
+        ApiRequest<String, String> apiRequest = new ApiRequest.Builder<String, String>()
+                .setLoadingTimeOut(timeOut)
+                .build();
+        assertEquals(ApiRequest.REQUEST_TIMEOUT, apiRequest.timeOut);
+    }
+
+    @Test
+    public void setLoadingTimeOut_zeroNumber_defaultTimeOut() {
+        int timeOut = 0;
+        ApiRequest<String, String> apiRequest = new ApiRequest.Builder<String, String>()
+                .setLoadingTimeOut(timeOut)
+                .build();
+        assertEquals(ApiRequest.REQUEST_TIMEOUT, apiRequest.timeOut);
+    }
+
+    @Test
+    public void setLoadingTimeOut_positiveNumber_transferredTimeOut() {
+        int timeOut = 10;
+        ApiRequest<String, String> apiRequest = new ApiRequest.Builder<String, String>()
+                .setLoadingTimeOut(timeOut)
+                .build();
+        assertEquals(timeOut, apiRequest.timeOut);
+    }
+
     private class ObjectContainer<ObjectType> {
         ObjectType referenceObject;
     }
@@ -133,7 +161,7 @@ public class ApiRequestTest {
         request.request();
         lock.await();
 
-        Assert.assertEquals(responseResult, responseContainer.referenceObject);
+        assertEquals(responseResult, responseContainer.referenceObject);
     }
 
 }
