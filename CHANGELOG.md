@@ -1,3 +1,9 @@
+## Version 1.5.0 (July 10, 2020)
+**Features**:
+* SDK improvement
+* Combining BidMachineFetcher and BidMachineHelper. Use BidMachineFetcher instead BidMachineHelper
+* Added API method ```AdReqeust#setLoadingTimeOut``` to set loading timeout for AdRequest
+
 ## Version 1.4.4 (May 22, 2020)
 **Features**:
 * Updated Amazon version to 8.3.0

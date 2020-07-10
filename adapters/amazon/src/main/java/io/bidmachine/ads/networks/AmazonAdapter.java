@@ -56,8 +56,8 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            Log.e(TAG, "Initialize failed: minSdkVersion for Amazon is 16");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            Log.e(TAG, "Initialize failed: minSdkVersion for Amazon is 19");
             return;
         }
         initialize(contextProvider, adRequestParams, networkConfigParams.obtainNetworkParams());

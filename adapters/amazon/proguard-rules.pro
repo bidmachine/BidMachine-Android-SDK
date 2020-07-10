@@ -1,1 +1,2 @@
 -keep class com.amazon.device.ads.** { *; }
+-dontwarn com.amazon.device.ads.**
