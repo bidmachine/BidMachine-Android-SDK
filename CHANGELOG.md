@@ -2,7 +2,7 @@
 **Features**:
 * SDK improvement
 * Combining BidMachineFetcher and BidMachineHelper. Use BidMachineFetcher instead BidMachineHelper
-* Added API method ```AdReqeust#setLoadingTimeOut``` to set loading timeout for AdRequest
+* Added API method ```AdRequest.Builder#setLoadingTimeOut``` to set loading timeout for AdRequest
 
 ## Version 1.4.4 (May 22, 2020)
 **Features**:
