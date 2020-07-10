@@ -4,8 +4,8 @@ This folder contains mediation adapter used to mediate `Tapjoy`.
 
 ## Integration
 
-[<img src="https://img.shields.io/badge/Min%20SDK%20version-1.4.4-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
-[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.4.4.3-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.my_target/1.4.4.3/)
+[<img src="https://img.shields.io/badge/Min%20SDK%20version-1.5.0-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
+[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.5.0.3-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.my_target/1.5.0.3/)
 [<img src="https://img.shields.io/badge/Network%20version-12.4.2-blue">](https://dev.tapjoy.com/sdk-integration/android/)
 
 Add next dependency to you `build.gradle`:
@@ -13,7 +13,7 @@ Add next dependency to you `build.gradle`:
 ```groovy
 dependencies {
     // ... other dependencies
-    implementation 'io.bidmachine:ads.networks.tapjoy:1.4.4.3'
+    implementation 'io.bidmachine:ads.networks.tapjoy:1.5.0.3'
 }
 ```
 
