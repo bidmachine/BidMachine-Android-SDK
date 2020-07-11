@@ -3,6 +3,7 @@
 * SDK improvement
 * Combining BidMachineFetcher and BidMachineHelper. Use BidMachineFetcher instead BidMachineHelper
 * Added API method ```AdRequest.Builder#setLoadingTimeOut``` to set loading timeout for AdRequest
+* Added API method ```AdRequest#notifyMediationWin``` and ```AdRequest#notifyMediationLoss``` to notify BidMachine of win/loss if you use BidMachine like in-house mediation
 
 ## Version 1.4.4 (May 22, 2020)
 **Features**:
