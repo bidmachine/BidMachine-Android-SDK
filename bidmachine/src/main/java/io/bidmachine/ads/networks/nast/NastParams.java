@@ -56,12 +56,18 @@ public class NastParams extends UnifiedParams {
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Icon)
                 && TextUtils.isEmpty(iconUrl)) {
-            callback.onAdLoadFailed(BMError.requestError("iconUrl not provided"));
+            callback.onAdLoadFailed(BMError.requestError("Your request settings require ICON, but it not provided in response"));
             return false;
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Image)
                 && TextUtils.isEmpty(imageUrl)) {
-            callback.onAdLoadFailed(BMError.requestError("imageUrl not provided"));
+            callback.onAdLoadFailed(BMError.requestError("Your request settings require IMAGE, but it not provided in response"));
+            return false;
+        }
+        if (adRequestParams.containsAssetType(MediaAssetType.Video)
+                && TextUtils.isEmpty(videoAdm)
+                && TextUtils.isEmpty(videoUrl)) {
+            callback.onAdLoadFailed(BMError.requestError("Your request settings require VIDEO, but it not provided in response"));
             return false;
         }
         return true;

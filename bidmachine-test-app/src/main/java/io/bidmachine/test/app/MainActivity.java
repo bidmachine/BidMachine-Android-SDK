@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -36,6 +37,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.wefika.flowlayout.FlowLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,12 +50,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import io.bidmachine.AdContentType;
 import io.bidmachine.AdsFormat;
 import io.bidmachine.BidMachine;
 import io.bidmachine.BuildConfig;
 import io.bidmachine.InitializationCallback;
+import io.bidmachine.MediaAssetType;
 import io.bidmachine.ads.networks.AmazonConfig;
 import io.bidmachine.ads.networks.adcolony.AdColonyConfig;
 import io.bidmachine.ads.networks.criteo.CriteoConfig;
@@ -81,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout nativeAdParent;
     private RadioGroup bannerSizesParent;
     private RadioGroup interstitialFormatParent;
+    private FlowLayout nativeMediaAssetParent;
     private TextView txtLocation;
 
     private RequestHelper requestHelper;
@@ -145,6 +151,19 @@ public class MainActivity extends AppCompatActivity {
         }
         if (savedInstanceState == null) {
             interstitialFormatParent.check(interstitialFormatParent.getChildAt(0).getId());
+        }
+
+        nativeMediaAssetParent = findViewById(R.id.nativeMediaAssetParent);
+        for (MediaAssetType mediaAssetType : MediaAssetType.values()) {
+            CheckBox checkBox = new CheckBox(this);
+            int id = ("cbmat" + mediaAssetType.name()).hashCode();
+            checkBox.setId(id < 0 ? -id : id);
+            checkBox.setText(mediaAssetType.name());
+            checkBox.setTag(mediaAssetType);
+            nativeMediaAssetParent.addView(checkBox,
+                                           new FlowLayout.LayoutParams(
+                                                   ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                   ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
         this.<SwitchCompat>findViewById(R.id.switchStaticMode).setOnCheckedChangeListener(
@@ -350,7 +369,8 @@ public class MainActivity extends AppCompatActivity {
      */
 
     public void loadNative(View view) {
-        requestHelper.loadNative();
+        MediaAssetType[] mediaAssetTypes = collectMediaAssetType();
+        requestHelper.loadNative(mediaAssetTypes);
     }
 
     public void showNative(View view) {
@@ -370,7 +390,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void requestNative(View view) {
-        requestHelper.requestNative();
+        MediaAssetType[] mediaAssetTypes = collectMediaAssetType();
+        requestHelper.requestNative(mediaAssetTypes);
     }
 
     public void loadRequestedNative(View view) {
@@ -471,6 +492,17 @@ public class MainActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(this, NativeActivity.class);
         startActivity(intent);
+    }
+
+    private MediaAssetType[] collectMediaAssetType() {
+        List<MediaAssetType> mediaAssetTypeList = new ArrayList<>();
+        for (int i = 0; i < nativeMediaAssetParent.getChildCount(); i++) {
+            CheckBox checkBox = (CheckBox) nativeMediaAssetParent.getChildAt(i);
+            if (checkBox.isChecked()) {
+                mediaAssetTypeList.add((MediaAssetType) checkBox.getTag());
+            }
+        }
+        return mediaAssetTypeList.toArray(new MediaAssetType[0]);
     }
 
     private SpannableStringBuilder appendBold(SpannableStringBuilder builder, Object text) {

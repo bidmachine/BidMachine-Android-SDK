@@ -317,59 +317,73 @@
 
             </com.wefika.flowlayout.FlowLayout>
 
-            <com.wefika.flowlayout.FlowLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <Button
-                    style="@style/MainActionButtonStyle"
-                    android:onClick="loadNative"
-                    android:text="Load Native"
-                    tools:ignore="HardcodedText" />
+                <com.wefika.flowlayout.FlowLayout
+                    android:id="@+id/nativeMediaAssetParent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp" />
 
-                <Button
-                    style="@style/MainActionButtonStyle"
-                    android:onClick="showNative"
-                    android:text="Show Native"
-                    tools:ignore="HardcodedText" />
+                <com.wefika.flowlayout.FlowLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <Button
-                    style="@style/MainActionButtonStyle.Secondary"
-                    android:onClick="hideNative"
-                    android:text="Hide Native"
-                    tools:ignore="HardcodedText" />
+                    <Button
+                        style="@style/MainActionButtonStyle"
+                        android:onClick="loadNative"
+                        android:text="Load Native"
+                        tools:ignore="HardcodedText" />
 
-                <Button
-                    style="@style/MainActionButtonStyle.Secondary"
-                    android:onClick="requestNative"
-                    android:text="Request Native"
-                    tools:ignore="HardcodedText" />
+                    <Button
+                        style="@style/MainActionButtonStyle"
+                        android:onClick="showNative"
+                        android:text="Show Native"
+                        tools:ignore="HardcodedText" />
 
-                <Button
-                    style="@style/MainActionButtonStyle.Secondary"
-                    android:onClick="loadRequestedNative"
-                    android:text="Load Requested Native"
-                    tools:ignore="HardcodedText" />
+                    <Button
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="hideNative"
+                        android:text="Hide Native"
+                        tools:ignore="HardcodedText" />
 
-                <Button
-                    style="@style/MainActionButtonStyle.Secondary"
-                    android:onClick="isRegisteredNative"
-                    android:text="Is registered"
-                    tools:ignore="HardcodedText" />
+                    <Button
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="requestNative"
+                        android:text="Request Native"
+                        tools:ignore="HardcodedText" />
 
-                <Button
-                    style="@style/MainActionButtonStyle.Secondary"
-                    android:onClick="openNativeActivity"
-                    android:text="Open Native Activity"
-                    tools:ignore="HardcodedText" />
+                    <Button
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="loadRequestedNative"
+                        android:text="Load Requested Native"
+                        tools:ignore="HardcodedText" />
 
-                <ImageButton
-                    android:id="@+id/btnNativeSettings"
-                    style="@style/MainSettingButtonStyle"
-                    android:onClick="showNativeParams"
-                    tools:ignore="ContentDescription" />
+                    <Button
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="isRegisteredNative"
+                        android:text="Is registered"
+                        tools:ignore="HardcodedText" />
 
-            </com.wefika.flowlayout.FlowLayout>
+                    <Button
+                        style="@style/MainActionButtonStyle.Secondary"
+                        android:onClick="openNativeActivity"
+                        android:text="Open Native Activity"
+                        tools:ignore="HardcodedText" />
+
+                    <ImageButton
+                        android:id="@+id/btnNativeSettings"
+                        style="@style/MainSettingButtonStyle"
+                        android:onClick="showNativeParams"
+                        tools:ignore="ContentDescription" />
+
+                </com.wefika.flowlayout.FlowLayout>
+
+            </LinearLayout>
 
             <FrameLayout
                 android:id="@+id/bannerFrame"

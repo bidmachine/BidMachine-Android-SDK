@@ -16,7 +16,10 @@ import io.bidmachine.unified.UnifiedNativeAdRequestParams;
 
 public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeAdRequestParams> {
 
-    private List<MediaAssetType> mediaAssetTypes = new ArrayList<>(MediaAssetType.values().length);
+    private List<MediaAssetType> mediaAssetTypes = new ArrayList<MediaAssetType>(MediaAssetType.values().length) {{
+        add(MediaAssetType.Icon);
+        add(MediaAssetType.Image);
+    }};
 
     private NativeRequest() {
         super(AdsType.Native);
@@ -47,8 +50,10 @@ public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeA
         @Override
         public Builder setMediaAssetTypes(@NonNull MediaAssetType... types) {
             prepareRequest();
-            params.mediaAssetTypes.clear();
-            params.mediaAssetTypes.addAll(Arrays.asList(types));
+            if (types.length > 0) {
+                params.mediaAssetTypes.clear();
+                params.mediaAssetTypes.addAll(Arrays.asList(types));
+            }
             return this;
         }
 

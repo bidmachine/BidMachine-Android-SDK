@@ -1,6 +1,11 @@
 package io.bidmachine;
 
+import android.support.annotation.NonNull;
+
 import java.lang.reflect.Field;
+
+import io.bidmachine.models.DataRestrictions;
+import io.bidmachine.unified.UnifiedNativeAdRequestParams;
 
 import static org.junit.Assert.assertNull;
 
@@ -19,6 +24,13 @@ public class TestUtils {
         field.setAccessible(true);
         field.set(null, null);
         assertNull(field.get(null));
+    }
+
+    public static UnifiedNativeAdRequestParams createUnifiedNativeAdRequestParams(@NonNull AdRequest adRequest,
+                                                                                  @NonNull TargetingParams targetingParams,
+                                                                                  @NonNull DataRestrictions dataRestrictions) {
+        return (UnifiedNativeAdRequestParams) adRequest
+                .createUnifiedAdRequestParams(targetingParams, dataRestrictions);
     }
 
 }
