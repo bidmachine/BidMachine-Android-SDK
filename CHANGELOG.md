@@ -1,3 +1,7 @@
+## Version 1.5.1 (July 15, 2020)
+**Features**:
+# Native ad improvement
+
 ## Version 1.5.0 (July 10, 2020)
 **Features**:
 * SDK improvement
