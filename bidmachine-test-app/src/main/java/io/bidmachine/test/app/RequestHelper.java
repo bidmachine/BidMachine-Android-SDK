@@ -3,6 +3,7 @@ package io.bidmachine.test.app;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import io.bidmachine.AdContentType;
@@ -386,10 +387,13 @@ public class RequestHelper {
     private NativeAd currentNativeAd;
     private NativeRequest pendingNativeRequest;
 
-    public void loadNative() {
-        final NativeRequest request = ParamsHelper.getInstance(activity,
-                                                               ParamsHelper.AdsType.Native)
-                .createParams(new NativeRequest.Builder().setMediaAssetTypes(MediaAssetType.All))
+    public void loadNative(@Nullable MediaAssetType... mediaAssetTypes) {
+        NativeRequest.Builder builder = new NativeRequest.Builder();
+        if (mediaAssetTypes != null) {
+            builder.setMediaAssetTypes(mediaAssetTypes);
+        }
+        NativeRequest request = ParamsHelper.getInstance(activity, ParamsHelper.AdsType.Native)
+                .createParams(builder)
                 .build();
         loadNative(request);
     }
@@ -439,32 +443,32 @@ public class RequestHelper {
         }
     }
 
-    public void requestNative() {
+    public void requestNative(@Nullable MediaAssetType... mediaAssetTypes) {
+        NativeRequest.Builder builder = new NativeRequest.Builder();
+        if (mediaAssetTypes != null && mediaAssetTypes.length > 0) {
+            builder.setMediaAssetTypes(mediaAssetTypes);
+        }
+        builder.setListener(new NativeRequest.AdRequestListener() {
+            @Override
+            public void onRequestSuccess(@NonNull NativeRequest request,
+                                         @NonNull AuctionResult auctionResult) {
+                Utils.showToast(peekContext(), "onRequestSuccess: " + auctionResult);
+            }
+
+            @Override
+            public void onRequestFailed(@NonNull NativeRequest request,
+                                        @NonNull BMError error) {
+                Utils.showToast(peekContext(), "onRequestFailed: " + error.getMessage());
+                pendingNativeRequest = null;
+            }
+
+            @Override
+            public void onRequestExpired(@NonNull NativeRequest request) {
+                Utils.showToast(peekContext(), "onRequestExpired: " + request);
+            }
+        });
         pendingNativeRequest = ParamsHelper.getInstance(activity, ParamsHelper.AdsType.Native)
-                .createParams(new NativeRequest.Builder()
-                                      .setListener(new NativeRequest.AdRequestListener() {
-                                          @Override
-                                          public void onRequestSuccess(@NonNull NativeRequest request,
-                                                                       @NonNull AuctionResult auctionResult) {
-                                              Utils.showToast(peekContext(),
-                                                              "onRequestSuccess: " + auctionResult);
-                                          }
-
-                                          @Override
-                                          public void onRequestFailed(@NonNull NativeRequest request,
-                                                                      @NonNull BMError error) {
-                                              Utils.showToast(peekContext(),
-                                                              "onRequestFailed: "
-                                                                      + error.getMessage());
-                                              pendingNativeRequest = null;
-                                          }
-
-                                          @Override
-                                          public void onRequestExpired(@NonNull NativeRequest request) {
-                                              Utils.showToast(peekContext(),
-                                                              "onRequestExpired: " + request);
-                                          }
-                                      }))
+                .createParams(builder)
                 .build();
 
         pendingNativeRequest.request(peekContext());

@@ -56,6 +56,36 @@ public class NastParamsTest {
     }
 
     @Test
+    public void isValid_positive3() {
+        UnifiedNativeAdRequestParams adRequestParams = mock(UnifiedNativeAdRequestParams.class);
+        doReturn(true)
+                .when(adRequestParams)
+                .containsAssetType(MediaAssetType.Video);
+        Map<String, Object> params = new HashMap<>();
+        params.put(IabUtils.KEY_TITLE, "test_title");
+        params.put(IabUtils.KEY_CTA, "test_call_to_action");
+        params.put(IabUtils.KEY_VIDEO_URL, "test_video_url");
+        NastParams nastParams = new NastParams(createParams(params));
+        boolean valid = nastParams.isValid(adRequestParams, mock(UnifiedAdCallback.class));
+        assertTrue(valid);
+    }
+
+    @Test
+    public void isValid_positive4() {
+        UnifiedNativeAdRequestParams adRequestParams = mock(UnifiedNativeAdRequestParams.class);
+        doReturn(true)
+                .when(adRequestParams)
+                .containsAssetType(MediaAssetType.Video);
+        Map<String, Object> params = new HashMap<>();
+        params.put(IabUtils.KEY_TITLE, "test_title");
+        params.put(IabUtils.KEY_CTA, "test_call_to_action");
+        params.put(IabUtils.KEY_VIDEO_URL, "test_video_adm");
+        NastParams nastParams = new NastParams(createParams(params));
+        boolean valid = nastParams.isValid(adRequestParams, mock(UnifiedAdCallback.class));
+        assertTrue(valid);
+    }
+
+    @Test
     public void isValid_negative1() {
         UnifiedNativeAdRequestParams adRequestParams = mock(UnifiedNativeAdRequestParams.class);
         Map<String, Object> params = new HashMap<>();
@@ -104,6 +134,20 @@ public class NastParamsTest {
         params.put(IabUtils.KEY_TITLE, "test_title");
         params.put(IabUtils.KEY_CTA, "test_call_to_action");
         params.put(IabUtils.KEY_ICON_URL, "test_icon_url");
+        NastParams nastParams = new NastParams(createParams(params));
+        boolean valid = nastParams.isValid(adRequestParams, mock(UnifiedAdCallback.class));
+        assertFalse(valid);
+    }
+
+    @Test
+    public void isValid_negative5() {
+        UnifiedNativeAdRequestParams adRequestParams = mock(UnifiedNativeAdRequestParams.class);
+        doReturn(true)
+                .when(adRequestParams)
+                .containsAssetType(MediaAssetType.Video);
+        Map<String, Object> params = new HashMap<>();
+        params.put(IabUtils.KEY_TITLE, "test_title");
+        params.put(IabUtils.KEY_CTA, "test_call_to_action");
         NastParams nastParams = new NastParams(createParams(params));
         boolean valid = nastParams.isValid(adRequestParams, mock(UnifiedAdCallback.class));
         assertFalse(valid);
