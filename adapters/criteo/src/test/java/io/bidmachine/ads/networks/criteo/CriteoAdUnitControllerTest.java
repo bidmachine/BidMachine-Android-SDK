@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,7 @@ public class CriteoAdUnitControllerTest {
 
     @Test
     public void extractAdUnits_obtainedMediationConfigIsNull_resultListIsNull() {
-        BidMachineNetworkConfigParams networkConfigParams = new BidMachineNetworkConfigParams(null);
+        BidMachineNetworkConfigParams networkConfigParams = new BidMachineNetworkConfigParams();
         List<AdUnit> adUnitList = CriteoAdUnitController.extractAdUnits(networkConfigParams);
         assertNull(adUnitList);
         assertNotNull(CriteoAdUnitController.getAdUnitMap());
@@ -156,18 +157,18 @@ public class CriteoAdUnitControllerTest {
 
     private static class BidMachineNetworkConfigParams implements NetworkConfigParams {
 
-        private EnumMap<AdsFormat, Map<String, String>> mapEnumMap;
-
-        BidMachineNetworkConfigParams() {
-            this(new EnumMap<AdsFormat, Map<String, String>>(AdsFormat.class));
-        }
-
-        BidMachineNetworkConfigParams(EnumMap<AdsFormat, Map<String, String>> mapEnumMap) {
-            this.mapEnumMap = mapEnumMap;
-        }
+        private EnumMap<AdsFormat, List<Map<String, String>>> listEnumMap;
 
         void addMap(AdsFormat adsFormat, Map<String, String> map) {
-            mapEnumMap.put(adsFormat, map);
+            if (listEnumMap == null) {
+                listEnumMap = new EnumMap<>(AdsFormat.class);
+            }
+            List<Map<String, String>> configList = listEnumMap.get(adsFormat);
+            if (configList == null) {
+                configList = new ArrayList<>();
+                listEnumMap.put(adsFormat, configList);
+            }
+            configList.add(map);
         }
 
         @Nullable
@@ -178,8 +179,8 @@ public class CriteoAdUnitControllerTest {
 
         @Nullable
         @Override
-        public EnumMap<AdsFormat, Map<String, String>> obtainNetworkMediationConfigs(@Nullable AdsFormat... adsFormats) {
-            return mapEnumMap;
+        public EnumMap<AdsFormat, List<Map<String, String>>> obtainNetworkMediationConfigs(@Nullable AdsFormat... adsFormats) {
+            return listEnumMap;
         }
 
     }

@@ -65,7 +65,8 @@ final class BidMachineImpl {
     private static final String PREF_IFV = "bid_machine_ifv";
 
     @Nullable
-    private Context appContext;
+    @VisibleForTesting
+    Context appContext;
     @Nullable
     private SessionTracker sessionTracker;
     @Nullable
@@ -167,6 +168,11 @@ final class BidMachineImpl {
         ((Application) context.getApplicationContext())
                 .registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks());
         isInitialized = true;
+    }
+
+    @Nullable
+    Context getAppContext() {
+        return appContext;
     }
 
     @NonNull

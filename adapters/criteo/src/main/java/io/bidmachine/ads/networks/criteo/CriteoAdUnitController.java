@@ -25,47 +25,49 @@ class CriteoAdUnitController {
 
     @Nullable
     static List<AdUnit> extractAdUnits(@NonNull NetworkConfigParams networkConfigParams) {
-        EnumMap<AdsFormat, Map<String, String>> networkMediationConfigs =
+        EnumMap<AdsFormat, List<Map<String, String>>> networkMediationConfigs =
                 networkConfigParams.obtainNetworkMediationConfigs(AdsFormat.values());
         if (networkMediationConfigs == null) {
             return null;
         }
         List<AdUnit> adUnitList = new ArrayList<>();
-        for (Map.Entry<AdsFormat, Map<String, String>> entry : networkMediationConfigs.entrySet()) {
+        for (Map.Entry<AdsFormat, List<Map<String, String>>> entry : networkMediationConfigs.entrySet()) {
             AdsFormat adsFormat = entry.getKey();
             if (adsFormat == null) {
                 continue;
             }
-            Map<String, String> map = entry.getValue();
-            if (map == null) {
+            List<Map<String, String>> configList = entry.getValue();
+            if (configList == null) {
                 continue;
             }
-            String adUnitId = map.get(CriteoConfig.AD_UNIT_ID);
-            if (TextUtils.isEmpty(adUnitId)) {
-                continue;
-            }
-            assert adUnitId != null;
-            AdUnit adUnit = null;
-            switch (adsFormat) {
-                case Banner:
-                case Banner_320x50:
-                    adUnit = new BannerAdUnit(adUnitId, new AdSize(320, 50));
-                    break;
-                case Banner_300x250:
-                    adUnit = new BannerAdUnit(adUnitId, new AdSize(300, 250));
-                    break;
-                case Banner_728x90:
-                    adUnit = new BannerAdUnit(adUnitId, new AdSize(728, 90));
-                    break;
-                case Interstitial:
-                case InterstitialStatic:
-                case InterstitialVideo:
-                    adUnit = new InterstitialAdUnit(adUnitId);
-                    break;
-            }
-            if (adUnit != null) {
-                adUnitMap.put(adUnitId, adUnit);
-                adUnitList.add(adUnit);
+            for (Map<String, String> config : configList) {
+                String adUnitId = config.get(CriteoConfig.AD_UNIT_ID);
+                if (TextUtils.isEmpty(adUnitId)) {
+                    continue;
+                }
+                assert adUnitId != null;
+                AdUnit adUnit = null;
+                switch (adsFormat) {
+                    case Banner:
+                    case Banner_320x50:
+                        adUnit = new BannerAdUnit(adUnitId, new AdSize(320, 50));
+                        break;
+                    case Banner_300x250:
+                        adUnit = new BannerAdUnit(adUnitId, new AdSize(300, 250));
+                        break;
+                    case Banner_728x90:
+                        adUnit = new BannerAdUnit(adUnitId, new AdSize(728, 90));
+                        break;
+                    case Interstitial:
+                    case InterstitialStatic:
+                    case InterstitialVideo:
+                        adUnit = new InterstitialAdUnit(adUnitId);
+                        break;
+                }
+                if (adUnit != null) {
+                    adUnitMap.put(adUnitId, adUnit);
+                    adUnitList.add(adUnit);
+                }
             }
         }
         return adUnitList;
