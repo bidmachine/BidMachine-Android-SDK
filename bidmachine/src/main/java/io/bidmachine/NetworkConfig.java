@@ -176,15 +176,23 @@ public abstract class NetworkConfig {
      * @param adsFormat certain {@link AdsFormat} that should use provided {@param config}
      * @param config    map of parameters to be used with Network Mediation
      */
-    @SuppressWarnings({"unchecked", "WeakerAccess"})
-    protected <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
-                                                              @Nullable Map<String, String> config) {
+    @SuppressWarnings({"WeakerAccess"})
+    public <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
+                                                           @Nullable Map<String, String> config) {
         return withMediationConfig(adsFormat, config, Orientation.Undefined);
     }
 
-    protected <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
-                                                              @Nullable Map<String, String> config,
-                                                              @NonNull Orientation orientation) {
+    /**
+     * Sets Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
+     * Will be used only for provided {@link AdsFormat}
+     *
+     * @param adsFormat   certain {@link AdsFormat} that should use provided {@param config}
+     * @param config      map of parameters to be used with Network Mediation
+     * @param orientation certain {@link Orientation} that should match the orientation of the device at the time of the request
+     */
+    public <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
+                                                           @Nullable Map<String, String> config,
+                                                           @NonNull Orientation orientation) {
         if (config == null) {
             if (typedMediationConfigs != null) {
                 typedMediationConfigs.remove(adsFormat);
