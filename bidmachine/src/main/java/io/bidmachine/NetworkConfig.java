@@ -1,13 +1,18 @@
 package io.bidmachine;
 
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import io.bidmachine.unified.UnifiedAdRequestParams;
+import android.support.annotation.VisibleForTesting;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import io.bidmachine.unified.UnifiedAdRequestParams;
 
 /**
  * Class to store and provide Network specific configuration.
@@ -16,6 +21,9 @@ import java.util.Map;
  */
 public abstract class NetworkConfig {
 
+    @VisibleForTesting
+    static final String CONFIG_ORIENTATION = "orientation";
+
     @Nullable
     private NetworkAdapter networkAdapter;
     @Nullable
@@ -23,7 +31,7 @@ public abstract class NetworkConfig {
     @Nullable
     private Map<String, String> baseMediationConfig;
     @Nullable
-    private EnumMap<AdsFormat, Map<String, String>> typedMediationConfigs;
+    private EnumMap<AdsFormat, List<Map<String, String>>> typedMediationConfigs;
     @Nullable
     private AdsType[] supportedAdsTypes;
     @Nullable
@@ -38,22 +46,34 @@ public abstract class NetworkConfig {
 
         @Nullable
         @Override
-        public EnumMap<AdsFormat, Map<String, String>> obtainNetworkMediationConfigs(AdsFormat... adsFormats) {
-            EnumMap<AdsFormat, Map<String, String>> resultMap = null;
+        public EnumMap<AdsFormat, List<Map<String, String>>> obtainNetworkMediationConfigs(AdsFormat... adsFormats) {
+            EnumMap<AdsFormat, List<Map<String, String>>> resultMap = null;
             if (adsFormats != null && adsFormats.length > 0) {
                 for (AdsFormat format : adsFormats) {
-                    Map<String, String> resultConfig = null;
+                    List<Map<String, String>> resultTypedConfigList = null;
                     if (typedMediationConfigs != null) {
-                        Map<String, String> typedConfig = typedMediationConfigs.get(format);
-                        if (typedConfig != null) {
-                            resultConfig = prepareTypedMediationConfig(typedConfig);
+                        List<Map<String, String>> typedConfigList = typedMediationConfigs.get(format);
+                        if (typedConfigList != null) {
+                            for (int i = 0; i < typedConfigList.size(); i++) {
+                                Map<String, String> resultConfig = null;
+                                Map<String, String> typedConfig = typedConfigList.get(i);
+                                if (typedConfig != null) {
+                                    resultConfig = prepareTypedMediationConfig(typedConfig);
+                                }
+                                if (resultConfig != null) {
+                                    if (resultTypedConfigList == null) {
+                                        resultTypedConfigList = new ArrayList<>();
+                                    }
+                                    resultTypedConfigList.add(resultConfig);
+                                }
+                            }
                         }
                     }
-                    if (resultConfig != null) {
+                    if (resultTypedConfigList != null) {
                         if (resultMap == null) {
                             resultMap = new EnumMap<>(AdsFormat.class);
                         }
-                        resultMap.put(format, resultConfig);
+                        resultMap.put(format, resultTypedConfigList);
                     }
                 }
             }
@@ -122,7 +142,7 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Sets `base` Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
+     * Sets `base` Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
      * Will be merged with config provided for certain {@link AdsFormat}
      *
      * @param config map of parameters which will be used for Network mediation
@@ -140,7 +160,8 @@ public abstract class NetworkConfig {
      * @param value parameter value
      */
     @SuppressWarnings({"unchecked", "WeakerAccess", "unused"})
-    public <T extends NetworkConfig> T setBaseMediationParam(@NonNull String key, @NonNull String value) {
+    public <T extends NetworkConfig> T setBaseMediationParam(@NonNull String key,
+                                                             @NonNull String value) {
         if (baseMediationConfig == null) {
             baseMediationConfig = new HashMap<>();
         }
@@ -149,24 +170,36 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Sets Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
+     * Sets Network mediation configuration (will be used for {@link HeaderBiddingAdapter#collectHeaderBiddingParams(ContextProvider, UnifiedAdRequestParams, HeaderBiddingAdRequestParams, HeaderBiddingCollectParamsCallback, Map)}).
      * Will be used only for provided {@link AdsFormat}
      *
      * @param adsFormat certain {@link AdsFormat} that should use provided {@param config}
      * @param config    map of parameters to be used with Network Mediation
      */
     @SuppressWarnings({"unchecked", "WeakerAccess"})
-    public <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
-                                                           @Nullable Map<String, String> config) {
+    protected <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
+                                                              @Nullable Map<String, String> config) {
+        return withMediationConfig(adsFormat, config, Orientation.Undefined);
+    }
+
+    protected <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
+                                                              @Nullable Map<String, String> config,
+                                                              @NonNull Orientation orientation) {
         if (config == null) {
             if (typedMediationConfigs != null) {
                 typedMediationConfigs.remove(adsFormat);
             }
         } else {
+            config.put(CONFIG_ORIENTATION, orientation.toString());
             if (typedMediationConfigs == null) {
                 typedMediationConfigs = new EnumMap<>(AdsFormat.class);
             }
-            typedMediationConfigs.put(adsFormat, config);
+            List<Map<String, String>> configList = typedMediationConfigs.get(adsFormat);
+            if (configList == null) {
+                configList = new ArrayList<>();
+                typedMediationConfigs.put(adsFormat, configList);
+            }
+            configList.add(config);
         }
         return (T) this;
     }
@@ -196,9 +229,16 @@ public abstract class NetworkConfig {
         Map<String, String> resultConfig = null;
         if (typedMediationConfigs != null) {
             Map<String, String> typedConfig = null;
-            for (Map.Entry<AdsFormat, Map<String, String>> entry : typedMediationConfigs.entrySet()) {
+            for (Map.Entry<AdsFormat, List<Map<String, String>>> entry : typedMediationConfigs.entrySet()) {
                 if (entry.getKey().isMatch(adsType, adRequestParams, adContentType)) {
-                    typedConfig = entry.getValue();
+                    List<Map<String, String>> configList = entry.getValue();
+                    if (configList != null) {
+                        for (Map<String, String> config : configList) {
+                            if (isOrientationMatched(config)) {
+                                typedConfig = config;
+                            }
+                        }
+                    }
                 }
             }
             if (typedConfig != null) {
@@ -207,6 +247,32 @@ public abstract class NetworkConfig {
             }
         }
         return resultConfig;
+    }
+
+    @VisibleForTesting
+    boolean isOrientationMatched(@Nullable Map<String, String> config) {
+        if (config == null) {
+            return true;
+        }
+        String orientation = config.get(CONFIG_ORIENTATION);
+        if (TextUtils.isEmpty(orientation)) {
+            return true;
+        }
+        Orientation requiredOrientation;
+        try {
+            requiredOrientation = Orientation.valueOf(orientation);
+        } catch (Exception e) {
+            return true;
+        }
+        if (requiredOrientation == Orientation.Undefined) {
+            return true;
+        }
+        int currentOrientation = Utils.getOrientation();
+        if (requiredOrientation == Orientation.Portrait
+                && currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            return true;
+        } else return requiredOrientation == Orientation.Landscape
+                && currentOrientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     /**

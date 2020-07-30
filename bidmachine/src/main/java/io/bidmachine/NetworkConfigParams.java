@@ -3,6 +3,7 @@ package io.bidmachine;
 import android.support.annotation.Nullable;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public interface NetworkConfigParams {
@@ -11,5 +12,6 @@ public interface NetworkConfigParams {
     Map<String, String> obtainNetworkParams();
 
     @Nullable
-    EnumMap<AdsFormat, Map<String, String>> obtainNetworkMediationConfigs(@Nullable AdsFormat... adsFormats);
+    EnumMap<AdsFormat, List<Map<String, String>>> obtainNetworkMediationConfigs(@Nullable AdsFormat... adsFormats);
+
 }

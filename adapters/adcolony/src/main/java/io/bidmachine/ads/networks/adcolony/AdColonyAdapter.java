@@ -18,6 +18,7 @@ import com.adcolony.sdk.AdColonyZone;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import io.bidmachine.AdsFormat;
@@ -62,11 +63,16 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
-        EnumMap<AdsFormat, Map<String, String>> mediationConfigs =
+        EnumMap<AdsFormat, List<Map<String, String>>> mediationConfigs =
                 networkConfigParams.obtainNetworkMediationConfigs(AdsFormat.values());
         if (mediationConfigs != null) {
-            for (Map<String, String> config : mediationConfigs.values()) {
-                extractZoneId(config);
+            for (List<Map<String, String>> configList : mediationConfigs.values()) {
+                if (configList == null) {
+                    continue;
+                }
+                for (Map<String, String> config : configList) {
+                    extractZoneId(config);
+                }
             }
         }
     }

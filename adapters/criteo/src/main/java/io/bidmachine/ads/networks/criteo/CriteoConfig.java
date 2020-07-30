@@ -9,6 +9,7 @@ import java.util.Map;
 import io.bidmachine.AdsFormat;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfig;
+import io.bidmachine.Orientation;
 
 public class CriteoConfig extends NetworkConfig {
 
@@ -34,9 +35,18 @@ public class CriteoConfig extends NetworkConfig {
 
     public CriteoConfig withMediationConfig(@NonNull AdsFormat adsFormat,
                                             @NonNull final String adUnitId) {
-        return withMediationConfig(adsFormat, new HashMap<String, String>() {{
-            put(AD_UNIT_ID, adUnitId);
-        }});
+        return withMediationConfig(adsFormat, adUnitId, Orientation.Undefined);
+    }
+
+    public CriteoConfig withMediationConfig(@NonNull AdsFormat adsFormat,
+                                            @NonNull final String adUnitId,
+                                            @NonNull Orientation orientation) {
+        return withMediationConfig(
+                adsFormat,
+                new HashMap<String, String>() {{
+                    put(AD_UNIT_ID, adUnitId);
+                }},
+                orientation);
     }
 
 }
