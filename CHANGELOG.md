@@ -1,3 +1,9 @@
+## Version 1.5.2 (August 3, 2020)
+**Features**:
+* SDK improvement
+* Updated AdColony adapter version to 1.5.2.4. More info [here](https://github.com/bidmachine/BidMachine-Android-SDK/blob/master/adapters/adcolony/CHANGELOG.md)
+* Updated Criteo adapter version to 1.5.2.4. More info [here](https://github.com/bidmachine/BidMachine-Android-SDK/blob/master/adapters/criteo/CHANGELOG.md)
+
 ## Version 1.5.1 (July 15, 2020)
 **Features**:
 * Native ad improvement
