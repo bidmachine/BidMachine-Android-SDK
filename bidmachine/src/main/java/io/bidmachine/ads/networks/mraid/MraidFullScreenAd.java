@@ -9,6 +9,7 @@ import com.explorestack.iab.mraid.MRAIDInterstitial;
 import com.explorestack.iab.vast.VideoType;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.measurer.mraid.MraidIABMeasurer;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
@@ -19,6 +20,7 @@ import static io.bidmachine.core.Utils.onUiThread;
 
 class MraidFullScreenAd extends UnifiedFullscreenAd {
 
+    private MraidIABMeasurer mraidIABMeasurer;
     private VideoType videoType;
     private MRAIDInterstitial mraidInterstitial;
     private MraidActivity showingActivity;
@@ -44,20 +46,23 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         if (!mraidParams.isValid(callback)) {
             return;
         }
+        assert mraidParams.creativeAdm != null;
+
         this.callback = callback;
+        mraidIABMeasurer = new MraidIABMeasurer();
         adapterListener = new MraidFullScreenAdapterListener(this, callback);
         onUiThread(new Runnable() {
             @Override
             public void run() {
-                mraidInterstitial = MRAIDInterstitial
-                        .newBuilder(activity,
-                                    mraidParams.creativeAdm,
-                                    mraidParams.width,
-                                    mraidParams.height)
+                mraidInterstitial = mraidIABMeasurer
+                        .createMraidInterstitialBuilder(activity,
+                                                        mraidParams.creativeAdm,
+                                                        mraidParams.width,
+                                                        mraidParams.height,
+                                                        adapterListener)
                         .setPreload(true)
                         .setCloseTime(mraidParams.skipOffset)
                         .forceUseNativeCloseButton(mraidParams.useNativeClose)
-                        .setListener(adapterListener)
                         .setNativeFeatureListener(adapterListener)
                         .build();
                 mraidInterstitial.load();

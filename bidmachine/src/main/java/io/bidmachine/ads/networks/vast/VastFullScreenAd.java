@@ -8,6 +8,8 @@ import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.VideoType;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.measurer.vast.VastIABMeasurer;
+import io.bidmachine.measurer.vast.VastWrapperListener;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
@@ -20,7 +22,8 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     private VideoType videoType;
     @Nullable
     private VastRequest vastRequest;
-    private VastFullScreenAdapterListener vastListener;
+    private VastIABMeasurer vastIABMeasurer;
+    private VastWrapperListener wrappedListener;
 
     VastFullScreenAd(@NonNull VideoType videoType) {
         this.videoType = videoType;
@@ -37,7 +40,12 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         }
         assert vastParams.creativeAdm != null;
 
-        vastListener = new VastFullScreenAdapterListener(callback);
+        vastIABMeasurer = new VastIABMeasurer();
+        VastFullScreenAdapterListener vastRequestListener =
+                new VastFullScreenAdapterListener(callback);
+        wrappedListener = new VastWrapperListener(vastIABMeasurer,
+                                                  vastRequestListener,
+                                                  null);
         vastRequest = VastRequest.newBuilder()
                 .setPreCache(true)
                 .setVideoCloseTime(vastParams.skipOffset)
@@ -47,13 +55,13 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         assert vastRequest != null;
         vastRequest.loadVideoWithData(contextProvider.getContext(),
                                       vastParams.creativeAdm,
-                                      vastListener);
+                                      vastRequestListener);
     }
 
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
         if (vastRequest != null && vastRequest.checkFile()) {
-            vastRequest.display(context, videoType, vastListener);
+            vastRequest.display(context, videoType, wrappedListener, wrappedListener);
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }

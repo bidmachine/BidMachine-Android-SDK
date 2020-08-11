@@ -1,10 +1,17 @@
 package io.bidmachine.ads.networks.mraid;
 
+import android.support.annotation.NonNull;
+
 import com.explorestack.iab.mraid.internal.MRAIDLog;
 import com.explorestack.iab.vast.VideoType;
+
 import io.bidmachine.AdsType;
 import io.bidmachine.BuildConfig;
+import io.bidmachine.ContextProvider;
 import io.bidmachine.NetworkAdapter;
+import io.bidmachine.NetworkConfigParams;
+import io.bidmachine.measurer.IABMeasurer;
+import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 
@@ -12,9 +19,9 @@ public class MraidAdapter extends NetworkAdapter {
 
     public MraidAdapter() {
         super("mraid",
-                "2.0",
-                BuildConfig.VERSION_NAME + ".1",
-                new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
+              "2.0",
+              BuildConfig.VERSION_NAME + ".1",
+              new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
     }
 
     @Override
@@ -35,6 +42,15 @@ public class MraidAdapter extends NetworkAdapter {
     @Override
     public UnifiedFullscreenAd createRewarded() {
         return new MraidFullScreenAd(VideoType.Rewarded);
+    }
+
+    @Override
+    protected void onInitialize(@NonNull final ContextProvider contextProvider,
+                                @NonNull UnifiedAdRequestParams adRequestParams,
+                                @NonNull NetworkConfigParams networkConfigParams) {
+        super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
+
+        IABMeasurer.initialize(contextProvider.getContext(), null);
     }
 
 }

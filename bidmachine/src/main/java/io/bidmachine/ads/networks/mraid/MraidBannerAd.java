@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import com.explorestack.iab.mraid.MRAIDView;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.core.Utils;
+import io.bidmachine.measurer.mraid.MraidIABMeasurer;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;
@@ -17,6 +19,8 @@ import static io.bidmachine.core.Utils.onUiThread;
 
 class MraidBannerAd extends UnifiedBannerAd {
 
+    private MraidIABMeasurer mraidIABMeasurer;
+    private MraidBannerAdListener adListener;
     @Nullable
     MRAIDView mraidView;
 
@@ -34,18 +38,21 @@ class MraidBannerAd extends UnifiedBannerAd {
         if (!mraidParams.isValid(callback)) {
             return;
         }
-        final MraidBannerAdListener mraidBannerAdListener =
-                new MraidBannerAdListener(this, callback);
+        assert mraidParams.creativeAdm != null;
+
+        mraidIABMeasurer = new MraidIABMeasurer();
+        adListener = new MraidBannerAdListener(this, callback);
         onUiThread(new Runnable() {
             @Override
             public void run() {
-                mraidView = new MRAIDView.builder(activity,
-                                                  mraidParams.creativeAdm,
-                                                  mraidParams.width,
-                                                  mraidParams.height)
+                mraidView = mraidIABMeasurer
+                        .createMraidViewBuilder(activity,
+                                                mraidParams.creativeAdm,
+                                                mraidParams.width,
+                                                mraidParams.height)
                         .setPreload(true)
-                        .setListener(mraidBannerAdListener)
-                        .setNativeFeatureListener(mraidBannerAdListener)
+                        .setListener(adListener)
+                        .setNativeFeatureListener(adListener)
                         .build();
                 mraidView.load();
             }
@@ -62,7 +69,22 @@ class MraidBannerAd extends UnifiedBannerAd {
     }
 
     @Override
+    public void onShown() {
+        Utils.onUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mraidIABMeasurer != null) {
+                    mraidIABMeasurer.shown();
+                }
+            }
+        });
+    }
+
+    @Override
     public void onDestroy() {
+        if (mraidIABMeasurer != null) {
+            mraidIABMeasurer.destroy();
+        }
         if (mraidView != null) {
             mraidView.destroy();
             mraidView = null;
