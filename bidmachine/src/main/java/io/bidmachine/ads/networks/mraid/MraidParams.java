@@ -19,6 +19,7 @@ class MraidParams extends UnifiedParams {
     final boolean useNativeClose;
     final int skipOffset;
     final int companionSkipOffset;
+    final boolean useOMSDK;
 
     MraidParams(@NonNull UnifiedMediationParams mediationParams) {
         super(mediationParams);
@@ -30,6 +31,7 @@ class MraidParams extends UnifiedParams {
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);
         companionSkipOffset = mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET);
         useNativeClose = mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE);
+        useOMSDK = mediationParams.getBool(IabUtils.KEY_USE_OM_SDK);
     }
 
     @Override

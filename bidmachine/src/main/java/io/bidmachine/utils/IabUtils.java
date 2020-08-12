@@ -21,5 +21,6 @@ public class IabUtils {
     public static final String KEY_USE_NATIVE_CLOSE = "useNativeClose";
     public static final String KEY_SKIP_OFFSET = "skipOffset";
     public static final String KEY_COMPANION_SKIP_OFFSET = "companionSkipOffset";
+    public static final String KEY_USE_OM_SDK = "useOMSDK";
 
 }

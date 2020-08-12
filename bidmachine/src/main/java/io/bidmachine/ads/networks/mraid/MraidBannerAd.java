@@ -19,6 +19,7 @@ import static io.bidmachine.core.Utils.onUiThread;
 
 class MraidBannerAd extends UnifiedBannerAd {
 
+    @Nullable
     private MraidIABMeasurer mraidIABMeasurer;
     private MraidBannerAdListener adListener;
     @Nullable
@@ -40,17 +41,25 @@ class MraidBannerAd extends UnifiedBannerAd {
         }
         assert mraidParams.creativeAdm != null;
 
-        mraidIABMeasurer = new MraidIABMeasurer();
         adListener = new MraidBannerAdListener(this, callback);
         onUiThread(new Runnable() {
             @Override
             public void run() {
-                mraidView = mraidIABMeasurer
-                        .createMraidViewBuilder(activity,
-                                                mraidParams.creativeAdm,
-                                                mraidParams.width,
-                                                mraidParams.height,
-                                                null)
+                MRAIDView.builder builder;
+                if (mraidParams.useOMSDK) {
+                    mraidIABMeasurer = new MraidIABMeasurer();
+                    builder = mraidIABMeasurer.createMraidViewBuilder(activity,
+                                                                      mraidParams.creativeAdm,
+                                                                      mraidParams.width,
+                                                                      mraidParams.height,
+                                                                      null);
+                } else {
+                    builder = new MRAIDView.builder(activity,
+                                                    mraidParams.creativeAdm,
+                                                    mraidParams.width,
+                                                    mraidParams.height);
+                }
+                mraidView = builder
                         .setPreload(true)
                         .setListener(adListener)
                         .setNativeFeatureListener(adListener)

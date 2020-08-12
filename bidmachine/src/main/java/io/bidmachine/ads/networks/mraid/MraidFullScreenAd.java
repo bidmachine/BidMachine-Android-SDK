@@ -20,7 +20,6 @@ import static io.bidmachine.core.Utils.onUiThread;
 
 class MraidFullScreenAd extends UnifiedFullscreenAd {
 
-    private MraidIABMeasurer mraidIABMeasurer;
     private VideoType videoType;
     private MRAIDInterstitial mraidInterstitial;
     private MraidActivity showingActivity;
@@ -49,18 +48,27 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         assert mraidParams.creativeAdm != null;
 
         this.callback = callback;
-        mraidIABMeasurer = new MraidIABMeasurer();
         adapterListener = new MraidFullScreenAdapterListener(this, callback);
         onUiThread(new Runnable() {
             @Override
             public void run() {
-                mraidInterstitial = mraidIABMeasurer
-                        .createMraidInterstitialBuilder(activity,
-                                                        mraidParams.creativeAdm,
-                                                        mraidParams.width,
-                                                        mraidParams.height,
-                                                        adapterListener,
-                                                        null)
+                MRAIDInterstitial.Builder builder;
+                if (mraidParams.useOMSDK) {
+                    MraidIABMeasurer mraidIABMeasurer = new MraidIABMeasurer();
+                    builder = mraidIABMeasurer.createMraidInterstitialBuilder(activity,
+                                                                              mraidParams.creativeAdm,
+                                                                              mraidParams.width,
+                                                                              mraidParams.height,
+                                                                              adapterListener,
+                                                                              null);
+                } else {
+                    builder = MRAIDInterstitial.newBuilder(activity,
+                                                           mraidParams.creativeAdm,
+                                                           mraidParams.width,
+                                                           mraidParams.height);
+                    builder.setListener(adapterListener);
+                }
+                mraidInterstitial = builder
                         .setPreload(true)
                         .setCloseTime(mraidParams.skipOffset)
                         .forceUseNativeCloseButton(mraidParams.useNativeClose)

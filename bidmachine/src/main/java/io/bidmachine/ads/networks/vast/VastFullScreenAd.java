@@ -23,8 +23,8 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     private VideoType videoType;
     @Nullable
     private VastRequest vastRequest;
-    private MraidIABMeasurer mraidIABMeasurer;
-    private VastIABMeasurer vastIABMeasurer;
+    private VastFullScreenAdapterListener vastRequestListener;
+    @Nullable
     private VastWrapperListener wrappedListener;
 
     VastFullScreenAd(@NonNull VideoType videoType) {
@@ -42,20 +42,19 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         }
         assert vastParams.creativeAdm != null;
 
-        mraidIABMeasurer = new MraidIABMeasurer();
-        vastIABMeasurer = new VastIABMeasurer();
-        VastFullScreenAdapterListener vastRequestListener =
-                new VastFullScreenAdapterListener(callback);
-        wrappedListener = new VastWrapperListener(vastIABMeasurer,
-                                                  vastRequestListener,
-                                                  null);
-        vastRequest = VastRequest.newBuilder()
+        vastRequestListener = new VastFullScreenAdapterListener(callback);
+        VastRequest.Builder builder = VastRequest.newBuilder()
                 .setPreCache(true)
                 .setVideoCloseTime(vastParams.skipOffset)
                 .setCompanionCloseTime(vastParams.companionSkipOffset)
-                .forceUseNativeCloseTime(vastParams.useNativeClose)
-                .setMraidMeasurer(mraidIABMeasurer)
-                .build();
+                .forceUseNativeCloseTime(vastParams.useNativeClose);
+        if (vastParams.useOMSDK) {
+            wrappedListener = new VastWrapperListener(new VastIABMeasurer(),
+                                                      vastRequestListener,
+                                                      null);
+            builder.setMraidMeasurer(new MraidIABMeasurer());
+        }
+        vastRequest = builder.build();
         assert vastRequest != null;
         vastRequest.loadVideoWithData(contextProvider.getContext(),
                                       vastParams.creativeAdm,
@@ -65,7 +64,11 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
         if (vastRequest != null && vastRequest.checkFile()) {
-            vastRequest.display(context, videoType, wrappedListener, wrappedListener);
+            if (wrappedListener != null) {
+                vastRequest.display(context, videoType, wrappedListener, wrappedListener);
+            } else {
+                vastRequest.display(context, videoType, vastRequestListener);
+            }
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }
