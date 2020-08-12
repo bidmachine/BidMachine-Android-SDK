@@ -8,6 +8,7 @@ import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.VideoType;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.measurer.mraid.MraidIABMeasurer;
 import io.bidmachine.measurer.vast.VastIABMeasurer;
 import io.bidmachine.measurer.vast.VastWrapperListener;
 import io.bidmachine.unified.UnifiedFullscreenAd;
@@ -22,6 +23,7 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     private VideoType videoType;
     @Nullable
     private VastRequest vastRequest;
+    private MraidIABMeasurer mraidIABMeasurer;
     private VastIABMeasurer vastIABMeasurer;
     private VastWrapperListener wrappedListener;
 
@@ -40,6 +42,7 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         }
         assert vastParams.creativeAdm != null;
 
+        mraidIABMeasurer = new MraidIABMeasurer();
         vastIABMeasurer = new VastIABMeasurer();
         VastFullScreenAdapterListener vastRequestListener =
                 new VastFullScreenAdapterListener(callback);
@@ -51,6 +54,7 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
                 .setVideoCloseTime(vastParams.skipOffset)
                 .setCompanionCloseTime(vastParams.companionSkipOffset)
                 .forceUseNativeCloseTime(vastParams.useNativeClose)
+                .setMraidMeasurer(mraidIABMeasurer)
                 .build();
         assert vastRequest != null;
         vastRequest.loadVideoWithData(contextProvider.getContext(),

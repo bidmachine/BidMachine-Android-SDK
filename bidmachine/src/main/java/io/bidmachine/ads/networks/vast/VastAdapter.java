@@ -11,7 +11,7 @@ import io.bidmachine.BuildConfig;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
-import io.bidmachine.measurer.IABMeasurer;
+import io.bidmachine.measurer.BMIABMeasurer;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 
@@ -45,6 +45,6 @@ public class VastAdapter extends NetworkAdapter {
                                 @NonNull NetworkConfigParams networkConfigParams) {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
 
-        IABMeasurer.initialize(contextProvider.getContext(), null);
+        BMIABMeasurer.initialize(contextProvider.getContext(), null);
     }
 }

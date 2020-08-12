@@ -1,9 +1,9 @@
 package io.bidmachine.measurer.vast;
 
 import android.content.Context;
-import android.view.View;
 
 import com.explorestack.iab.vast.VastActivityListener;
+import com.explorestack.iab.vast.VastClickCallback;
 import com.explorestack.iab.vast.VastPlaybackListener;
 import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.activity.VastActivity;
@@ -18,8 +18,10 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import io.bidmachine.measurer.IABMeasurer;
+import io.bidmachine.measurer.BMIABMeasurer;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
@@ -33,50 +35,28 @@ import static org.mockito.Mockito.verify;
 @Config(manifest = Config.NONE)
 public class VastWrapperListenerTest {
 
-    private Context context;
-    private VastIABMeasurer measurer;
-    private VastWrapperListener wrapperListener;
-
     private VastActivity vastActivity;
     private VastRequest vastRequest;
-    private VastActivityListener listener;
+    private VastIABMeasurer measurer;
+    private VastActivityListener activityListener;
     private VastPlaybackListener playbackListener;
+    private VastWrapperListener wrapperListener;
 
     @Before
     public void setUp() throws Exception {
-        context = RuntimeEnvironment.application;
-        measurer = spy(new VastIABMeasurer());
-        wrapperListener = new VastWrapperListener(measurer, null);
-
         vastActivity = mock(VastActivity.class);
         vastRequest = mock(VastRequest.class);
-        measurer = mock(VastIABMeasurer.class);
-        listener = mock(VastActivityListener.class);
+        measurer = spy(new VastIABMeasurer());
+        activityListener = mock(VastActivityListener.class);
         playbackListener = mock(VastPlaybackListener.class);
-    }
+        wrapperListener = new VastWrapperListener(measurer, activityListener, playbackListener);
 
-    @Test
-    public void processOnShown() {
-        IABMeasurer.initialize(context, "TestSDK", "1.2.3", "test_script", null);
-
-        int skipTime = 10;
-        View[] views = new View[]{};
-        VastView vastView = mock(VastView.class);
-        VastAd vastAd = mock(VastAd.class);
-        doReturn(skipTime).when(vastView).getSkipTime();
-        doReturn(views).when(vastView).getNativeViews();
-        wrapperListener.processOnShown(vastView, vastAd);
-        wrapperListener.processOnShown(vastView, vastAd);
-
-        verify(measurer).addVerificationScriptResources(anyListOf(VerificationScriptResource.class));
-        verify(measurer).setAutoPlay(true);
-        verify(measurer).setSkipOffset(skipTime);
-        verify(measurer).configure(any(Context.class), eq(vastView));
-        verify(measurer).addIgnoredViews(views);
-        verify(measurer, times(2)).registerAdView(vastView);
-        verify(measurer).startSession();
-        verify(measurer).loaded();
-        verify(measurer).shown();
+        Context context = RuntimeEnvironment.application;
+        BMIABMeasurer.initialize(context,
+                                 "test_partner_name",
+                                 "test_partner_version",
+                                 "test_measurer_js",
+                                 null);
     }
 
     @Test
@@ -152,19 +132,32 @@ public class VastWrapperListenerTest {
 
     @Test
     public void onVastShown() {
+        int skipTime = 10;
         VastView vastView = mock(VastView.class);
+        VastAd vastAd = mock(VastAd.class);
         doReturn(vastView).when(vastActivity).getVastView();
+        doReturn(vastAd).when(vastRequest).getVastAd();
+        doReturn(skipTime).when(vastView).getSkipTime();
+
+        assertFalse(measurer.isSessionStarted());
         wrapperListener.onVastShown(vastActivity, vastRequest);
-        verify(wrapperListener).processOnShown(eq(vastView), any(VastAd.class));
+        assertTrue(measurer.isSessionStarted());
+        wrapperListener.onVastShown(vastActivity, vastRequest);
+
+        verify(measurer).addVerificationScriptResources(anyListOf(VerificationScriptResource.class));
+        verify(measurer).setAutoPlay(true);
+        verify(measurer).setSkipOffset(skipTime);
+        verify(measurer).configure(any(Context.class), eq(vastView));
+        verify(measurer).registerAdView(vastView);
         verify(measurer).startSession();
+        verify(measurer).loaded();
         verify(measurer).shown();
-        verify(listener).onVastShown(vastActivity, vastRequest);
     }
 
     @Test
     public void onVastComplete() {
         wrapperListener.onVastComplete(vastActivity, vastRequest);
-        verify(listener).onVastComplete(vastActivity, vastRequest);
+        verify(activityListener).onVastComplete(vastActivity, vastRequest);
     }
 
     @Test
@@ -174,26 +167,26 @@ public class VastWrapperListenerTest {
 
         wrapperListener.onVastClick(vastActivity, vastRequest, vastClickCallback, url);
         verify(measurer).clicked();
-        verify(listener).onVastClick(vastActivity, vastRequest, vastClickCallback, url);
+        verify(activityListener).onVastClick(vastActivity, vastRequest, vastClickCallback, url);
     }
 
     @Test
     public void onVastDismiss() {
         wrapperListener.onVastDismiss(vastActivity, vastRequest, true);
-        verify(listener).onVastDismiss(vastActivity, vastRequest, true);
+        verify(activityListener).onVastDismiss(vastActivity, vastRequest, true);
 
         wrapperListener.onVastDismiss(vastActivity, vastRequest, false);
-        verify(listener).onVastDismiss(vastActivity, vastRequest, false);
+        verify(activityListener).onVastDismiss(vastActivity, vastRequest, false);
         verify(measurer, times(2)).destroy();
     }
 
     @Test
     public void onVastError() {
         wrapperListener.onVastError(vastActivity, vastRequest, 100);
-        verify(listener).onVastError(vastActivity, vastRequest, 100);
+        verify(activityListener).onVastError(vastActivity, vastRequest, 100);
 
         wrapperListener.onVastError(vastActivity, vastRequest, 200);
-        verify(listener).onVastError(vastActivity, vastRequest, 200);
+        verify(activityListener).onVastError(vastActivity, vastRequest, 200);
     }
 
 }

@@ -24,9 +24,9 @@ import com.iab.omid.library.appodeal.adsession.media.VastProperties;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.bidmachine.measurer.IABMeasurer;
+import io.bidmachine.measurer.BMIABMeasurer;
 
-public class VastIABMeasurer extends IABMeasurer {
+public class VastIABMeasurer extends BMIABMeasurer {
 
     private float skipOffset;
     private boolean isAutoPlay;

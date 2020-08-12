@@ -8,9 +8,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
-import com.explorestack.iab.mraid.MRAIDInterstitial;
-import com.explorestack.iab.mraid.MRAIDInterstitialListener;
+import com.explorestack.iab.measurer.MraidWrapperListener;
 import com.explorestack.iab.mraid.MRAIDView;
+import com.explorestack.iab.mraid.MRAIDViewLifecycleListener;
 import com.explorestack.iab.utils.Utils;
 import com.iab.omid.library.appodeal.ScriptInjector;
 import com.iab.omid.library.appodeal.adsession.AdEvents;
@@ -21,9 +21,9 @@ import com.iab.omid.library.appodeal.adsession.ImpressionType;
 import com.iab.omid.library.appodeal.adsession.Owner;
 import com.iab.omid.library.appodeal.adsession.Partner;
 
-import io.bidmachine.measurer.IABMeasurer;
+import io.bidmachine.measurer.BMIABMeasurer;
 
-public class MraidIABMeasurer extends IABMeasurer {
+public class MraidIABMeasurer extends BMIABMeasurer {
 
     private final static int DESTROY_DELAY_MS = 1000;
     private WebView webView;
@@ -31,43 +31,30 @@ public class MraidIABMeasurer extends IABMeasurer {
     public MRAIDView.builder createMraidViewBuilder(@NonNull Context context,
                                                     @NonNull String adm,
                                                     int width,
-                                                    int height) {
+                                                    int height,
+                                                    @Nullable MRAIDViewLifecycleListener lifecycleListener) {
         MRAIDView.builder builder = new MRAIDView.builder(
                 context,
-                wrapCreativeWithMeasureJS(adm),
+                transformCreative(adm),
                 width,
                 height);
-        builder.setLifecycleListener(new MraidWrapperListener(this));
+        builder.setLifecycleListener(new MraidWrapperListener(this, lifecycleListener));
         return builder;
     }
 
-    public MRAIDInterstitial.Builder createMraidInterstitialBuilder(@NonNull Context context,
-                                                                    @NonNull String adm,
-                                                                    int width,
-                                                                    int height,
-                                                                    @Nullable MRAIDInterstitialListener listener) {
-        MraidFullscreenWrapperListener wrapperListener = new MraidFullscreenWrapperListener(
-                this,
-                listener);
-        MRAIDInterstitial.Builder builder = MRAIDInterstitial.newBuilder(
-                context,
-                wrapCreativeWithMeasureJS(adm),
-                width,
-                height);
-        builder.setListener(wrapperListener);
-        builder.setLifecycleListener(wrapperListener);
-        return builder;
-    }
-
-    public String wrapCreativeWithMeasureJS(String creative) {
-        if (!isInitialized() || TextUtils.isEmpty(creative) || TextUtils.isEmpty(measurerJs)) {
-            return creative;
+    @Override
+    public String transformCreative(String originalCreative) {
+        if (!isInitialized()
+                || TextUtils.isEmpty(originalCreative)
+                || TextUtils.isEmpty(measurerJs)) {
+            return super.transformCreative(originalCreative);
         }
         try {
-            return ScriptInjector.injectScriptContentIntoHtml(measurerJs, creative);
-        } catch (Exception e) {
-            return creative;
+            return ScriptInjector.injectScriptContentIntoHtml(measurerJs, originalCreative);
+        } catch (Exception ignored) {
+
         }
+        return super.transformCreative(originalCreative);
     }
 
     @Override

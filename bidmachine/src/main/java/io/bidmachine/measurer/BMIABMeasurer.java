@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.explorestack.iab.measurer.IABMeasurer;
 import com.iab.omid.library.appodeal.Omid;
 import com.iab.omid.library.appodeal.adsession.AdEvents;
 import com.iab.omid.library.appodeal.adsession.AdSession;
@@ -16,7 +17,7 @@ import com.iab.omid.library.appodeal.adsession.Partner;
 
 import io.bidmachine.core.Utils;
 
-public abstract class IABMeasurer implements Measurer {
+public abstract class BMIABMeasurer extends IABMeasurer {
 
     private static final String PARTNER_NAME = "Bidmachineio";
     private static final String PARTNER_VERSION = "1.3.1";
@@ -31,8 +32,6 @@ public abstract class IABMeasurer implements Measurer {
     private AdSessionContext adSessionContext;
     private AdSession adSession;
     private AdEvents adEvents;
-
-    private boolean sessionStarted;
 
     public static void initialize(@NonNull Context context, @Nullable InitListener listener) {
         initialize(context, PARTNER_NAME, PARTNER_VERSION, OMID_JS, listener);
@@ -53,9 +52,9 @@ public abstract class IABMeasurer implements Measurer {
                     return;
                 }
                 try {
-                    IABMeasurer.partnerName = partnerName;
-                    IABMeasurer.partnerVersion = partnerVersion;
-                    IABMeasurer.measurerJs = measurerJs;
+                    BMIABMeasurer.partnerName = partnerName;
+                    BMIABMeasurer.partnerVersion = partnerVersion;
+                    BMIABMeasurer.measurerJs = measurerJs;
                     boolean isCompatible = Omid.isCompatibleWithOmidApiVersion(Omid.getVersion());
                     if (isCompatible) {
                         boolean isActive = Omid.isActive();
@@ -144,17 +143,13 @@ public abstract class IABMeasurer implements Measurer {
         }
     }
 
-    public boolean isSessionStarted() {
-        return sessionStarted;
-    }
-
     @Override
     @MainThread
     public void startSession() {
         try {
             if (adSession != null) {
                 adSession.start();
-                sessionStarted = true;
+                setSessionStarted(true);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,6 +157,16 @@ public abstract class IABMeasurer implements Measurer {
     }
 
     @Override
+    @MainThread
+    public void addIgnoredViews(@Nullable View... views) {
+        if (views == null || views.length == 0) {
+            return;
+        }
+        for (View view : views) {
+            addIgnoredView(view);
+        }
+    }
+
     @MainThread
     public void addIgnoredView(@Nullable View view) {
         if (view == null) {
@@ -173,16 +178,6 @@ public abstract class IABMeasurer implements Measurer {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    @MainThread
-    public void addIgnoredViews(@Nullable View... views) {
-        if (views == null || views.length == 0) {
-            return;
-        }
-        for (View view : views) {
-            addIgnoredView(view);
         }
     }
 
@@ -226,7 +221,7 @@ public abstract class IABMeasurer implements Measurer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        sessionStarted = false;
+        setSessionStarted(false);
     }
 
     @Override

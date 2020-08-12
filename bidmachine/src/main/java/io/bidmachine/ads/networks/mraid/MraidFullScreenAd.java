@@ -59,7 +59,8 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                                                         mraidParams.creativeAdm,
                                                         mraidParams.width,
                                                         mraidParams.height,
-                                                        adapterListener)
+                                                        adapterListener,
+                                                        null)
                         .setPreload(true)
                         .setCloseTime(mraidParams.skipOffset)
                         .forceUseNativeCloseButton(mraidParams.useNativeClose)
