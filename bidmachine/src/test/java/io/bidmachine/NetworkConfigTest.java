@@ -444,7 +444,7 @@ public class NetworkConfigTest {
                 AdContentType.All);
         assertNotNull(mediationConfig);
         assertEquals("test_value1", mediationConfig.get("test_key1"));
-        assertEquals("Undefined", mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertNull(mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
 
         context.getResources().getConfiguration().orientation = Configuration.ORIENTATION_PORTRAIT;
         mediationConfig = networkConfig.peekMediationConfig(

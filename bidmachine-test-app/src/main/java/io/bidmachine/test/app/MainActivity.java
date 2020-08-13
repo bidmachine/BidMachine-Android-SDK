@@ -645,30 +645,21 @@ public class MainActivity extends AppCompatActivity {
             new OptionalNetwork(
                     1, "AdColony",
                     new AdColonyConfig("app185a7e71e1714831a49ec7")
-                            .withMediationConfig(AdsFormat.InterstitialVideo,
-                                                 "vz06e8c32a037749699e7050")
-                            .withMediationConfig(AdsFormat.RewardedVideo,
-                                                 "vz1fd5a8b2bf6841a0a4b826"),
-                    "{\n" +
-                            "        \"network\": \"adcolony\",\n" +
-                            "        \"network_config\": {\n" +
-                            "            \"app_id\": \"app185a7e71e1714831a49ec7\"\n" +
-                            "        },\n" +
-                            "        \"ad_units\": [\n" +
-                            "            {\n" +
-                            "                \"format\": \"interstitial_video\",\n" +
-                            "                \"app_id\": \"app185a7e71e1714831a49ec7\",\n" +
-                            "                \"zone_id\": \"vz06e8c32a037749699e7050\",\n" +
-                            "                \"store_id\": \"google\" // optional\n" +
-                            "            },\n" +
-                            "            {\n" +
-                            "                \"format\": \"rewarded_video\",\n" +
-                            "                \"app_id\": \"app185a7e71e1714831a49ec7\",\n" +
-                            "                \"zone_id\": \"vz1fd5a8b2bf6841a0a4b826\",\n" +
-                            "                \"store_id\": \"google\" // optional\n" +
-                            "            }\n" +
-                            "        ]\n" +
-                            "    }"),
+                            .withMediationConfig(AdsFormat.InterstitialVideo, "vz06e8c32a037749699e7050")
+                            .withMediationConfig(AdsFormat.RewardedVideo, "vz1fd5a8b2bf6841a0a4b826"),
+                    "{"
+                            + "    \"network\": \"adcolony\","
+                            + "    \"app_id\": \"app185a7e71e1714831a49ec7\","
+                            + "    \"ad_units\": [{"
+                            + "        \"format\": \"interstitial_video\","
+                            + "        \"zone_id\": \"vz06e8c32a037749699e7050\","
+                            + "        \"store_id\": \"google\" // optional"
+                            + "    }, {"
+                            + "        \"format\": \"rewarded_video\","
+                            + "        \"zone_id\": \"vz1fd5a8b2bf6841a0a4b826\","
+                            + "        \"store_id\": \"google\" // optional"
+                            + "    }]"
+                            + "}"),
             new OptionalNetwork(
                     2, "myTarget",
                     new MyTargetConfig()
@@ -678,181 +669,141 @@ public class MainActivity extends AppCompatActivity {
                             .withMediationConfig(AdsFormat.Banner_728x90, "81620")
                             .withMediationConfig(AdsFormat.InterstitialStatic, "365991")
                             .withMediationConfig(AdsFormat.RewardedVideo, "482205"),
-                    "{\n" +
-                            "    \"network\":\"my_target\",\n" +
-                            "    \"ad_units\":[\n" +
-                            "        {\n" +
-                            "            \"format\":\"banner\",\n" +
-                            "            \"slot_id\":\"437933\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"banner_320x50\",\n" +
-                            "            \"slot_id\":\"437933\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"banner_300x250\",\n" +
-                            "            \"slot_id\":\"64526\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"banner_728x90\",\n" +
-                            "            \"slot_id\":\"81620\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"interstitial_static\",\n" +
-                            "            \"slot_id\":\"365991\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"rewarded_video\",\n" +
-                            "            \"slot_id\":\"482205\"\n" +
-                            "        }\n" +
-                            "    ]\n" +
-                            "}"),
+                    "{"
+                            + "    \"network\": \"my_target\","
+                            + "    \"ad_units\": [{"
+                            + "        \"format\": \"banner\","
+                            + "        \"slot_id\": \"437933\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_320x50\","
+                            + "        \"slot_id\": \"437933\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_300x250\","
+                            + "        \"slot_id\": \"64526\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_728x90\","
+                            + "        \"slot_id\": \"81620\""
+                            + "    }, {"
+                            + "        \"format\": \"interstitial_static\","
+                            + "        \"slot_id\": \"365991\""
+                            + "    }, {"
+                            + "        \"format\": \"rewarded_video\","
+                            + "        \"slot_id\": \"482205\""
+                            + "    }]"
+                            + "}"),
             new OptionalNetwork(
                     3, "Tapjoy",
                     new TapjoyConfig("tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y")
-                            .withMediationConfig(AdsFormat.InterstitialVideo,
-                                                 "video_without_cap_pb")
-                            .withMediationConfig(AdsFormat.RewardedVideo,
-                                                 "rewarded_video_without_cap_pb"),
-                    "{\n"
-                            +
-                            "        \"network\": \"tapjoy\",\n"
-                            +
-                            "        \"sdk_key\": \"tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y\",\n"
-                            +
-                            "        \"ad_units\": [\n"
-                            +
-                            "            {\n"
-                            +
-                            "                \"format\": \"interstitial_video\",\n"
-                            +
-                            "                \"sdk_key\": \"tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y\",\n"
-                            +
-                            "                \"placement_name\": \"video_without_cap_pb\"\n"
-                            +
-                            "            },\n"
-                            +
-                            "            {\n"
-                            +
-                            "                \"format\": \"rewarded_video\",\n"
-                            +
-                            "                \"sdk_key\": \"tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y\",\n"
-                            +
-                            "                \"placement_name\": \"rewarded_video_without_cap_pb\"\n"
-                            +
-                            "            }\n"
-                            +
-                            "        ]\n"
-                            +
-                            "    }"),
+                            .withMediationConfig(AdsFormat.InterstitialVideo, "video_without_cap_pb")
+                            .withMediationConfig(AdsFormat.RewardedVideo, "rewarded_video_without_cap_pb"),
+                    "{"
+                            + "    \"network\": \"tapjoy\","
+                            + "    \"sdk_key\": \"tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y\","
+                            + "    \"ad_units\": [{"
+                            + "        \"format\": \"interstitial_video\","
+                            + "        \"placement_name\": \"video_without_cap_pb\""
+                            + "    }, {"
+                            + "        \"format\": \"rewarded_video\","
+                            + "        \"placement_name\": \"rewarded_video_without_cap_pb\""
+                            + "    }]"
+                            + "}"),
             new OptionalNetwork(
                     4, "Facebook",
                     new FacebookConfig("1525692904128549")
-                            .withMediationConfig(AdsFormat.Banner,
-                                                 "1525692904128549_2386746951356469")
-                            .withMediationConfig(AdsFormat.Banner_300x250,
-                                                 "1525692904128549_2386746951356469")
-                            .withMediationConfig(AdsFormat.InterstitialStatic,
-                                                 "1525692904128549_2386743441356820")
-                            .withMediationConfig(AdsFormat.RewardedVideo,
-                                                 "1525692904128549_2386753464689151"),
-                    "{\n" +
-                            "    \"network\":\"facebook\",\n" +
-                            "    \"app_id\":\"1525692904128549\",\n" +
-                            "    \"ad_units\":[\n" +
-                            "        {\n" +
-                            "            \"format\":\"banner\",\n" +
-                            "            \"facebook_key\":\"1525692904128549_2386746951356469\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"banner_320x50\",\n" +
-                            "            \"facebook_key\":\"1525692904128549_2386746951356469\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"banner_300x250\",\n" +
-                            "            \"facebook_key\":\"1525692904128549_2386746951356469\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"interstitial_static\",\n" +
-                            "            \"facebook_key\":\"1525692904128549_2386743441356820\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"rewarded_video\",\n" +
-                            "            \"facebook_key\":\"1525692904128549_2386753464689151\"\n" +
-                            "        }\n" +
-                            "    ]\n" +
-                            "}"),
+                            .withMediationConfig(AdsFormat.Banner, "1525692904128549_2386746951356469")
+                            .withMediationConfig(AdsFormat.Banner_300x250, "1525692904128549_2386746951356469")
+                            .withMediationConfig(AdsFormat.InterstitialStatic, "1525692904128549_2386743441356820")
+                            .withMediationConfig(AdsFormat.RewardedVideo, "1525692904128549_2386753464689151"),
+                    "{"
+                            + "    \"network\": \"facebook\","
+                            + "    \"app_id\": \"1525692904128549\","
+                            + "    \"ad_units\": [{"
+                            + "        \"format\": \"banner\","
+                            + "        \"facebook_key\": \"1525692904128549_2386746951356469\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_320x50\","
+                            + "        \"facebook_key\": \"1525692904128549_2386746951356469\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_300x250\","
+                            + "        \"facebook_key\": \"1525692904128549_2386746951356469\""
+                            + "    }, {"
+                            + "        \"format\": \"interstitial_static\","
+                            + "        \"facebook_key\": \"1525692904128549_2386743441356820\""
+                            + "    }, {"
+                            + "        \"format\": \"rewarded_video\","
+                            + "        \"facebook_key\": \"1525692904128549_2386753464689151\""
+                            + "    }]"
+                            + "}"),
             new OptionalNetwork(
                     5, "Mintegral",
                     new MintegralConfig("117852", "936dcbdd57fe235fd7cf61c2e93da3c4")
                             .withMediationConfig(AdsFormat.InterstitialVideo, "140146")
                             .withMediationConfig(AdsFormat.RewardedVideo, "140144"),
-                    "{\n" +
-                            "    \"network\":\"mintegral\",\n" +
-                            "    \"app_id\":\"117852\",\n" +
-                            "    \"api_key\":\"936dcbdd57fe235fd7cf61c2e93da3c4\",\n" +
-                            "    \"ad_units\":[\n" +
-                            "        {\n" +
-                            "            \"format\":\"interstitial_video\",\n" +
-                            "            \"unit_id\":\"140146\"\n" +
-                            "        },\n" +
-                            "        {\n" +
-                            "            \"format\":\"rewarded_video\",\n" +
-                            "            \"unit_id\":\"140144\",\n" +
-                            "            \"reward_id\":\"12817\"\n" +
-                            "        }\n" +
-                            "    ]\n" +
-                            "}"),
+                    "{"
+                            + "    \"network\": \"mintegral\","
+                            + "    \"app_id\": \"117852\","
+                            + "    \"api_key\": \"936dcbdd57fe235fd7cf61c2e93da3c4\","
+                            + "    \"ad_units\": [{"
+                            + "        \"format\": \"interstitial_video\","
+                            + "        \"unit_id\": \"140146\""
+                            + "    }, {"
+                            + "        \"format\": \"rewarded_video\","
+                            + "        \"unit_id\": \"140144\","
+                            + "        \"reward_id\": \"12817\""
+                            + "    }]"
+                            + "}"),
             new OptionalNetwork(
                     6, "Amazon",
                     new AmazonConfig("a9_onboarding_app_id")
-                            .withMediationConfig(AdsFormat.Banner_320x50,
-                                                 "5ab6a4ae-4aa5-43f4-9da4-e30755f2b295")
-                            .withMediationConfig(AdsFormat.Banner_300x250,
-                                                 "54fb2d08-c222-40b1-8bbe-4879322dc04b")
-                            .withMediationConfig(AdsFormat.Banner_728x90,
-                                                 "bed17ec3-b185-453e-b2a8-4a3c6bb9234d")
-                            .withMediationConfig(AdsFormat.InterstitialStatic,
-                                                 "4e918ac0-5c68-4fe1-8d26-4e76e8f74831")
-                            .withMediationConfig(AdsFormat.InterstitialVideo,
-                                                 "4acc26e6-3ada-4ee8-bae0-753c1e0ad278"),
-                    "{\n"
-                            + "    \"network\": \"amazon\",\n"
-                            + "    \"app_key\": \"a9_onboarding_app_id\",\n"
-                            + "    \"ad_units\": [\n"
-                            + "        {\n"
-                            + "            \"format\": \"banner\",\n"
-                            + "            \"slot_uuid\": \"5ab6a4ae-4aa5-43f4-9da4-e30755f2b295\"\n"
-                            + "        },\n"
-                            + "        {\n"
-                            + "            \"format\": \"banner_320x50\",\n"
-                            + "            \"slot_uuid\": \"5ab6a4ae-4aa5-43f4-9da4-e30755f2b295\"\n"
-                            + "        },\n"
-                            + "        {\n"
-                            + "            \"format\": \"banner_300x250\",\n"
-                            + "            \"slot_uuid\": \"54fb2d08-c222-40b1-8bbe-4879322dc04b\"\n"
-                            + "        },\n"
-                            + "        {\n"
-                            + "            \"format\": \"banner_728x90\",\n"
-                            + "            \"slot_uuid\": \"bed17ec3-b185-453e-b2a8-4a3c6bb9234d\"\n"
-                            + "        },\n"
-                            + "        {\n"
-                            + "            \"format\": \"interstitial_static\",\n"
-                            + "            \"slot_uuid\": \"4e918ac0-5c68-4fe1-8d26-4e76e8f74831\"\n"
-                            + "        },\n"
-                            + "        {\n"
-                            + "            \"format\":\"interstitial_video\",\n"
-                            + "            \"slot_uuid\":\"4acc26e6-3ada-4ee8-bae0-753c1e0ad278\"\n"
-                            + "        }\n"
-                            + "    ]\n"
+                            .withMediationConfig(AdsFormat.Banner_320x50, "5ab6a4ae-4aa5-43f4-9da4-e30755f2b295")
+                            .withMediationConfig(AdsFormat.Banner_300x250, "54fb2d08-c222-40b1-8bbe-4879322dc04b")
+                            .withMediationConfig(AdsFormat.Banner_728x90, "bed17ec3-b185-453e-b2a8-4a3c6bb9234d")
+                            .withMediationConfig(AdsFormat.InterstitialStatic, "4e918ac0-5c68-4fe1-8d26-4e76e8f74831")
+                            .withMediationConfig(AdsFormat.InterstitialVideo, "4acc26e6-3ada-4ee8-bae0-753c1e0ad278"),
+                    "{"
+                            + "    \"network\": \"amazon\","
+                            + "    \"app_key\": \"a9_onboarding_app_id\","
+                            + "    \"ad_units\": [{"
+                            + "        \"format\": \"banner\","
+                            + "        \"slot_uuid\": \"5ab6a4ae-4aa5-43f4-9da4-e30755f2b295\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_320x50\","
+                            + "        \"slot_uuid\": \"5ab6a4ae-4aa5-43f4-9da4-e30755f2b295\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_300x250\","
+                            + "        \"slot_uuid\": \"54fb2d08-c222-40b1-8bbe-4879322dc04b\""
+                            + "    }, {"
+                            + "        \"format\": \"banner_728x90\","
+                            + "        \"slot_uuid\": \"bed17ec3-b185-453e-b2a8-4a3c6bb9234d\""
+                            + "    }, {"
+                            + "        \"format\": \"interstitial_static\","
+                            + "        \"slot_uuid\": \"4e918ac0-5c68-4fe1-8d26-4e76e8f74831\""
+                            + "    }, {"
+                            + "        \"format\": \"interstitial_video\","
+                            + "        \"slot_uuid\": \"4acc26e6-3ada-4ee8-bae0-753c1e0ad278\""
+                            + "    }]"
                             + "}"),
-            new OptionalNetwork(7, "Criteo",
-                                new CriteoConfig("B-057601")
-                                        .withMediationConfig(AdsFormat.Banner_320x50, "30s6zt3ayypfyemwjvmp")
-                                        .withMediationConfig(AdsFormat.Interstitial, "6yws53jyfjgoq1ghnuqb"),
-                                "{\n"
-                                        + "    \"network\":\"criteo\",\n"
-                                        + "    \"publisher_id\":\"B-057601\"\n"
-                                        + "}")
+            new OptionalNetwork(
+                    7, "Criteo",
+                    new CriteoConfig("B-057601")
+                            .withMediationConfig(AdsFormat.Banner_320x50, "30s6zt3ayypfyemwjvmp")
+                            .withMediationConfig(AdsFormat.Interstitial, "6yws53jyfjgoq1ghnuqb"),
+                    "{"
+                            + "    \"network\": \"criteo\","
+                            + "    \"publisher_id\": \"B-057601\","
+                            + "    \"ad_units\": [{"
+                            + "        \"ad_unit_id\": \"30s6zt3ayypfyemwjvmp\","
+                            + "        \"format\": \"banner_320x50\""
+                            + "    }, {"
+                            + "        \"orientation\": \"portrait\","
+                            + "        \"ad_unit_id\": \"6yws53jyfjgoq1ghnuqb\","
+                            + "        \"format\": \"interstitial_static\""
+                            + "    }, {"
+                            + "        \"orientation\": \"landscape\","
+                            + "        \"ad_unit_id\": \"6yws53jyfjgoq1ghnuqb\","
+                            + "        \"format\": \"interstitial_video\""
+                            + "    }]"
+                            + "}")
     };
+
 }
