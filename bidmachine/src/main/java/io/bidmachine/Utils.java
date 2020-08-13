@@ -17,6 +17,10 @@ public class Utils {
         return target == targetDefault ? def : target;
     }
 
+    public static String capitalize(String value) {
+        return value.substring(0, 1).toUpperCase() + value.substring(1).toLowerCase();
+    }
+
     public static int getOrientation() {
         Context context = BidMachineImpl.get().getAppContext();
         if (context == null) {

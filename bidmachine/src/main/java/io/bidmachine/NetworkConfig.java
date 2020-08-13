@@ -179,7 +179,7 @@ public abstract class NetworkConfig {
     @SuppressWarnings({"WeakerAccess"})
     public <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
                                                            @Nullable Map<String, String> config) {
-        return withMediationConfig(adsFormat, config, Orientation.Undefined);
+        return withMediationConfig(adsFormat, config, null);
     }
 
     /**
@@ -192,13 +192,15 @@ public abstract class NetworkConfig {
      */
     public <T extends NetworkConfig> T withMediationConfig(@NonNull AdsFormat adsFormat,
                                                            @Nullable Map<String, String> config,
-                                                           @NonNull Orientation orientation) {
+                                                           @Nullable Orientation orientation) {
         if (config == null) {
             if (typedMediationConfigs != null) {
                 typedMediationConfigs.remove(adsFormat);
             }
         } else {
-            config.put(CONFIG_ORIENTATION, orientation.toString());
+            if (orientation != null) {
+                config.put(CONFIG_ORIENTATION, orientation.toString());
+            }
             if (typedMediationConfigs == null) {
                 typedMediationConfigs = new EnumMap<>(AdsFormat.class);
             }
@@ -266,9 +268,11 @@ public abstract class NetworkConfig {
         if (TextUtils.isEmpty(orientation)) {
             return true;
         }
+        assert orientation != null;
+
         Orientation requiredOrientation;
         try {
-            requiredOrientation = Orientation.valueOf(orientation);
+            requiredOrientation = Orientation.valueOf(Utils.capitalize(orientation));
         } catch (Exception e) {
             return true;
         }
