@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 4
+        versionCode 5
     }
 }
 
@@ -12,12 +12,13 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
-        maven {
-            url "https://pubsdk-bin.criteo.com/publishersdk/android"
-        }
     }
 }
 
+configurations {
+    compile.exclude group: 'org.jetbrains' , module:'annotations'
+}
+
 dependencies {
-    adapterDependency 'com.criteo.publisher:criteo-publisher-sdk:3.5.0'
+    adapterDependency 'com.criteo.publisher:criteo-publisher-sdk:3.9.0'
 }
