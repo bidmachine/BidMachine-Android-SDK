@@ -37,7 +37,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     CriteoAdapter() {
         super("criteo",
-              "3.5.0",
+              "3.9.0",
               BuildConfig.VERSION_NAME,
               new AdsType[]{AdsType.Banner, AdsType.Interstitial});
         BidMachine.registerAdRequestListener(new AdRequest.AdRequestListener() {
