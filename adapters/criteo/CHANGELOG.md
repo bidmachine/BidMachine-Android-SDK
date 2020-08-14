@@ -1,3 +1,6 @@
+## Version 1.5.2.5
+* Updated Criteo version to 3.9.0
+
 ## Version 1.5.2.4
 * Added the ability to transfer orientation for a specific AdUnitId
 
