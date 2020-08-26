@@ -62,6 +62,12 @@ public interface AuctionResult {
     String getNetworkKey();
 
     /**
+     * @return Client parameters of winner networks.
+     */
+    @NonNull
+    Map<String, String> getNetworkParams();
+
+    /**
      * @return {@link CreativeFormat} of winner ad
      */
     @Nullable

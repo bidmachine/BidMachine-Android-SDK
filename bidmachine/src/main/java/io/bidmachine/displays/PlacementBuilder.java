@@ -2,17 +2,20 @@ package io.bidmachine.displays;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.explorestack.protobuf.Message;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
-import com.explorestack.protobuf.Message;
+
+import java.util.Collection;
+
 import io.bidmachine.AdContentType;
 import io.bidmachine.AdsType;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.NetworkConfig;
 import io.bidmachine.models.AdObjectParams;
+import io.bidmachine.protobuf.headerbidding.HeaderBiddingAd;
 import io.bidmachine.unified.UnifiedAdRequestParams;
-
-import java.util.Collection;
 
 public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdRequestParams> {
 
@@ -63,6 +66,12 @@ public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends Unifie
                                                      @NonNull Ad ad) {
         return headerBiddingPlacementBuilder != null
                 ? headerBiddingPlacementBuilder.createAdObjectParams(contextProvider, adRequest, seatbid, bid, ad)
+                : null;
+    }
+
+    public HeaderBiddingAd obtainHeaderBiddingAd(@NonNull Ad ad) {
+        return headerBiddingPlacementBuilder != null
+                ? headerBiddingPlacementBuilder.obtainHeaderBiddingAd(ad)
                 : null;
     }
 

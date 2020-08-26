@@ -14,8 +14,10 @@ import java.util.Map;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.protobuf.AdExtension;
 import io.bidmachine.protobuf.AppExtension;
+import io.bidmachine.protobuf.headerbidding.HeaderBiddingAd;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
@@ -48,6 +50,7 @@ public class AuctionResultImplTest {
                 .addExt(Any.pack(adExtension3))
                 .build();
         AuctionResult auctionResult = new AuctionResultImpl(
+                AdsType.Banner,
                 Response.Seatbid.newBuilder().build(),
                 Response.Seatbid.Bid.newBuilder().build(),
                 ad,
@@ -60,6 +63,37 @@ public class AuctionResultImplTest {
         assertEquals("new_custom_value_4", customParams.get("custom_key_4"));
         assertEquals("custom_value_5", customParams.get("custom_key_5"));
         assertEquals("custom_value_6", customParams.get("custom_key_6"));
+    }
+
+    @Test
+    public void createClientParams() {
+        AuctionResultImpl auctionResultImpl = new AuctionResultImpl(
+                AdsType.Banner,
+                Response.Seatbid.newBuilder().build(),
+                Response.Seatbid.Bid.newBuilder().build(),
+                Ad.newBuilder().build(),
+                mock(NetworkConfig.class));
+
+        Map<String, String> networkParams = auctionResultImpl.createClientParams(null);
+        assertNotNull(networkParams);
+        assertEquals(0, networkParams.size());
+
+        HeaderBiddingAd headerBiddingAd = HeaderBiddingAd.newBuilder().build();
+        networkParams = auctionResultImpl.createClientParams(headerBiddingAd);
+        assertNotNull(networkParams);
+        assertEquals(0, networkParams.size());
+
+        headerBiddingAd = HeaderBiddingAd.newBuilder()
+                .putClientParams("test_key_1", "test_value_1")
+                .putClientParams("test_key_2", "test_value_2")
+                .putClientParams("test_key_3", "test_value_3")
+                .build();
+        networkParams = auctionResultImpl.createClientParams(headerBiddingAd);
+        assertNotNull(networkParams);
+        assertEquals(3, networkParams.size());
+        assertEquals("test_value_1", networkParams.get("test_key_1"));
+        assertEquals("test_value_2", networkParams.get("test_key_2"));
+        assertEquals("test_value_3", networkParams.get("test_key_3"));
     }
 
     @Test

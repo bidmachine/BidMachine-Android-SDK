@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,6 @@ import io.bidmachine.ads.networks.mraid.MraidAdapter;
 import io.bidmachine.ads.networks.nast.NastAdapter;
 import io.bidmachine.ads.networks.vast.VastAdapter;
 import io.bidmachine.core.Logger;
-import io.bidmachine.core.Utils;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.utils.BMError;
 
@@ -150,11 +148,6 @@ class NetworkRegistry {
 
     private static final class NetworkLoadTask implements Runnable {
 
-        private static final String KEY_NETWORK = "network";
-        private static final String KEY_AD_UNITS = "ad_units";
-        private static final String KEY_FORMAT = "format";
-        private static final String KEY_CLASSPATH = "classpath";
-
         private static Executor executor = Executors.newFixedThreadPool(
                 Math.max(8, Runtime.getRuntime().availableProcessors() * 4));
 
@@ -203,49 +196,17 @@ class NetworkRegistry {
         }
 
         private void process() {
-            String networkName = null;
             if (jsonConfig != null) {
-                try {
-                    networkName = jsonConfig.getString(KEY_NETWORK);
-                    Logger.log(String.format("Load network from json config start: %s",
-                                             networkName));
-                    JSONObject networkAssetConfig =
-                            new JSONObject(
-                                    Utils.streamToString(
-                                            contextProvider.getContext().getAssets()
-                                                    .open(String.format("bm_networks/%s.bmnetwork",
-                                                                        networkName))));
-                    networkConfig = (NetworkConfig)
-                            Class.forName(networkAssetConfig.getString(KEY_CLASSPATH))
-                                    .getConstructor(Map.class)
-                                    .newInstance(toMap(jsonConfig));
-                    JSONArray params = jsonConfig.getJSONArray(KEY_AD_UNITS);
-                    for (int i = 0; i < params.length(); i++) {
-                        JSONObject mediationConfig = params.getJSONObject(i);
-                        AdsFormat format = AdsFormat.byRemoteName(mediationConfig.getString(
-                                KEY_FORMAT));
-                        if (format != null) {
-                            networkConfig.withMediationConfig(format, toMap(mediationConfig));
-                        } else {
-                            Logger.log(String.format(
-                                    "Network (%s) adunit register fail: %s not provided",
-                                    networkName,
-                                    KEY_FORMAT));
-                        }
-                    }
-                    Logger.log(
-                            String.format("Load network from json config finish: %s, %s",
-                                          networkName, networkConfig.getVersion()));
-                } catch (Throwable e) {
-                    Logger.log(String.format("Network (%s) load fail!", networkName));
-                    Logger.log(e);
-                    return;
+                networkConfig = NetworkConfig.create(contextProvider.getContext(), jsonConfig);
+                if (networkConfig != null) {
+                    Logger.log(String.format(
+                            "Load network from json config completed successfully: %s, %s",
+                            networkConfig.getKey(),
+                            networkConfig.getVersion()));
                 }
             }
             if (networkConfig != null) {
-                if (networkName == null) {
-                    networkName = networkConfig.getKey();
-                }
+                String networkName = networkConfig.getKey();
                 TrackingObject trackingObject = new TrackingObject() {
                     @Override
                     public Object getTrackingKey() {
@@ -302,19 +263,6 @@ class NetworkRegistry {
             executor.execute(this);
         }
 
-        private static Map<String, String> toMap(JSONObject jsonObject) throws JSONException {
-            Map<String, String> map = new HashMap<>();
-            Iterator<String> keys = jsonObject.keys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                Object value = jsonObject.get(key);
-                if (value != null) {
-                    map.put(key, value.toString());
-                }
-            }
-            return map;
-        }
-
         interface NetworkLoadCallback {
             void onNetworkLoadingFinished();
         }
@@ -329,4 +277,5 @@ class NetworkRegistry {
     interface NetworksInitializeCallback {
         void onNetworksInitialized();
     }
+
 }

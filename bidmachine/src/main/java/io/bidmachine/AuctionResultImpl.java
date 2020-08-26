@@ -14,6 +14,7 @@ import java.util.Map;
 
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.protobuf.AdExtension;
+import io.bidmachine.protobuf.headerbidding.HeaderBiddingAd;
 
 final class AuctionResultImpl implements AuctionResult {
 
@@ -34,12 +35,15 @@ final class AuctionResultImpl implements AuctionResult {
     private final String[] adDomains;
     @NonNull
     private final String networkKey;
+    @NonNull
+    private final Map<String, String> networkParams;
     @Nullable
     private final CreativeFormat creativeFormat;
     @NonNull
     private final Map<String, String> customParams;
 
-    AuctionResultImpl(@NonNull Response.Seatbid seatbid,
+    AuctionResultImpl(@NonNull AdsType adsType,
+                      @NonNull Response.Seatbid seatbid,
                       @NonNull Response.Seatbid.Bid bid,
                       @NonNull Ad ad,
                       @NonNull NetworkConfig networkConfig) {
@@ -57,6 +61,7 @@ final class AuctionResultImpl implements AuctionResult {
         }
         customParams = createCustomParams(ad);
         networkKey = networkConfig.getKey();
+        networkParams = createClientParams(adsType.obtainHeaderBiddingAd(ad));
         creativeFormat = identifyCreativeFormat(ad);
     }
 
@@ -113,6 +118,12 @@ final class AuctionResultImpl implements AuctionResult {
         return networkKey;
     }
 
+    @NonNull
+    @Override
+    public Map<String, String> getNetworkParams() {
+        return networkParams;
+    }
+
     @Nullable
     @Override
     public CreativeFormat getCreativeFormat() {
@@ -135,7 +146,7 @@ final class AuctionResultImpl implements AuctionResult {
 
     @NonNull
     private Map<String, String> createCustomParams(@NonNull Ad ad) {
-        Map<String,String> customParams = new HashMap<>();
+        Map<String, String> customParams = new HashMap<>();
         for (Any any : ad.getExtList()) {
             if (any.is(AdExtension.class)) {
                 try {
@@ -146,6 +157,19 @@ final class AuctionResultImpl implements AuctionResult {
             }
         }
         return customParams;
+    }
+
+    @NonNull
+    @VisibleForTesting
+    Map<String, String> createClientParams(@Nullable HeaderBiddingAd headerBiddingAd) {
+        Map<String, String> clientParamsMap = new HashMap<>();
+        if (headerBiddingAd != null) {
+            Map<String, String> headerBiddingAdClientParamsMap = headerBiddingAd.getClientParamsMap();
+            if (headerBiddingAdClientParamsMap != null) {
+                clientParamsMap.putAll(headerBiddingAdClientParamsMap);
+            }
+        }
+        return clientParamsMap;
     }
 
     @Nullable

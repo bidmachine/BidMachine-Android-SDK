@@ -67,6 +67,12 @@ public class TestAdRequest extends AdRequest {
                 return builder.auctionNetworkName;
             }
 
+            @NonNull
+            @Override
+            public Map<String, String> getNetworkParams() {
+                return builder.auctionNetworkParams;
+            }
+
             @Nullable
             @Override
             public CreativeFormat getCreativeFormat() {
@@ -107,6 +113,7 @@ public class TestAdRequest extends AdRequest {
         String auctionCid;
         String[] auctionAdDomains;
         String auctionNetworkName = "test_network";
+        Map<String, String> auctionNetworkParams = new HashMap<>();
         CreativeFormat auctionCreativeFormat;
         Map<String, String> auctionCustomParams = new HashMap<>();
 
@@ -156,6 +163,11 @@ public class TestAdRequest extends AdRequest {
 
         public Builder setAuctionNetworkName(String auctionNetworkName) {
             this.auctionNetworkName = auctionNetworkName;
+            return this;
+        }
+
+        public Builder setAuctionNetworkParams(Map<String, String> auctionNetworkParams) {
+            this.auctionNetworkParams = auctionNetworkParams;
             return this;
         }
 

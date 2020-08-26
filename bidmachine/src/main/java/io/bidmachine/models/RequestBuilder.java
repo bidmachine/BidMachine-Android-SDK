@@ -1,6 +1,11 @@
 package io.bidmachine.models;
 
+import android.support.annotation.NonNull;
+
+import java.util.List;
+
 import io.bidmachine.AdRequest;
+import io.bidmachine.NetworkConfig;
 import io.bidmachine.PriceFloorParams;
 import io.bidmachine.TargetingParams;
 
@@ -12,6 +17,12 @@ public interface RequestBuilder<SelfType extends RequestBuilder,
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setTargetingParams(TargetingParams targetingParams);
+
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setNetworks(@NonNull List<NetworkConfig> networkConfigList);
+
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setNetworks(@NonNull String jsonData);
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setLoadingTimeOut(int timeOutMs);

@@ -1,17 +1,25 @@
 package io.bidmachine;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import io.bidmachine.core.Logger;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 
 /**
@@ -20,6 +28,17 @@ import io.bidmachine.unified.UnifiedAdRequestParams;
  * config from json.
  */
 public abstract class NetworkConfig {
+
+    private static final String KEY_CLASSPATH = "classpath";
+    private static final String KEY_NETWORK = "network";
+    private static final String KEY_FORMAT = "format";
+    private static final String KEY_AD_UNITS = "ad_units";
+
+    public static final List<String> PRIVATE_FIELDS = new ArrayList<String>(){{
+        add(KEY_NETWORK);
+        add(KEY_FORMAT);
+        add(KEY_AD_UNITS);
+    }};
 
     @VisibleForTesting
     static final String CONFIG_ORIENTATION = "orientation";
@@ -199,7 +218,7 @@ public abstract class NetworkConfig {
             }
         } else {
             if (orientation != null) {
-                config.put(CONFIG_ORIENTATION, orientation.toString());
+                config.put(CONFIG_ORIENTATION, orientation.toString().toLowerCase());
             }
             if (typedMediationConfigs == null) {
                 typedMediationConfigs = new EnumMap<>(AdsFormat.class);
@@ -322,6 +341,59 @@ public abstract class NetworkConfig {
         }
         resultConfig.putAll(config);
         return resultConfig;
+    }
+
+    static NetworkConfig create(@Nullable Context context,
+                                @NonNull JSONObject networkConfigJsonObject) {
+        if (context == null) {
+            return null;
+        }
+        String networkName = null;
+        InputStream inputStream = null;
+        try {
+            networkName = networkConfigJsonObject.getString(KEY_NETWORK);
+            String networkFileName = String.format("bm_networks/%s.bmnetwork", networkName);
+            inputStream = context.getAssets().open(networkFileName);
+            String networkAssetsJson = io.bidmachine.core.Utils.streamToString(inputStream);
+            JSONObject networkAssetConfig = new JSONObject(networkAssetsJson);
+            NetworkConfig networkConfig = (NetworkConfig)
+                    Class.forName(networkAssetConfig.getString(KEY_CLASSPATH))
+                            .getConstructor(Map.class)
+                            .newInstance(toMap(networkConfigJsonObject));
+
+            JSONArray params = networkConfigJsonObject.getJSONArray(KEY_AD_UNITS);
+            for (int i = 0; i < params.length(); i++) {
+                JSONObject mediationConfig = params.getJSONObject(i);
+                AdsFormat format = AdsFormat.byRemoteName(mediationConfig.getString(KEY_FORMAT));
+                if (format != null) {
+                    networkConfig.withMediationConfig(format, toMap(mediationConfig));
+                } else {
+                    Logger.log(String.format("Network (%s) adUnit register fail: %s not provided",
+                                             networkName,
+                                             KEY_FORMAT));
+                }
+            }
+            return networkConfig;
+        } catch (Throwable t) {
+            Logger.log(String.format("Network (%s) load fail!", networkName));
+            Logger.log(t);
+        } finally {
+            io.bidmachine.core.Utils.close(inputStream);
+        }
+        return null;
+    }
+
+    private static Map<String, String> toMap(JSONObject jsonObject) throws JSONException {
+        Map<String, String> map = new HashMap<>();
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonObject.get(key);
+            if (value != null) {
+                map.put(key, value.toString());
+            }
+        }
+        return map;
     }
 
     @SuppressWarnings("WeakerAccess")
