@@ -31,11 +31,11 @@ public abstract class AdObjectParams {
     public AdObjectParams(@NonNull Response.Seatbid seatbid,
                           @NonNull Response.Seatbid.Bid bid,
                           @NonNull Ad ad) {
-        if (ad.getExtCount() > 0) {
-            for (int i = 0; i < ad.getExtCount(); i++) {
-                if (ad.getExt(i).is(AdExtension.class)) {
+        if (ad.getExtProtoCount() > 0) {
+            for (int i = 0; i < ad.getExtProtoCount(); i++) {
+                if (ad.getExtProto(i).is(AdExtension.class)) {
                     try {
-                        AdExtension extension = ad.getExt(i).unpack(AdExtension.class);
+                        AdExtension extension = ad.getExtProto(i).unpack(AdExtension.class);
                         prepareExtensions(seatbid, bid, extension);
                     } catch (InvalidProtocolBufferException e) {
                         e.printStackTrace();

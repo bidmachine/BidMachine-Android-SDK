@@ -96,13 +96,13 @@ public enum AdsType {
         if (ad.hasDisplay()) {
             Ad.Display display = ad.getDisplay();
             if (display.hasBanner()) {
-                extensions = display.getBanner().getExtList();
+                extensions = display.getBanner().getExtProtoList();
             } else if (display.hasNative()) {
-                extensions = display.getNative().getExtList();
+                extensions = display.getNative().getExtProtoList();
             }
         }
         if ((extensions == null || extensions.isEmpty()) && ad.hasVideo()) {
-            extensions = ad.getVideo().getExtList();
+            extensions = ad.getVideo().getExtProtoList();
         }
         if (extensions != null) {
             return obtainHeaderBiddingAdNetworkConfig(extensions);

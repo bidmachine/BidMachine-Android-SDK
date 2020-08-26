@@ -156,7 +156,7 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
                 adsType,
                 networkConfigs);
         if (headerBiddingPlacement != null) {
-            builder.addExt(Any.pack(headerBiddingPlacement.build()));
+            builder.addExtProto(Any.pack(headerBiddingPlacement.build()));
         }
         callback.onCreated(builder);
     }

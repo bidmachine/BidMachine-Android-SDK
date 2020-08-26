@@ -125,14 +125,14 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
         HeaderBiddingAd headerBiddingAd = null;
         if (ad.hasDisplay()) {
             if (ad.getDisplay().hasBanner()) {
-                headerBiddingAd = obtainHeaderBiddingAd(ad.getDisplay().getBanner().getExtList());
+                headerBiddingAd = obtainHeaderBiddingAd(ad.getDisplay().getBanner().getExtProtoList());
             }
             if (headerBiddingAd == null && ad.getDisplay().hasNative()) {
-                headerBiddingAd = obtainHeaderBiddingAd(ad.getDisplay().getNative().getExtList());
+                headerBiddingAd = obtainHeaderBiddingAd(ad.getDisplay().getNative().getExtProtoList());
             }
         }
         if (headerBiddingAd == null && ad.hasVideo()) {
-            headerBiddingAd = obtainHeaderBiddingAd(ad.getVideo().getExtList());
+            headerBiddingAd = obtainHeaderBiddingAd(ad.getVideo().getExtProtoList());
         }
         return headerBiddingAd != null
                 ? new HeaderBiddingAdObjectParams(seatbid, bid, ad, headerBiddingAd)
