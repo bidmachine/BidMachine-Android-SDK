@@ -135,6 +135,10 @@ class OrtbUtils {
         initRequest.setSellerId(sellerId);
         initRequest.setOs(OS.OS_ANDROID);
         initRequest.setOsv(Build.VERSION.RELEASE);
+        String appVersion = Utils.getAppVersion(context);
+        if (appVersion != null) {
+            initRequest.setAppVer(appVersion);
+        }
         initRequest.setSdk(BidMachine.NAME);
         initRequest.setSdkver(BidMachine.VERSION);
         initRequest.setIfa(AdvertisingPersonalData.getAdvertisingId(context, !restrictions.canSendIfa()));
