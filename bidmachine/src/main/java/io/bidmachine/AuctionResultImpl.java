@@ -147,7 +147,7 @@ final class AuctionResultImpl implements AuctionResult {
     @NonNull
     private Map<String, String> createCustomParams(@NonNull Ad ad) {
         Map<String, String> customParams = new HashMap<>();
-        for (Any any : ad.getExtList()) {
+        for (Any any : ad.getExtProtoList()) {
             if (any.is(AdExtension.class)) {
                 try {
                     AdExtension adExtension = any.unpack(AdExtension.class);

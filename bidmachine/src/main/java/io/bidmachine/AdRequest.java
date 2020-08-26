@@ -252,7 +252,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                         : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
         requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
 
-        requestBuilder.addExt(Any.pack(requestExtensionBuilder.build()));
+        requestBuilder.addExtProto(Any.pack(requestExtensionBuilder.build()));
 
         return requestBuilder.build();
     }

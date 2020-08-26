@@ -41,7 +41,7 @@ final class UserRestrictionParams
             RegsCcpaExtension regsCcpaExtension = RegsCcpaExtension.newBuilder()
                     .setUsPrivacy(iabUsPrivacyString)
                     .build();
-            builder.addExt(Any.pack(regsCcpaExtension));
+            builder.addExtProto(Any.pack(regsCcpaExtension));
         }
     }
 
