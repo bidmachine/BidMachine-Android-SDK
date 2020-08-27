@@ -25,6 +25,8 @@ public class AdRequestBuilderImplTest {
 
     @Test
     public void setNetworksJson() {
+        adRequestBuilder.setNetworks((String) null);
+        assertNull(adRequestBuilder.params);
         adRequestBuilder.setNetworks("");
         assertNull(adRequestBuilder.params);
         adRequestBuilder.setNetworks("test_string");

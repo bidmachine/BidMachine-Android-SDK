@@ -635,30 +635,32 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
         @Override
         @SuppressWarnings("unchecked")
-        public SelfType setNetworks(@NonNull List<NetworkConfig> networkConfigList) {
+        public SelfType setNetworks(@Nullable List<NetworkConfig> networkConfigList) {
             fillNetworkConfigs(networkConfigList);
             return (SelfType) this;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public SelfType setNetworks(@NonNull String jsonData) {
-            List<NetworkConfig> networkConfigList = new ArrayList<>();
-            try {
-                JSONArray networkConfigJsonArray = new JSONArray(jsonData);
-                for (int i = 0; i < networkConfigJsonArray.length(); i++) {
-                    JSONObject networkConfigJsonObject = networkConfigJsonArray.getJSONObject(i);
-                    NetworkConfig networkConfig = NetworkConfig.create(
-                            BidMachineImpl.get().getAppContext(),
-                            networkConfigJsonObject);
-                    if (networkConfig != null) {
-                        networkConfigList.add(networkConfig);
+        public SelfType setNetworks(@Nullable String jsonData) {
+            if (!TextUtils.isEmpty(jsonData)) {
+                List<NetworkConfig> networkConfigList = new ArrayList<>();
+                try {
+                    JSONArray networkConfigJsonArray = new JSONArray(jsonData);
+                    for (int i = 0; i < networkConfigJsonArray.length(); i++) {
+                        JSONObject networkConfigJsonObject = networkConfigJsonArray.getJSONObject(i);
+                        NetworkConfig networkConfig = NetworkConfig.create(
+                                BidMachineImpl.get().getAppContext(),
+                                networkConfigJsonObject);
+                        if (networkConfig != null) {
+                            networkConfigList.add(networkConfig);
+                        }
                     }
+                } catch (Exception e) {
+                    Logger.log(e);
                 }
-            } catch (Exception e) {
-                Logger.log(e);
+                fillNetworkConfigs(networkConfigList);
             }
-            fillNetworkConfigs(networkConfigList);
             return (SelfType) this;
         }
 

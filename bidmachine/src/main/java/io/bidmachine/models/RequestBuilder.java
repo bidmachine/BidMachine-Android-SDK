@@ -1,6 +1,6 @@
 package io.bidmachine.models;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
@@ -19,10 +19,10 @@ public interface RequestBuilder<SelfType extends RequestBuilder,
     SelfType setTargetingParams(TargetingParams targetingParams);
 
     @SuppressWarnings("UnusedReturnValue")
-    SelfType setNetworks(@NonNull List<NetworkConfig> networkConfigList);
+    SelfType setNetworks(@Nullable List<NetworkConfig> networkConfigList);
 
     @SuppressWarnings("UnusedReturnValue")
-    SelfType setNetworks(@NonNull String jsonData);
+    SelfType setNetworks(@Nullable String jsonData);
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setLoadingTimeOut(int timeOutMs);
