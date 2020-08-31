@@ -46,15 +46,7 @@ final class UserRestrictionParams
     }
 
     void build(@NonNull Context.User.Builder builder) {
-        String consentString = oneOf(
-                gdprConsentString,
-                BidMachineImpl.get().getIabSharedPreference().getGDPRConsentString());
-        if (TextUtils.isEmpty(consentString)) {
-            consentString = hasConsent() ? "1" : "0";
-        }
-        if (consentString != null) {
-            builder.setConsent(consentString);
-        }
+        builder.setConsent(getIABGDPRString());
     }
 
     @Override
@@ -134,6 +126,18 @@ final class UserRestrictionParams
     @Override
     public String getUsPrivacy() {
         return BidMachineImpl.get().getIabSharedPreference().getUSPrivacyString();
+    }
+
+    @NonNull
+    @Override
+    public String getIABGDPRString() {
+        String consentString = oneOf(
+                gdprConsentString,
+                BidMachineImpl.get().getIabSharedPreference().getGDPRConsentString());
+        if (TextUtils.isEmpty(consentString)) {
+            consentString = hasConsent() ? "1" : "0";
+        }
+        return consentString;
     }
 
 }

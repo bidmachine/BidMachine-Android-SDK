@@ -1,3 +1,6 @@
+## Version 1.6.0.5
+* Updated AdColony version to 4.2.2
+
 ## Version 1.5.2.4
 * Small internal changes
 
