@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.tapjoy.TJConnectListener;
+import com.tapjoy.TJPrivacyPolicy;
 import com.tapjoy.Tapjoy;
 import io.bidmachine.*;
 import io.bidmachine.models.DataRestrictions;
@@ -88,17 +89,16 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     private static void configure(@NonNull UnifiedAdRequestParams adRequestParams) {
         DataRestrictions dataRestrictions = adRequestParams.getDataRestrictions();
-        if (dataRestrictions.isUserInGdprScope()) {
-            Tapjoy.subjectToGDPR(true);
-            Tapjoy.setUserConsent(dataRestrictions.isUserHasConsent() ? "1" : "0");
-        } else {
-            Tapjoy.subjectToGDPR(false);
-        }
-        Tapjoy.belowConsentAge(dataRestrictions.isUserAgeRestricted());
+        TJPrivacyPolicy tjPrivacyPolicy = TJPrivacyPolicy.getInstance();
+        tjPrivacyPolicy.setBelowConsentAge(dataRestrictions.isUserAgeRestricted());
+        tjPrivacyPolicy.setSubjectToGDPR(dataRestrictions.isUserInGdprScope());
+        tjPrivacyPolicy.setUserConsent(dataRestrictions.getIABGDPRString());
+        tjPrivacyPolicy.setUSPrivacy(dataRestrictions.getUsPrivacy());
+
         TargetingInfo targetingInfo = adRequestParams.getTargetingParams();
         String userId = targetingInfo.getUserId();
         if (userId != null) {
-            Tapjoy.setUserID(targetingInfo.getUserId());
+            Tapjoy.setUserID(userId);
         }
     }
 
