@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 4
+        versionCode 5
     }
 }
 
@@ -17,5 +17,5 @@ rootProject.allprojects {
 }
 
 dependencies {
-    adapterDependency 'com.adcolony:sdk:4.1.0'
+    adapterDependency 'com.adcolony:sdk:4.2.2'
 }

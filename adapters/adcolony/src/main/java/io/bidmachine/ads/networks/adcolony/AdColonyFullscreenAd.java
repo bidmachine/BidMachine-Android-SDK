@@ -37,7 +37,7 @@ class AdColonyFullscreenAd extends UnifiedFullscreenAd {
         if (isRewarded) {
             AdColonyRewardListenerWrapper.get().addListener(listener);
         }
-        AdColony.requestInterstitial(zoneId, listener, AdColonyAdapter.createAdOptions(requestParams));
+        AdColony.requestInterstitial(zoneId, listener);
     }
 
     @Override
