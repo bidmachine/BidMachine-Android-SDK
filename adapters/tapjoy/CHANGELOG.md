@@ -1,3 +1,6 @@
+## Version 1.6.0.4
+* Updated Tapjoy version to 12.6.1
+
 ## Version 1.4.3.3
 * Updated Tapjoy version to 12.4.2
 
