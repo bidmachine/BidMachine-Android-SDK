@@ -214,4 +214,18 @@ public class UserRestrictionParamsTest {
         assertEquals(0, builder.getExtProtoCount());
     }
 
+    @Test
+    public void buildRegs_ccpaPassedThroughBidMachine_extensionIsSet() throws Exception {
+        String ccpaString = "Test String";
+        BidMachine.setUSPrivacyString(ccpaString);
+        Context.Regs.Builder builder = Context.Regs.newBuilder();
+        BidMachineImpl.get()
+                .getUserRestrictionParams()
+                .build(builder);
+        List<Any> extList = builder.getExtProtoList();
+        assertEquals(1, extList.size());
+        RegsCcpaExtension regsCcpaExtension = extList.get(0).unpack(RegsCcpaExtension.class);
+        assertEquals(ccpaString, regsCcpaExtension.getUsPrivacy());
+    }
+
 }

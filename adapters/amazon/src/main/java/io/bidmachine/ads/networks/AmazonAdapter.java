@@ -89,7 +89,7 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
         final AdsType adsType = hbAdRequestParams.getAdsType();
         final AdContentType adContentType = hbAdRequestParams.getAdContentType();
-        String usPrivacy = adRequestParams.getDataRestrictions().getUsPrivacy();
+        String usPrivacy = adRequestParams.getDataRestrictions().getUSPrivacyString();
         if (adsType == AdsType.Banner) {
             BannerSize bannerSize = ((UnifiedBannerAdRequestParams) adRequestParams).getBannerSize();
             AmazonLoader.forDisplay(collectCallback)

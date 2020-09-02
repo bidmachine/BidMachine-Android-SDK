@@ -23,6 +23,7 @@ final class UserRestrictionParams
     private Boolean subjectToGDPR;
     private Boolean hasConsent;
     private Boolean hasCoppa;
+    private String usPrivacyString;
 
     @Override
     public void merge(@NonNull UserRestrictionParams instance) {
@@ -30,13 +31,14 @@ final class UserRestrictionParams
         subjectToGDPR = oneOf(subjectToGDPR, instance.subjectToGDPR);
         hasConsent = oneOf(hasConsent, instance.hasConsent);
         hasCoppa = oneOf(hasCoppa, instance.hasCoppa);
+        usPrivacyString = oneOf(usPrivacyString, instance.usPrivacyString);
     }
 
     void build(@NonNull Context.Regs.Builder builder) {
         builder.setGdpr(subjectToGDPR());
         builder.setCoppa(hasCoppa != null && hasCoppa);
 
-        String iabUsPrivacyString = getUsPrivacy();
+        String iabUsPrivacyString = this.getUSPrivacyString();
         if (!TextUtils.isEmpty(iabUsPrivacyString)) {
             assert iabUsPrivacyString != null;
             RegsCcpaExtension regsCcpaExtension = RegsCcpaExtension.newBuilder()
@@ -66,6 +68,12 @@ final class UserRestrictionParams
     @Override
     public UserRestrictionParams setCoppa(Boolean coppa) {
         hasCoppa = coppa;
+        return this;
+    }
+
+    @Override
+    public UserRestrictionParams setUSPrivacyString(String usPrivacyString) {
+        this.usPrivacyString = usPrivacyString;
         return this;
     }
 
@@ -125,8 +133,9 @@ final class UserRestrictionParams
 
     @Nullable
     @Override
-    public String getUsPrivacy() {
-        return BidMachineImpl.get().getIabSharedPreference().getUSPrivacyString();
+    public String getUSPrivacyString() {
+        return oneOf(usPrivacyString,
+                     BidMachineImpl.get().getIabSharedPreference().getUSPrivacyString());
     }
 
     @NonNull

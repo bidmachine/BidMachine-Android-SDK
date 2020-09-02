@@ -22,7 +22,7 @@ public interface DataRestrictions {
     boolean isUserAgeRestricted();
 
     @Nullable
-    String getUsPrivacy();
+    String getUSPrivacyString();
 
     @NonNull
     String getIABGDPRString();
