@@ -27,6 +27,9 @@ class MyTargetBanner extends UnifiedBannerAd {
         if (!params.isValid(callback)) {
             return;
         }
+        assert params.slotId != null;
+        assert params.bidId != null;
+
         BannerSize size = requestParams.getBannerSize();
         int adSize;
         switch (size) {
@@ -44,12 +47,9 @@ class MyTargetBanner extends UnifiedBannerAd {
             }
         }
         adView = new MyTargetView(contextProvider.getContext());
-        assert params.slotId != null; // it's shouldn't be null since we already check it in {@link MyTargetParams}
         adView.init(params.slotId, adSize, false);
         adView.setListener(new MyTargetListener(callback));
-        assert adView.getCustomParams() != null; // it's shouldn't be null at this point
         MyTargetAdapter.updateTargeting(requestParams, adView.getCustomParams());
-        assert params.bidId != null; // it's shouldn't be null since we already check it in {@link MyTargetParams}
         adView.loadFromBid(params.bidId);
     }
 
@@ -61,7 +61,7 @@ class MyTargetBanner extends UnifiedBannerAd {
         }
     }
 
-    private final class MyTargetListener implements MyTargetView.MyTargetViewListener {
+    private static final class MyTargetListener implements MyTargetView.MyTargetViewListener {
 
         private UnifiedBannerAdCallback callback;
 
@@ -88,6 +88,7 @@ class MyTargetBanner extends UnifiedBannerAd {
         public void onClick(@NonNull MyTargetView myTargetView) {
             callback.onAdClicked();
         }
+
     }
 
 }

@@ -28,11 +28,12 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
         if (!params.isValid(callback)) {
             return;
         }
-        assert params.slotId != null; // it's shouldn't be null since we already check it in {@link MyTargetParams}
+        assert params.slotId != null;
+        assert params.bidId != null;
+
         interstitialAd = new InterstitialAd(params.slotId, contextProvider.getContext());
         interstitialAd.setListener(new MyTargetFullscreenListener(callback));
         MyTargetAdapter.updateTargeting(requestParams, interstitialAd.getCustomParams());
-        assert params.bidId != null; // it's shouldn't be null since we already check it in {@link MyTargetParams}
         interstitialAd.loadFromBid(params.bidId);
     }
 
@@ -53,7 +54,7 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
         }
     }
 
-    private final class MyTargetFullscreenListener implements InterstitialAd.InterstitialAdListener {
+    private static final class MyTargetFullscreenListener implements InterstitialAd.InterstitialAdListener {
 
         private UnifiedFullscreenAdCallback callback;
 
@@ -90,6 +91,7 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
         public void onDisplay(@NonNull InterstitialAd interstitialAd) {
             callback.onAdShown();
         }
+
     }
 
 }
