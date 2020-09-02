@@ -1,11 +1,12 @@
 package io.bidmachine.ads.networks;
 
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdRegistration;

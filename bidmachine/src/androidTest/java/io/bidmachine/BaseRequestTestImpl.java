@@ -5,25 +5,19 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.wifi.WifiManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.ActivityTestRule;
 import android.util.Base64;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+
+import com.explorestack.protobuf.Any;
+import com.explorestack.protobuf.MessageOrBuilder;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Openrtb;
 import com.explorestack.protobuf.openrtb.Response;
-import com.explorestack.protobuf.Any;
-import com.explorestack.protobuf.MessageOrBuilder;
-import io.bidmachine.protobuf.AdExtension;
-import io.bidmachine.protobuf.ErrorReason;
-import io.bidmachine.protobuf.InitRequest;
-import io.bidmachine.protobuf.InitResponse;
-import io.bidmachine.test_utils.TestHelper;
-import io.bidmachine.test_utils.ViewAction;
-import io.bidmachine.utils.BMError;
-import okhttp3.mockwebserver.*;
-import okio.Buffer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,7 +28,26 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import io.bidmachine.protobuf.AdExtension;
+import io.bidmachine.protobuf.ErrorReason;
+import io.bidmachine.protobuf.InitRequest;
+import io.bidmachine.protobuf.InitResponse;
+import io.bidmachine.test_utils.TestHelper;
+import io.bidmachine.test_utils.ViewAction;
+import io.bidmachine.utils.BMError;
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import okhttp3.mockwebserver.SocketPolicy;
+import okio.Buffer;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequestType extends AdRequest>
         implements AdRequestTests, AdListener<AdType>, AdFullScreenListener<AdType>, AdRewardedListener<AdType> {
@@ -294,7 +307,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
                 AdExtension adExtension = AdExtension.newBuilder()
                                                      .setViewabilityTimeThreshold(1)
                                                      .build();
-                adBuilder.addExt(Any.pack(adExtension));
+                adBuilder.addExtProto(Any.pack(adExtension));
             }
         }), null, true);
 
@@ -316,7 +329,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
                 AdExtension adExtension = AdExtension.newBuilder()
                                                      .setViewabilityTimeThreshold(1)
                                                      .build();
-                adBuilder.addExt(Any.pack(adExtension));
+                adBuilder.addExtProto(Any.pack(adExtension));
             }
         }), null, true);
 
@@ -336,7 +349,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
                 AdExtension adExtension = AdExtension.newBuilder()
                                                      .setViewabilityTimeThreshold(3)
                                                      .build();
-                adBuilder.addExt(Any.pack(adExtension));
+                adBuilder.addExtProto(Any.pack(adExtension));
             }
         }), null);
 
@@ -356,7 +369,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
                 AdExtension adExtension = AdExtension.newBuilder()
                                                      .setViewabilityTimeThreshold(1)
                                                      .build();
-                adBuilder.addExt(Any.pack(adExtension));
+                adBuilder.addExtProto(Any.pack(adExtension));
             }
         }), null);
 

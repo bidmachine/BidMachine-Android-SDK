@@ -1,6 +1,6 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import io.bidmachine.displays.PlacementBuilder;
 import io.bidmachine.models.DataRestrictions;

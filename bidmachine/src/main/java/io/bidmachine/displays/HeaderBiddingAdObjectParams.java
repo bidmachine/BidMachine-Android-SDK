@@ -1,9 +1,11 @@
 package io.bidmachine.displays;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
+
 import io.bidmachine.core.Logger;
 import io.bidmachine.models.AdObjectParams;
 import io.bidmachine.protobuf.headerbidding.HeaderBiddingAd;

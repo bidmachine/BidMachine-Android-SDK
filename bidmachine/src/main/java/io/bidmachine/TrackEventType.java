@@ -1,7 +1,9 @@
 package io.bidmachine;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+
 import com.explorestack.protobuf.adcom.EventType;
+
 import io.bidmachine.protobuf.ActionType;
 import io.bidmachine.protobuf.EventTypeExtended;
 

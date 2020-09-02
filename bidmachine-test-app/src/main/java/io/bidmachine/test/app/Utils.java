@@ -5,13 +5,15 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.Toast;
-import io.bidmachine.utils.ActivityHelper;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
+
+import io.bidmachine.utils.ActivityHelper;
 
 public class Utils {
 

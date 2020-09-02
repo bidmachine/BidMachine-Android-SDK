@@ -1,11 +1,23 @@
 package io.bidmachine.ads.networks.my_target;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
 import com.my.target.common.CustomParams;
 import com.my.target.common.MyTargetPrivacy;
 import com.my.target.common.MyTargetVersion;
-import io.bidmachine.*;
+
+import java.util.Collections;
+import java.util.Map;
+
+import io.bidmachine.AdsType;
+import io.bidmachine.ContextProvider;
+import io.bidmachine.HeaderBiddingAdRequestParams;
+import io.bidmachine.HeaderBiddingAdapter;
+import io.bidmachine.HeaderBiddingCollectParamsCallback;
+import io.bidmachine.NetworkAdapter;
+import io.bidmachine.NetworkConfigParams;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.TargetingInfo;
 import io.bidmachine.unified.UnifiedAdRequestParams;
@@ -13,9 +25,6 @@ import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.utils.BMError;
 import io.bidmachine.utils.Gender;
-
-import java.util.Collections;
-import java.util.Map;
 
 class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 

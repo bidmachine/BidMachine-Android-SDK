@@ -1,8 +1,9 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 public class DeviceInfo {
 

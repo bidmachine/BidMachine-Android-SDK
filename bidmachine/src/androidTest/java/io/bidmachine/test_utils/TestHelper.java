@@ -6,9 +6,10 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+
+import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
-import com.explorestack.protobuf.Any;
 
 import java.lang.reflect.Field;
 import java.util.Map;

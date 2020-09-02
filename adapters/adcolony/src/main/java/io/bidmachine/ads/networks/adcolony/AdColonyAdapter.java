@@ -2,8 +2,9 @@ package io.bidmachine.ads.networks.adcolony;
 
 import android.app.Application;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.adcolony.sdk.AdColony;
 import com.adcolony.sdk.AdColonyAppOptions;

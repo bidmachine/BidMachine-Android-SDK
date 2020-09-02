@@ -1,10 +1,10 @@
 package io.bidmachine.test.app;
 
-import android.support.annotation.NonNull;
-import io.bidmachine.NetworkConfig;
-import org.json.JSONObject;
+import androidx.annotation.NonNull;
 
 import java.util.Arrays;
+
+import io.bidmachine.NetworkConfig;
 
 class OptionalNetwork {
 

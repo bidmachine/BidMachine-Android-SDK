@@ -2,7 +2,6 @@ package io.bidmachine.test.app.params;
 
 import android.content.Context;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.widget.EditText;
 

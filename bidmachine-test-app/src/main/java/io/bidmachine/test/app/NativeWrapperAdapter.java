@@ -1,20 +1,21 @@
 package io.bidmachine.test.app;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.HashSet;
 
 import io.bidmachine.nativead.NativeAd;
 import io.bidmachine.nativead.view.NativeMediaView;
 
-import static android.support.v7.widget.RecyclerView.AdapterDataObserver;
-import static android.support.v7.widget.RecyclerView.ViewHolder;
+import static androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
+import static androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 /**
  * Wrapper adapter that used to show Native Ad in recycler view with fixed step

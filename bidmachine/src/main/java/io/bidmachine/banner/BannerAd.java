@@ -1,9 +1,17 @@
 package io.bidmachine.banner;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-import io.bidmachine.*;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
+import io.bidmachine.AdListener;
+import io.bidmachine.AdProcessCallback;
+import io.bidmachine.AdsType;
+import io.bidmachine.ContextProvider;
+import io.bidmachine.NetworkAdapter;
+import io.bidmachine.ViewAd;
+import io.bidmachine.ViewAdObject;
 import io.bidmachine.models.AdObjectParams;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;

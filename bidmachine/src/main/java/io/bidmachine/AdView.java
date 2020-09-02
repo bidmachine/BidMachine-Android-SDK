@@ -2,11 +2,13 @@ package io.bidmachine;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import io.bidmachine.core.Logger;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.models.RequestBuilder;

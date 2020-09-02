@@ -1,6 +1,6 @@
 package io.bidmachine.ads.networks.criteo;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;

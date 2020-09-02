@@ -1,10 +1,12 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.explorestack.protobuf.AbstractMessage;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,6 +24,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import io.bidmachine.BuildConfig;
 
 public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> {
 

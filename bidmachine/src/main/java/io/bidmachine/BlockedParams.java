@@ -1,12 +1,14 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import com.explorestack.protobuf.adcom.Context;
-import io.bidmachine.models.IBlockedParams;
-import io.bidmachine.models.RequestParams;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import io.bidmachine.models.IBlockedParams;
+import io.bidmachine.models.RequestParams;
 
 public final class BlockedParams
         extends RequestParams<BlockedParams>

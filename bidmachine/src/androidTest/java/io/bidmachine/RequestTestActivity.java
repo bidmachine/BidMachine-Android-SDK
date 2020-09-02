@@ -2,8 +2,9 @@ package io.bidmachine;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 public class RequestTestActivity extends Activity {
 

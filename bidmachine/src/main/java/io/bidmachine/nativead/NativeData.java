@@ -1,6 +1,6 @@
 package io.bidmachine.nativead;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public interface NativeData extends NativePublicData {
 
