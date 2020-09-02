@@ -1,7 +1,13 @@
 package io.bidmachine.ads.networks.adcolony;
 
-import android.support.annotation.NonNull;
-import com.adcolony.sdk.*;
+import androidx.annotation.NonNull;
+
+import com.adcolony.sdk.AdColonyInterstitial;
+import com.adcolony.sdk.AdColonyInterstitialListener;
+import com.adcolony.sdk.AdColonyReward;
+import com.adcolony.sdk.AdColonyRewardListener;
+import com.adcolony.sdk.AdColonyZone;
+
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.utils.BMError;
 

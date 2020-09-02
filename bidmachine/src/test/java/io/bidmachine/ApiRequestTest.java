@@ -1,11 +1,7 @@
 package io.bidmachine;
 
-import android.support.annotation.Nullable;
-import io.bidmachine.core.NetworkRequest;
-import io.bidmachine.utils.BMError;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.SocketPolicy;
+import androidx.annotation.Nullable;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +15,13 @@ import java.net.URLConnection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import io.bidmachine.core.NetworkRequest;
+import io.bidmachine.utils.BMError;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 
 import static org.junit.Assert.assertEquals;
 

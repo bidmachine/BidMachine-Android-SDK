@@ -1,6 +1,6 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface AdRewardedListener<AdType extends IAd> {
 

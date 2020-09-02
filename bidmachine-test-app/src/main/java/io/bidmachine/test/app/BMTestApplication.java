@@ -1,6 +1,7 @@
 package io.bidmachine.test.app;
 
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDexApplication;
+
 import io.bidmachine.BidMachine;
 
 public class BMTestApplication extends MultiDexApplication {

@@ -1,6 +1,7 @@
 package io.bidmachine.rewarded;
 
 import com.explorestack.protobuf.adcom.Placement;
+
 import io.bidmachine.AdRequest;
 import io.bidmachine.AdsType;
 import io.bidmachine.FullScreenAdRequest;

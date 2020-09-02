@@ -1,7 +1,9 @@
 package io.bidmachine.ads.networks.my_target;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
 import io.bidmachine.unified.UnifiedAdCallback;
 import io.bidmachine.unified.UnifiedMediationParams;
 import io.bidmachine.unified.UnifiedParams;

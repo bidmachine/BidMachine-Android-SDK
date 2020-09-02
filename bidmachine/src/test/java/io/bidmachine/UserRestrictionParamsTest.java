@@ -171,7 +171,7 @@ public class UserRestrictionParamsTest {
         BidMachineImpl.get()
                 .getUserRestrictionParams()
                 .build(builder);
-        assertEquals(0, builder.getExtCount());
+        assertEquals(0, builder.getExtProtoCount());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class UserRestrictionParamsTest {
         BidMachineImpl.get()
                 .getUserRestrictionParams()
                 .build(builder);
-        assertEquals(0, builder.getExtCount());
+        assertEquals(0, builder.getExtProtoCount());
     }
 
     @Test
@@ -195,7 +195,7 @@ public class UserRestrictionParamsTest {
         BidMachineImpl.get()
                 .getUserRestrictionParams()
                 .build(builder);
-        List<Any> extList = builder.getExtList();
+        List<Any> extList = builder.getExtProtoList();
         assertEquals(1, extList.size());
         RegsCcpaExtension regsCcpaExtension = extList.get(0).unpack(RegsCcpaExtension.class);
         assertEquals(ccpaString, regsCcpaExtension.getUsPrivacy());
@@ -211,7 +211,7 @@ public class UserRestrictionParamsTest {
         BidMachineImpl.get()
                 .getUserRestrictionParams()
                 .build(builder);
-        assertEquals(0, builder.getExtCount());
+        assertEquals(0, builder.getExtProtoCount());
     }
 
 }

@@ -1,11 +1,12 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.util.Pair;
+
+import androidx.annotation.NonNull;
 
 public class AdvertisingIdClientInfo implements Runnable {
 

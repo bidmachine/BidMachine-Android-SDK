@@ -1,9 +1,10 @@
 package io.bidmachine.utils;
 
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import androidx.annotation.NonNull;
 
 public class ViewHelper {
 

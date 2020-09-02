@@ -1,6 +1,6 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.concurrent.ThreadFactory;
 

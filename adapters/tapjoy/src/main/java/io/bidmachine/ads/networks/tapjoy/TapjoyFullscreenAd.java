@@ -2,11 +2,16 @@ package io.bidmachine.ads.networks.tapjoy;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.tapjoy.TJPlacement;
 import com.tapjoy.Tapjoy;
 import com.tapjoy.TapjoyAuctionFlags;
+
+import java.util.HashMap;
+
 import io.bidmachine.BidMachine;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedFullscreenAd;
@@ -14,8 +19,6 @@ import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
 import io.bidmachine.unified.UnifiedMediationParams;
 import io.bidmachine.utils.BMError;
-
-import java.util.HashMap;
 
 public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
 

@@ -2,10 +2,6 @@ apply plugin: 'com.android.library'
 apply from: "../config.gradle"
 apply from: "publish.gradle"
 
-gradle.ext {
-    adsCoreJarPackageName = "io.bidmachine.core"
-}
-
 android {
     compileSdkVersion androidCompileSdkVersion
 
@@ -14,7 +10,7 @@ android {
         targetSdkVersion androidTargetSdkVersion
         versionCode 100100034
         versionName "1.5.2"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         consumerProguardFiles 'proguard-rules.pro'
     }
@@ -39,27 +35,19 @@ dependencies {
     implementation "io.bidmachine:protobuf-models:$protobufModelsVersion"
     implementation "com.explorestack:iab:$stackIabVersion"
 
-    compileOnly "com.android.support:support-annotations:$supportVersion"
+    compileOnly "androidx.annotation:annotation:1.1.0"
     compileOnly "com.google.android.gms:play-services-ads:$playServicesVersion"
 
-    androidTestImplementation 'com.android.support:multidex:1.0.3'
+    androidTestImplementation "androidx.multidex:multidex:2.0.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.1"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+    androidTestImplementation "androidx.test:rules:1.2.0"
+    androidTestImplementation "androidx.test:runner:1.2.0"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$mockwebserver"
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation('com.android.support.test:rules:1.0.1') {
-        exclude module: 'support-annotations'
-    }
-    testImplementation "com.android.support:support-annotations:$supportVersion"
+
+    testImplementation "androidx.annotation:annotation:1.1.0"
     testImplementation "junit:junit:$jUnitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
     testImplementation "com.squareup.okhttp3:mockwebserver:$mockwebserver"
 }
-
-task createJarAdsCore(type: Copy) {
-    from('../appodeal_ads_core/build/intermediates/intermediate-jars/debug/ads_core.jar')
-    into('../bidmachine/libs_ext')
-}
-
-createJarAdsCore.dependsOn(":appodeal_ads_core:prepareAppodealAdsCore")
-preBuild.dependsOn createJarAdsCore

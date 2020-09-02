@@ -1,6 +1,7 @@
 package io.bidmachine.unified;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import io.bidmachine.ContextProvider;
 
 public abstract class UnifiedAd<

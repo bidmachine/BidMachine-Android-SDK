@@ -3,16 +3,19 @@ package io.bidmachine;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Build;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+
 import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.adcom.DeviceType;
 import com.explorestack.protobuf.adcom.OS;
+
+import java.util.Locale;
+
 import io.bidmachine.core.DeviceInfo;
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.RequestParams;
-
-import java.util.Locale;
 
 final class DeviceParams extends RequestParams {
 

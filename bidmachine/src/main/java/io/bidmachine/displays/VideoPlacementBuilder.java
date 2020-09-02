@@ -1,18 +1,29 @@
 package io.bidmachine.displays;
 
 import android.graphics.Point;
-import android.support.annotation.NonNull;
-import com.explorestack.protobuf.adcom.*;
-import com.explorestack.protobuf.openrtb.Response;
+
+import androidx.annotation.NonNull;
+
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.Message;
-import io.bidmachine.*;
-import io.bidmachine.core.Utils;
-import io.bidmachine.models.AdObjectParams;
-import io.bidmachine.unified.UnifiedAdRequestParams;
+import com.explorestack.protobuf.adcom.Ad;
+import com.explorestack.protobuf.adcom.Placement;
+import com.explorestack.protobuf.adcom.PlacementPosition;
+import com.explorestack.protobuf.adcom.SizeUnit;
+import com.explorestack.protobuf.adcom.VideoCreativeType;
+import com.explorestack.protobuf.openrtb.Response;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import io.bidmachine.AdContentType;
+import io.bidmachine.AdsType;
+import io.bidmachine.Constants;
+import io.bidmachine.ContextProvider;
+import io.bidmachine.NetworkConfig;
+import io.bidmachine.core.Utils;
+import io.bidmachine.models.AdObjectParams;
+import io.bidmachine.unified.UnifiedAdRequestParams;
 
 public class VideoPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdRequestParams>
         extends PlacementBuilder<UnifiedAdRequestParamsType>

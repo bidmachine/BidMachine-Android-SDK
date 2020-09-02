@@ -1,4 +1,4 @@
-include ':bidmachine', ':bidmachine-test-app', ':appodeal_ads_core', ':adapters'
+include ':bidmachine', ':bidmachine-test-app', ':adapters'
 
 
 /**

@@ -41,11 +41,11 @@ public class AuctionResultImplTest {
                 .build();
         AppExtension notAdExtension = AppExtension.newBuilder().build();
         Ad ad = Ad.newBuilder()
-                .addExt(Any.pack(adExtension1))
-                .addExt(Any.pack(notAdExtension))
-                .addExt(Any.pack(adExtension2))
-                .addExt(Any.pack(adExtension3))
-                .addExt(Any.pack(adExtension3))
+                .addExtProto(Any.pack(adExtension1))
+                .addExtProto(Any.pack(notAdExtension))
+                .addExtProto(Any.pack(adExtension2))
+                .addExtProto(Any.pack(adExtension3))
+                .addExtProto(Any.pack(adExtension3))
                 .build();
         AuctionResult auctionResult = new AuctionResultImpl(
                 Response.Seatbid.newBuilder().build(),

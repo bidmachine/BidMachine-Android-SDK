@@ -1,6 +1,6 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.openrtb.Request;
@@ -169,21 +169,21 @@ public class AdRequestTest {
     public void headerBidding() throws Exception {
         //Default HeaderBidding
         Request request = (Request) adRequest.build(context, adRequest.getType());
-        RequestExtension requestExtension = request.getExt(0).unpack(RequestExtension.class);
+        RequestExtension requestExtension = request.getExtProto(0).unpack(RequestExtension.class);
         assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED_VALUE,
                      requestExtension.getHeaderBiddingTypeValue());
 
         //Disabled HeaderBidding
         adRequest.headerBiddingEnabled = false;
         request = (Request) adRequest.build(context, adRequest.getType());
-        requestExtension = request.getExt(0).unpack(RequestExtension.class);
+        requestExtension = request.getExtProto(0).unpack(RequestExtension.class);
         assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED_VALUE,
                      requestExtension.getHeaderBiddingTypeValue());
 
         //Enabled HeaderBidding
         adRequest.headerBiddingEnabled = true;
         request = (Request) adRequest.build(context, adRequest.getType());
-        requestExtension = request.getExt(0).unpack(RequestExtension.class);
+        requestExtension = request.getExtProto(0).unpack(RequestExtension.class);
         assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED_VALUE,
                      requestExtension.getHeaderBiddingTypeValue());
     }

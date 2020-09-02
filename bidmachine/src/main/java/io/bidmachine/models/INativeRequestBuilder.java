@@ -1,6 +1,6 @@
 package io.bidmachine.models;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import io.bidmachine.MediaAssetType;
 

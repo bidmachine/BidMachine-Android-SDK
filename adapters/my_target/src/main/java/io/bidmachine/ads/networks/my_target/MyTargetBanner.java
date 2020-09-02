@@ -1,8 +1,10 @@
 package io.bidmachine.ads.networks.my_target;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.my.target.ads.MyTargetView;
+
 import io.bidmachine.ContextProvider;
 import io.bidmachine.banner.BannerSize;
 import io.bidmachine.unified.UnifiedBannerAd;

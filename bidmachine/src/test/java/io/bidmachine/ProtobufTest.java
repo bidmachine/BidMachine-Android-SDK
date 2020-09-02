@@ -1,7 +1,8 @@
 package io.bidmachine;
 
-import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.Any;
+import com.explorestack.protobuf.adcom.Context;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,15 +23,15 @@ public class ProtobufTest {
                 .setAlbum("TestAlbum123")
                 .setArtist("TestArtist123").build();
         Context.App.Publisher publisher = Context.App.Publisher.newBuilder()
-                .addExt(Any.pack(extContent)).build();
+                .addExtProto(Any.pack(extContent)).build();
         Context.App app = Context.App.newBuilder().setPub(publisher).build();
         Context context = Context.newBuilder().setApp(app).build();
 
         ByteArrayOutputStream outstr = new ByteArrayOutputStream();
         context.writeTo(outstr);
         Context context2 = Context.parseFrom(outstr.toByteArray());
-        if (context2.getApp().getPub().getExt(0).is(Context.App.Content.class)) {
-            Context.App.Content newExtContent = context2.getApp().getPub().getExt(0).unpack(Context.App.Content.class);
+        if (context2.getApp().getPub().getExtProto(0).is(Context.App.Content.class)) {
+            Context.App.Content newExtContent = context2.getApp().getPub().getExtProto(0).unpack(Context.App.Content.class);
             Assert.assertNotSame(extContent, newExtContent);
         } else {
             fail("Wrong class instance");

@@ -1,11 +1,12 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 public class VisibilityTrackerActivity extends Activity {
 
