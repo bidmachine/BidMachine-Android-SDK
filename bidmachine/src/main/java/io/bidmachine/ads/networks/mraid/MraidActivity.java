@@ -7,16 +7,23 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 import android.util.TypedValue;
-import android.view.*;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.Nullable;
+
 import com.explorestack.iab.utils.Assets;
 import com.explorestack.iab.utils.CircularProgressBar;
 import com.explorestack.iab.utils.Utils;
 import com.explorestack.iab.vast.VideoType;
 import com.explorestack.iab.vast.view.CircleCountdownView;
+
 import io.bidmachine.utils.BMError;
 
 public class MraidActivity extends Activity {

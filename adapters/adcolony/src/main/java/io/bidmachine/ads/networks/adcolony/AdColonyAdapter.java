@@ -2,17 +2,14 @@ package io.bidmachine.ads.networks.adcolony;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import com.adcolony.sdk.AdColony;
-import com.adcolony.sdk.AdColonyAdOptions;
 import com.adcolony.sdk.AdColonyAppOptions;
 import com.adcolony.sdk.AdColonyInterstitial;
 import com.adcolony.sdk.AdColonyInterstitialListener;
-import com.adcolony.sdk.AdColonyUserMetadata;
 import com.adcolony.sdk.AdColonyZone;
 
 import java.util.EnumMap;
@@ -29,15 +26,16 @@ import io.bidmachine.HeaderBiddingAdapter;
 import io.bidmachine.HeaderBiddingCollectParamsCallback;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
+import io.bidmachine.core.Utils;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.TargetingInfo;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.utils.BMError;
-import io.bidmachine.utils.Gender;
 
 class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
+    private static final String AD_COLONY_VERSION = "4.2.2";
     private static HashSet<String> zonesCache = new HashSet<>();
     private boolean isAdapterInitialized = false;
 
@@ -134,7 +132,7 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                 public void onRequestNotFilled(AdColonyZone zone) {
                     collectCallback.onCollectFail(BMError.NoContent);
                 }
-            }, createAdOptions(adRequestParams));
+            });
         }
     }
 
@@ -153,54 +151,28 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             options.setUserID(userId);
         }
         options.setOriginStore(storeId);
-        try {
-            options.setAppVersion(
-                    context.getPackageManager()
-                            .getPackageInfo(context.getPackageName(), 0).versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+
+        String appVersion = Utils.getAppVersion(context);
+        if (!TextUtils.isEmpty(appVersion)) {
+            options.setAppVersion(appVersion);
         }
-        if (dataRestrictions.isUserInGdprScope()) {
-            options.setOption("explicit_consent_given", true);
-            options.setOption("consent_response", dataRestrictions.isUserHasConsent());
-        }
+        options.setPrivacyFrameworkRequired(AdColonyAppOptions.COPPA,
+                                            dataRestrictions.isUserAgeRestricted());
+        options.setPrivacyFrameworkRequired(AdColonyAppOptions.GDPR,
+                                            dataRestrictions.isUserInGdprScope());
+        options.setPrivacyConsentString(AdColonyAppOptions.GDPR,
+                                        dataRestrictions.getIABGDPRString());
+
+        // CCPA - AdColony take parameter from SharedPreference
+
         options.setTestModeEnabled(adRequestParams.isTestMode());
         return options;
-    }
-
-    static AdColonyAdOptions createAdOptions(UnifiedAdRequestParams adRequestParams) {
-        TargetingInfo targetingInfo = adRequestParams.getTargetingParams();
-        AdColonyUserMetadata metadata = new AdColonyUserMetadata();
-        Integer age = targetingInfo.getUserAge();
-        if (age != null) {
-            metadata.setUserAge(age);
-        }
-        Gender gender = targetingInfo.getGender();
-        if (gender != null) {
-            switch (gender) {
-                case Male:
-                    metadata.setUserGender(AdColonyUserMetadata.USER_MALE);
-                    break;
-                case Female:
-                    metadata.setUserGender(AdColonyUserMetadata.USER_FEMALE);
-                    break;
-            }
-        }
-        String zip = targetingInfo.getZip();
-        if (zip != null) {
-            metadata.setUserZipCode(zip);
-        }
-        Location location = targetingInfo.getDeviceLocation();
-        if (location != null) {
-            metadata.setUserLocation(location);
-        }
-        return new AdColonyAdOptions().setUserMetadata(metadata);
     }
 
     private static String obtainAdColonyVersion() {
         String version = AdColony.getSDKVersion();
         if (TextUtils.isEmpty(version)) {
-            return "4.1.0";
+            return AD_COLONY_VERSION;
         }
         return version;
     }

@@ -1,8 +1,9 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewTreeObserver;
+
+import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

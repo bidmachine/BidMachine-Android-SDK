@@ -1,7 +1,8 @@
 package io.bidmachine.banner;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import io.bidmachine.BidMachineAd;
 

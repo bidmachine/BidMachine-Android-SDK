@@ -1,13 +1,14 @@
 package io.bidmachine.ads.networks.my_target;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import io.bidmachine.AdsFormat;
-import io.bidmachine.NetworkAdapter;
-import io.bidmachine.NetworkConfig;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import io.bidmachine.AdsFormat;
+import io.bidmachine.NetworkAdapter;
+import io.bidmachine.NetworkConfig;
 
 public class MyTargetConfig extends NetworkConfig {
 
@@ -29,7 +30,8 @@ public class MyTargetConfig extends NetworkConfig {
         return new MyTargetAdapter();
     }
 
-    public MyTargetConfig withMediationConfig(@NonNull AdsFormat format, @NonNull final String slotId) {
+    public MyTargetConfig withMediationConfig(@NonNull AdsFormat format,
+                                              @NonNull final String slotId) {
         return withMediationConfig(format, new HashMap<String, String>() {{
             put(KEY_SLOT_ID, slotId);
         }});

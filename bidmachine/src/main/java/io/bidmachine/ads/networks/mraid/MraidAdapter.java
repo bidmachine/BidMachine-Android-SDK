@@ -2,6 +2,7 @@ package io.bidmachine.ads.networks.mraid;
 
 import com.explorestack.iab.mraid.internal.MRAIDLog;
 import com.explorestack.iab.vast.VideoType;
+
 import io.bidmachine.AdsType;
 import io.bidmachine.BuildConfig;
 import io.bidmachine.NetworkAdapter;

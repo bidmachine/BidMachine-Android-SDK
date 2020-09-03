@@ -1,11 +1,18 @@
 package io.bidmachine.ads.networks.vast;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.explorestack.iab.utils.Utils;
-import com.explorestack.iab.vast.*;
+import com.explorestack.iab.vast.VastActivityListener;
+import com.explorestack.iab.vast.VastClickCallback;
+import com.explorestack.iab.vast.VastError;
+import com.explorestack.iab.vast.VastRequest;
+import com.explorestack.iab.vast.VastRequestListener;
 import com.explorestack.iab.vast.activity.VastActivity;
+
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.utils.BMError;
 

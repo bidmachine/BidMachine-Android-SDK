@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 3
+        versionCode 4
     }
 }
 
@@ -16,5 +16,5 @@ repositories {
 }
 
 dependencies {
-    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.4.2@aar'
+    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.6.1@aar'
 }

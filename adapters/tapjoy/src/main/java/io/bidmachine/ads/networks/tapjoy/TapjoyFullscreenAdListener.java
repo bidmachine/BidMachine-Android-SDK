@@ -1,7 +1,13 @@
 package io.bidmachine.ads.networks.tapjoy;
 
-import android.support.annotation.NonNull;
-import com.tapjoy.*;
+import androidx.annotation.NonNull;
+
+import com.tapjoy.TJActionRequest;
+import com.tapjoy.TJError;
+import com.tapjoy.TJPlacement;
+import com.tapjoy.TJPlacementListener;
+import com.tapjoy.TJPlacementVideoListener;
+
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.utils.BMError;
 

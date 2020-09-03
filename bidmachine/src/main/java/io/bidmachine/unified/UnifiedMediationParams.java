@@ -1,10 +1,11 @@
 package io.bidmachine.unified;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import io.bidmachine.core.Logger;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Map;
+
+import io.bidmachine.core.Logger;
 
 public abstract class UnifiedMediationParams {
 

@@ -1,10 +1,13 @@
 package io.bidmachine.ads.networks.adcolony;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
 import com.adcolony.sdk.AdColony;
 import com.adcolony.sdk.AdColonyInterstitial;
+
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
@@ -37,7 +40,7 @@ class AdColonyFullscreenAd extends UnifiedFullscreenAd {
         if (isRewarded) {
             AdColonyRewardListenerWrapper.get().addListener(listener);
         }
-        AdColony.requestInterstitial(zoneId, listener, AdColonyAdapter.createAdOptions(requestParams));
+        AdColony.requestInterstitial(zoneId, listener);
     }
 
     @Override

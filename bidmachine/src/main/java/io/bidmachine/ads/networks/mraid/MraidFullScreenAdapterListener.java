@@ -1,12 +1,15 @@
 package io.bidmachine.ads.networks.mraid;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.webkit.WebView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.explorestack.iab.mraid.MRAIDInterstitial;
 import com.explorestack.iab.mraid.MRAIDInterstitialListener;
 import com.explorestack.iab.mraid.MRAIDNativeFeatureListener;
 import com.explorestack.iab.utils.Utils;
+
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.utils.BMError;
 

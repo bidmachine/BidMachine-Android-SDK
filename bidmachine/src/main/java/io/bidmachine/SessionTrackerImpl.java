@@ -1,14 +1,15 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import io.bidmachine.utils.BMError;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import io.bidmachine.utils.BMError;
 
 class SessionTrackerImpl extends SessionTracker {
 

@@ -1,21 +1,31 @@
 package io.bidmachine.ads.networks.facebook;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.facebook.ads.AdSettings;
 import com.facebook.ads.AudienceNetworkAds;
 import com.facebook.ads.BidderTokenProvider;
-import io.bidmachine.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import io.bidmachine.AdsType;
+import io.bidmachine.BidMachine;
+import io.bidmachine.ContextProvider;
+import io.bidmachine.HeaderBiddingAdRequestParams;
+import io.bidmachine.HeaderBiddingAdapter;
+import io.bidmachine.HeaderBiddingCollectParamsCallback;
+import io.bidmachine.NetworkAdapter;
+import io.bidmachine.NetworkConfigParams;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.utils.BMError;
-
-import java.util.HashMap;
-import java.util.Map;
 
 class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
@@ -24,9 +34,9 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     FacebookAdapter() {
         super("facebook",
-                com.facebook.ads.BuildConfig.VERSION_NAME,
-                BuildConfig.VERSION_NAME,
-                new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
+              com.facebook.ads.BuildConfig.VERSION_NAME,
+              BuildConfig.VERSION_NAME,
+              new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
     }
 
     @Override

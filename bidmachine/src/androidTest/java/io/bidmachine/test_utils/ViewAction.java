@@ -2,12 +2,11 @@ package io.bidmachine.test_utils;
 
 import android.app.Activity;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
-import android.support.test.InstrumentationRegistry;
 import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import io.bidmachine.core.Utils;
 

@@ -1,6 +1,6 @@
 package io.bidmachine;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import java.util.EnumMap;
 import java.util.List;

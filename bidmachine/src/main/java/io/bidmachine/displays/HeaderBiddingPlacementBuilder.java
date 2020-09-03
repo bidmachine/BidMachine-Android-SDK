@@ -1,8 +1,7 @@
 package io.bidmachine.displays;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.InvalidProtocolBufferException;

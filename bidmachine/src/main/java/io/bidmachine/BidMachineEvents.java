@@ -1,6 +1,7 @@
 package io.bidmachine;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+
 import io.bidmachine.utils.BMError;
 
 public class BidMachineEvents {

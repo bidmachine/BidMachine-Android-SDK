@@ -2,10 +2,9 @@ package io.bidmachine.banner;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.widget.FrameLayout;
 
-import io.bidmachine.banner.BannerView;
+import androidx.annotation.Nullable;
 
 public class BannerViewActivity extends Activity {
 

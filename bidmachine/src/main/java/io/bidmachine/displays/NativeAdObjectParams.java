@@ -1,16 +1,26 @@
 package io.bidmachine.displays;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
-import io.bidmachine.TrackEventType;
-import io.bidmachine.models.AdObjectParams;
-import io.bidmachine.unified.UnifiedMediationParams;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.bidmachine.utils.IabUtils.*;
+import io.bidmachine.TrackEventType;
+import io.bidmachine.models.AdObjectParams;
+import io.bidmachine.unified.UnifiedMediationParams;
+
+import static io.bidmachine.utils.IabUtils.KEY_CLICK_URL;
+import static io.bidmachine.utils.IabUtils.KEY_CTA;
+import static io.bidmachine.utils.IabUtils.KEY_DESCRIPTION;
+import static io.bidmachine.utils.IabUtils.KEY_ICON_URL;
+import static io.bidmachine.utils.IabUtils.KEY_IMAGE_URL;
+import static io.bidmachine.utils.IabUtils.KEY_RATING;
+import static io.bidmachine.utils.IabUtils.KEY_TITLE;
+import static io.bidmachine.utils.IabUtils.KEY_VIDEO_ADM;
+import static io.bidmachine.utils.IabUtils.KEY_VIDEO_URL;
 
 final class NativeAdObjectParams
         extends AdObjectParams

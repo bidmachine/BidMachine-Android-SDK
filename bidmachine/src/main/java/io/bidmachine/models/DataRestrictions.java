@@ -1,6 +1,7 @@
 package io.bidmachine.models;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public interface DataRestrictions {
 
@@ -22,5 +23,8 @@ public interface DataRestrictions {
 
     @Nullable
     String getUsPrivacy();
+
+    @NonNull
+    String getIABGDPRString();
 
 }

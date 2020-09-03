@@ -1,7 +1,8 @@
 package io.bidmachine.displays;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;

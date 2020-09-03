@@ -1,6 +1,6 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.openrtb.Request;

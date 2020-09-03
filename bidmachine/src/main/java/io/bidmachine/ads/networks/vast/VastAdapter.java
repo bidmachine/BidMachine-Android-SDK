@@ -3,6 +3,7 @@ package io.bidmachine.ads.networks.vast;
 import com.explorestack.iab.utils.Logger;
 import com.explorestack.iab.vast.VastLog;
 import com.explorestack.iab.vast.VideoType;
+
 import io.bidmachine.AdsType;
 import io.bidmachine.BuildConfig;
 import io.bidmachine.NetworkAdapter;
