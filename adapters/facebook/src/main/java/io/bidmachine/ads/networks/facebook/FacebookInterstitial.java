@@ -87,5 +87,7 @@ class FacebookInterstitial extends UnifiedFullscreenAd {
             getCallback().onAdClosed();
             ad.destroy();
         }
+
     }
+
 }
