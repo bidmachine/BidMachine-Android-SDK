@@ -199,12 +199,6 @@ class NetworkRegistry {
         private void process() {
             if (jsonConfig != null) {
                 networkConfig = NetworkConfig.create(contextProvider.getContext(), jsonConfig);
-                if (networkConfig != null) {
-                    Logger.log(String.format(
-                            "Load network from json config completed successfully: %s, %s",
-                            networkConfig.getKey(),
-                            networkConfig.getVersion()));
-                }
             }
             if (networkConfig != null) {
                 String networkName = networkConfig.getKey();

@@ -97,6 +97,72 @@ public class AuctionResultImplTest {
     }
 
     @Test
+    public void getNetworkParams_withoutHeaderBiddingAd_networkParamsEmpty() {
+        AuctionResult auctionResult = new AuctionResultImpl(
+                AdsType.Banner,
+                Response.Seatbid.newBuilder().build(),
+                Response.Seatbid.Bid.newBuilder().build(),
+                Ad.newBuilder().build(),
+                mock(NetworkConfig.class));
+        Map<String, String> networkParams = auctionResult.getNetworkParams();
+        assertNotNull(networkParams);
+        assertEquals(0, networkParams.size());
+    }
+
+    @Test
+    public void getNetworkParams_withHeaderBiddingAdAndEmptyClientParams_networkParamsEmpty() {
+        HeaderBiddingAd headerBiddingAd = HeaderBiddingAd.newBuilder().build();
+        Ad.Display.Banner banner = Ad.Display.Banner.newBuilder()
+                .addExtProto(Any.pack(headerBiddingAd))
+                .build();
+        Ad.Display display = Ad.Display.newBuilder()
+                .setBanner(banner)
+                .build();
+        Ad ad = Ad.newBuilder()
+                .setDisplay(display)
+                .build();
+        AuctionResult auctionResult = new AuctionResultImpl(
+                AdsType.Banner,
+                Response.Seatbid.newBuilder().build(),
+                Response.Seatbid.Bid.newBuilder().build(),
+                ad,
+                mock(NetworkConfig.class));
+        Map<String, String> networkParams = auctionResult.getNetworkParams();
+        assertNotNull(networkParams);
+        assertEquals(0, networkParams.size());
+    }
+
+    @Test
+    public void getNetworkParams_withHeaderBiddingAdAndClientParams_networkParamsNotEmpty() {
+        HeaderBiddingAd headerBiddingAd = HeaderBiddingAd.newBuilder()
+                .putClientParams("test_key_1", "test_value_1")
+                .putClientParams("test_key_2", "test_value_2")
+                .putClientParams("test_key_3", "test_value_3")
+                .build();
+        Ad.Display.Banner banner = Ad.Display.Banner.newBuilder()
+                .addExtProto(Any.pack(headerBiddingAd))
+                .build();
+        Ad.Display display = Ad.Display.newBuilder()
+                .setBanner(banner)
+                .build();
+        Ad ad = Ad.newBuilder()
+                .setDisplay(display)
+                .build();
+        AuctionResult auctionResult = new AuctionResultImpl(
+                AdsType.Banner,
+                Response.Seatbid.newBuilder().build(),
+                Response.Seatbid.Bid.newBuilder().build(),
+                ad,
+                mock(NetworkConfig.class));
+        Map<String, String> networkParams = auctionResult.getNetworkParams();
+        assertNotNull(networkParams);
+        assertEquals(3, networkParams.size());
+        assertEquals("test_value_1", networkParams.get("test_key_1"));
+        assertEquals("test_value_2", networkParams.get("test_key_2"));
+        assertEquals("test_value_3", networkParams.get("test_key_3"));
+    }
+
+    @Test
     public void identifyCreativeFormat_withEmptyAd_creativeFormatIsNull() {
         Ad ad = Ad.newBuilder()
                 .build();

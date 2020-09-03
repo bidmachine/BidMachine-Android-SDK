@@ -1,6 +1,6 @@
 package io.bidmachine.models;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import java.util.List;
 
@@ -9,8 +9,7 @@ import io.bidmachine.NetworkConfig;
 import io.bidmachine.PriceFloorParams;
 import io.bidmachine.TargetingParams;
 
-public interface RequestBuilder<SelfType extends RequestBuilder,
-        ReturnType extends AdRequest> {
+public interface RequestBuilder<SelfType extends RequestBuilder, ReturnType extends AdRequest> {
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setPriceFloorParams(PriceFloorParams priceFloorParams);

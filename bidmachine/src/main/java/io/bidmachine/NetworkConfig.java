@@ -374,6 +374,10 @@ public abstract class NetworkConfig {
                                              KEY_FORMAT));
                 }
             }
+            Logger.log(String.format(
+                    "Load network from json config completed successfully: %s, %s",
+                    networkConfig.getKey(),
+                    networkConfig.getVersion()));
             return networkConfig;
         } catch (Throwable t) {
             Logger.log(String.format("Network (%s) load fail!", networkName));
