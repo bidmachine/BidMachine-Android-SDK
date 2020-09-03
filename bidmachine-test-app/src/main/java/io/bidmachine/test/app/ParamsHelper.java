@@ -133,8 +133,12 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                                             .setDomain(publisherDomain)
                                             .addCategories(publisherCategories)
                                             .build());
+            BidMachine.setUSPrivacyString(usPrivacyString);
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPreferences.edit().putString("IABUSPrivacy_String", usPrivacyString).apply();
+            sharedPreferences.edit()
+                    .putString("IABConsent_ConsentString", consentString)
+                    .putString("IABUSPrivacy_String", usPrivacyString)
+                    .apply();
         }
     }
 
@@ -303,6 +307,12 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         return this;
     }
 
+    @Override
+    public ParamsHelper setUSPrivacyString(String usPrivacyString) {
+        this.usPrivacyString = usPrivacyString;
+        return this;
+    }
+
     public Boolean hasCoppa() {
         return hasCoppa;
     }
@@ -315,12 +325,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         return hasConsent;
     }
 
-    public ParamsHelper setUSPrivacyString(String usPrivacyString) {
-        this.usPrivacyString = usPrivacyString;
-        return this;
-    }
-
-    public String getUsPrivacyString() {
+    public String getUSPrivacyString() {
         return usPrivacyString;
     }
 

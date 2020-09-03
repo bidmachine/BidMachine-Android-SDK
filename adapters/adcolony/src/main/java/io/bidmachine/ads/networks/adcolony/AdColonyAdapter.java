@@ -156,14 +156,21 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         if (!TextUtils.isEmpty(appVersion)) {
             options.setAppVersion(appVersion);
         }
+
         options.setPrivacyFrameworkRequired(AdColonyAppOptions.COPPA,
                                             dataRestrictions.isUserAgeRestricted());
         options.setPrivacyFrameworkRequired(AdColonyAppOptions.GDPR,
                                             dataRestrictions.isUserInGdprScope());
         options.setPrivacyConsentString(AdColonyAppOptions.GDPR,
                                         dataRestrictions.getIABGDPRString());
-
-        // CCPA - AdColony take parameter from SharedPreference
+        String usPrivacyString = dataRestrictions.getUSPrivacyString();
+        if (!TextUtils.isEmpty(usPrivacyString)) {
+            assert usPrivacyString != null;
+            options.setPrivacyFrameworkRequired(AdColonyAppOptions.CCPA,
+                                                dataRestrictions.isUserInCcpaScope());
+            options.setPrivacyConsentString(AdColonyAppOptions.CCPA,
+                                            usPrivacyString);
+        }
 
         options.setTestModeEnabled(adRequestParams.isTestMode());
         return options;

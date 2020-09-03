@@ -102,7 +102,7 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         tjPrivacyPolicy.setBelowConsentAge(dataRestrictions.isUserAgeRestricted());
         tjPrivacyPolicy.setSubjectToGDPR(dataRestrictions.isUserInGdprScope());
         tjPrivacyPolicy.setUserConsent(dataRestrictions.getIABGDPRString());
-        tjPrivacyPolicy.setUSPrivacy(dataRestrictions.getUsPrivacy());
+        tjPrivacyPolicy.setUSPrivacy(dataRestrictions.getUSPrivacyString());
 
         TargetingInfo targetingInfo = adRequestParams.getTargetingParams();
         String userId = targetingInfo.getUserId();
