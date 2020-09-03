@@ -30,7 +30,8 @@ public class MyTargetConfig extends NetworkConfig {
         return new MyTargetAdapter();
     }
 
-    public MyTargetConfig withMediationConfig(@NonNull AdsFormat format, @NonNull final String slotId) {
+    public MyTargetConfig withMediationConfig(@NonNull AdsFormat format,
+                                              @NonNull final String slotId) {
         return withMediationConfig(format, new HashMap<String, String>() {{
             put(KEY_SLOT_ID, slotId);
         }});

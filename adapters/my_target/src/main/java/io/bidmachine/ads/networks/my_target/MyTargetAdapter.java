@@ -3,6 +3,7 @@ package io.bidmachine.ads.networks.my_target;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.my.target.common.CustomParams;
 import com.my.target.common.MyTargetPrivacy;
@@ -30,9 +31,9 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     MyTargetAdapter() {
         super("my_target",
-                MyTargetVersion.VERSION,
-                BuildConfig.VERSION_NAME,
-                new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
+              MyTargetVersion.VERSION,
+              BuildConfig.VERSION_NAME,
+              new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
     }
 
     @Override
@@ -81,7 +82,11 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         MyTargetPrivacy.setUserAgeRestricted(dataRestrictions.isUserAgeRestricted());
     }
 
-    static void updateTargeting(@NonNull UnifiedAdRequestParams adRequestParams, @NonNull CustomParams customParams) {
+    static void updateTargeting(@NonNull UnifiedAdRequestParams adRequestParams,
+                                @Nullable CustomParams customParams) {
+        if (customParams == null) {
+            return;
+        }
         TargetingInfo targetingInfo = adRequestParams.getTargetingParams();
         Integer age = targetingInfo.getUserAge();
         if (age != null) {

@@ -87,5 +87,7 @@ class FacebookRewarded extends UnifiedFullscreenAd {
         public void onRewardedVideoClosed() {
             getCallback().onAdClosed();
         }
+
     }
+
 }

@@ -1,3 +1,6 @@
+## Version 1.6.0.4
+* Updated Facebook version to 6.0.0
+
 ## Version 1.4.3.3
 * Updated Facebook version to 5.7.1
 

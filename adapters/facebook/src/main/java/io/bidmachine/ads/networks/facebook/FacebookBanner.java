@@ -77,6 +77,7 @@ class FacebookBanner extends UnifiedBannerAd {
         public void onLoggingImpression(Ad ad) {
             //ignore
         }
+
     }
 
 }
