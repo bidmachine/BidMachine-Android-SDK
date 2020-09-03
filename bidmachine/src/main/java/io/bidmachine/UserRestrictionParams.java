@@ -38,7 +38,7 @@ final class UserRestrictionParams
         builder.setGdpr(subjectToGDPR());
         builder.setCoppa(hasCoppa != null && hasCoppa);
 
-        String iabUsPrivacyString = this.getUSPrivacyString();
+        String iabUsPrivacyString = getUSPrivacyString();
         if (!TextUtils.isEmpty(iabUsPrivacyString)) {
             assert iabUsPrivacyString != null;
             RegsCcpaExtension regsCcpaExtension = RegsCcpaExtension.newBuilder()
@@ -136,6 +136,24 @@ final class UserRestrictionParams
     public String getUSPrivacyString() {
         return oneOf(usPrivacyString,
                      BidMachineImpl.get().getIabSharedPreference().getUSPrivacyString());
+    }
+
+    @Override
+    public boolean isUserInCcpaScope() {
+        String usPrivacyString = getUSPrivacyString();
+        return usPrivacyString != null
+                && usPrivacyString.length() == 4
+                && usPrivacyString.charAt(0) == '1'
+                && !usPrivacyString.contains("---");
+    }
+
+    @Override
+    public boolean isUserHasCcpaConsent() {
+        String usPrivacyString = getUSPrivacyString();
+        return usPrivacyString != null
+                && usPrivacyString.length() == 4
+                && usPrivacyString.charAt(0) == '1'
+                && (usPrivacyString.charAt(2) == 'N' || usPrivacyString.charAt(2) == 'n');
     }
 
     @NonNull

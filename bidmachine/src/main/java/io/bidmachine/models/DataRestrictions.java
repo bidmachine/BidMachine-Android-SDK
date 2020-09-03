@@ -24,6 +24,10 @@ public interface DataRestrictions {
     @Nullable
     String getUSPrivacyString();
 
+    boolean isUserInCcpaScope();
+
+    boolean isUserHasCcpaConsent();
+
     @NonNull
     String getIABGDPRString();
 

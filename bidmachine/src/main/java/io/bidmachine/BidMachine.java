@@ -120,7 +120,7 @@ public class BidMachine {
      * @param usPrivacyString - CCPA string if applicable, complying with the comply with the IAB standard
      *                        <a href="https://github.com/InteractiveAdvertisingBureau/USPrivacy/blob/master/CCPA/US%20Privacy%20String.md">CCPA String Format</a>
      */
-    public static void setUSPrivacyString(String usPrivacyString) {
+    public static void setUSPrivacyString(@Nullable String usPrivacyString) {
         BidMachineImpl.get().getUserRestrictionParams().setUSPrivacyString(usPrivacyString);
     }
 

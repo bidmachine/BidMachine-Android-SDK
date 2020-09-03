@@ -27,12 +27,16 @@ public class UserRestrictionParamsTest {
 
     private android.content.Context context;
     private SharedPreferences defaultSharedPreferences;
+    private UserRestrictionParams userRestrictionParams;
 
     @Before
     public void setUp() throws Exception {
         context = RuntimeEnvironment.application;
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         defaultSharedPreferences.edit().clear().apply();
+        userRestrictionParams = BidMachineImpl.get().getUserRestrictionParams();
+        BidMachine.setConsentConfig(false, null);
+        BidMachine.setUSPrivacyString(null);
     }
 
     @Test
@@ -45,9 +49,7 @@ public class UserRestrictionParamsTest {
 
         Context.User.Builder builder = Context.User.newBuilder();
         assertEquals("", builder.getConsent());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertEquals("bid_machine_consent_string", builder.getConsent());
     }
 
@@ -58,9 +60,7 @@ public class UserRestrictionParamsTest {
 
         Context.User.Builder builder = Context.User.newBuilder();
         assertEquals("", builder.getConsent());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertEquals("bid_machine_consent_string", builder.getConsent());
     }
 
@@ -74,9 +74,7 @@ public class UserRestrictionParamsTest {
 
         Context.User.Builder builder = Context.User.newBuilder();
         assertEquals("", builder.getConsent());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertEquals("iab_consent_string", builder.getConsent());
     }
 
@@ -87,9 +85,7 @@ public class UserRestrictionParamsTest {
 
         Context.User.Builder builder = Context.User.newBuilder();
         assertEquals("", builder.getConsent());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertEquals("1", builder.getConsent());
     }
 
@@ -100,9 +96,7 @@ public class UserRestrictionParamsTest {
 
         Context.User.Builder builder = Context.User.newBuilder();
         assertEquals("", builder.getConsent());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertEquals("0", builder.getConsent());
     }
 
@@ -116,9 +110,7 @@ public class UserRestrictionParamsTest {
 
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         assertFalse(builder.getGdpr());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertTrue(builder.getGdpr());
     }
 
@@ -129,9 +121,7 @@ public class UserRestrictionParamsTest {
 
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         assertFalse(builder.getGdpr());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertTrue(builder.getGdpr());
     }
 
@@ -145,9 +135,7 @@ public class UserRestrictionParamsTest {
 
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         assertFalse(builder.getGdpr());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertTrue(builder.getGdpr());
     }
 
@@ -158,9 +146,7 @@ public class UserRestrictionParamsTest {
 
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         assertFalse(builder.getGdpr());
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
         assertFalse(builder.getGdpr());
     }
 
@@ -168,33 +154,33 @@ public class UserRestrictionParamsTest {
     public void buildRegs_ccpaNotPresentInSharedPreference_extensionIsNotSet() {
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
+
         assertEquals(0, builder.getExtProtoCount());
     }
 
     @Test
     public void buildRegs_ccpaIsEmptyInSharedPreference_extensionIsNotSet() {
+        defaultSharedPreferences.edit()
+                .putString(IABSharedPreference.IAB_US_PRIVACY_STRING, "")
+                .apply();
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
+
         assertEquals(0, builder.getExtProtoCount());
     }
 
     @Test
     public void buildRegs_ccpaIsPresentInSharedPreference_extensionIsSet() throws Exception {
-        String ccpaString = "Test String";
+        String ccpaString = "test_string";
         defaultSharedPreferences.edit()
                 .putString(IABSharedPreference.IAB_US_PRIVACY_STRING, ccpaString)
                 .apply();
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
+
         List<Any> extList = builder.getExtProtoList();
         assertEquals(1, extList.size());
         RegsCcpaExtension regsCcpaExtension = extList.get(0).unpack(RegsCcpaExtension.class);
@@ -202,30 +188,77 @@ public class UserRestrictionParamsTest {
     }
 
     @Test
-    public void buildRegs_ccpaIsPresentInSharedPreferenceButWrongType_extensionIsSet() throws Exception {
+    public void buildRegs_ccpaIsPresentInSharedPreferenceButWrongType_extensionNotSet() throws Exception {
         defaultSharedPreferences.edit()
                 .putInt(IABSharedPreference.IAB_US_PRIVACY_STRING, 123)
                 .apply();
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
+
         assertEquals(0, builder.getExtProtoCount());
     }
 
     @Test
     public void buildRegs_ccpaPassedThroughBidMachine_extensionIsSet() throws Exception {
-        String ccpaString = "Test String";
+        String ccpaString = "test_string";
         BidMachine.setUSPrivacyString(ccpaString);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        BidMachineImpl.get()
-                .getUserRestrictionParams()
-                .build(builder);
+        userRestrictionParams.build(builder);
+
         List<Any> extList = builder.getExtProtoList();
         assertEquals(1, extList.size());
         RegsCcpaExtension regsCcpaExtension = extList.get(0).unpack(RegsCcpaExtension.class);
         assertEquals(ccpaString, regsCcpaExtension.getUsPrivacy());
+    }
+
+    @Test
+    public void buildRegs_ccpaPassedThroughBidMachineAndSharedPreference_extensionIsSet() throws Exception {
+        String ccpaString = "test_string";
+        BidMachine.setUSPrivacyString(ccpaString);
+        defaultSharedPreferences.edit()
+                .putString(IABSharedPreference.IAB_US_PRIVACY_STRING, "test_string_2")
+                .apply();
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.Regs.Builder builder = Context.Regs.newBuilder();
+        userRestrictionParams.build(builder);
+
+        List<Any> extList = builder.getExtProtoList();
+        assertEquals(1, extList.size());
+        RegsCcpaExtension regsCcpaExtension = extList.get(0).unpack(RegsCcpaExtension.class);
+        assertEquals(ccpaString, regsCcpaExtension.getUsPrivacy());
+    }
+
+    @Test
+    public void isUserInCcpaScope() {
+        BidMachine.setUSPrivacyString(null);
+        assertFalse(userRestrictionParams.isUserInCcpaScope());
+        BidMachine.setUSPrivacyString("");
+        assertFalse(userRestrictionParams.isUserInCcpaScope());
+        BidMachine.setUSPrivacyString("test_string");
+        assertFalse(userRestrictionParams.isUserInCcpaScope());
+        BidMachine.setUSPrivacyString("1---");
+        assertFalse(userRestrictionParams.isUserInCcpaScope());
+        BidMachine.setUSPrivacyString("1Y--");
+        assertTrue(userRestrictionParams.isUserInCcpaScope());
+    }
+
+    @Test
+    public void isUserHasCcpaConsent() {
+        BidMachine.setUSPrivacyString(null);
+        assertFalse(userRestrictionParams.isUserHasCcpaConsent());
+        BidMachine.setUSPrivacyString("");
+        assertFalse(userRestrictionParams.isUserHasCcpaConsent());
+        BidMachine.setUSPrivacyString("test_string");
+        assertFalse(userRestrictionParams.isUserHasCcpaConsent());
+        BidMachine.setUSPrivacyString("1---");
+        assertFalse(userRestrictionParams.isUserHasCcpaConsent());
+        BidMachine.setUSPrivacyString("1Y--");
+        assertFalse(userRestrictionParams.isUserHasCcpaConsent());
+        BidMachine.setUSPrivacyString("1YY-");
+        assertFalse(userRestrictionParams.isUserHasCcpaConsent());
+        BidMachine.setUSPrivacyString("1YN-");
+        assertTrue(userRestrictionParams.isUserHasCcpaConsent());
     }
 
 }

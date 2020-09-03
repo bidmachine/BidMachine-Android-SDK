@@ -135,7 +135,10 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                                             .build());
             BidMachine.setUSPrivacyString(usPrivacyString);
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPreferences.edit().putString("IABUSPrivacy_String", usPrivacyString).apply();
+            sharedPreferences.edit()
+                    .putString("IABConsent_ConsentString", consentString)
+                    .putString("IABUSPrivacy_String", usPrivacyString)
+                    .apply();
         }
     }
 
