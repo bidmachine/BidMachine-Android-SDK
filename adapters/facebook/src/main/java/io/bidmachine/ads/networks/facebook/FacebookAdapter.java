@@ -68,6 +68,13 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         DataRestrictions dataRestrictions = adRequestParams.getDataRestrictions();
         AdSettings.setMediationService(BidMachine.NAME);
         AdSettings.setMixedAudience(dataRestrictions.isUserAgeRestricted());
+        if (dataRestrictions.isUserInCcpaScope()) {
+            if (dataRestrictions.isUserHasCcpaConsent()) {
+                AdSettings.setDataProcessingOptions(new String[]{});
+            } else {
+                AdSettings.setDataProcessingOptions(new String[]{"LDU"}, 0, 0);
+            }
+        }
         if (adRequestParams.isTestMode()) {
             AdSettings.setTestAdType(AdSettings.TestAdType.DEFAULT);
         }

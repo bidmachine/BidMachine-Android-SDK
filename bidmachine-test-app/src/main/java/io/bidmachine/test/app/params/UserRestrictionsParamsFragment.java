@@ -48,7 +48,7 @@ public class UserRestrictionsParamsFragment extends BaseParamsFragment {
                         }));
         bindParamWidget(context, parent, "US Privacy",
                 new TextInputParamWidget("US Privacy String",
-                        paramsHelper.getUsPrivacyString(),
+                        paramsHelper.getUSPrivacyString(),
                         new ParamWidget.ChangeTracker<String>() {
                             @Override
                             public void onChanged(ParamWidget widget, String param) {

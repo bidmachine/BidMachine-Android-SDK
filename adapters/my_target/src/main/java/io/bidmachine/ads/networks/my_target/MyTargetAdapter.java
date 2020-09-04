@@ -79,6 +79,9 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         if (dataRestrictions.isUserInGdprScope()) {
             MyTargetPrivacy.setUserConsent(dataRestrictions.isUserHasConsent());
         }
+        if (dataRestrictions.isUserInCcpaScope()) {
+            MyTargetPrivacy.setCcpaUserConsent(dataRestrictions.isUserHasCcpaConsent());
+        }
         MyTargetPrivacy.setUserAgeRestricted(dataRestrictions.isUserAgeRestricted());
     }
 
