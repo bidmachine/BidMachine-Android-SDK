@@ -2,6 +2,7 @@ package io.bidmachine.models;
 
 import io.bidmachine.AdRequest;
 import io.bidmachine.PriceFloorParams;
+import io.bidmachine.SessionAdParams;
 import io.bidmachine.TargetingParams;
 
 public interface RequestBuilder<SelfType extends RequestBuilder,
@@ -12,6 +13,9 @@ public interface RequestBuilder<SelfType extends RequestBuilder,
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setTargetingParams(TargetingParams targetingParams);
+
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setSessionAdParams(SessionAdParams sessionAdParams);
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setLoadingTimeOut(int timeOutMs);

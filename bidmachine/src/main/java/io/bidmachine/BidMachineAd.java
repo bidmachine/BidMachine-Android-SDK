@@ -43,6 +43,7 @@ public abstract class BidMachineAd<
 
     private boolean isShownTracked;
     private boolean isImpressionTracked;
+    private boolean isClickTracked;
     private boolean isFinishTracked;
     private boolean isCloseTracked;
 
@@ -363,13 +364,13 @@ public abstract class BidMachineAd<
                 return;
             }
             isShownTracked = true;
+            log("processShown");
             if (adRequest != null) {
                 adRequest.onShown();
             }
             if (loadedObject != null) {
                 loadedObject.onShown();
             }
-            log("processShown");
             trackEvent(TrackEventType.Show, null);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -385,10 +386,10 @@ public abstract class BidMachineAd<
         @Override
         @SuppressWarnings("unchecked")
         public void processShowFail(final BMError error) {
+            log("processShowFail");
             if (loadedObject != null) {
                 loadedObject.onShowFailed();
             }
-            log("processShowFail");
             trackEvent(TrackEventType.Show, error);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -407,10 +408,16 @@ public abstract class BidMachineAd<
             if (currentState.ordinal() > State.Success.ordinal()) {
                 return;
             }
+            isClickTracked = true;
+            log("processClicked");
             if (loadedObject != null) {
                 loadedObject.onClicked();
             }
-            log("processClicked");
+            SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+            sessionAdParams.addClick();
+            if (isImpressionTracked) {
+                sessionAdParams.setIsUserClickedOnLastAd(true);
+            }
             trackEvent(TrackEventType.Click, null);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -433,10 +440,21 @@ public abstract class BidMachineAd<
                 return;
             }
             isImpressionTracked = true;
+            log("processImpression");
             if (loadedObject != null) {
                 loadedObject.onImpression();
             }
-            log("processImpression");
+            SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+            sessionAdParams.addImpression();
+            if (adRequest != null) {
+                Ad ad = adRequest.adResult;
+                if (ad != null && ad.getAdomainCount() > 0) {
+                    sessionAdParams.setLastAdDomain(ad.getAdomain(0));
+                }
+            }
+            if (isClickTracked) {
+                sessionAdParams.setIsUserClickedOnLastAd(true);
+            }
             trackEvent(TrackEventType.Impression, null);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -458,10 +476,19 @@ public abstract class BidMachineAd<
                 return;
             }
             isFinishTracked = true;
+            log("processFinished");
             if (loadedObject != null) {
                 loadedObject.onFinished();
             }
-            log("processFinished");
+            if (adRequest != null) {
+                AuctionResult auctionResult = adRequest.getAuctionResult();
+                if (auctionResult != null
+                        && auctionResult.getCreativeFormat() == CreativeFormat.Video) {
+                    BidMachineImpl.get()
+                            .getSessionAdParams(adsType)
+                            .addCompletedVideos();
+                }
+            }
             Utils.onUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -483,10 +510,10 @@ public abstract class BidMachineAd<
                 return;
             }
             isCloseTracked = true;
+            log("processClosed (" + isFinishTracked + ")");
             if (loadedObject != null) {
                 loadedObject.onClosed(isFinishTracked);
             }
-            log("processClosed (" + isFinishTracked + ")");
             trackEvent(TrackEventType.Close, null);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -505,13 +532,13 @@ public abstract class BidMachineAd<
             if (currentState.ordinal() > State.Success.ordinal()) {
                 return;
             }
+            log("processExpired");
             if (adRequest != null) {
                 adRequest.onExpired();
             }
             if (loadedObject != null) {
                 loadedObject.onExpired();
             }
-            log("processExpired");
             currentState = State.Expired;
             trackEvent(TrackEventType.Expired, null);
             Utils.onUiThread(new Runnable() {
@@ -559,6 +586,7 @@ public abstract class BidMachineAd<
                 Logger.log(String.format("%s: %s", selfMessage, message));
             }
         }
+
     };
 
     private void trackEvent(TrackEventType eventType, @Nullable BMError error) {

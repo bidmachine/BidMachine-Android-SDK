@@ -1,8 +1,14 @@
 package io.bidmachine;
 
 import android.location.Location;
+import android.os.Build;
 import android.support.annotation.NonNull;
+
+import com.explorestack.protobuf.ListValue;
+import com.explorestack.protobuf.Struct;
+import com.explorestack.protobuf.Value;
 import com.explorestack.protobuf.adcom.Context;
+
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.ITargetingParams;
 import io.bidmachine.models.RequestParams;
@@ -21,6 +27,9 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     private String zip;
     private Location deviceLocation;
     private String storeUrl;
+    private String storeCategory;
+    private String[] storeSubCategories;
+    private Framework framework;
     private Boolean isPaid;
     private BlockedParams blockedParams;
 
@@ -43,6 +52,9 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
         zip = oneOf(zip, instance.zip);
         deviceLocation = oneOf(deviceLocation, instance.deviceLocation);
         storeUrl = oneOf(storeUrl, instance.storeUrl);
+        storeCategory = oneOf(storeCategory, instance.storeCategory);
+        storeSubCategories = oneOf(storeSubCategories, instance.storeSubCategories);
+        framework = oneOf(framework, instance.framework);
         isPaid = oneOf(isPaid, instance.isPaid);
         if (instance.blockedParams != null) {
             if (blockedParams == null) {
@@ -69,6 +81,36 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
             builder.setStoreurl(storeUrl);
         }
         builder.setPaid(isPaid != null && isPaid);
+    }
+
+    void fillAppExtension(Struct.Builder appExtBuilder) {
+        if (storeCategory != null) {
+            appExtBuilder.putFields(ProtoExtConstants.Context.App.STORE_CATEGORY,
+                                    Value.newBuilder()
+                                            .setStringValue(storeCategory)
+                                            .build());
+        }
+        if (storeSubCategories != null && storeSubCategories.length > 0) {
+            ListValue.Builder listValueBuilder = ListValue.newBuilder();
+            for (String storeSubCategory : storeSubCategories) {
+                listValueBuilder.addValues(Value.newBuilder()
+                                                   .setStringValue(storeSubCategory)
+                                                   .build());
+            }
+            appExtBuilder.putFields(ProtoExtConstants.Context.App.STORE_SUB_CATEGORY,
+                                    Value.newBuilder()
+                                            .setListValue(listValueBuilder.build())
+                                            .build());
+        }
+        if (framework != null) {
+            appExtBuilder.putFields(ProtoExtConstants.Context.App.FRAMEWORK,
+                                    Value.newBuilder()
+                                            .setStringValue(framework.toString().toLowerCase())
+                                            .build());
+        }
+        appExtBuilder.putFields(ProtoExtConstants.Context.App.API_LEVEL, Value.newBuilder()
+                .setNumberValue(Build.VERSION.SDK_INT)
+                .build());
     }
 
     void build(Context.User.Builder builder) {
@@ -160,6 +202,24 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     @Override
     public TargetingParams setStoreUrl(String url) {
         this.storeUrl = url;
+        return this;
+    }
+
+    @Override
+    public TargetingParams setStoreCategory(String storeCategory) {
+        this.storeCategory = storeCategory;
+        return this;
+    }
+
+    @Override
+    public TargetingParams setStoreSubCategory(String... storeSubCategories) {
+        this.storeSubCategories = storeSubCategories;
+        return this;
+    }
+
+    @Override
+    public TargetingParams setFramework(Framework framework) {
+        this.framework = framework;
         return this;
     }
 

@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.InvalidProtocolBufferException;
 import com.explorestack.protobuf.Message;
+import com.explorestack.protobuf.Struct;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.adcom.Placement;
@@ -48,6 +49,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     PriceFloorParams priceFloorParams;
     TargetingParams targetingParams;
+    SessionAdParams sessionAdParams;
     int timeOut = -1;
     boolean headerBiddingEnabled = true;
 
@@ -138,6 +140,11 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         final Request.Builder requestBuilder = Request.newBuilder();
         final TargetingParams targetingParams =
                 RequestParams.resolveParams(this.targetingParams, bidMachine.getTargetingParams());
+        final SessionAdParams sessionAdParams =
+                RequestParams.resolveParams(this.sessionAdParams,
+                                            bidMachine.getSessionAdParams(adsType)
+                                                    .setSessionDuration((int) SessionManager.get()
+                                                            .getSessionDuration()));
         final BlockedParams blockedParams = targetingParams.getBlockedParams();
         final UserRestrictionParams userRestrictionParams =
                 RequestParams.resolveParams(this.userRestrictionParams, bidMachine.getUserRestrictionParams());
@@ -200,6 +207,13 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         targetingParams.build(context, appBuilder);
 
+        //Context -> App -> Extension
+        Struct.Builder appExtBuilder = Struct.newBuilder();
+        targetingParams.fillAppExtension(appExtBuilder);
+        if (appExtBuilder.getFieldsCount() > 0) {
+            appBuilder.setExt(appExtBuilder.build());
+        }
+
         contextBuilder.setApp(appBuilder);
 
         //Context -> Restrictions
@@ -215,6 +229,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         if (userRestrictionParams.canSendUserInfo()) {
             targetingParams.build(userBuilder);
         }
+
+        //Context -> User -> Extension
+        Struct.Builder userExtBuilder = Struct.newBuilder();
+        sessionAdParams.fillUserExtension(userExtBuilder);
+        if (userExtBuilder.getFieldsCount() > 0) {
+            userBuilder.setExt(userExtBuilder.build());
+        }
+
         contextBuilder.setUser(userBuilder);
 
         //Context -> Regs
@@ -226,6 +248,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         final Context.Device.Builder deviceBuilder = Context.Device.newBuilder();
         bidMachine.getDeviceParams().build(context, deviceBuilder, targetingParams,
                 bidMachine.getTargetingParams(), userRestrictionParams);
+
+        //Context -> Device -> Extension
+        Struct.Builder deviceExtBuilder = Struct.newBuilder();
+        bidMachine.getDeviceParams().fillDeviceExtension(context, deviceExtBuilder);
+        if (deviceExtBuilder.getFieldsCount() > 0) {
+            deviceBuilder.setExt(deviceExtBuilder.build());
+        }
+
         contextBuilder.setDevice(deviceBuilder);
 
         requestBuilder.setContext(Any.pack(contextBuilder.build()));
@@ -622,6 +652,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public SelfType setTargetingParams(TargetingParams userParams) {
             prepareRequest();
             params.targetingParams = userParams;
+            return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public SelfType setSessionAdParams(SessionAdParams sessionAdParams) {
+            prepareRequest();
+            params.sessionAdParams = sessionAdParams;
             return (SelfType) this;
         }
 

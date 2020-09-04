@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import io.bidmachine.BidMachine;
 import io.bidmachine.ExtraParams;
+import io.bidmachine.Framework;
 import io.bidmachine.PriceFloorParams;
 import io.bidmachine.Publisher;
 import io.bidmachine.TargetingParams;
@@ -259,6 +260,21 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     public ParamsHelper setStoreUrl(String url) {
         this.storeUrl = url;
         return this;
+    }
+
+    @Override
+    public ParamsHelper setStoreCategory(String category) {
+        return null;
+    }
+
+    @Override
+    public ParamsHelper setStoreSubCategory(String... category) {
+        return null;
+    }
+
+    @Override
+    public ParamsHelper setFramework(Framework framework) {
+        return null;
     }
 
     public String getStoreUrl() {

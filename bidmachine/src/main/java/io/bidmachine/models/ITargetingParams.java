@@ -2,6 +2,7 @@ package io.bidmachine.models;
 
 import android.location.Location;
 
+import io.bidmachine.Framework;
 import io.bidmachine.utils.Gender;
 
 public interface ITargetingParams<SelfType> extends IBlockedParams<SelfType> {
@@ -86,6 +87,33 @@ public interface ITargetingParams<SelfType> extends IBlockedParams<SelfType> {
      */
     @SuppressWarnings("UnusedReturnValue")
     SelfType setStoreUrl(String url);
+
+    /**
+     * Sets App store category definitions (e.g - "games")
+     *
+     * @param storeCategory App store category
+     * @return Self instance
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setStoreCategory(String storeCategory);
+
+    /**
+     * Sets App Store Subcategory definitions. The array is always capped at 3 strings.
+     *
+     * @param storeSubCategories App Store Subcategory definitions
+     * @return Self instance
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setStoreSubCategory(String... storeSubCategories);
+
+    /**
+     * Sets app framework definitions. For example, If the app is using the Unity, put {@link Framework#Unity}
+     *
+     * @param framework App framework
+     * @return Self instance
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setFramework(Framework framework);
 
     /**
      * Sets if it is paid app version

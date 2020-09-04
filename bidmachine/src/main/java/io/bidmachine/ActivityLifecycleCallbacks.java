@@ -19,11 +19,12 @@ class ActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbac
     @Override
     public void onActivityResumed(Activity activity) {
         BidMachineImpl.get().topActivity = activity;
+        SessionManager.get().resume();
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-        // ignore
+        SessionManager.get().pause();
     }
 
     @Override
