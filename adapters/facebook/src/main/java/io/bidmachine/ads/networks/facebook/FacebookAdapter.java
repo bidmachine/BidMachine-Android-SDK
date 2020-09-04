@@ -136,7 +136,10 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                             return;
                         }
                         if (TextUtils.isEmpty(bidderToken)) {
-                            bidderToken = BidderTokenProvider.getBidderToken(context);
+                            try {
+                                bidderToken = BidderTokenProvider.getBidderToken(context);
+                            } catch (Throwable ignore) {
+                            }
                         }
                         if (listener != null) {
                             if (TextUtils.isEmpty(bidderToken)) {
