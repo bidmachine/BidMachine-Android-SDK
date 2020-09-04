@@ -1,6 +1,6 @@
 package io.bidmachine.ads.networks.criteo;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.criteo.publisher.BidToken;
 import com.criteo.publisher.CriteoUtils;

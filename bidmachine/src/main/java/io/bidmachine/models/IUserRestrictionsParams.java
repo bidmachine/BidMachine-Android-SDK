@@ -23,4 +23,11 @@ public interface IUserRestrictionsParams<SelfType> {
     @SuppressWarnings("UnusedReturnValue")
     SelfType setCoppa(Boolean coppa);
 
+    /**
+     * @param usPrivacyString - CCPA string if applicable, complying with the comply with the IAB standard
+     *                        <a href="https://github.com/InteractiveAdvertisingBureau/USPrivacy/blob/master/CCPA/US%20Privacy%20String.md">CCPA String Format</a>
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setUSPrivacyString(String usPrivacyString);
+
 }

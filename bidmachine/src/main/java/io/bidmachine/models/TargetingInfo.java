@@ -1,7 +1,8 @@
 package io.bidmachine.models;
 
 import android.location.Location;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import io.bidmachine.utils.Gender;
 

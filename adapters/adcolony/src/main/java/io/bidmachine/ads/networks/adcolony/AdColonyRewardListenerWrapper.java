@@ -1,7 +1,9 @@
 package io.bidmachine.ads.networks.adcolony;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
 import com.adcolony.sdk.AdColony;
 import com.adcolony.sdk.AdColonyReward;
 import com.adcolony.sdk.AdColonyRewardListener;

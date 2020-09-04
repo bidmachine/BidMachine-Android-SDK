@@ -1,9 +1,12 @@
 package io.bidmachine.ads.networks.my_target;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.my.target.ads.InterstitialAd;
+
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
@@ -25,11 +28,12 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
         if (!params.isValid(callback)) {
             return;
         }
-        assert params.slotId != null; // it's shouldn't be null since we already check it in {@link MyTargetParams}
+        assert params.slotId != null;
+        assert params.bidId != null;
+
         interstitialAd = new InterstitialAd(params.slotId, contextProvider.getContext());
         interstitialAd.setListener(new MyTargetFullscreenListener(callback));
         MyTargetAdapter.updateTargeting(requestParams, interstitialAd.getCustomParams());
-        assert params.bidId != null; // it's shouldn't be null since we already check it in {@link MyTargetParams}
         interstitialAd.loadFromBid(params.bidId);
     }
 
@@ -50,7 +54,7 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
         }
     }
 
-    private final class MyTargetFullscreenListener implements InterstitialAd.InterstitialAdListener {
+    private static final class MyTargetFullscreenListener implements InterstitialAd.InterstitialAdListener {
 
         private UnifiedFullscreenAdCallback callback;
 
@@ -87,6 +91,7 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
         public void onDisplay(@NonNull InterstitialAd interstitialAd) {
             callback.onAdShown();
         }
+
     }
 
 }

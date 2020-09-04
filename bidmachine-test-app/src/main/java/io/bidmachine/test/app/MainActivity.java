@@ -10,15 +10,6 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -37,6 +28,16 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.wefika.flowlayout.FlowLayout;
 
@@ -62,7 +63,6 @@ import io.bidmachine.ads.networks.AmazonConfig;
 import io.bidmachine.ads.networks.adcolony.AdColonyConfig;
 import io.bidmachine.ads.networks.criteo.CriteoConfig;
 import io.bidmachine.ads.networks.facebook.FacebookConfig;
-import io.bidmachine.ads.networks.mintegral.MintegralConfig;
 import io.bidmachine.ads.networks.my_target.MyTargetConfig;
 import io.bidmachine.ads.networks.tapjoy.TapjoyConfig;
 import io.bidmachine.banner.BannerSize;
@@ -734,26 +734,26 @@ public class MainActivity extends AppCompatActivity {
                             + "        \"facebook_key\": \"1525692904128549_2386753464689151\""
                             + "    }]"
                             + "}"),
+//            new OptionalNetwork(
+//                    5, "Mintegral",
+//                    new MintegralConfig("117852", "936dcbdd57fe235fd7cf61c2e93da3c4")
+//                            .withMediationConfig(AdsFormat.InterstitialVideo, "140146")
+//                            .withMediationConfig(AdsFormat.RewardedVideo, "140144"),
+//                    "{"
+//                            + "    \"network\": \"mintegral\","
+//                            + "    \"app_id\": \"117852\","
+//                            + "    \"api_key\": \"936dcbdd57fe235fd7cf61c2e93da3c4\","
+//                            + "    \"ad_units\": [{"
+//                            + "        \"format\": \"interstitial_video\","
+//                            + "        \"unit_id\": \"140146\""
+//                            + "    }, {"
+//                            + "        \"format\": \"rewarded_video\","
+//                            + "        \"unit_id\": \"140144\","
+//                            + "        \"reward_id\": \"12817\""
+//                            + "    }]"
+//                            + "}"),
             new OptionalNetwork(
-                    5, "Mintegral",
-                    new MintegralConfig("117852", "936dcbdd57fe235fd7cf61c2e93da3c4")
-                            .withMediationConfig(AdsFormat.InterstitialVideo, "140146")
-                            .withMediationConfig(AdsFormat.RewardedVideo, "140144"),
-                    "{"
-                            + "    \"network\": \"mintegral\","
-                            + "    \"app_id\": \"117852\","
-                            + "    \"api_key\": \"936dcbdd57fe235fd7cf61c2e93da3c4\","
-                            + "    \"ad_units\": [{"
-                            + "        \"format\": \"interstitial_video\","
-                            + "        \"unit_id\": \"140146\""
-                            + "    }, {"
-                            + "        \"format\": \"rewarded_video\","
-                            + "        \"unit_id\": \"140144\","
-                            + "        \"reward_id\": \"12817\""
-                            + "    }]"
-                            + "}"),
-            new OptionalNetwork(
-                    6, "Amazon",
+                    5, "Amazon",
                     new AmazonConfig("a9_onboarding_app_id")
                             .withMediationConfig(AdsFormat.Banner_320x50, "5ab6a4ae-4aa5-43f4-9da4-e30755f2b295")
                             .withMediationConfig(AdsFormat.Banner_300x250, "54fb2d08-c222-40b1-8bbe-4879322dc04b")
@@ -784,7 +784,7 @@ public class MainActivity extends AppCompatActivity {
                             + "    }]"
                             + "}"),
             new OptionalNetwork(
-                    7, "Criteo",
+                    6, "Criteo",
                     new CriteoConfig("B-057601")
                             .withMediationConfig(AdsFormat.Banner_320x50, "30s6zt3ayypfyemwjvmp")
                             .withMediationConfig(AdsFormat.Interstitial, "6yws53jyfjgoq1ghnuqb"),

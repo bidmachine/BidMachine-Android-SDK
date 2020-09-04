@@ -1,6 +1,5 @@
 package io.bidmachine;
 
-import io.bidmachine.protobuf.EventTypeExtended;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import io.bidmachine.protobuf.EventTypeExtended;
 import io.bidmachine.utils.BMError;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;

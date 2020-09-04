@@ -1,7 +1,7 @@
 package io.bidmachine.displays;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.Message;

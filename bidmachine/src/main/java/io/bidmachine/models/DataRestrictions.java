@@ -1,6 +1,7 @@
 package io.bidmachine.models;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public interface DataRestrictions {
 
@@ -21,6 +22,13 @@ public interface DataRestrictions {
     boolean isUserAgeRestricted();
 
     @Nullable
-    String getUsPrivacy();
+    String getUSPrivacyString();
+
+    boolean isUserInCcpaScope();
+
+    boolean isUserHasCcpaConsent();
+
+    @NonNull
+    String getIABGDPRString();
 
 }

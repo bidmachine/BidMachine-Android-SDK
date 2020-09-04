@@ -1,10 +1,12 @@
 package io.bidmachine.ads.networks.mraid;
 
 import android.webkit.WebView;
+
 import com.explorestack.iab.mraid.MRAIDNativeFeatureListener;
 import com.explorestack.iab.mraid.MRAIDView;
 import com.explorestack.iab.mraid.MRAIDViewListener;
 import com.explorestack.iab.utils.Utils;
+
 import io.bidmachine.unified.UnifiedBannerAdCallback;
 import io.bidmachine.utils.BMError;
 

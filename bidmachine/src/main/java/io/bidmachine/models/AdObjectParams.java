@@ -1,14 +1,12 @@
 package io.bidmachine.models;
 
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.explorestack.protobuf.InvalidProtocolBufferException;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
-import com.explorestack.protobuf.InvalidProtocolBufferException;
-import io.bidmachine.TrackEventType;
-import io.bidmachine.protobuf.AdExtension;
-import io.bidmachine.unified.UnifiedMediationParams;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -16,7 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static io.bidmachine.Utils.getOrDefault;
+import io.bidmachine.TrackEventType;
+import io.bidmachine.Utils;
+import io.bidmachine.protobuf.AdExtension;
+import io.bidmachine.unified.UnifiedMediationParams;
 
 public abstract class AdObjectParams {
 
@@ -49,10 +50,10 @@ public abstract class AdObjectParams {
     protected void prepareExtensions(@NonNull Response.Seatbid seatbid,
                                      @NonNull Response.Seatbid.Bid bid,
                                      @NonNull AdExtension extension) {
-        viewabilityTimeThresholdSec = getOrDefault(extension.getViewabilityTimeThreshold(),
+        viewabilityTimeThresholdSec = Utils.getOrDefault(extension.getViewabilityTimeThreshold(),
                 AdExtension.getDefaultInstance().getViewabilityTimeThreshold(),
                 DEF_VIEWABILITY_TIME_THRESHOLD);
-        viewabilityPixelThreshold = getOrDefault(extension.getViewabilityPixelThreshold(),
+        viewabilityPixelThreshold = Utils.getOrDefault(extension.getViewabilityPixelThreshold(),
                 AdExtension.getDefaultInstance().getViewabilityPixelThreshold(),
                 DEF_VIEWABILITY_PIXEL_THRESHOLD); //possibly should be multiplied by 100;
         prepareEvents(extension.getEventList());

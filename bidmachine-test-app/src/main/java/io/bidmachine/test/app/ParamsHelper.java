@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -133,8 +134,12 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                                             .setDomain(publisherDomain)
                                             .addCategories(publisherCategories)
                                             .build());
+            BidMachine.setUSPrivacyString(usPrivacyString);
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPreferences.edit().putString("IABUSPrivacy_String", usPrivacyString).apply();
+            sharedPreferences.edit()
+                    .putString("IABConsent_ConsentString", consentString)
+                    .putString("IABUSPrivacy_String", usPrivacyString)
+                    .apply();
         }
     }
 
@@ -318,6 +323,12 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         return this;
     }
 
+    @Override
+    public ParamsHelper setUSPrivacyString(String usPrivacyString) {
+        this.usPrivacyString = usPrivacyString;
+        return this;
+    }
+
     public Boolean hasCoppa() {
         return hasCoppa;
     }
@@ -330,12 +341,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         return hasConsent;
     }
 
-    public ParamsHelper setUSPrivacyString(String usPrivacyString) {
-        this.usPrivacyString = usPrivacyString;
-        return this;
-    }
-
-    public String getUsPrivacyString() {
+    public String getUSPrivacyString() {
         return usPrivacyString;
     }
 

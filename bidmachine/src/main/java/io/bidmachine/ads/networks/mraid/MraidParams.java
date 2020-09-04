@@ -1,7 +1,8 @@
 package io.bidmachine.ads.networks.mraid;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import io.bidmachine.unified.UnifiedAdCallback;
 import io.bidmachine.unified.UnifiedMediationParams;

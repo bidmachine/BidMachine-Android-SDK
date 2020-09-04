@@ -1,7 +1,8 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.util.Collection;
 import java.util.Map;

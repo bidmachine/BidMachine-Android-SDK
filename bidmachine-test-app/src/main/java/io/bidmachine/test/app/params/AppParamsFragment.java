@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +12,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import io.bidmachine.test.app.ParamsHelper;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -22,6 +23,8 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+
+import io.bidmachine.test.app.ParamsHelper;
 
 public class AppParamsFragment extends BaseParamsFragment {
 

@@ -1,6 +1,7 @@
 package io.bidmachine.interstitial;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import io.bidmachine.AdContentType;
 import io.bidmachine.AdRequest;
 import io.bidmachine.AdsType;

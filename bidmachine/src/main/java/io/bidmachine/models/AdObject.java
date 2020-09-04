@@ -1,6 +1,7 @@
 package io.bidmachine.models;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import io.bidmachine.AdProcessCallback;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedAdCallback;

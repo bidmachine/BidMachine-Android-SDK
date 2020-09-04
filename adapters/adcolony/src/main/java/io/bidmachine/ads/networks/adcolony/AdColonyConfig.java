@@ -1,14 +1,16 @@
 package io.bidmachine.ads.networks.adcolony;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import io.bidmachine.AdsFormat;
-import io.bidmachine.NetworkAdapter;
-import io.bidmachine.NetworkConfig;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import io.bidmachine.AdsFormat;
+import io.bidmachine.NetworkAdapter;
+import io.bidmachine.NetworkConfig;
 
 public class AdColonyConfig extends NetworkConfig {
 

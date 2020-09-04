@@ -3,9 +3,10 @@ package io.bidmachine.ads.networks.criteo;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;

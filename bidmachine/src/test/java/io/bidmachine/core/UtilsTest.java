@@ -1,4 +1,4 @@
-package com.appodeal.ads.core;
+package io.bidmachine.core;
 
 import android.app.Activity;
 import android.net.NetworkInfo;

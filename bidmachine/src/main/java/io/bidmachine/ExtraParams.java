@@ -1,11 +1,12 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
-import io.bidmachine.models.IExtraParams;
-import io.bidmachine.models.RequestParams;
+import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import io.bidmachine.models.IExtraParams;
+import io.bidmachine.models.RequestParams;
 
 public class ExtraParams extends RequestParams<ExtraParams> implements IExtraParams<ExtraParams> {
 

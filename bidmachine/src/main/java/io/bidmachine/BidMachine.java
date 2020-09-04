@@ -1,8 +1,9 @@
 package io.bidmachine;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import io.bidmachine.core.Logger;
 
@@ -111,6 +112,16 @@ public class BidMachine {
      */
     public static void setCoppa(@Nullable Boolean coppa) {
         BidMachineImpl.get().getUserRestrictionParams().setCoppa(coppa);
+    }
+
+    /**
+     * Sets US Privacy string
+     *
+     * @param usPrivacyString - CCPA string if applicable, complying with the comply with the IAB standard
+     *                        <a href="https://github.com/InteractiveAdvertisingBureau/USPrivacy/blob/master/CCPA/US%20Privacy%20String.md">CCPA String Format</a>
+     */
+    public static void setUSPrivacyString(@Nullable String usPrivacyString) {
+        BidMachineImpl.get().getUserRestrictionParams().setUSPrivacyString(usPrivacyString);
     }
 
     /**

@@ -1,11 +1,12 @@
 package io.bidmachine.ads.networks;
 
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdRegistration;
@@ -88,7 +89,7 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
         final AdsType adsType = hbAdRequestParams.getAdsType();
         final AdContentType adContentType = hbAdRequestParams.getAdContentType();
-        String usPrivacy = adRequestParams.getDataRestrictions().getUsPrivacy();
+        String usPrivacy = adRequestParams.getDataRestrictions().getUSPrivacyString();
         if (adsType == AdsType.Banner) {
             BannerSize bannerSize = ((UnifiedBannerAdRequestParams) adRequestParams).getBannerSize();
             AmazonLoader.forDisplay(collectCallback)
