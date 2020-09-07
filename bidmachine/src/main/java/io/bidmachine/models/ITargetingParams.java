@@ -104,7 +104,7 @@ public interface ITargetingParams<SelfType> extends IBlockedParams<SelfType> {
      * @return Self instance
      */
     @SuppressWarnings("UnusedReturnValue")
-    SelfType setStoreSubCategory(String... storeSubCategories);
+    SelfType setStoreSubCategories(String... storeSubCategories);
 
     /**
      * Sets app framework definitions. For example, If the app is using the Unity, put {@link Framework#Unity}

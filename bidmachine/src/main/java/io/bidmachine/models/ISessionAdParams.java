@@ -1,7 +1,7 @@
 package io.bidmachine.models;
 
-import android.support.annotation.FloatRange;
-import android.support.annotation.IntRange;
+import androidx.annotation.FloatRange;
+import androidx.annotation.IntRange;
 
 public interface ISessionAdParams<SelfType> {
 

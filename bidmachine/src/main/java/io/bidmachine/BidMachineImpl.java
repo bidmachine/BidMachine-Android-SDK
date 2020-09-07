@@ -335,8 +335,7 @@ final class BidMachineImpl {
     SessionAdParams getSessionAdParams(AdsType adsType) {
         SessionAdParams sessionAdParams = sessionAdParamsMap.get(adsType);
         if (sessionAdParams == null) {
-            sessionAdParams = new SessionAdParams()
-                    .setIsUserClickedOnLastAd(false);
+            sessionAdParams = new SessionAdParams();
             sessionAdParamsMap.put(adsType, sessionAdParams);
         }
         return sessionAdParams;

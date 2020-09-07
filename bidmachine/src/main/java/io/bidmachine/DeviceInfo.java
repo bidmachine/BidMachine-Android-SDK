@@ -4,8 +4,9 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
+import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.File;

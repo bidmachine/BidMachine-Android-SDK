@@ -237,6 +237,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         if (userExtBuilder.getFieldsCount() > 0) {
             userBuilder.setExt(userExtBuilder.build());
         }
+        bidMachine.getSessionAdParams(adsType).setIsUserClickedOnLastAd(false);
 
         contextBuilder.setUser(userBuilder);
 

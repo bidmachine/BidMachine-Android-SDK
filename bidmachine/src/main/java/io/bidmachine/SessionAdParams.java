@@ -1,6 +1,8 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.explorestack.protobuf.Struct;
 import com.explorestack.protobuf.Value;
@@ -19,6 +21,7 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
 
     private String lastAdDomain;
     private int clickCount;
+    private int videoImpressionCount;
     private int completedVideosCount;
 
     @Override
@@ -69,12 +72,22 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         }
     }
 
+    @Nullable
+    Integer getSessionDuration() {
+        return sessionDuration;
+    }
+
     @Override
     public SessionAdParams setSessionDuration(Integer sessionDuration) {
         if (sessionDuration >= 0) {
             this.sessionDuration = sessionDuration;
         }
         return this;
+    }
+
+    @Nullable
+    Integer getImpressionCount() {
+        return impressionCount;
     }
 
     @Override
@@ -85,6 +98,11 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         return this;
     }
 
+    @Nullable
+    Float getClickRate() {
+        return clickRate;
+    }
+
     @Override
     public SessionAdParams setClickRate(Float clickRate) {
         if (clickRate >= 0 && clickRate <= 100) {
@@ -93,10 +111,20 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         return this;
     }
 
+    @Nullable
+    Boolean getUserClickedOnLastAd() {
+        return isUserClickedOnLastAd;
+    }
+
     @Override
     public SessionAdParams setIsUserClickedOnLastAd(Boolean isUserClickedOnLastAd) {
         this.isUserClickedOnLastAd = isUserClickedOnLastAd;
         return this;
+    }
+
+    @Nullable
+    Float getCompletionRate() {
+        return completionRate;
     }
 
     @Override
@@ -105,6 +133,10 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
             this.completionRate = completionRate;
         }
         return this;
+    }
+
+    public String getLastAdDomain() {
+        return lastAdDomain;
     }
 
     void setLastAdDomain(String lastAdDomain) {
@@ -120,9 +152,14 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         updateClickRate();
     }
 
+    int getClickCount() {
+        return clickCount;
+    }
+
     void addClick() {
         clickCount++;
         updateClickRate();
+        isUserClickedOnLastAd = true;
     }
 
     private void updateClickRate() {
@@ -132,16 +169,42 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         clickRate = (float) clickCount / impressionCount * 100;
     }
 
-    void addCompletedVideos() {
+    public int getVideoImpressionCount() {
+        return videoImpressionCount;
+    }
+
+    void addVideoImpression() {
+        videoImpressionCount++;
+        updateCompletionRate();
+    }
+
+    public int getCompletedVideosCount() {
+        return completedVideosCount;
+    }
+
+    void addCompletedVideo() {
         completedVideosCount++;
         updateCompletionRate();
     }
 
     private void updateCompletionRate() {
-        if (impressionCount == null || impressionCount == 0) {
+        if (videoImpressionCount == 0) {
             return;
         }
-        completionRate = (float) completedVideosCount / impressionCount * 100;
+        completionRate = (float) completedVideosCount / videoImpressionCount * 100;
+    }
+
+    @VisibleForTesting
+    void clear() {
+        sessionDuration = null;
+        impressionCount = null;
+        clickRate = null;
+        isUserClickedOnLastAd = null;
+        completionRate = null;
+        lastAdDomain = null;
+        clickCount = 0;
+        videoImpressionCount = 0;
+        completedVideosCount = 0;
     }
 
 }

@@ -5,7 +5,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -11,12 +11,13 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -154,8 +155,8 @@ public class Utils {
 
     @Nullable
     public static Boolean isAirplaneModeOn(@NonNull Context context) {
-        ContentResolver contentResolver = context.getContentResolver();
         try {
+            ContentResolver contentResolver = context.getContentResolver();
             int value;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 value = Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON);
@@ -181,21 +182,21 @@ public class Utils {
 
     @Nullable
     public static String getDeviceName(@NonNull Context context) {
-        ContentResolver contentResolver = context.getContentResolver();
-        String deviceName;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            deviceName = Settings.Global.getString(contentResolver, "device_name");
-        } else {
-            deviceName = Settings.System.getString(contentResolver, "device_name");
-        }
-        if (!TextUtils.isEmpty(deviceName)) {
-            return deviceName;
-        }
-        deviceName = Settings.Secure.getString(contentResolver, "bluetooth_name");
-        if (!TextUtils.isEmpty(deviceName)) {
-            return deviceName;
-        }
         try {
+            ContentResolver contentResolver = context.getContentResolver();
+            String deviceName;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                deviceName = Settings.Global.getString(contentResolver, "device_name");
+            } else {
+                deviceName = Settings.System.getString(contentResolver, "device_name");
+            }
+            if (!TextUtils.isEmpty(deviceName)) {
+                return deviceName;
+            }
+            deviceName = Settings.Secure.getString(contentResolver, "bluetooth_name");
+            if (!TextUtils.isEmpty(deviceName)) {
+                return deviceName;
+            }
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter != null) {
                 return bluetoothAdapter.getName();

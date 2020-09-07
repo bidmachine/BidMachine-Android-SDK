@@ -213,7 +213,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     }
 
     @Override
-    public TargetingParams setStoreSubCategory(String... storeSubCategories) {
+    public TargetingParams setStoreSubCategories(String... storeSubCategories) {
         this.storeSubCategories = storeSubCategories;
         return this;
     }

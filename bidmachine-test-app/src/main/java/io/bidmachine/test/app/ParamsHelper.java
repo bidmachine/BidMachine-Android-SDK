@@ -81,6 +81,9 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     private String currentCity;
     private String currentZip;
     private String storeUrl;
+    private String storeCategory;
+    private String[] storeSubCategories;
+    private Framework framework;
     private Location currentDeviceLocation;
     private Boolean isPaid;
 
@@ -135,7 +138,8 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                                             .addCategories(publisherCategories)
                                             .build());
             BidMachine.setUSPrivacyString(usPrivacyString);
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+                    context);
             sharedPreferences.edit()
                     .putString("IABConsent_ConsentString", consentString)
                     .putString("IABUSPrivacy_String", usPrivacyString)
@@ -161,6 +165,9 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                 .setZip(currentZip)
                 .setDeviceLocation(currentDeviceLocation)
                 .setStoreUrl(storeUrl)
+                .setStoreCategory(storeCategory)
+                .setStoreSubCategories(storeSubCategories)
+                .setFramework(framework)
                 .setPaid(isPaid);
         if (blockedAdvertiserIABCategories != null) {
             for (String value : blockedAdvertiserIABCategories) {
@@ -267,23 +274,37 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         return this;
     }
 
+    public String getStoreUrl() {
+        return storeUrl;
+    }
     @Override
-    public ParamsHelper setStoreCategory(String category) {
-        return null;
+    public ParamsHelper setStoreCategory(String storeCategory) {
+        this.storeCategory = storeCategory;
+        return this;
+    }
+
+    public String getStoreCategory() {
+        return storeCategory;
     }
 
     @Override
-    public ParamsHelper setStoreSubCategory(String... category) {
-        return null;
+    public ParamsHelper setStoreSubCategories(String... storeSubCategories) {
+        this.storeSubCategories = storeSubCategories;
+        return this;
+    }
+
+    public String[] getStoreSubCategories() {
+        return storeSubCategories;
     }
 
     @Override
     public ParamsHelper setFramework(Framework framework) {
-        return null;
+        this.framework = framework;
+        return this;
     }
 
-    public String getStoreUrl() {
-        return storeUrl;
+    public Framework getFramework() {
+        return framework;
     }
 
     @Override

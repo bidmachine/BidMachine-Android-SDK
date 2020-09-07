@@ -23,28 +23,33 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
+import io.bidmachine.Framework;
 import io.bidmachine.test.app.ParamsHelper;
 
 public class AppParamsFragment extends BaseParamsFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         final ScrollView scrollView = new ScrollView(getContext());
         scrollView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+                                                              ViewGroup.LayoutParams.MATCH_PARENT));
 
         scrollView.setBackgroundColor(Color.WHITE);
 
         final View origin = super.onCreateView(inflater, container, savedInstanceState);
         origin.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+                                                          ViewGroup.LayoutParams.WRAP_CONTENT));
 
         final LinearLayout parent = new LinearLayout(getContext());
         parent.setOrientation(LinearLayout.VERTICAL);
         parent.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+                                                          ViewGroup.LayoutParams.MATCH_PARENT));
         parent.addView(origin);
 
         Button btnFetchInfo = new Button(getContext());
@@ -75,53 +80,80 @@ public class AppParamsFragment extends BaseParamsFragment {
     @Override
     protected void prepareView(Context context, ViewGroup parent, final ParamsHelper paramsHelper) {
         bindParamWidget(context, parent, null,
-                new TextInputParamWidget("Init url", paramsHelper.getInitUrl(),
-                        new ParamWidget.ChangeTracker<String>() {
-                            @Override
-                            public void onChanged(ParamWidget widget, String param) {
-                                paramsHelper.setInitUrl(param);
-                            }
-                        }));
+                        new TextInputParamWidget(
+                                "Init url", paramsHelper.getInitUrl(),
+                                (widget, param) -> paramsHelper.setInitUrl(param)));
         bindParamWidget(context, parent, null,
-                new TextInputParamWidget("Seller Id", paramsHelper.getSellerId(),
-                        new ParamWidget.ChangeTracker<String>() {
-                            @Override
-                            public void onChanged(ParamWidget widget, String param) {
-                                paramsHelper.setSellerId(param);
-                            }
-                        }));
+                        new TextInputParamWidget(
+                                "Seller Id", paramsHelper.getSellerId(),
+                                (widget, param) -> paramsHelper.setSellerId(param)));
         bindParamWidget(context, parent, null,
-                new TextInputParamWidget("App Bundle", paramsHelper.getAppBundle(),
-                        new ParamWidget.ChangeTracker<String>() {
-                            @Override
-                            public void onChanged(ParamWidget widget, String param) {
-                                paramsHelper.setAppBundle(param);
-                            }
-                        }));
+                        new TextInputParamWidget(
+                                "App Bundle", paramsHelper.getAppBundle(),
+                                (widget, param) -> paramsHelper.setAppBundle(param)));
         bindParamWidget(context, parent, null,
-                new TextInputParamWidget("App Name", paramsHelper.getAppName(),
-                        new ParamWidget.ChangeTracker<String>() {
-                            @Override
-                            public void onChanged(ParamWidget widget, String param) {
-                                paramsHelper.setAppName(param);
-                            }
-                        }));
+                        new TextInputParamWidget(
+                                "App Name", paramsHelper.getAppName(),
+                                (widget, param) -> paramsHelper.setAppName(param)));
         bindParamWidget(context, parent, null,
-                new TextInputParamWidget("App Version", paramsHelper.getAppVersion(),
-                        new ParamWidget.ChangeTracker<String>() {
-                            @Override
-                            public void onChanged(ParamWidget widget, String param) {
-                                paramsHelper.setAppVersion(param);
-                            }
-                        }));
+                        new TextInputParamWidget(
+                                "App Version", paramsHelper.getAppVersion(),
+                                (widget, param) -> paramsHelper.setAppVersion(param)));
         bindParamWidget(context, parent, null,
-                new TextInputParamWidget("Store Url", paramsHelper.getStoreUrl(),
-                        new ParamWidget.ChangeTracker<String>() {
-                            @Override
-                            public void onChanged(ParamWidget widget, String param) {
-                                paramsHelper.setStoreUrl(param);
-                            }
-                        }));
+                        new TextInputParamWidget(
+                                "Store Url", paramsHelper.getStoreUrl(),
+                                (widget, param) -> paramsHelper.setStoreUrl(param)));
+        bindParamWidget(context, parent, null,
+                        new TextInputParamWidget(
+                                "Store Cat", paramsHelper.getStoreCategory(),
+                                (widget, param) -> paramsHelper.setStoreCategory(param)));
+
+        StringBuilder storeSubCat = new StringBuilder();
+        if (paramsHelper.getStoreSubCategories() != null) {
+            for (String keyword : paramsHelper.getStoreSubCategories()) {
+                if (storeSubCat.length() > 0) {
+                    storeSubCat.append(",");
+                }
+                storeSubCat.append(keyword);
+            }
+        }
+        bindParamWidget(context, parent, null,
+                        new TextInputParamWidget(
+                                "Store Sub Cat (split by \",\")", storeSubCat.toString(),
+                                (widget, param) -> {
+                                    if (param != null) {
+                                        final String[] splitted = param.split(",");
+                                        final List<String> outParams = new ArrayList<>();
+                                        for (String variable : splitted) {
+                                            if (!TextUtils.isEmpty(variable) && !",".equals(variable)) {
+                                                outParams.add(variable);
+                                            }
+                                        }
+                                        paramsHelper.setStoreSubCategories(outParams.toArray(new String[0]));
+                                    } else {
+                                        paramsHelper.setStoreSubCategories((String[]) null);
+                                    }
+                                }));
+
+        Framework[] frameworks = Framework.values();
+        SelectionContainer[] displayFrameworks = new SelectionContainer[frameworks.length + 1];
+        displayFrameworks[0] = new SelectionContainer("null", null);
+        for (int i = 0; i < frameworks.length; i++) {
+            displayFrameworks[i + 1] = new SelectionContainer(frameworks[i].name(), frameworks[i]);
+        }
+        Framework currentFramework = paramsHelper.getFramework();
+        SelectionContainer displayFramework = currentFramework != null
+                ? new SelectionContainer(currentFramework.name(), currentFramework)
+                : null;
+        bindParamWidget(context, parent, "Framework",
+                        new SpinnerParamsWidget(
+                                "Framework", displayFrameworks, displayFramework,
+                                (widget, param) -> {
+                                    Framework framework = param.getReferenceObject() != null
+                                            ? (Framework) param.getReferenceObject()
+                                            : null;
+                                    paramsHelper.setFramework(framework);
+                                }));
     }
 
     private void fetchInfo(View view, final boolean force) {

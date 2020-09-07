@@ -7,7 +7,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
@@ -32,7 +31,10 @@ public class SessionManagerTest {
         Thread.sleep(1000);
         sessionManager.pause();
         Thread.sleep(1000);
-        assertTrue(sessionManager.getSessionDuration() < 2000);
+        sessionManager.resume();
+        Thread.sleep(1000);
+
+        assertEquals(2, sessionManager.getSessionDuration());
     }
 
 }

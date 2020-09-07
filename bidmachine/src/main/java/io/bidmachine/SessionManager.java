@@ -1,7 +1,7 @@
 package io.bidmachine;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 public class SessionManager {
 
@@ -38,7 +38,7 @@ public class SessionManager {
             return 0;
         }
         long afterResume = System.currentTimeMillis() - resumeTime;
-        return sessionDuration + afterResume / 1000;
+        return (sessionDuration + afterResume) / 1000;
     }
 
     @VisibleForTesting

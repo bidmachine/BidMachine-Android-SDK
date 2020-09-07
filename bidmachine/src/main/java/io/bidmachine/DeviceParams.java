@@ -115,7 +115,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
         if (isRingMuted != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.RING_MUTE,
                                        Value.newBuilder()
-                                               .setNumberValue(isRingMuted ? 1 : 0)
+                                               .setNumberValue(isRingMuted ? 0 : 1)
                                                .build());
         }
         Boolean isCharging = io.bidmachine.Utils.isCharging(context);
