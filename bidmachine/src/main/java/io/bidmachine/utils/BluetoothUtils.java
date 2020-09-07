@@ -72,12 +72,13 @@ public class BluetoothUtils {
 
     @Nullable
     public static List<String> getPairedDevices() {
-        List<String> pairedDeviceList = new ArrayList<>();
+        List<String> pairedDeviceList = null;
         try {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter == null) {
                 return null;
             }
+            pairedDeviceList = new ArrayList<>();
             Set<BluetoothDevice> bluetoothDeviceSet = bluetoothAdapter.getBondedDevices();
             for (BluetoothDevice bluetoothDevice : bluetoothDeviceSet) {
                 pairedDeviceList.add(bluetoothDevice.getName());
@@ -112,12 +113,13 @@ public class BluetoothUtils {
 
     @Nullable
     private static Set<String> getConnectedDevices(@Nullable Integer profile) {
-        Set<String> connectedDeviceSet = new HashSet<>();
+        Set<String> connectedDeviceSet = null;
         try {
             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter == null) {
                 return null;
             }
+            connectedDeviceSet = new HashSet<>();
             for (Map.Entry<Integer, BluetoothProfile> entry : proxyMap.entrySet()) {
                 if (profile == null || entry.getKey().equals(profile)) {
                     BluetoothProfile bluetoothProfile = entry.getValue();
