@@ -48,10 +48,10 @@ public class BidMachineAdTest {
 
         BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
         BidMachineAd interstitialAd = new InterstitialAd(context);
-        bannerAd.processCallback.processImpression();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getImpressionCount());
@@ -64,10 +64,10 @@ public class BidMachineAdTest {
 
         bannerAd = BannerBridge.createBannerAd(context);
         interstitialAd = new InterstitialAd(context);
-        bannerAd.processCallback.processImpression();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getImpressionCount());
@@ -98,19 +98,6 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processClicked();
         interstitialAd.processCallback.processClicked();
 
-        assertEquals(0, BidMachineImpl.get()
-                .getSessionAdParams(AdsType.Banner)
-                .getClickCount());
-        assertEquals(0, BidMachineImpl.get()
-                .getSessionAdParams(AdsType.Interstitial)
-                .getClickCount());
-        assertEquals(0, BidMachineImpl.get()
-                .getSessionAdParams(AdsType.Rewarded)
-                .getClickCount());
-
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-
         assertEquals(1, BidMachineImpl.get()
                 .getSessionAdParams(AdsType.Banner)
                 .getClickCount());
@@ -125,10 +112,8 @@ public class BidMachineAdTest {
         interstitialAd = new InterstitialAd(context);
         bannerAd.processCallback.processClicked();
         bannerAd.processCallback.processClicked();
-        bannerAd.processCallback.processImpression();
         interstitialAd.processCallback.processClicked();
         interstitialAd.processCallback.processClicked();
-        interstitialAd.processCallback.processImpression();
 
         assertEquals(2, BidMachineImpl.get()
                 .getSessionAdParams(AdsType.Banner)
@@ -155,8 +140,8 @@ public class BidMachineAdTest {
 
         BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
         BidMachineAd interstitialAd = new InterstitialAd(context);
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getClickRate());
@@ -193,8 +178,8 @@ public class BidMachineAdTest {
 
         bannerAd = BannerBridge.createBannerAd(context);
         interstitialAd = new InterstitialAd(context);
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getClickRate());
@@ -207,44 +192,7 @@ public class BidMachineAdTest {
     }
 
     @Test
-    public void isUserClickedOnLastAd_impressionBeforeClick() {
-        assertNull(BidMachineImpl.get()
-                           .getSessionAdParams(AdsType.Banner)
-                           .getUserClickedOnLastAd());
-        assertNull(BidMachineImpl.get()
-                           .getSessionAdParams(AdsType.Interstitial)
-                           .getUserClickedOnLastAd());
-        assertNull(BidMachineImpl.get()
-                           .getSessionAdParams(AdsType.Rewarded)
-                           .getUserClickedOnLastAd());
-
-        BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
-        BidMachineAd interstitialAd = new InterstitialAd(context);
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
-        assertNull(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
-        assertNull(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
-        assertNull(sessionAdParams.getUserClickedOnLastAd());
-
-        bannerAd.processCallback.processClicked();
-        interstitialAd.processCallback.processClicked();
-
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
-        assertNotNull(sessionAdParams.getUserClickedOnLastAd());
-        assertTrue(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
-        assertNotNull(sessionAdParams.getUserClickedOnLastAd());
-        assertTrue(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
-        assertNull(sessionAdParams.getUserClickedOnLastAd());
-    }
-
-    @Test
-    public void isUserClickedOnLastAd_clickBeforeImpression() {
+    public void isUserClickedOnLastAd() {
         assertNull(BidMachineImpl.get()
                            .getSessionAdParams(AdsType.Banner)
                            .getUserClickedOnLastAd());
@@ -261,16 +209,6 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processClicked();
 
         SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
-        assertNull(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
-        assertNull(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
-        assertNull(sessionAdParams.getUserClickedOnLastAd());
-
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getUserClickedOnLastAd());
         assertTrue(sessionAdParams.getUserClickedOnLastAd());
         sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
@@ -300,10 +238,10 @@ public class BidMachineAdTest {
         interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
                 .setAuctionCreativeFormat(CreativeFormat.Video)
                 .build();
-        bannerAd.processCallback.processImpression();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         assertEquals(0, BidMachineImpl.get()
                 .getSessionAdParams(AdsType.Banner)
@@ -323,10 +261,10 @@ public class BidMachineAdTest {
         interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
                 .setAuctionCreativeFormat(CreativeFormat.Video)
                 .build();
-        bannerAd.processCallback.processImpression();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         assertEquals(0, BidMachineImpl.get()
                 .getSessionAdParams(AdsType.Banner)
@@ -346,10 +284,10 @@ public class BidMachineAdTest {
         interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
                 .setAuctionCreativeFormat(CreativeFormat.Banner)
                 .build();
-        bannerAd.processCallback.processImpression();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         assertEquals(0, BidMachineImpl.get()
                 .getSessionAdParams(AdsType.Banner)
@@ -441,8 +379,8 @@ public class BidMachineAdTest {
         interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
                 .setAuctionCreativeFormat(CreativeFormat.Video)
                 .build();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getCompletionRate());
@@ -482,8 +420,8 @@ public class BidMachineAdTest {
         interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial)
                 .setAuctionCreativeFormat(CreativeFormat.Video)
                 .build();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getCompletionRate());
@@ -500,8 +438,8 @@ public class BidMachineAdTest {
         bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner).build();
         BidMachineAd interstitialAd = new InterstitialAd(context);
         interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial).build();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getLastAdDomain());
@@ -529,8 +467,8 @@ public class BidMachineAdTest {
                     add("test_interstitial_ad_domain_3");
                 }})
                 .build();
-        bannerAd.processCallback.processImpression();
-        interstitialAd.processCallback.processImpression();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
 
         SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getLastAdDomain());

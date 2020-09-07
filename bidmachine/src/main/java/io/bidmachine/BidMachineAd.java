@@ -373,6 +373,25 @@ public abstract class BidMachineAd<
             if (loadedObject != null) {
                 loadedObject.onShown();
             }
+            SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+            sessionAdParams.addImpression();
+            if (adRequest != null) {
+                AuctionResult auctionResult = adRequest.getAuctionResult();
+                if (auctionResult != null
+                        && auctionResult.getCreativeFormat() == CreativeFormat.Video) {
+                    BidMachineImpl.get()
+                            .getSessionAdParams(adsType)
+                            .addVideoImpression();
+                }
+                Ad ad = adRequest.adResult;
+                if (ad != null && ad.getAdomainCount() > 0) {
+                    sessionAdParams.setLastAdDomain(ad.getAdomain(0));
+                } else {
+                    sessionAdParams.setLastAdDomain(null);
+                }
+            } else {
+                sessionAdParams.setLastAdDomain(null);
+            }
             trackEvent(TrackEventType.Show, null);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -410,7 +429,7 @@ public abstract class BidMachineAd<
             if (currentState.ordinal() > State.Success.ordinal()) {
                 return;
             }
-            if (!isClickTracked && isImpressionTracked) {
+            if (!isClickTracked) {
                 SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
                 sessionAdParams.addClick();
             }
@@ -444,28 +463,6 @@ public abstract class BidMachineAd<
             log("processImpression");
             if (loadedObject != null) {
                 loadedObject.onImpression();
-            }
-            SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
-            sessionAdParams.addImpression();
-            if (adRequest != null) {
-                AuctionResult auctionResult = adRequest.getAuctionResult();
-                if (auctionResult != null
-                        && auctionResult.getCreativeFormat() == CreativeFormat.Video) {
-                    BidMachineImpl.get()
-                            .getSessionAdParams(adsType)
-                            .addVideoImpression();
-                }
-                Ad ad = adRequest.adResult;
-                if (ad != null && ad.getAdomainCount() > 0) {
-                    sessionAdParams.setLastAdDomain(ad.getAdomain(0));
-                } else {
-                    sessionAdParams.setLastAdDomain(null);
-                }
-            } else {
-                sessionAdParams.setLastAdDomain(null);
-            }
-            if (isClickTracked) {
-                sessionAdParams.addClick();
             }
             trackEvent(TrackEventType.Impression, null);
             Utils.onUiThread(new Runnable() {
