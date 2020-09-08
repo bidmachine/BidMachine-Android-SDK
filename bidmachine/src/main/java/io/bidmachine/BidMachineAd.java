@@ -1,6 +1,7 @@
 package io.bidmachine;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -374,6 +375,7 @@ public abstract class BidMachineAd<
             }
             log("processShown");
             SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+            sessionAdParams.setLastBundle(null);
             sessionAdParams.setLastAdDomain(null);
             sessionAdParams.addImpression();
             if (adRequest != null) {
@@ -383,8 +385,19 @@ public abstract class BidMachineAd<
                     sessionAdParams.addVideoImpression();
                 }
                 Ad ad = adRequest.adResult;
-                if (ad != null && ad.getAdomainCount() > 0) {
-                    sessionAdParams.setLastAdDomain(ad.getAdomain(0));
+                if (ad != null) {
+                    for (String bundle : ad.getBundleList()) {
+                        if (!TextUtils.isEmpty(bundle)) {
+                            sessionAdParams.setLastBundle(bundle);
+                            break;
+                        }
+                    }
+                    for (String adomain : ad.getAdomainList()) {
+                        if (!TextUtils.isEmpty(adomain)) {
+                            sessionAdParams.setLastAdDomain(adomain);
+                            break;
+                        }
+                    }
                 }
             }
             trackEvent(TrackEventType.Show, null);

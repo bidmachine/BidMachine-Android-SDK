@@ -19,6 +19,7 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
     private Boolean isUserClickedOnLastAd;
     private Float completionRate;
 
+    private String lastBundle;
     private String lastAdDomain;
     private int clickCount;
     private int videoImpressionCount;
@@ -62,6 +63,12 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
             userExtBuilder.putFields(ProtoExtConstants.Context.User.COMPLETION_RATE,
                                      Value.newBuilder()
                                              .setNumberValue(completionRate)
+                                             .build());
+        }
+        if (lastBundle != null) {
+            userExtBuilder.putFields(ProtoExtConstants.Context.User.LAST_BUNDLE,
+                                     Value.newBuilder()
+                                             .setStringValue(lastBundle)
                                              .build());
         }
         if (lastAdDomain != null) {
@@ -135,6 +142,14 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         return this;
     }
 
+    public String getLastBundle() {
+        return lastBundle;
+    }
+
+    public void setLastBundle(String lastBundle) {
+        this.lastBundle = lastBundle;
+    }
+
     public String getLastAdDomain() {
         return lastAdDomain;
     }
@@ -201,6 +216,7 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         clickRate = null;
         isUserClickedOnLastAd = null;
         completionRate = null;
+        lastBundle = null;
         lastAdDomain = null;
         clickCount = 0;
         videoImpressionCount = 0;

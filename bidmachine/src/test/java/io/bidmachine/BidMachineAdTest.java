@@ -433,6 +433,126 @@ public class BidMachineAdTest {
     }
 
     @Test
+    public void lastBundle_adNotContainsBundle_returnNull() {
+        BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner).build();
+        BidMachineAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial).build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNull(sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNull(sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastBundle());
+    }
+
+    @Test
+    public void lastBundle_adContainsBundle_returnFirstBundle() {
+        BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setBundleList(new ArrayList<String>() {{
+                    add("test_banner_bundle_1");
+                    add("test_banner_bundle_2");
+                    add("test_banner_bundle_3");
+                }})
+                .build();
+        BidMachineAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setBundleList(new ArrayList<String>() {{
+                    add("test_interstitial_bundle_1");
+                    add("test_interstitial_bundle_2");
+                    add("test_interstitial_bundle_3");
+                }})
+                .build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNotNull(sessionAdParams.getLastBundle());
+        assertEquals("test_banner_bundle_1", sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNotNull(sessionAdParams.getLastBundle());
+        assertEquals("test_interstitial_bundle_1", sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastBundle());
+    }
+
+    @Test
+    public void lastBundle_adContainsBundle_returnFirstNotEmptyBundle() {
+        BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setBundleList(new ArrayList<String>() {{
+                    add("");
+                    add("test_banner_bundle_2");
+                    add("test_banner_bundle_3");
+                }})
+                .build();
+        BidMachineAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setBundleList(new ArrayList<String>() {{
+                    add("");
+                    add("test_interstitial_bundle_2");
+                    add("test_interstitial_bundle_3");
+                }})
+                .build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNotNull(sessionAdParams.getLastBundle());
+        assertEquals("test_banner_bundle_2", sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNotNull(sessionAdParams.getLastBundle());
+        assertEquals("test_interstitial_bundle_2", sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastBundle());
+    }
+
+    @Test
+    public void lastBundle_secondAdNotContainsBundle_returnNull() {
+        BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setBundleList(new ArrayList<String>() {{
+                    add("test_banner_bundle_1");
+                }})
+                .build();
+        BidMachineAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setBundleList(new ArrayList<String>() {{
+                    add("test_interstitial_bundle_1");
+                }})
+                .build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNotNull(sessionAdParams.getLastBundle());
+        assertEquals("test_banner_bundle_1", sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNotNull(sessionAdParams.getLastBundle());
+        assertEquals("test_interstitial_bundle_1", sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastBundle());
+
+        bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner).build();
+        interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial).build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNull(sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNull(sessionAdParams.getLastBundle());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastBundle());
+    }
+
+    @Test
     public void lastAdDomain_adNotContainsAdDomain_returnNull() {
         BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
         bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner).build();
@@ -453,7 +573,7 @@ public class BidMachineAdTest {
     public void lastAdDomain_adContainsAdDomain_returnFirstAdDomain() {
         BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
         bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
-                .setAdDomain(new ArrayList<String>() {{
+                .setAdDomainList(new ArrayList<String>() {{
                     add("test_banner_ad_domain_1");
                     add("test_banner_ad_domain_2");
                     add("test_banner_ad_domain_3");
@@ -461,7 +581,7 @@ public class BidMachineAdTest {
                 .build();
         BidMachineAd interstitialAd = new InterstitialAd(context);
         interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
-                .setAdDomain(new ArrayList<String>() {{
+                .setAdDomainList(new ArrayList<String>() {{
                     add("test_interstitial_ad_domain_1");
                     add("test_interstitial_ad_domain_2");
                     add("test_interstitial_ad_domain_3");
@@ -476,6 +596,78 @@ public class BidMachineAdTest {
         sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getLastAdDomain());
         assertEquals("test_interstitial_ad_domain_1", sessionAdParams.getLastAdDomain());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastAdDomain());
+    }
+
+    @Test
+    public void lastAdDomain_adContainsAdDomain_returnFirstNotEmptyAdDomain() {
+        BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAdDomainList(new ArrayList<String>() {{
+                    add("");
+                    add("test_banner_ad_domain_2");
+                    add("test_banner_ad_domain_3");
+                }})
+                .build();
+        BidMachineAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAdDomainList(new ArrayList<String>() {{
+                    add("");
+                    add("test_interstitial_ad_domain_2");
+                    add("test_interstitial_ad_domain_3");
+                }})
+                .build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNotNull(sessionAdParams.getLastAdDomain());
+        assertEquals("test_banner_ad_domain_2", sessionAdParams.getLastAdDomain());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNotNull(sessionAdParams.getLastAdDomain());
+        assertEquals("test_interstitial_ad_domain_2", sessionAdParams.getLastAdDomain());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastAdDomain());
+    }
+
+    @Test
+    public void lastAdDomain_secondAdNotContainsAdDomain_returnNull() {
+        BidMachineAd bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAdDomainList(new ArrayList<String>() {{
+                    add("test_banner_ad_domain_1");
+                }})
+                .build();
+        BidMachineAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setAdDomainList(new ArrayList<String>() {{
+                    add("test_interstitial_ad_domain_1");
+                }})
+                .build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNotNull(sessionAdParams.getLastAdDomain());
+        assertEquals("test_banner_ad_domain_1", sessionAdParams.getLastAdDomain());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNotNull(sessionAdParams.getLastAdDomain());
+        assertEquals("test_interstitial_ad_domain_1", sessionAdParams.getLastAdDomain());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        assertNull(sessionAdParams.getLastAdDomain());
+
+        bannerAd = BannerBridge.createBannerAd(context);
+        bannerAd.adRequest = new TestAdRequest.Builder(AdsType.Banner).build();
+        interstitialAd = new InterstitialAd(context);
+        interstitialAd.adRequest = new TestAdRequest.Builder(AdsType.Interstitial).build();
+        bannerAd.processCallback.processShown();
+        interstitialAd.processCallback.processShown();
+
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        assertNull(sessionAdParams.getLastAdDomain());
+        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        assertNull(sessionAdParams.getLastAdDomain());
         sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastAdDomain());
     }

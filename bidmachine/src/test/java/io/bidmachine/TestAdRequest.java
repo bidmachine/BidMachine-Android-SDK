@@ -85,7 +85,8 @@ public class TestAdRequest extends AdRequest {
 
         };
         adResult = Ad.newBuilder()
-                .addAllAdomain(builder.adDomain)
+                .addAllBundle(builder.bundleList)
+                .addAllAdomain(builder.adDomainList)
                 .build();
     }
 
@@ -117,7 +118,8 @@ public class TestAdRequest extends AdRequest {
         CreativeFormat auctionCreativeFormat;
         Map<String, String> auctionCustomParams = new HashMap<>();
 
-        List<String> adDomain = new ArrayList<>();
+        List<String> bundleList = new ArrayList<>();
+        List<String> adDomainList = new ArrayList<>();
 
         public Builder(@NonNull AdsType adsType) {
             this.adsType = adsType;
@@ -178,8 +180,13 @@ public class TestAdRequest extends AdRequest {
             return this;
         }
 
-        public Builder setAdDomain(List<String> adDomain) {
-            this.adDomain = adDomain;
+        public Builder setBundleList(List<String> bundleList) {
+            this.bundleList = bundleList;
+            return this;
+        }
+
+        public Builder setAdDomainList(List<String> adDomainList) {
+            this.adDomainList = adDomainList;
             return this;
         }
 

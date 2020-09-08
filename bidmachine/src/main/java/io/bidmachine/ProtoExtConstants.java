@@ -17,6 +17,7 @@ public class ProtoExtConstants {
 
             static final String IMPRESSION_DEPTH = "impdepth";
             static final String SESSION_DURATION = "sessionduration";
+            static final String LAST_BUNDLE = "lastbundle";
             static final String LAST_AD_DOMAIN = "lastadomain";
             static final String CLICK_RATE = "clickrate";
             static final String LAST_CLICK = "lastclick";
@@ -31,8 +32,6 @@ public class ProtoExtConstants {
             static final String TOTAL_DISK = "totaldisk";
             static final String RING_MUTE = "ringmute";
             static final String CHARGING = "charging";
-            static final String BLUETOOTH = "bluetooth";
-            static final String BLUETOOTH_NAME = "bluetoothname";
             static final String HEADSET = "headset";
             static final String BATTERY_LEVEL = "batterylevel";
             static final String BATTERY_SAVER = "batterysaver";

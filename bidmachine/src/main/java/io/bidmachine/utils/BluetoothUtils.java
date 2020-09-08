@@ -8,10 +8,8 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,9 +17,9 @@ import java.util.Set;
 public class BluetoothUtils {
 
     private static final int[] profileArray = new int[]{
-            BluetoothProfile.HEADSET,
-            BluetoothProfile.A2DP,
-            BluetoothProfile.HEALTH
+            BluetoothProfile.HEADSET
+//            BluetoothProfile.A2DP,
+//            BluetoothProfile.HEALTH
     };
     private static final Map<Integer, BluetoothProfile> proxyMap = new HashMap<>(profileArray.length);
     private static final BluetoothProfile.ServiceListener listener = new BluetoothProfile.ServiceListener() {
@@ -61,34 +59,6 @@ public class BluetoothUtils {
     }
 
     @Nullable
-    public static Boolean isEnabled() {
-        try {
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
-        } catch (Exception ignore) {
-        }
-        return null;
-    }
-
-    @Nullable
-    public static List<String> getPairedDevices() {
-        List<String> pairedDeviceList = null;
-        try {
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (bluetoothAdapter == null) {
-                return null;
-            }
-            pairedDeviceList = new ArrayList<>();
-            Set<BluetoothDevice> bluetoothDeviceSet = bluetoothAdapter.getBondedDevices();
-            for (BluetoothDevice bluetoothDevice : bluetoothDeviceSet) {
-                pairedDeviceList.add(bluetoothDevice.getName());
-            }
-        } catch (Exception ignore) {
-        }
-        return pairedDeviceList;
-    }
-
-    @Nullable
     public static Boolean isHeadsetConnected() {
         try {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -99,11 +69,6 @@ public class BluetoothUtils {
         } catch (Exception ignore) {
         }
         return null;
-    }
-
-    @Nullable
-    public static Set<String> getConnectedDevices() {
-        return getConnectedDevices(null);
     }
 
     @Nullable
