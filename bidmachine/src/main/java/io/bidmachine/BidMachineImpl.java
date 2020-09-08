@@ -332,7 +332,7 @@ final class BidMachineImpl {
     }
 
     @NonNull
-    SessionAdParams getSessionAdParams(AdsType adsType) {
+    synchronized SessionAdParams getSessionAdParams(AdsType adsType) {
         SessionAdParams sessionAdParams = sessionAdParamsMap.get(adsType);
         if (sessionAdParams == null) {
             sessionAdParams = new SessionAdParams();

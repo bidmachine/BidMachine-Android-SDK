@@ -374,23 +374,18 @@ public abstract class BidMachineAd<
             }
             log("processShown");
             SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+            sessionAdParams.setLastAdDomain(null);
             sessionAdParams.addImpression();
             if (adRequest != null) {
                 AuctionResult auctionResult = adRequest.getAuctionResult();
                 if (auctionResult != null
                         && auctionResult.getCreativeFormat() == CreativeFormat.Video) {
-                    BidMachineImpl.get()
-                            .getSessionAdParams(adsType)
-                            .addVideoImpression();
+                    sessionAdParams.addVideoImpression();
                 }
                 Ad ad = adRequest.adResult;
                 if (ad != null && ad.getAdomainCount() > 0) {
                     sessionAdParams.setLastAdDomain(ad.getAdomain(0));
-                } else {
-                    sessionAdParams.setLastAdDomain(null);
                 }
-            } else {
-                sessionAdParams.setLastAdDomain(null);
             }
             trackEvent(TrackEventType.Show, null);
             Utils.onUiThread(new Runnable() {
