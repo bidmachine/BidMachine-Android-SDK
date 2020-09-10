@@ -28,6 +28,7 @@ import io.bidmachine.protobuf.InitRequest;
 import io.bidmachine.protobuf.InitResponse;
 import io.bidmachine.utils.ActivityHelper;
 import io.bidmachine.utils.BMError;
+import io.bidmachine.utils.BluetoothUtils;
 
 final class BidMachineImpl {
 
@@ -74,6 +75,8 @@ final class BidMachineImpl {
     private String sellerId;
     @NonNull
     private TargetingParams targetingParams = new TargetingParams();
+    @NonNull
+    private EnumMap<AdsType, SessionAdParams> sessionAdParamsMap = new EnumMap<>(AdsType.class);
     @NonNull
     private ExtraParams extraParams = new ExtraParams();
     @NonNull
@@ -168,6 +171,8 @@ final class BidMachineImpl {
         topActivity = ActivityHelper.getTopActivity();
         ((Application) context.getApplicationContext())
                 .registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks());
+        SessionManager.get().resume();
+        BluetoothUtils.register(context);
         isInitialized = true;
     }
 
@@ -324,6 +329,16 @@ final class BidMachineImpl {
     @NonNull
     TargetingParams getTargetingParams() {
         return targetingParams;
+    }
+
+    @NonNull
+    synchronized SessionAdParams getSessionAdParams(AdsType adsType) {
+        SessionAdParams sessionAdParams = sessionAdParamsMap.get(adsType);
+        if (sessionAdParams == null) {
+            sessionAdParams = new SessionAdParams();
+            sessionAdParamsMap.put(adsType, sessionAdParams);
+        }
+        return sessionAdParams;
     }
 
     @Nullable

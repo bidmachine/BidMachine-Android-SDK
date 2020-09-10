@@ -19,7 +19,7 @@ class DeviceInfoImpl implements DeviceInfo {
     @Override
     public String getHttpAgent(@NonNull android.content.Context context) {
         if (dataRestrictions.canSendDeviceInfo()) {
-            return io.bidmachine.core.DeviceInfo.obtain(context).httpAgent;
+            return io.bidmachine.DeviceInfo.obtain(context).httpAgent;
         }
         return null;
     }

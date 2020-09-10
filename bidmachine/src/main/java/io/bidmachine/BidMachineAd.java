@@ -1,6 +1,7 @@
 package io.bidmachine;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -34,7 +35,8 @@ public abstract class BidMachineAd<
     @NonNull
     private final AdsType adsType;
     @Nullable
-    private AdRequestType adRequest;
+    @VisibleForTesting
+    AdRequestType adRequest;
     @Nullable
     private AdListenerType listener;
     @Nullable
@@ -44,6 +46,7 @@ public abstract class BidMachineAd<
 
     private boolean isShownTracked;
     private boolean isImpressionTracked;
+    private boolean isClickTracked;
     private boolean isFinishTracked;
     private boolean isCloseTracked;
 
@@ -371,6 +374,32 @@ public abstract class BidMachineAd<
                 loadedObject.onShown();
             }
             log("processShown");
+            SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+            sessionAdParams.setLastBundle(null);
+            sessionAdParams.setLastAdDomain(null);
+            sessionAdParams.addImpression();
+            if (adRequest != null) {
+                AuctionResult auctionResult = adRequest.getAuctionResult();
+                if (auctionResult != null
+                        && auctionResult.getCreativeFormat() == CreativeFormat.Video) {
+                    sessionAdParams.addVideoImpression();
+                }
+                Ad ad = adRequest.adResult;
+                if (ad != null) {
+                    for (String bundle : ad.getBundleList()) {
+                        if (!TextUtils.isEmpty(bundle)) {
+                            sessionAdParams.setLastBundle(bundle);
+                            break;
+                        }
+                    }
+                    for (String adomain : ad.getAdomainList()) {
+                        if (!TextUtils.isEmpty(adomain)) {
+                            sessionAdParams.setLastAdDomain(adomain);
+                            break;
+                        }
+                    }
+                }
+            }
             trackEvent(TrackEventType.Show, null);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -408,6 +437,11 @@ public abstract class BidMachineAd<
             if (currentState.ordinal() > State.Success.ordinal()) {
                 return;
             }
+            if (!isClickTracked) {
+                SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+                sessionAdParams.addClick();
+            }
+            isClickTracked = true;
             if (loadedObject != null) {
                 loadedObject.onClicked();
             }
@@ -463,6 +497,15 @@ public abstract class BidMachineAd<
                 loadedObject.onFinished();
             }
             log("processFinished");
+            if (adRequest != null) {
+                AuctionResult auctionResult = adRequest.getAuctionResult();
+                if (auctionResult != null
+                        && auctionResult.getCreativeFormat() == CreativeFormat.Video) {
+                    BidMachineImpl.get()
+                            .getSessionAdParams(adsType)
+                            .addCompletedVideo();
+                }
+            }
             Utils.onUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -560,6 +603,7 @@ public abstract class BidMachineAd<
                 Logger.log(String.format("%s: %s", selfMessage, message));
             }
         }
+
     };
 
     private void trackEvent(TrackEventType eventType, @Nullable BMError error) {

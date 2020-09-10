@@ -7,6 +7,7 @@ import java.util.List;
 import io.bidmachine.AdRequest;
 import io.bidmachine.NetworkConfig;
 import io.bidmachine.PriceFloorParams;
+import io.bidmachine.SessionAdParams;
 import io.bidmachine.TargetingParams;
 
 public interface RequestBuilder<SelfType extends RequestBuilder, ReturnType extends AdRequest> {
@@ -16,6 +17,9 @@ public interface RequestBuilder<SelfType extends RequestBuilder, ReturnType exte
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setTargetingParams(TargetingParams targetingParams);
+
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setSessionAdParams(SessionAdParams sessionAdParams);
 
     @SuppressWarnings("UnusedReturnValue")
     SelfType setNetworks(@Nullable List<NetworkConfig> networkConfigList);

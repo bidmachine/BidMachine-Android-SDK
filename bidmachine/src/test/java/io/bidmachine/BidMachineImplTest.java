@@ -10,6 +10,7 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
@@ -47,6 +48,18 @@ public class BidMachineImplTest {
         String ifv3 = bidMachine.obtainIFV(context);
         assertNotNull(ifv3);
         assertEquals(ifv2, ifv3);
+    }
+
+    @Test
+    public void getSessionAdParams() {
+        SessionAdParams bannerSessionAdParams1 = bidMachine.getSessionAdParams(AdsType.Banner);
+        assertNotNull(bannerSessionAdParams1);
+        SessionAdParams bannerSessionAdParams2 = bidMachine.getSessionAdParams(AdsType.Banner);
+        assertNotNull(bannerSessionAdParams1);
+        assertEquals(bannerSessionAdParams1, bannerSessionAdParams2);
+        SessionAdParams interstitialSessionAdParams1 = bidMachine.getSessionAdParams(AdsType.Interstitial);
+        assertNotNull(bannerSessionAdParams1);
+        assertNotEquals(interstitialSessionAdParams1, bannerSessionAdParams1);
     }
 
 }

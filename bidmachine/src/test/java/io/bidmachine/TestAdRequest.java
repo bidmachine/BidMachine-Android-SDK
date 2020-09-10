@@ -3,7 +3,11 @@ package io.bidmachine;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.explorestack.protobuf.adcom.Ad;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.bidmachine.models.AuctionResult;
@@ -86,6 +90,10 @@ public class TestAdRequest extends AdRequest {
             }
 
         };
+        adResult = Ad.newBuilder()
+                .addAllBundle(builder.bundleList)
+                .addAllAdomain(builder.adDomainList)
+                .build();
     }
 
     @NonNull
@@ -116,6 +124,9 @@ public class TestAdRequest extends AdRequest {
         Map<String, String> auctionNetworkParams = new HashMap<>();
         CreativeFormat auctionCreativeFormat;
         Map<String, String> auctionCustomParams = new HashMap<>();
+
+        List<String> bundleList = new ArrayList<>();
+        List<String> adDomainList = new ArrayList<>();
 
         public Builder(@NonNull AdsType adsType) {
             this.adsType = adsType;
@@ -178,6 +189,16 @@ public class TestAdRequest extends AdRequest {
 
         public Builder setAuctionCustomParams(Map<String, String> auctionCustomParams) {
             this.auctionCustomParams = auctionCustomParams;
+            return this;
+        }
+
+        public Builder setBundleList(List<String> bundleList) {
+            this.bundleList = bundleList;
+            return this;
+        }
+
+        public Builder setAdDomainList(List<String> adDomainList) {
+            this.adDomainList = adDomainList;
             return this;
         }
 

@@ -447,7 +447,7 @@ public class Utils {
     Device info utils
      */
 
-    public static float getBatteryLevel(Context context) {
+    public static float getBatteryPercent(Context context) {
         try {
             IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
             Intent batteryStatus = context.registerReceiver(null, intentFilter);
@@ -468,7 +468,7 @@ public class Utils {
 
     public static boolean canUseExternalFilesDir(Context context) {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT || writePermissionGranted(context))
-                && isExternalStorageWritable();
+                && isExternalMemoryAvailable();
     }
 
     public static boolean isPermissionGranted(@NonNull Context context,
@@ -486,9 +486,8 @@ public class Utils {
         return isPermissionGranted(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    private static boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(state);
+    public static boolean isExternalMemoryAvailable() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
     public static byte[] getMD5(byte[] bytes) {

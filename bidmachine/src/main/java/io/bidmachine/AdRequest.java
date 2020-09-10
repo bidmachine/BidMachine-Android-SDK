@@ -9,6 +9,7 @@ import androidx.annotation.VisibleForTesting;
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.InvalidProtocolBufferException;
 import com.explorestack.protobuf.Message;
+import com.explorestack.protobuf.Struct;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.adcom.Placement;
@@ -53,6 +54,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     PriceFloorParams priceFloorParams;
     TargetingParams targetingParams;
+    SessionAdParams sessionAdParams;
     Map<String, NetworkConfig> networkConfigMap;
     int timeOut = -1;
     boolean headerBiddingEnabled = true;
@@ -144,16 +146,26 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         final Request.Builder requestBuilder = Request.newBuilder();
         final TargetingParams targetingParams =
                 RequestParams.resolveParams(this.targetingParams, bidMachine.getTargetingParams());
+        final SessionAdParams sessionAdParams =
+                RequestParams.resolveParams(this.sessionAdParams,
+                                            bidMachine.getSessionAdParams(adsType)
+                                                    .setSessionDuration((int) SessionManager.get()
+                                                            .getSessionDuration()));
         final BlockedParams blockedParams = targetingParams.getBlockedParams();
         final UserRestrictionParams userRestrictionParams =
-                RequestParams.resolveParams(this.userRestrictionParams, bidMachine.getUserRestrictionParams());
-        unifiedAdRequestParams = createUnifiedAdRequestParams(targetingParams, userRestrictionParams);
+                RequestParams.resolveParams(this.userRestrictionParams,
+                                            bidMachine.getUserRestrictionParams());
+        unifiedAdRequestParams = createUnifiedAdRequestParams(targetingParams,
+                                                              userRestrictionParams);
 
         //PriceFloor params
-        final PriceFloorParams priceFloorParams = oneOf(this.priceFloorParams, bidMachine.getPriceFloorParams());
+        final PriceFloorParams priceFloorParams = oneOf(this.priceFloorParams,
+                                                        bidMachine.getPriceFloorParams());
         final Map<String, Double> priceFloorsMap =
-                priceFloorParams.getPriceFloors() == null || priceFloorParams.getPriceFloors().size() == 0
-                        ? bidMachine.getPriceFloorParams().getPriceFloors() : priceFloorParams.getPriceFloors();
+                priceFloorParams.getPriceFloors() == null
+                        || priceFloorParams.getPriceFloors().size() == 0
+                        ? bidMachine.getPriceFloorParams().getPriceFloors()
+                        : priceFloorParams.getPriceFloors();
 
         if (priceFloorsMap == null) {
             return BMError.paramError("PriceFloors not provided");
@@ -209,6 +221,13 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         targetingParams.build(context, appBuilder);
 
+        //Context -> App -> Extension
+        Struct.Builder appExtBuilder = Struct.newBuilder();
+        targetingParams.fillAppExtension(appExtBuilder);
+        if (appExtBuilder.getFieldsCount() > 0) {
+            appBuilder.setExt(appExtBuilder.build());
+        }
+
         contextBuilder.setApp(appBuilder);
 
         //Context -> Restrictions
@@ -224,6 +243,15 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         if (userRestrictionParams.canSendUserInfo()) {
             targetingParams.build(userBuilder);
         }
+
+        //Context -> User -> Extension
+        Struct.Builder userExtBuilder = Struct.newBuilder();
+        sessionAdParams.fillUserExtension(userExtBuilder);
+        if (userExtBuilder.getFieldsCount() > 0) {
+            userBuilder.setExt(userExtBuilder.build());
+        }
+        bidMachine.getSessionAdParams(adsType).setIsUserClickedOnLastAd(false);
+
         contextBuilder.setUser(userBuilder);
 
         //Context -> Regs
@@ -233,8 +261,21 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
         //Context -> Device
         final Context.Device.Builder deviceBuilder = Context.Device.newBuilder();
-        bidMachine.getDeviceParams().build(context, deviceBuilder, targetingParams,
-                bidMachine.getTargetingParams(), userRestrictionParams);
+        bidMachine.getDeviceParams().build(context,
+                                           deviceBuilder,
+                                           targetingParams,
+                                           bidMachine.getTargetingParams(),
+                                           userRestrictionParams);
+
+        //Context -> Device -> Extension
+        Struct.Builder deviceExtBuilder = Struct.newBuilder();
+        bidMachine.getDeviceParams().fillDeviceExtension(context,
+                                                         deviceExtBuilder,
+                                                         userRestrictionParams);
+        if (deviceExtBuilder.getFieldsCount() > 0) {
+            deviceBuilder.setExt(deviceExtBuilder.build());
+        }
+
         contextBuilder.setDevice(deviceBuilder);
 
         requestBuilder.setContext(Any.pack(contextBuilder.build()));
@@ -329,8 +370,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                         currentApiRequest = currentApiRequestBuilder.request();
                     } else {
                         processRequestFail(requestBuildResult instanceof BMError
-                                ? (BMError) requestBuildResult
-                                : BMError.Internal);
+                                                   ? (BMError) requestBuildResult
+                                                   : BMError.Internal);
                     }
                 }
             });
@@ -490,8 +531,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     seatBidResult = seatbid;
                     auctionResult = new AuctionResultImpl(getType(), seatbid, bid, ad, networkConfig);
                     expirationTime = getOrDefault(bid.getExp(),
-                            Response.Seatbid.Bid.getDefaultInstance().getExp(),
-                            DEF_EXPIRATION_TIME);
+                                                  Response.Seatbid.Bid.getDefaultInstance()
+                                                          .getExp(),
+                                                  DEF_EXPIRATION_TIME);
                     extractTrackUrls(bid);
                     subscribeExpireTracker();
                     Logger.log(toString() + ": Request finished (" + auctionResult + ")");
@@ -500,7 +542,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             listener.onRequestSuccess(this, auctionResult);
                         }
                     }
-                    for (AdRequestListener listener : BidMachineImpl.get().getAdRequestListeners()) {
+                    for (AdRequestListener listener : BidMachineImpl.get()
+                            .getAdRequestListeners()) {
                         listener.onRequestSuccess(this, auctionResult);
                     }
                     BidMachineEvents.eventFinish(
@@ -631,6 +674,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public SelfType setTargetingParams(TargetingParams userParams) {
             prepareRequest();
             params.targetingParams = userParams;
+            return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public SelfType setSessionAdParams(SessionAdParams sessionAdParams) {
+            prepareRequest();
+            params.sessionAdParams = sessionAdParams;
             return (SelfType) this;
         }
 
