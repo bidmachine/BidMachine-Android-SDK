@@ -7,6 +7,7 @@ import androidx.annotation.VisibleForTesting;
 import com.explorestack.protobuf.Struct;
 import com.explorestack.protobuf.Value;
 
+import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.ISessionAdParams;
 import io.bidmachine.models.RequestParams;
@@ -88,6 +89,8 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
     public SessionAdParams setSessionDuration(Integer sessionDuration) {
         if (sessionDuration >= 0) {
             this.sessionDuration = sessionDuration;
+        } else {
+            Logger.log("session duration shouldn't be negative");
         }
         return this;
     }
@@ -101,6 +104,8 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
     public SessionAdParams setImpressionCount(Integer impressionCount) {
         if (impressionCount >= 0) {
             this.impressionCount = impressionCount;
+        } else {
+            Logger.log("impression count shouldn't be negative");
         }
         return this;
     }
@@ -114,6 +119,8 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
     public SessionAdParams setClickRate(Float clickRate) {
         if (clickRate >= 0 && clickRate <= 100) {
             this.clickRate = clickRate;
+        } else {
+            Logger.log("click rate be between 0 and 100");
         }
         return this;
     }
@@ -138,6 +145,8 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
     public SessionAdParams setCompletionRate(Float completionRate) {
         if (completionRate >= 0 && completionRate <= 100) {
             this.completionRate = completionRate;
+        } else {
+            Logger.log("click rate be between 0 and 100");
         }
         return this;
     }

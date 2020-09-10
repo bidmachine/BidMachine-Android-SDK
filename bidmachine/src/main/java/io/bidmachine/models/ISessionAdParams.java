@@ -8,7 +8,7 @@ public interface ISessionAdParams<SelfType> {
     /**
      * The total duration of time a user has spent so far in a specific app session expressed in seconds
      *
-     * @param sessionDuration total session duration. Must not be negative.
+     * @param sessionDuration total session duration. Shouldn't be negative.
      */
     SelfType setSessionDuration(@IntRange(from = 0) Integer sessionDuration);
 
@@ -16,7 +16,7 @@ public interface ISessionAdParams<SelfType> {
      * The count of impressions for a specific placement type in a given app session.
      * The impression depth is reset once the session ends.
      *
-     * @param impressionCount count of impressions. Must not be negative.
+     * @param impressionCount count of impressions. Shouldn't be negative.
      */
     SelfType setImpressionCount(@IntRange(from = 0) Integer impressionCount);
 
