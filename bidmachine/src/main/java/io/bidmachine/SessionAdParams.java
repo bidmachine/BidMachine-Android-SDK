@@ -146,7 +146,7 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         return lastBundle;
     }
 
-    public void setLastBundle(String lastBundle) {
+    void setLastBundle(String lastBundle) {
         this.lastBundle = lastBundle;
     }
 
