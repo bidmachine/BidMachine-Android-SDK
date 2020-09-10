@@ -5,15 +5,12 @@ import android.graphics.Point;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.explorestack.protobuf.Any;
-import com.explorestack.protobuf.InvalidProtocolBufferException;
 import com.explorestack.protobuf.Message;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
@@ -78,7 +75,10 @@ public enum AdsType {
     }
 
     NetworkConfig obtainNetworkConfig(@NonNull Ad ad) {
-        NetworkConfig networkConfig = obtainHeaderBiddingAdNetworkConfig(ad);
+        HeaderBiddingAd headerBiddingAd = obtainHeaderBiddingAd(ad);
+        NetworkConfig networkConfig = headerBiddingAd != null
+                ? NetworkRegistry.getConfig(headerBiddingAd.getBidder())
+                : null;
         if (networkConfig == null) {
             if (this == AdsType.Native) {
                 networkConfig = NetworkRegistry.getConfig(NetworkRegistry.Nast);
@@ -89,41 +89,6 @@ public enum AdsType {
             }
         }
         return networkConfig;
-    }
-
-    @Nullable
-    private NetworkConfig obtainHeaderBiddingAdNetworkConfig(@NonNull Ad ad) {
-        List<Any> extensions = null;
-        if (ad.hasDisplay()) {
-            Ad.Display display = ad.getDisplay();
-            if (display.hasBanner()) {
-                extensions = display.getBanner().getExtProtoList();
-            } else if (display.hasNative()) {
-                extensions = display.getNative().getExtProtoList();
-            }
-        }
-        if ((extensions == null || extensions.isEmpty()) && ad.hasVideo()) {
-            extensions = ad.getVideo().getExtProtoList();
-        }
-        if (extensions != null) {
-            return obtainHeaderBiddingAdNetworkConfig(extensions);
-        }
-        return null;
-    }
-
-    @Nullable
-    private NetworkConfig obtainHeaderBiddingAdNetworkConfig(@NonNull List<Any> extensions) {
-        for (Any extension : extensions) {
-            if (extension.is(HeaderBiddingAd.class)) {
-                try {
-                    HeaderBiddingAd headerBiddingAd = extension.unpack(HeaderBiddingAd.class);
-                    return NetworkRegistry.getConfig(headerBiddingAd.getBidder());
-                } catch (InvalidProtocolBufferException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return null;
     }
 
     ApiRequest.ApiAuctionDataBinder getBinder() {
@@ -146,11 +111,22 @@ public enum AdsType {
         return null;
     }
 
+    HeaderBiddingAd obtainHeaderBiddingAd(@NonNull Ad ad) {
+        for (PlacementBuilder builder : placementBuilders) {
+            HeaderBiddingAd headerBiddingAd = builder.obtainHeaderBiddingAd(ad);
+            if (headerBiddingAd != null) {
+                return headerBiddingAd;
+            }
+        }
+        return null;
+    }
+
     @SuppressWarnings("unchecked")
     void collectDisplayPlacements(@NonNull final ContextProvider contextProvider,
                                   @NonNull final AdRequest adRequest,
                                   @NonNull final UnifiedAdRequestParams adRequestParams,
-                                  @NonNull final ArrayList<Message.Builder> outList) {
+                                  @NonNull final ArrayList<Message.Builder> outList,
+                                  @Nullable final Map<String, NetworkConfig> networkConfigMap) {
         final CountDownLatch syncLock = new CountDownLatch(placementBuilders.length);
         for (final PlacementBuilder placementBuilder : placementBuilders) {
             if (adRequest.isPlacementBuilderMatch(placementBuilder)) {
@@ -161,7 +137,9 @@ public enum AdsType {
                                 contextProvider,
                                 adRequestParams,
                                 AdsType.this,
-                                networkConfigs.values(),
+                                networkConfigMap != null
+                                        ? networkConfigMap.values()
+                                        : networkConfigs.values(),
                                 new PlacementBuilder.PlacementCreateCallback() {
                                     @Override
                                     public void onCreated(@Nullable Message.Builder placement) {

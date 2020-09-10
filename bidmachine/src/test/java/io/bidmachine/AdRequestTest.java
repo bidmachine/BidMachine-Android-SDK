@@ -251,13 +251,4 @@ public class AdRequestTest {
 
     }
 
-    private static class TestAdRequestBuilder extends AdRequest.AdRequestBuilderImpl<TestAdRequestBuilder, TestAdRequest> {
-
-        @Override
-        protected TestAdRequest createRequest() {
-            return new TestAdRequest(AdsType.Interstitial);
-        }
-
-    }
-
 }
