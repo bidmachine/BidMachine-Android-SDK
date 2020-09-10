@@ -14,6 +14,7 @@ import io.bidmachine.AdsType;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.NetworkConfig;
 import io.bidmachine.models.AdObjectParams;
+import io.bidmachine.protobuf.headerbidding.HeaderBiddingAd;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 
 public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdRequestParams> {
@@ -65,6 +66,12 @@ public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends Unifie
                                                      @NonNull Ad ad) {
         return headerBiddingPlacementBuilder != null
                 ? headerBiddingPlacementBuilder.createAdObjectParams(contextProvider, adRequest, seatbid, bid, ad)
+                : null;
+    }
+
+    public HeaderBiddingAd obtainHeaderBiddingAd(@NonNull Ad ad) {
+        return headerBiddingPlacementBuilder != null
+                ? headerBiddingPlacementBuilder.obtainHeaderBiddingAd(ad)
                 : null;
     }
 

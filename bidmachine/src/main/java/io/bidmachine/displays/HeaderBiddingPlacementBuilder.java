@@ -1,5 +1,7 @@
 package io.bidmachine.displays;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -122,21 +124,28 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                                         @NonNull Response.Seatbid seatbid,
                                         @NonNull Response.Seatbid.Bid bid,
                                         @NonNull Ad ad) {
+        HeaderBiddingAd headerBiddingAd = obtainHeaderBiddingAd(ad);
+        return headerBiddingAd != null
+                ? new HeaderBiddingAdObjectParams(seatbid, bid, ad, headerBiddingAd)
+                : null;
+    }
+
+    @Nullable
+    HeaderBiddingAd obtainHeaderBiddingAd(@NonNull Ad ad) {
         HeaderBiddingAd headerBiddingAd = null;
         if (ad.hasDisplay()) {
-            if (ad.getDisplay().hasBanner()) {
-                headerBiddingAd = obtainHeaderBiddingAd(ad.getDisplay().getBanner().getExtProtoList());
+            Ad.Display display = ad.getDisplay();
+            if (display.hasBanner()) {
+                headerBiddingAd = obtainHeaderBiddingAd(display.getBanner().getExtProtoList());
             }
-            if (headerBiddingAd == null && ad.getDisplay().hasNative()) {
-                headerBiddingAd = obtainHeaderBiddingAd(ad.getDisplay().getNative().getExtProtoList());
+            if (headerBiddingAd == null && display.hasNative()) {
+                headerBiddingAd = obtainHeaderBiddingAd(display.getNative().getExtProtoList());
             }
         }
         if (headerBiddingAd == null && ad.hasVideo()) {
             headerBiddingAd = obtainHeaderBiddingAd(ad.getVideo().getExtProtoList());
         }
-        return headerBiddingAd != null
-                ? new HeaderBiddingAdObjectParams(seatbid, bid, ad, headerBiddingAd)
-                : null;
+        return headerBiddingAd;
     }
 
     @Nullable
@@ -229,6 +238,15 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             HeaderBiddingPlacement.AdUnit.Builder builder = HeaderBiddingPlacement.AdUnit.newBuilder();
             builder.setBidder(adapter.getKey());
             builder.setBidderSdkver(adapter.getVersion());
+            for (Map.Entry<String, String> mediationEntry : mediationConfig.entrySet()) {
+                String key = mediationEntry.getKey();
+                String value = mediationEntry.getValue();
+                if (!TextUtils.isEmpty(key)
+                        && !TextUtils.isEmpty(value)
+                        && !NetworkConfig.PRIVATE_FIELDS.contains(key)) {
+                    builder.putClientParams(key, value);
+                }
+            }
             builder.putAllClientParams(params);
             adUnit = builder.build();
             Logger.log(String.format("%s: %s: Header bidding collect finished",

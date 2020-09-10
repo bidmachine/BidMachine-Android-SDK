@@ -15,8 +15,12 @@ import com.explorestack.protobuf.adcom.Placement;
 import com.explorestack.protobuf.openrtb.Request;
 import com.explorestack.protobuf.openrtb.Response;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,6 +53,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     PriceFloorParams priceFloorParams;
     TargetingParams targetingParams;
+    Map<String, NetworkConfig> networkConfigMap;
     int timeOut = -1;
     boolean headerBiddingEnabled = true;
 
@@ -155,8 +160,11 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
 
         final ArrayList<Message.Builder> placements = new ArrayList<>();
-        adsType.collectDisplayPlacements(
-                new SimpleContextProvider(context), this, unifiedAdRequestParams, placements);
+        adsType.collectDisplayPlacements(new SimpleContextProvider(context),
+                                         this,
+                                         unifiedAdRequestParams,
+                                         placements,
+                                         networkConfigMap);
 
         final Request.Item.Builder itemBuilder = Request.Item.newBuilder();
         itemBuilder.setId(UUID.randomUUID().toString());
@@ -480,7 +488,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     adResult = ad;
                     bidResult = bid;
                     seatBidResult = seatbid;
-                    auctionResult = new AuctionResultImpl(seatbid, bid, ad, networkConfig);
+                    auctionResult = new AuctionResultImpl(getType(), seatbid, bid, ad, networkConfig);
                     expirationTime = getOrDefault(bid.getExp(),
                             Response.Seatbid.Bid.getDefaultInstance().getExp(),
                             DEF_EXPIRATION_TIME);
@@ -624,6 +632,50 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             prepareRequest();
             params.targetingParams = userParams;
             return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public SelfType setNetworks(@Nullable List<NetworkConfig> networkConfigList) {
+            fillNetworkConfigs(networkConfigList);
+            return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public SelfType setNetworks(@Nullable String jsonData) {
+            if (!TextUtils.isEmpty(jsonData)) {
+                List<NetworkConfig> networkConfigList = new ArrayList<>();
+                try {
+                    JSONArray networkConfigJsonArray = new JSONArray(jsonData);
+                    for (int i = 0; i < networkConfigJsonArray.length(); i++) {
+                        JSONObject networkConfigJsonObject = networkConfigJsonArray.getJSONObject(i);
+                        NetworkConfig networkConfig = NetworkConfig.create(
+                                BidMachineImpl.get().getAppContext(),
+                                networkConfigJsonObject);
+                        if (networkConfig != null) {
+                            networkConfigList.add(networkConfig);
+                        }
+                    }
+                } catch (Exception e) {
+                    Logger.log(e);
+                }
+                fillNetworkConfigs(networkConfigList);
+            }
+            return (SelfType) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @VisibleForTesting
+        void fillNetworkConfigs(@Nullable List<NetworkConfig> networkConfigList) {
+            if (networkConfigList != null && networkConfigList.size() > 0) {
+                prepareRequest();
+
+                params.networkConfigMap = new HashMap<String, NetworkConfig>();
+                for (NetworkConfig networkConfig : networkConfigList) {
+                    params.networkConfigMap.put(networkConfig.getKey(), networkConfig);
+                }
+            }
         }
 
         @Override

@@ -393,15 +393,15 @@ public class NetworkConfigTest {
 
         Map<String, String> config = configList.get(0);
         assertEquals("test_value1", config.get("test_key1"));
-        assertEquals("Portrait", config.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("portrait", config.get(NetworkConfig.CONFIG_ORIENTATION));
 
         config = configList.get(1);
         assertEquals("test_value2", config.get("test_key2"));
-        assertEquals("Landscape", config.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("landscape", config.get(NetworkConfig.CONFIG_ORIENTATION));
 
         config = configList.get(2);
         assertEquals("test_value3", config.get("test_key3"));
-        assertEquals("Landscape", config.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("landscape", config.get(NetworkConfig.CONFIG_ORIENTATION));
     }
 
     @Test
@@ -454,7 +454,7 @@ public class NetworkConfigTest {
                 AdContentType.All);
         assertNotNull(mediationConfig);
         assertEquals("test_value3", mediationConfig.get("test_key3"));
-        assertEquals("Portrait", mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("portrait", mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
 
         context.getResources().getConfiguration().orientation = Configuration.ORIENTATION_LANDSCAPE;
         mediationConfig = networkConfig.peekMediationConfig(
@@ -463,7 +463,7 @@ public class NetworkConfigTest {
                 AdContentType.All);
         assertNotNull(mediationConfig);
         assertEquals("test_value5", mediationConfig.get("test_key5"));
-        assertEquals("Landscape", mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("landscape", mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
     }
 
     @Test

@@ -35,12 +35,12 @@ public class CriteoConfig extends NetworkConfig {
 
     public CriteoConfig withMediationConfig(@NonNull AdsFormat adsFormat,
                                             @NonNull final String adUnitId) {
-        return withMediationConfig(adsFormat, adUnitId, Orientation.Undefined);
+        return withMediationConfig(adsFormat, adUnitId, null);
     }
 
     public CriteoConfig withMediationConfig(@NonNull AdsFormat adsFormat,
                                             @NonNull final String adUnitId,
-                                            @NonNull Orientation orientation) {
+                                            @Nullable Orientation orientation) {
         return withMediationConfig(
                 adsFormat,
                 new HashMap<String, String>() {{
