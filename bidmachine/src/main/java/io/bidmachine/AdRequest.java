@@ -148,14 +148,19 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                                             .getSessionDuration()));
         final BlockedParams blockedParams = targetingParams.getBlockedParams();
         final UserRestrictionParams userRestrictionParams =
-                RequestParams.resolveParams(this.userRestrictionParams, bidMachine.getUserRestrictionParams());
-        unifiedAdRequestParams = createUnifiedAdRequestParams(targetingParams, userRestrictionParams);
+                RequestParams.resolveParams(this.userRestrictionParams,
+                                            bidMachine.getUserRestrictionParams());
+        unifiedAdRequestParams = createUnifiedAdRequestParams(targetingParams,
+                                                              userRestrictionParams);
 
         //PriceFloor params
-        final PriceFloorParams priceFloorParams = oneOf(this.priceFloorParams, bidMachine.getPriceFloorParams());
+        final PriceFloorParams priceFloorParams = oneOf(this.priceFloorParams,
+                                                        bidMachine.getPriceFloorParams());
         final Map<String, Double> priceFloorsMap =
-                priceFloorParams.getPriceFloors() == null || priceFloorParams.getPriceFloors().size() == 0
-                        ? bidMachine.getPriceFloorParams().getPriceFloors() : priceFloorParams.getPriceFloors();
+                priceFloorParams.getPriceFloors() == null
+                        || priceFloorParams.getPriceFloors().size() == 0
+                        ? bidMachine.getPriceFloorParams().getPriceFloors()
+                        : priceFloorParams.getPriceFloors();
 
         if (priceFloorsMap == null) {
             return BMError.paramError("PriceFloors not provided");
@@ -248,12 +253,17 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
         //Context -> Device
         final Context.Device.Builder deviceBuilder = Context.Device.newBuilder();
-        bidMachine.getDeviceParams().build(context, deviceBuilder, targetingParams,
-                bidMachine.getTargetingParams(), userRestrictionParams);
+        bidMachine.getDeviceParams().build(context,
+                                           deviceBuilder,
+                                           targetingParams,
+                                           bidMachine.getTargetingParams(),
+                                           userRestrictionParams);
 
         //Context -> Device -> Extension
         Struct.Builder deviceExtBuilder = Struct.newBuilder();
-        bidMachine.getDeviceParams().fillDeviceExtension(context, deviceExtBuilder);
+        bidMachine.getDeviceParams().fillDeviceExtension(context,
+                                                         deviceExtBuilder,
+                                                         userRestrictionParams);
         if (deviceExtBuilder.getFieldsCount() > 0) {
             deviceBuilder.setExt(deviceExtBuilder.build());
         }
@@ -352,8 +362,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                         currentApiRequest = currentApiRequestBuilder.request();
                     } else {
                         processRequestFail(requestBuildResult instanceof BMError
-                                ? (BMError) requestBuildResult
-                                : BMError.Internal);
+                                                   ? (BMError) requestBuildResult
+                                                   : BMError.Internal);
                     }
                 }
             });
@@ -513,8 +523,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     seatBidResult = seatbid;
                     auctionResult = new AuctionResultImpl(seatbid, bid, ad, networkConfig);
                     expirationTime = getOrDefault(bid.getExp(),
-                            Response.Seatbid.Bid.getDefaultInstance().getExp(),
-                            DEF_EXPIRATION_TIME);
+                                                  Response.Seatbid.Bid.getDefaultInstance()
+                                                          .getExp(),
+                                                  DEF_EXPIRATION_TIME);
                     extractTrackUrls(bid);
                     subscribeExpireTracker();
                     Logger.log(toString() + ": Request finished (" + auctionResult + ")");
@@ -523,7 +534,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             listener.onRequestSuccess(this, auctionResult);
                         }
                     }
-                    for (AdRequestListener listener : BidMachineImpl.get().getAdRequestListeners()) {
+                    for (AdRequestListener listener : BidMachineImpl.get()
+                            .getAdRequestListeners()) {
                         listener.onRequestSuccess(this, auctionResult);
                     }
                     BidMachineEvents.eventFinish(

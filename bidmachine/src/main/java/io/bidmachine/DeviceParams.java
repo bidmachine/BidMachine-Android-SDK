@@ -82,7 +82,9 @@ final class DeviceParams extends RequestParams<DeviceParams> {
         }
     }
 
-    void fillDeviceExtension(android.content.Context context, Struct.Builder deviceExtBuilder) {
+    void fillDeviceExtension(android.content.Context context,
+                             Struct.Builder deviceExtBuilder,
+                             UserRestrictionParams userRestrictionParams) {
         Set<String> inputLanguageSet = io.bidmachine.Utils.getInputLanguageSet(context);
         if (inputLanguageSet.size() > 0) {
             ListValue.Builder listValueBuilder = ListValue.newBuilder();
@@ -165,12 +167,14 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                                .setNumberValue(isDoNotDisturbOn ? 1 : 0)
                                                .build());
         }
-        String deviceName = io.bidmachine.Utils.getDeviceName(context);
-        if (deviceName != null) {
-            deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.DEVICE_NAME,
-                                       Value.newBuilder()
-                                               .setStringValue(deviceName)
-                                               .build());
+        if (userRestrictionParams.canSendDeviceInfo()) {
+            String deviceName = io.bidmachine.Utils.getDeviceName(context);
+            if (deviceName != null) {
+                deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.DEVICE_NAME,
+                                           Value.newBuilder()
+                                                   .setStringValue(deviceName)
+                                                   .build());
+            }
         }
         deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.TIME,
                                    Value.newBuilder()
