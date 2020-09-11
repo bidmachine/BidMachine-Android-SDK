@@ -53,17 +53,19 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
         for (NetworkConfig networkConfig : networkConfigs) {
             NetworkAdapter adapter = networkConfig.obtainNetworkAdapter();
             if (adapter instanceof HeaderBiddingAdapter) {
-                Map<String, String> mediationConfig =
+                List<Map<String, String>> mediationConfigs =
                         networkConfig.peekMediationConfig(adsType, adRequestParams, adContentType);
-                if (mediationConfig != null) {
-                    preloadTasks.add(
-                            new AdUnitPreloadTask<>(
-                                    contextProvider,
-                                    (HeaderBiddingAdapter) adapter,
-                                    adsType,
-                                    adContentType,
-                                    adRequestParams,
-                                    mediationConfig));
+                if (mediationConfigs != null) {
+                    for (Map<String, String> config : mediationConfigs) {
+                        preloadTasks.add(
+                                new AdUnitPreloadTask<>(
+                                        contextProvider,
+                                        (HeaderBiddingAdapter) adapter,
+                                        adsType,
+                                        adContentType,
+                                        adRequestParams,
+                                        config));
+                    }
                 }
             }
         }
