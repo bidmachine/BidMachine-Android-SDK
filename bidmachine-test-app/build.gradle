@@ -8,8 +8,8 @@ android {
         applicationId "io.bidmachine.test.app"
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
-        versionCode 100100028
-        versionName "1.1.4"
+        versionCode 100100029
+        versionName "1.1.5"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

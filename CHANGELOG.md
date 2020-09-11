@@ -1,3 +1,15 @@
+## Version 1.6.0 (September 11, 2020)
+**Features**:
+* SDK improvement
+* Added API method ```BidMachine.setUSPrivacyString``` to set US privacy string
+* Added API method ```AdRequest.Builder#setNetworks``` to set certain networks for AdRequest
+* Added API method ```AdRequest.Builder#setSessionAdParams``` to set additional session parameters for AdRequest
+* Updated AdColony adapter version to 1.6.0.5. More info [here](adapters/adcolony/CHANGELOG.md)
+* Updated Amazon adapter version to 1.6.0.3. More info [here](adapters/amazon/CHANGELOG.md)
+* Updated Facebook adapter version to 1.6.0.4. More info [here](adapters/facebook/CHANGELOG.md)
+* Updated MyTarget adapter version to 1.6.0.3. More info [here](adapters/my_target/CHANGELOG.md)
+* Updated Tapjoy adapter version to 1.6.0.4. More info [here](adapters/tapjoy/CHANGELOG.md)
+
 ## Version 1.5.2 (August 3, 2020)
 **Features**:
 * SDK improvement
