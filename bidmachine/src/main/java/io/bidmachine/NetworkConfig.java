@@ -303,8 +303,10 @@ public abstract class NetworkConfig {
         if (requiredOrientation == Orientation.Portrait
                 && currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
             return true;
-        } else return requiredOrientation == Orientation.Landscape
-                && currentOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        } else {
+            return requiredOrientation == Orientation.Landscape
+                    && currentOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        }
     }
 
     /**

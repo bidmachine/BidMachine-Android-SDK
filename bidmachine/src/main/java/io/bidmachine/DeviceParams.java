@@ -127,7 +127,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                                .setNumberValue(isCharging ? 1 : 0)
                                                .build());
         }
-        Boolean isHeadsetConnected = BluetoothUtils.isHeadsetConnected();
+        Boolean isHeadsetConnected = BluetoothUtils.isHeadsetConnected(context);
         if (isHeadsetConnected != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.HEADSET,
                                        Value.newBuilder()
@@ -195,7 +195,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                    Value.newBuilder()
                                            .setNumberValue(SystemClock.elapsedRealtime())
                                            .build());
-        Set<String> bluetoothConnectedHeadsets = BluetoothUtils.getConnectedHeadsets();
+        Set<String> bluetoothConnectedHeadsets = BluetoothUtils.getConnectedHeadsets(context);
         if (bluetoothConnectedHeadsets != null && bluetoothConnectedHeadsets.size() > 0) {
             String headset = bluetoothConnectedHeadsets.iterator().next();
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.HEADSET_NAME,
