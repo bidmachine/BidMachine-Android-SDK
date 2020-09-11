@@ -228,61 +228,81 @@ public class NetworkConfigTest {
         }});
         UnifiedBannerAdRequestParams bannerRequestParams = mock(UnifiedBannerAdRequestParams.class);
         doReturn(BannerSize.Size_320x50).when(bannerRequestParams).getBannerSize();
-        assertEquals("TestValueBanner",
-                     networkConfig.peekMediationConfig(AdsType.Banner,
-                                                       bannerRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
+
+        List<Map<String, String>> mediationConfig = networkConfig.peekMediationConfig(AdsType.Banner,
+                                                                                      bannerRequestParams,
+                                                                                      AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueBanner", mediationConfig.get(0).get("TestKey"));
         doReturn(BannerSize.Size_300x250).when(bannerRequestParams).getBannerSize();
-        assertEquals("TestValueBanner",
-                     networkConfig.peekMediationConfig(AdsType.Banner,
-                                                       bannerRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Banner,
+                                                            bannerRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueBanner", mediationConfig.get(0).get("TestKey"));
         doReturn(BannerSize.Size_728x90).when(bannerRequestParams).getBannerSize();
-        assertEquals("TestValueBanner",
-                     networkConfig.peekMediationConfig(AdsType.Banner,
-                                                       bannerRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Banner,
+                                                            bannerRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueBanner", mediationConfig.get(0).get("TestKey"));
+
         UnifiedFullscreenAdRequestParams fullscreenAdRequestParams = mock(
                 UnifiedFullscreenAdRequestParams.class);
-        assertEquals("TestValueInterstitialStatic",
-                     networkConfig.peekMediationConfig(AdsType.Interstitial,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
-        assertEquals("TestValueInterstitialStatic",
-                     networkConfig.peekMediationConfig(AdsType.Interstitial,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Video)
-                             .get("TestKey"));
-        assertEquals("TestValueInterstitialStatic",
-                     networkConfig.peekMediationConfig(AdsType.Interstitial,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Static)
-                             .get("TestKey"));
-        assertEquals("TestValueRewardedStatic",
-                     networkConfig.peekMediationConfig(AdsType.Rewarded,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
-        assertEquals("TestValueRewardedStatic",
-                     networkConfig.peekMediationConfig(AdsType.Rewarded,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Video)
-                             .get("TestKey"));
-        assertEquals("TestValueRewardedStatic",
-                     networkConfig.peekMediationConfig(AdsType.Rewarded,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Static)
-                             .get("TestKey"));
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Interstitial,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueInterstitialStatic", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Interstitial,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Video);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueInterstitialStatic", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Interstitial,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Static);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueInterstitialStatic", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Rewarded,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueRewardedStatic", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Rewarded,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Video);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueRewardedStatic", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Rewarded,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Static);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueRewardedStatic", mediationConfig.get(0).get("TestKey"));
+
         UnifiedNativeAdRequestParams nativeAdRequestParams = mock(UnifiedNativeAdRequestParams.class);
-        assertEquals("TestValueNative",
-                     networkConfig.peekMediationConfig(AdsType.Native,
-                                                       nativeAdRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Native,
+                                                            nativeAdRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueNative", mediationConfig.get(0).get("TestKey"));
     }
 
     @Test
@@ -313,51 +333,70 @@ public class NetworkConfigTest {
         }});
         UnifiedBannerAdRequestParams bannerRequestParams = mock(UnifiedBannerAdRequestParams.class);
         doReturn(BannerSize.Size_320x50).when(bannerRequestParams).getBannerSize();
-        assertEquals("TestValueBanner320",
-                     networkConfig.peekMediationConfig(AdsType.Banner,
-                                                       bannerRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
+        List<Map<String, String>> mediationConfig = networkConfig.peekMediationConfig(AdsType.Banner,
+                                                                                      bannerRequestParams,
+                                                                                      AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueBanner320", mediationConfig.get(0).get("TestKey"));
+
         doReturn(BannerSize.Size_300x250).when(bannerRequestParams).getBannerSize();
-        assertEquals("TestValueBanner300",
-                     networkConfig.peekMediationConfig(AdsType.Banner,
-                                                       bannerRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Banner,
+                                                            bannerRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueBanner300", mediationConfig.get(0).get("TestKey"));
+
         doReturn(BannerSize.Size_728x90).when(bannerRequestParams).getBannerSize();
-        assertEquals("TestValueBanner728",
-                     networkConfig.peekMediationConfig(AdsType.Banner,
-                                                       bannerRequestParams,
-                                                       AdContentType.All)
-                             .get("TestKey"));
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Banner,
+                                                            bannerRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueBanner728", mediationConfig.get(0).get("TestKey"));
+
         UnifiedFullscreenAdRequestParams fullscreenAdRequestParams = mock(
                 UnifiedFullscreenAdRequestParams.class);
-        assertNull(networkConfig.peekMediationConfig(AdsType.Interstitial,
-                                                     fullscreenAdRequestParams,
-                                                     AdContentType.All));
-        assertEquals("TestValueInterstitialVideo",
-                     networkConfig.peekMediationConfig(AdsType.Interstitial,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Video)
-                             .get("TestKey"));
-        assertEquals("TestValueInterstitialStatic",
-                     networkConfig.peekMediationConfig(AdsType.Interstitial,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Static)
-                             .get("TestKey"));
-        assertNull(networkConfig.peekMediationConfig(AdsType.Rewarded,
-                                                     fullscreenAdRequestParams,
-                                                     AdContentType.All));
-        assertEquals("TestValueRewardedVideo",
-                     networkConfig.peekMediationConfig(AdsType.Rewarded,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Video)
-                             .get("TestKey"));
-        assertEquals("TestValueRewardedStatic",
-                     networkConfig.peekMediationConfig(AdsType.Rewarded,
-                                                       fullscreenAdRequestParams,
-                                                       AdContentType.Static)
-                             .get("TestKey"));
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Interstitial,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(0, mediationConfig.size());
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Interstitial,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Video);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueInterstitialVideo", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Interstitial,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Static);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueInterstitialStatic", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Rewarded,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.All);
+        assertNotNull(mediationConfig);
+        assertEquals(0, mediationConfig.size());
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Rewarded,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Video);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueRewardedVideo", mediationConfig.get(0).get("TestKey"));
+
+        mediationConfig = networkConfig.peekMediationConfig(AdsType.Rewarded,
+                                                            fullscreenAdRequestParams,
+                                                            AdContentType.Static);
+        assertNotNull(mediationConfig);
+        assertEquals(1, mediationConfig.size());
+        assertEquals("TestValueRewardedStatic", mediationConfig.get(0).get("TestKey"));
     }
 
     @Test
@@ -439,13 +478,14 @@ public class NetworkConfigTest {
         BidMachineImpl.get().appContext = context;
 
         context.getResources().getConfiguration().orientation = Configuration.ORIENTATION_UNDEFINED;
-        Map<String, String> mediationConfig = networkConfig.peekMediationConfig(
+        List<Map<String, String>> mediationConfig = networkConfig.peekMediationConfig(
                 AdsType.Interstitial,
                 mock(UnifiedFullscreenAdRequestParams.class),
                 AdContentType.All);
         assertNotNull(mediationConfig);
-        assertEquals("test_value1", mediationConfig.get("test_key1"));
-        assertNull(mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals(1, mediationConfig.size());
+        assertEquals("test_value1", mediationConfig.get(0).get("test_key1"));
+        assertNull(mediationConfig.get(0).get(NetworkConfig.CONFIG_ORIENTATION));
 
         context.getResources().getConfiguration().orientation = Configuration.ORIENTATION_PORTRAIT;
         mediationConfig = networkConfig.peekMediationConfig(
@@ -453,8 +493,13 @@ public class NetworkConfigTest {
                 mock(UnifiedFullscreenAdRequestParams.class),
                 AdContentType.All);
         assertNotNull(mediationConfig);
-        assertEquals("test_value3", mediationConfig.get("test_key3"));
-        assertEquals("portrait", mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals(3, mediationConfig.size());
+        assertEquals("test_value1", mediationConfig.get(0).get("test_key1"));
+        assertNull(mediationConfig.get(0).get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("test_value2", mediationConfig.get(1).get("test_key2"));
+        assertEquals("portrait", mediationConfig.get(1).get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("test_value3", mediationConfig.get(2).get("test_key3"));
+        assertEquals("portrait", mediationConfig.get(2).get(NetworkConfig.CONFIG_ORIENTATION));
 
         context.getResources().getConfiguration().orientation = Configuration.ORIENTATION_LANDSCAPE;
         mediationConfig = networkConfig.peekMediationConfig(
@@ -462,8 +507,13 @@ public class NetworkConfigTest {
                 mock(UnifiedFullscreenAdRequestParams.class),
                 AdContentType.All);
         assertNotNull(mediationConfig);
-        assertEquals("test_value5", mediationConfig.get("test_key5"));
-        assertEquals("landscape", mediationConfig.get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals(3, mediationConfig.size());
+        assertEquals("test_value1", mediationConfig.get(0).get("test_key1"));
+        assertNull(mediationConfig.get(0).get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("test_value4", mediationConfig.get(1).get("test_key4"));
+        assertEquals("landscape", mediationConfig.get(1).get(NetworkConfig.CONFIG_ORIENTATION));
+        assertEquals("test_value5", mediationConfig.get(2).get("test_key5"));
+        assertEquals("landscape", mediationConfig.get(2).get(NetworkConfig.CONFIG_ORIENTATION));
     }
 
     @Test

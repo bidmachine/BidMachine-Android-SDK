@@ -252,7 +252,7 @@ public abstract class NetworkConfig {
      * @param adRequestParams provided typed {@link UnifiedAdRequestParams}
      * @return map of parameters for provided {@link AdsType} and {@link AdContentType} to be used for mediation process
      */
-    @Nullable
+    @NonNull
     public <T extends UnifiedAdRequestParams> List<Map<String, String>> peekMediationConfig(@NonNull AdsType adsType,
                                                                                             @NonNull T adRequestParams,
                                                                                             @NonNull AdContentType adContentType) {
