@@ -252,31 +252,29 @@ public abstract class NetworkConfig {
      * @param adRequestParams provided typed {@link UnifiedAdRequestParams}
      * @return map of parameters for provided {@link AdsType} and {@link AdContentType} to be used for mediation process
      */
-    @Nullable
-    public <T extends UnifiedAdRequestParams> Map<String, String> peekMediationConfig(@NonNull AdsType adsType,
-                                                                                      @NonNull T adRequestParams,
-                                                                                      @NonNull AdContentType adContentType) {
-        Map<String, String> resultConfig = null;
+    @NonNull
+    public <T extends UnifiedAdRequestParams> List<Map<String, String>> peekMediationConfig(@NonNull AdsType adsType,
+                                                                                            @NonNull T adRequestParams,
+                                                                                            @NonNull AdContentType adContentType) {
+        List<Map<String, String>> targetConfigs = new ArrayList<>();
         if (typedMediationConfigs != null) {
-            Map<String, String> typedConfig = null;
             for (Map.Entry<AdsFormat, List<Map<String, String>>> entry : typedMediationConfigs.entrySet()) {
                 if (entry.getKey().isMatch(adsType, adRequestParams, adContentType)) {
                     List<Map<String, String>> configList = entry.getValue();
                     if (configList != null) {
                         for (Map<String, String> config : configList) {
                             if (isOrientationMatched(config)) {
-                                typedConfig = config;
+                                targetConfigs.add(config);
                             }
                         }
                     }
                 }
             }
-            if (typedConfig != null) {
-                // Copy provided config since we shouldn't modify it
-                resultConfig = prepareTypedMediationConfig(typedConfig);
-            }
         }
-        return resultConfig;
+        for (int i = 0; i < targetConfigs.size(); i++) {
+            targetConfigs.set(i, prepareTypedMediationConfig(targetConfigs.get(i)));
+        }
+        return targetConfigs;
     }
 
     @VisibleForTesting
