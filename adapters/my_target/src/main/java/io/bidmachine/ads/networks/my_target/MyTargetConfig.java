@@ -12,6 +12,7 @@ import io.bidmachine.NetworkConfig;
 
 public class MyTargetConfig extends NetworkConfig {
 
+    static final String KEY_BIDDER_TOKEN = "bidder_token";
     static final String KEY_SLOT_ID = "slot_id";
     static final String KEY_BID_ID = "bid_id";
 
