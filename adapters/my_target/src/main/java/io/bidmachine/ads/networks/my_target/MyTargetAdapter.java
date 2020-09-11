@@ -1,15 +1,17 @@
 package io.bidmachine.ads.networks.my_target;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.my.target.common.CustomParams;
+import com.my.target.common.MyTargetManager;
 import com.my.target.common.MyTargetPrivacy;
 import com.my.target.common.MyTargetVersion;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.bidmachine.AdsType;
@@ -28,6 +30,9 @@ import io.bidmachine.utils.BMError;
 import io.bidmachine.utils.Gender;
 
 class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
+
+    @Nullable
+    private static String bidderToken = null;
 
     MyTargetAdapter() {
         super("my_target",
@@ -62,16 +67,28 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     public void collectHeaderBiddingParams(@NonNull ContextProvider contextProvider,
                                            @NonNull UnifiedAdRequestParams adRequestParams,
                                            @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
-                                           @NonNull HeaderBiddingCollectParamsCallback collectCallback,
+                                           @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
                                            @NonNull Map<String, String> mediationConfig) {
-        String slotId = mediationConfig.get(MyTargetConfig.KEY_SLOT_ID);
+        final String slotId = mediationConfig.get(MyTargetConfig.KEY_SLOT_ID);
         if (TextUtils.isEmpty(slotId)) {
             collectCallback.onCollectFail(BMError.requestError("slot_id not provided"));
             return;
         }
         updateRestrictions(adRequestParams);
-        Map<String, String> params = Collections.singletonMap(MyTargetConfig.KEY_SLOT_ID, slotId);
-        collectCallback.onCollectFinished(params);
+        obtainBidderToken(contextProvider.getContext(), new TokenListener() {
+            @Override
+            public void onInitialized(@NonNull String bidderToken) {
+                Map<String, String> params = new HashMap<>();
+                params.put(MyTargetConfig.KEY_BIDDER_TOKEN, bidderToken);
+                params.put(MyTargetConfig.KEY_SLOT_ID, slotId);
+                collectCallback.onCollectFinished(params);
+            }
+
+            @Override
+            public void onInitializationFailed() {
+                collectCallback.onCollectFail(BMError.Internal);
+            }
+        });
     }
 
     private void updateRestrictions(@NonNull UnifiedAdRequestParams adRequestParams) {
@@ -110,6 +127,52 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             default:
                 return CustomParams.Gender.UNKNOWN;
         }
+    }
+
+    private static synchronized void obtainBidderToken(@NonNull final Context context,
+                                                       @Nullable final TokenListener listener) {
+        if (!TextUtils.isEmpty(bidderToken)) {
+            if (listener != null) {
+                assert bidderToken != null;
+                listener.onInitialized(bidderToken);
+            }
+        } else {
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    synchronized (MyTargetAdapter.class) {
+                        if (!TextUtils.isEmpty(bidderToken)) {
+                            if (listener != null) {
+                                assert bidderToken != null;
+                                listener.onInitialized(bidderToken);
+                            }
+                            return;
+                        }
+                        if (TextUtils.isEmpty(bidderToken)) {
+                            try {
+                                bidderToken = MyTargetManager.getBidderToken(context);
+                            } catch (Throwable ignore) {
+                            }
+                        }
+                        if (listener != null) {
+                            if (TextUtils.isEmpty(bidderToken)) {
+                                listener.onInitializationFailed();
+                            } else {
+                                assert bidderToken != null;
+                                listener.onInitialized(bidderToken);
+                            }
+                        }
+                    }
+                }
+            }.start();
+        }
+    }
+
+    private interface TokenListener {
+        void onInitialized(@NonNull String bidderToken);
+
+        void onInitializationFailed();
     }
 
 }
