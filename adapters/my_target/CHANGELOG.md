@@ -1,5 +1,5 @@
 ## Version 1.6.0.3
-* Updated MyTarget version to 5.9.1
+* Updated MyTarget version to 5.11.0
 
 ## Version 1.4.0.2
 * Minimum BidMachine SDK version was changed to v1.4.0

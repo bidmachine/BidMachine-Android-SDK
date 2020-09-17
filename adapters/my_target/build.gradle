@@ -9,5 +9,5 @@ android {
 apply from: '../adapters.gradle'
 
 dependencies {
-    adapterDependency 'com.my.target:mytarget-sdk:5.9.1'
+    adapterDependency 'com.my.target:mytarget-sdk:5.11.0'
 }
