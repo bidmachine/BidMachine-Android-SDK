@@ -282,11 +282,15 @@ public class MediaView extends RelativeLayout implements
     }
 
     private void pausePlayer() {
-        if (isMediaPlayerAvailable() && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-        }
-        if (state != NativeState.LOADING) {
-            updateViewState(NativeState.PAUSED);
+        try {
+            if (isMediaPlayerAvailable() && mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+            }
+            if (state != NativeState.LOADING) {
+                updateViewState(NativeState.PAUSED);
+            }
+        } catch (Exception e) {
+            Logger.log(e);
         }
     }
 
