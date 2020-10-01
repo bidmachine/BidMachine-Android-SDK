@@ -112,27 +112,27 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                 }
                 isAdapterInitialized = true;
             }
-        }
 
-        final Map<String, String> params = new HashMap<>();
-        params.put(AdColonyConfig.KEY_APP_ID, appId);
-        params.put(AdColonyConfig.KEY_ZONE_ID, zoneId);
+            final Map<String, String> params = new HashMap<>();
+            params.put(AdColonyConfig.KEY_APP_ID, appId);
+            params.put(AdColonyConfig.KEY_ZONE_ID, zoneId);
 
-        AdColonyZone zone = AdColony.getZone(zoneId);
-        if (zone != null && zone.isValid()) {
-            collectCallback.onCollectFinished(params);
-        } else {
-            AdColony.requestInterstitial(zoneId, new AdColonyInterstitialListener() {
-                @Override
-                public void onRequestFilled(AdColonyInterstitial adColonyInterstitial) {
-                    collectCallback.onCollectFinished(params);
-                }
+            AdColonyZone zone = AdColony.getZone(zoneId);
+            if (zone != null && zone.isValid()) {
+                collectCallback.onCollectFinished(params);
+            } else {
+                AdColony.requestInterstitial(zoneId, new AdColonyInterstitialListener() {
+                    @Override
+                    public void onRequestFilled(AdColonyInterstitial adColonyInterstitial) {
+                        collectCallback.onCollectFinished(params);
+                    }
 
-                @Override
-                public void onRequestNotFilled(AdColonyZone zone) {
-                    collectCallback.onCollectFail(BMError.NoContent);
-                }
-            });
+                    @Override
+                    public void onRequestNotFilled(AdColonyZone zone) {
+                        collectCallback.onCollectFail(BMError.NoContent);
+                    }
+                });
+            }
         }
     }
 
