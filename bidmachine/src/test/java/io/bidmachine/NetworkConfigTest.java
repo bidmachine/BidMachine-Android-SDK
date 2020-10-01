@@ -3,9 +3,6 @@ package io.bidmachine;
 import android.content.Context;
 import android.content.res.Configuration;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -560,27 +557,6 @@ public class NetworkConfigTest {
             put(NetworkConfig.CONFIG_ORIENTATION, Orientation.Landscape.toString());
         }});
         assertFalse(result);
-    }
-
-
-    static class TestNetworkConfig extends NetworkConfig {
-
-        TestNetworkConfig(@Nullable Map<String, String> networkParams) {
-            super(networkParams);
-        }
-
-        @NonNull
-        @Override
-        protected NetworkAdapter createNetworkAdapter() {
-            return new TestNetworkAdapter();
-        }
-    }
-
-    static class TestNetworkAdapter extends NetworkAdapter {
-
-        TestNetworkAdapter() {
-            super("TestAdapter", "1", "1", AdsType.values());
-        }
     }
 
 }
