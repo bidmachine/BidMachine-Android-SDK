@@ -4,17 +4,18 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -60,7 +61,8 @@ class NetworkRegistry {
     private static Set<NetworkConfig> pendingNetworks;
     private static Set<JSONObject> pendingNetworksJson;
 
-    private static final HashMap<String, NetworkConfig> cache = new HashMap<>();
+    @VisibleForTesting
+    static final Map<String, NetworkConfig> cache = new ConcurrentHashMap<>();
 
     private static boolean isNetworksInitialized = false;
 
