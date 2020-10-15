@@ -1,7 +1,6 @@
 package io.bidmachine;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Base64;
 
 import com.explorestack.protobuf.adcom.Ad;
@@ -31,6 +30,7 @@ import static io.bidmachine.TestUtils.resetBidMachineInstance;
 import static io.bidmachine.TestUtils.restoreInitUrl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -78,21 +78,17 @@ public class InitRequestTest {
         Buffer buffer = new Buffer();
         buffer.write(initResponse.toByteArray());
 
-        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
-                .setBody(buffer));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(buffer));
 
         BidMachineImpl.get().initialize(RuntimeEnvironment.application, "1", null);
 
-        RecordedRequest recordedRequest =
-                mockWebServer.takeRequest(3, TimeUnit.SECONDS);
-        RecordedRequest eventRequest =
-                mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        RecordedRequest recordedRequest = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        RecordedRequest eventRequest = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
 
         String path = eventRequest.getPath();
-
-        assertTrue(eventRequest.getPath().contains("event_code=" + eventCode)
-                && eventRequest.getPath().contains("event_code2=" + eventCode));
-
+        assertNotNull(path);
+        assertTrue(path.contains("event_code=" + eventCode));
+        assertTrue(path.contains("event_code2=" + eventCode));
         assertEquals(eventCode, getParamLongValue(path, "event_code"));
         assertEquals(eventCode, getParamLongValue(path, "event_code2"));
         assertNotEquals(0, getParamLongValue(path, "start"));
@@ -116,25 +112,29 @@ public class InitRequestTest {
         Buffer buffer = new Buffer();
         buffer.write(initResponse.toByteArray());
 
-        SharedPreferences preferences = RuntimeEnvironment.application.getSharedPreferences("BidMachinePref", Context.MODE_PRIVATE);
-        preferences.edit().putString("initData", Base64.encodeToString(initResponse.toByteArray(), Base64.DEFAULT)).apply();
+        RuntimeEnvironment.application.getSharedPreferences("BidMachinePref", Context.MODE_PRIVATE)
+                .edit()
+                .putString("initData",
+                           Base64.encodeToString(initResponse.toByteArray(), Base64.DEFAULT))
+                .apply();
 
-        mockWebServer.enqueue(new MockResponse().setResponseCode(400)
-                .setBody(buffer));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(400).setBody(buffer));
 
         BidMachineImpl.get().initialize(RuntimeEnvironment.application, "1", null);
 
-        RecordedRequest recordedRequest =
-                mockWebServer.takeRequest(3, TimeUnit.SECONDS);
-        RecordedRequest eventRequest =
-                mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        RecordedRequest recordedRequest = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        RecordedRequest eventRequest = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
 
         String path = eventRequest.getPath();
 
-        assertEquals(ActionType.ACTION_TYPE_SESSION_INITIALIZING_VALUE, getParamLongValue(path, "action_code"));
-        assertEquals(ActionType.ACTION_TYPE_SESSION_INITIALIZING_VALUE, getParamLongValue(path, "action_code2"));
-        assertEquals(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE, getParamLongValue(path, "error_reason"));
-        assertEquals(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE, getParamLongValue(path, "error_reason2"));
+        assertEquals(ActionType.ACTION_TYPE_SESSION_INITIALIZING_VALUE,
+                     getParamLongValue(path, "action_code"));
+        assertEquals(ActionType.ACTION_TYPE_SESSION_INITIALIZING_VALUE,
+                     getParamLongValue(path, "action_code2"));
+        assertEquals(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE,
+                     getParamLongValue(path, "error_reason"));
+        assertEquals(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE,
+                     getParamLongValue(path, "error_reason2"));
         assertNotEquals(0, getParamLongValue(path, "start"));
         assertNotEquals(0, getParamLongValue(path, "start2"));
         assertNotEquals(0, getParamLongValue(path, "finish"));
@@ -144,7 +144,7 @@ public class InitRequestTest {
     private long getParamLongValue(String path, String param) throws Exception {
         Matcher matcher = Pattern.compile("(" + param + "=)(\\d*)").matcher(path);
         if (matcher.find()) {
-            return Long.valueOf(matcher.group(2));
+            return Long.parseLong(matcher.group(2));
         }
         throw new Exception("Value not found");
     }
