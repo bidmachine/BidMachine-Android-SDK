@@ -5,8 +5,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import java.util.EnumMap;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.bidmachine.utils.BMError;
@@ -44,11 +45,10 @@ class SessionTrackerImpl extends SessionTracker {
     private final String sessionId = UUID.randomUUID().toString();
 
     @VisibleForTesting
-    final HashMap<AdsType, EventsHolder> trackingMap = new HashMap<>();
+    final Map<AdsType, EventsHolder> trackingMap = new ConcurrentHashMap<>();
 
     @VisibleForTesting
-    final HashMap<Object, EnumMap<TrackEventType, TrackEventInfo>> intervalHolders =
-            new HashMap<>();
+    final Map<Object, EnumMap<TrackEventType, TrackEventInfo>> intervalHolders = new ConcurrentHashMap<>();
 
     private final EventsHolder totalHolder = new EventsHolder(null);
 
@@ -66,6 +66,9 @@ class SessionTrackerImpl extends SessionTracker {
             return;
         }
         Object key = trackingObject.getTrackingKey();
+        if (key == null) {
+            return;
+        }
         EnumMap<TrackEventType, TrackEventInfo> eventsMap = intervalHolders.get(key);
         if (eventsMap == null) {
             eventsMap = new EnumMap<>(TrackEventType.class);
@@ -86,6 +89,9 @@ class SessionTrackerImpl extends SessionTracker {
         }
         TrackEventInfo trackEventInfo = null;
         Object key = trackingObject.getTrackingKey();
+        if (key == null) {
+            return;
+        }
         EnumMap<TrackEventType, TrackEventInfo> eventsMap = intervalHolders.get(key);
         if (eventsMap != null && eventsMap.containsKey(trackEventType)) {
             trackEventInfo = eventsMap.get(trackEventType);
@@ -110,6 +116,9 @@ class SessionTrackerImpl extends SessionTracker {
             return;
         }
         Object key = trackingObject.getTrackingKey();
+        if (key == null) {
+            return;
+        }
         EnumMap<TrackEventType, TrackEventInfo> eventsMap = intervalHolders.get(key);
         if (eventsMap != null) {
             eventsMap.remove(trackEventType);
@@ -133,7 +142,7 @@ class SessionTrackerImpl extends SessionTracker {
         return totalHolder.getCount(eventType);
     }
 
-    private EventsHolder obtainHolder(AdsType adsType) {
+    private EventsHolder obtainHolder(@NonNull AdsType adsType) {
         EventsHolder holder;
         if (!trackingMap.containsKey(adsType)) {
             holder = new EventsHolder(totalHolder);

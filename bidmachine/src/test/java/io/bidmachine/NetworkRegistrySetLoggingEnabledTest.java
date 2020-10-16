@@ -1,45 +1,19 @@
 package io.bidmachine;
 
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.ParameterizedRobolectricTestRunner;
 import org.robolectric.ParameterizedRobolectricTestRunner.Parameters;
-import org.robolectric.annotation.Config;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
+public class NetworkRegistrySetLoggingEnabledTest extends MultiThreadingTest {
 
-@RunWith(ParameterizedRobolectricTestRunner.class)
-@Config(manifest = Config.NONE)
-public class NetworkRegistrySetLoggingEnabledTest {
-
-    private final int actionCount;
-    private final int readThreadCount;
-
-    private final AtomicInteger countSuccess;
-
-    @Parameters(name = "Count of NativeAd: {0}, Count of read thread: {1}")
+    @Parameters(name = "Count of actions: {0}, Count of read thread: {1}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {100, 2},
-                {200, 3},
-                {100, 4},
-                {300, 5},
-                {150, 6},
-                {400, 7}
-        });
+        return createDefaultParameters();
     }
 
     public NetworkRegistrySetLoggingEnabledTest(int actionCount, int readThreadCount) {
-        this.actionCount = actionCount;
-        this.readThreadCount = readThreadCount;
-
-        countSuccess = new AtomicInteger(0);
+        super(actionCount, readThreadCount);
     }
 
     @Before
@@ -47,54 +21,14 @@ public class NetworkRegistrySetLoggingEnabledTest {
         NetworkRegistry.cache.clear();
     }
 
-    @Test(timeout = 60000)
-    public void test() throws Exception {
-        final CountDownLatch countDownLatch = new CountDownLatch(readThreadCount + 1);
+    @Override
+    void writeAction(int actionNumber, int totalActions) {
+        NetworkRegistry.cache.put("key" + actionNumber, new TestNetworkConfig());
+    }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    for (int i = 0; i < actionCount; i++) {
-                        NetworkRegistry.cache.put("key" + i, new TestNetworkConfig());
-                        try {
-                            Thread.sleep(3);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    countSuccess.incrementAndGet();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                countDownLatch.countDown();
-            }
-        }).start();
-
-        for (int i = 0; i < readThreadCount; i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        for (int i = 0; i < actionCount / readThreadCount; i++) {
-                            NetworkRegistry.setLoggingEnabled(true);
-                            try {
-                                Thread.sleep(10);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        countSuccess.incrementAndGet();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    countDownLatch.countDown();
-                }
-            }).start();
-        }
-        countDownLatch.await();
-
-        assertEquals(readThreadCount + 1, countSuccess.get());
+    @Override
+    void readAction(int actionNumber, int totalActions) {
+        NetworkRegistry.setLoggingEnabled(true);
     }
 
 }

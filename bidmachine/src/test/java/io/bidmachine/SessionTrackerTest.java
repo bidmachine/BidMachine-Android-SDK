@@ -13,8 +13,6 @@ import io.bidmachine.rewarded.RewardedAd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 @RunWith(RobolectricTestRunner.class)
 public class SessionTrackerTest {
@@ -53,7 +51,7 @@ public class SessionTrackerTest {
 
     @Test
     public void notifyEvent_sameObject_clearInstanceWhenIntervalsEmptyAfterFinish() {
-        TrackingObject trackingObject = mock(TrackingObject.class);
+        TrackingObject trackingObject = new TestTrackingObject("test_key");
         tracker.trackEventStart(trackingObject, TrackEventType.AuctionRequest, null, null);
         assertEquals(1, tracker.intervalHolders.size());
         assertEquals(1, tracker.intervalHolders.get(trackingObject.getTrackingKey()).size());
@@ -63,7 +61,7 @@ public class SessionTrackerTest {
 
     @Test
     public void notifyEvent_sameObject_notEmptyInstanceAfterFinish() {
-        TrackingObject trackingObject = mock(TrackingObject.class);
+        TrackingObject trackingObject = new TestTrackingObject("test_key");
         tracker.trackEventStart(trackingObject, TrackEventType.AuctionRequest, null, null);
         tracker.trackEventStart(trackingObject, TrackEventType.Load, null, null);
         assertEquals(1, tracker.intervalHolders.size());
@@ -74,10 +72,8 @@ public class SessionTrackerTest {
 
     @Test
     public void notifyEvent_differentObject() {
-        TrackingObject trackingObject1 = mock(TrackingObject.class);
-        doReturn("1").when(trackingObject1).getTrackingKey();
-        TrackingObject trackingObject2 = mock(TrackingObject.class);
-        doReturn("2").when(trackingObject2).getTrackingKey();
+        TrackingObject trackingObject1 = new TestTrackingObject("test_key_1");
+        TrackingObject trackingObject2 = new TestTrackingObject("test_key_2");
 
         tracker.trackEventStart(trackingObject1, TrackEventType.AuctionRequest, null, null);
         tracker.trackEventStart(trackingObject2, TrackEventType.AuctionRequest, null, null);
@@ -104,13 +100,7 @@ public class SessionTrackerTest {
     @Test
     public void replaceMacros_urlWithoutMacros_returnInputUrl() {
         String url = "http://test.com";
-        assertEquals(
-                url,
-                SessionTracker.replaceMacros(
-                        url,
-                        new TrackEventInfo(),
-                        100,
-                        500));
+        assertEquals(url, SessionTracker.replaceMacros(url, new TrackEventInfo(), 100, 500));
     }
 
     @Test

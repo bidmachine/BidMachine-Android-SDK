@@ -68,6 +68,9 @@ class NetworkRegistry {
 
     @Nullable
     static NetworkConfig getConfig(String key) {
+        if (key == null) {
+            return null;
+        }
         return cache.get(key);
     }
 
