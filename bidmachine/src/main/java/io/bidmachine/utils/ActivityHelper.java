@@ -2,8 +2,7 @@ package io.bidmachine.utils;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
-
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Map;
