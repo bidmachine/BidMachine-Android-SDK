@@ -28,6 +28,6 @@ final class SimpleContextProvider implements ContextProvider {
         if (context instanceof Activity) {
             return (Activity) context;
         }
-        return BidMachineImpl.getTopActivity();
+        return BidMachineImpl.get().getTopActivity();
     }
 }

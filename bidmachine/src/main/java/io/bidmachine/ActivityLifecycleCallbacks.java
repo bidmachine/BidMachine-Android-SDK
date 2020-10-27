@@ -13,12 +13,12 @@ class ActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbac
 
     @Override
     public void onActivityStarted(Activity activity) {
-        BidMachineImpl.get().topActivity = activity;
+        BidMachineImpl.get().setTopActivity(activity);
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
-        BidMachineImpl.get().topActivity = activity;
+        BidMachineImpl.get().setTopActivity(activity);
         SessionManager.get().resume();
     }
 
@@ -41,4 +41,5 @@ class ActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbac
     public void onActivityDestroyed(Activity activity) {
         // ignore
     }
+
 }
