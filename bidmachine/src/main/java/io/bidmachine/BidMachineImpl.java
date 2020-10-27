@@ -11,6 +11,7 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -105,7 +106,8 @@ final class BidMachineImpl {
     private static final long MIN_INIT_REQUEST_DELAY_MS = TimeUnit.SECONDS.toMillis(2);
     private static final long MAX_INIT_REQUEST_DELAY_MS = TimeUnit.SECONDS.toMillis(128);
 
-    Activity topActivity;
+    @Nullable
+    private WeakReference<Activity> weakTopActivity;
 
     private final Runnable rescheduleInitRunnable = new Runnable() {
         @Override
@@ -164,7 +166,7 @@ final class BidMachineImpl {
                 requestInitData(context, sellerId, callback);
             }
         });
-        topActivity = ActivityHelper.getTopActivity();
+        setTopActivity(ActivityHelper.getTopActivity());
         ((Application) context.getApplicationContext())
                 .registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks());
         isInitialized = true;
@@ -380,8 +382,15 @@ final class BidMachineImpl {
         return currentAuctionUrl;
     }
 
-    static Activity getTopActivity() {
-        return get().topActivity;
+    @Nullable
+    Activity getTopActivity() {
+        return weakTopActivity != null ? weakTopActivity.get() : null;
+    }
+
+    void setTopActivity(@Nullable Activity activity) {
+        if (activity != null) {
+            weakTopActivity = new WeakReference<>(activity);
+        }
     }
 
     void registerAdRequestListener(@Nullable AdRequest.AdRequestListener adRequestListener) {

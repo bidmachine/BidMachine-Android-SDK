@@ -1,3 +1,7 @@
+## Version 1.5.3 (October 27, 2020)
+**Features**:
+* SDK improvement
+
 ## Version 1.5.2 (August 3, 2020)
 **Features**:
 * SDK improvement
