@@ -29,6 +29,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Process;
 import android.security.NetworkSecurityPolicy;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -46,7 +47,6 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -472,9 +472,12 @@ public class Utils {
     }
 
     public static boolean isPermissionGranted(@NonNull Context context,
-                                              @NonNull String permission) {
+                                              @Nullable String permission) {
+        if (TextUtils.isEmpty(permission)) {
+            return false;
+        }
         try {
-            return ContextCompat.checkSelfPermission(context, permission)
+            return context.checkPermission(permission, android.os.Process.myPid(), Process.myUid())
                     == PackageManager.PERMISSION_GRANTED;
         } catch (Exception e) {
             return false;
