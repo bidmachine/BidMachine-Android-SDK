@@ -56,6 +56,9 @@ public class Utils {
         try {
             InputMethodManager inputMethodManager = (InputMethodManager) context
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (inputMethodManager == null) {
+                return languageSet;
+            }
             List<InputMethodInfo> inputMethodInfoList = inputMethodManager.getEnabledInputMethodList();
             for (InputMethodInfo inputMethodInfo : inputMethodInfoList) {
                 List<InputMethodSubtype> inputMethodSubtypeList = inputMethodManager
@@ -141,9 +144,9 @@ public class Utils {
 
     @Nullable
     public static Boolean isBatterySaverEnabled(@NonNull Context context) {
-        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return powerManager.isPowerSaveMode();
+            PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            return powerManager != null ? powerManager.isPowerSaveMode() : null;
         }
         return null;
     }
