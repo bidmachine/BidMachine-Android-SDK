@@ -3,6 +3,7 @@ package io.bidmachine;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,9 @@ class IABSharedPreference {
         sharedPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (TextUtils.isEmpty(key)) {
+                    return;
+                }
                 switch (key) {
                     case IAB_CONSENT_STRING:
                         updateConsentString(sharedPreferences);
