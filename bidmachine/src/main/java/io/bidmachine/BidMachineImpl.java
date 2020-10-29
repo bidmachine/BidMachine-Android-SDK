@@ -13,11 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import io.bidmachine.core.AdvertisingIdClientInfo;
@@ -87,7 +87,7 @@ final class BidMachineImpl {
             new PriceFloorParams()
                     .addPriceFloor(UUID.randomUUID().toString(), 0.01);
     @NonNull
-    private DeviceParams deviceParams = new DeviceParams();
+    private final DeviceParams deviceParams = new DeviceParams();
     @NonNull
     private final IABSharedPreference iabSharedPreference = new IABSharedPreference();
 
@@ -103,7 +103,7 @@ final class BidMachineImpl {
     @VisibleForTesting
     String currentAuctionUrl = DEF_AUCTION_URL;
     @VisibleForTesting
-    private Map<TrackEventType, List<String>> trackingEventTypes =
+    private final Map<TrackEventType, List<String>> trackingEventTypes =
             new EnumMap<>(TrackEventType.class);
 
     private long initRequestDelayMs = 0;
@@ -127,7 +127,7 @@ final class BidMachineImpl {
         }
     };
 
-    private List<AdRequest.AdRequestListener> adRequestListeners = new ArrayList<>();
+    private final List<AdRequest.AdRequestListener> adRequestListeners = new CopyOnWriteArrayList<>();
 
     @VisibleForTesting
     String ifv;
@@ -423,6 +423,7 @@ final class BidMachineImpl {
         adRequestListeners.remove(adRequestListener);
     }
 
+    @NonNull
     List<AdRequest.AdRequestListener> getAdRequestListeners() {
         return adRequestListeners;
     }
