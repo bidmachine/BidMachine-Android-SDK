@@ -978,7 +978,7 @@ public class Utils {
                 if ((packageInfo.versionName) != null) {
                     appVersion = packageInfo.versionName;
                 }
-            } catch (PackageManager.NameNotFoundException e) {
+            } catch (Exception e) {
                 Logger.log(e);
             }
         }
