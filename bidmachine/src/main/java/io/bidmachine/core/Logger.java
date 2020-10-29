@@ -32,9 +32,9 @@ public class Logger {
         Logger.messageBuilder = messageBuilder;
     }
 
-    public static void log(Throwable e) {
+    public static void log(Throwable t) {
         if (isLoggingEnabled) {
-            e.printStackTrace();
+            t.printStackTrace();
         }
     }
 
