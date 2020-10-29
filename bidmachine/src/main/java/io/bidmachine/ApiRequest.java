@@ -60,12 +60,12 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
     }
 
     @Override
-    protected BMError obtainError(URLConnection connection, @Nullable Exception e) {
-        Logger.log("obtainError: " + e + "(" + connection + ")");
+    protected BMError obtainError(URLConnection connection, @Nullable Throwable t) {
+        Logger.log("obtainError: " + t + "(" + connection + ")");
         //TODO: not checked
-        if (e instanceof UnknownHostException) {
+        if (t instanceof UnknownHostException) {
             return BMError.Connection;
-        } else if (e instanceof SocketTimeoutException || e instanceof ConnectTimeoutException) {
+        } else if (t instanceof SocketTimeoutException || t instanceof ConnectTimeoutException) {
             return BMError.TimeoutError;
         }
         return BMError.Internal;

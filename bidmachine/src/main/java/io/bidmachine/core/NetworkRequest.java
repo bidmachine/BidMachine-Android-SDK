@@ -201,9 +201,9 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                     isResponse.close();
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            errorResult = obtainError(connection, e);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            errorResult = obtainError(connection, t);
         } finally {
             if (connection instanceof HttpURLConnection) {
                 ((HttpURLConnection) connection).disconnect();
@@ -269,7 +269,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
     protected abstract ErrorResultType obtainError(URLConnection connection, @Nullable InputStream errorStream, int responseCode);
 
-    protected abstract ErrorResultType obtainError(URLConnection connection, @Nullable Exception e);
+    protected abstract ErrorResultType obtainError(URLConnection connection, @Nullable Throwable t);
 
     private int obtainResponseCode(URLConnection connection) throws IOException {
         if (connection instanceof HttpURLConnection) {
