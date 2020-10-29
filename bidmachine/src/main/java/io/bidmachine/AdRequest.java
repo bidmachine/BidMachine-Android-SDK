@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -76,7 +77,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     @Nullable
     private ApiRequest<Request, Response> currentApiRequest;
     @Nullable
-    private ArrayList<AdRequestListener<SelfType>> adRequestListeners;
+    private List<AdRequestListener<SelfType>> adRequestListeners;
     @Nullable
     private UnifiedAdRequestParamsType unifiedAdRequestParams;
     @Nullable
@@ -85,8 +86,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     private long expirationTime = -1;
 
-    private AtomicBoolean isApiRequestCanceled = new AtomicBoolean(false);
-    private AtomicBoolean isApiRequestCompleted = new AtomicBoolean(false);
+    private final AtomicBoolean isApiRequestCanceled = new AtomicBoolean(false);
+    private final AtomicBoolean isApiRequestCompleted = new AtomicBoolean(false);
     private boolean isExpired;
     private boolean isExpireTrackerSubscribed;
 
@@ -441,7 +442,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     @SuppressWarnings("WeakerAccess")
     public void addListener(@Nullable AdRequestListener<SelfType> listener) {
         if (adRequestListeners == null) {
-            adRequestListeners = new ArrayList<>(2);
+            adRequestListeners = new CopyOnWriteArrayList<>();
         }
         if (listener != null) {
             adRequestListeners.add(listener);
