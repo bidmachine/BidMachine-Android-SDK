@@ -41,7 +41,7 @@ public class VideoPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdR
                                 @NonNull UnifiedAdRequestParamsType adRequestParams,
                                 @NonNull AdsType adsType,
                                 @NonNull Collection<NetworkConfig> networkConfigs,
-                                @NonNull PlacementCreateCallback callback) {
+                                @NonNull PlacementCreateCallback callback) throws Exception {
         Placement.VideoPlacement.Builder builder = Placement.VideoPlacement.newBuilder();
         builder.setSkip(canSkip);
         builder.setUnit(SizeUnit.SIZE_UNIT_DIPS);

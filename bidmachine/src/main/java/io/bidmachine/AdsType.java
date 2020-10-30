@@ -133,24 +133,29 @@ public enum AdsType {
                 placementCreateExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        placementBuilder.createPlacement(
-                                contextProvider,
-                                adRequestParams,
-                                AdsType.this,
-                                networkConfigMap != null
-                                        ? networkConfigMap.values()
-                                        : networkConfigs.values(),
-                                new PlacementBuilder.PlacementCreateCallback() {
-                                    @Override
-                                    public void onCreated(@Nullable Message.Builder placement) {
-                                        if (placement != null) {
-                                            synchronized (outList) {
-                                                outList.add(placement);
+                        try {
+                            placementBuilder.createPlacement(
+                                    contextProvider,
+                                    adRequestParams,
+                                    AdsType.this,
+                                    networkConfigMap != null
+                                            ? networkConfigMap.values()
+                                            : networkConfigs.values(),
+                                    new PlacementBuilder.PlacementCreateCallback() {
+                                        @Override
+                                        public void onCreated(@Nullable Message.Builder placement) {
+                                            if (placement != null) {
+                                                synchronized (outList) {
+                                                    outList.add(placement);
+                                                }
                                             }
+                                            syncLock.countDown();
                                         }
-                                        syncLock.countDown();
-                                    }
-                                });
+                                    });
+                        } catch (Exception e) {
+                            Logger.log(e);
+                            syncLock.countDown();
+                        }
                     }
                 });
             } else {
