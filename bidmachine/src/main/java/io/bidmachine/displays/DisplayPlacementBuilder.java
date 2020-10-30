@@ -42,7 +42,7 @@ public class DisplayPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedA
                                 @NonNull UnifiedAdRequestParamsType adRequestParams,
                                 @NonNull AdsType adsType,
                                 @NonNull Collection<NetworkConfig> networkConfigs,
-                                @NonNull PlacementCreateCallback callback) {
+                                @NonNull PlacementCreateCallback callback) throws Exception {
         Placement.DisplayPlacement.Builder builder = Placement.DisplayPlacement.newBuilder();
         builder.addApi(ApiFramework.API_FRAMEWORK_MRAID_2_0);
         builder.setUnit(SizeUnit.SIZE_UNIT_DIPS);

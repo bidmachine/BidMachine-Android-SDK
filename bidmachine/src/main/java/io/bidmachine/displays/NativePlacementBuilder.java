@@ -131,7 +131,7 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
                                 @NonNull UnifiedNativeAdRequestParams adRequestParams,
                                 @NonNull AdsType adsType,
                                 @NonNull Collection<NetworkConfig> networkConfigs,
-                                @NonNull PlacementCreateCallback callback) {
+                                @NonNull PlacementCreateCallback callback) throws Exception{
         Placement.DisplayPlacement.Builder builder = Placement.DisplayPlacement.newBuilder();
         builder.setInstl(false);
         builder.setUnit(SizeUnit.SIZE_UNIT_DIPS);

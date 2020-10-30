@@ -38,7 +38,7 @@ public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends Unifie
                                          @NonNull UnifiedAdRequestParamsType adRequestParams,
                                          @NonNull AdsType adsType,
                                          @NonNull Collection<NetworkConfig> networkConfigs,
-                                         @NonNull PlacementCreateCallback callback);
+                                         @NonNull PlacementCreateCallback callback) throws Exception;
 
     public abstract AdObjectParams createAdObjectParams(@NonNull ContextProvider contextProvider,
                                                         @NonNull UnifiedAdRequestParamsType adRequest,
