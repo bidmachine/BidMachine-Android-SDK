@@ -24,8 +24,6 @@ import io.bidmachine.utils.BluetoothUtils;
 
 final class DeviceParams extends RequestParams<DeviceParams> {
 
-    private final String[] tmpOperatorInfo = new String[4];
-
     void build(@NonNull android.content.Context context,
                @NonNull Context.Device.Builder builder,
                @NonNull TargetingParams targetingParams,
@@ -66,12 +64,11 @@ final class DeviceParams extends RequestParams<DeviceParams> {
             if (lang != null) {
                 builder.setLang(lang);
             }
-            Utils.getOperatorInfo(context, tmpOperatorInfo);
-            if (tmpOperatorInfo[Utils.INDEX_CRR] != null) {
-                builder.setMccmnc(tmpOperatorInfo[Utils.INDEX_CRR]);
+            if (deviceInfo.telephonyNetworkOperator != null) {
+                builder.setMccmnc(deviceInfo.telephonyNetworkOperator);
             }
-            if (tmpOperatorInfo[Utils.INDEX_OPERATOR_NAME] != null) {
-                builder.setCarrier(tmpOperatorInfo[Utils.INDEX_OPERATOR_NAME]);
+            if (deviceInfo.telephonyNetworkOperatorName != null) {
+                builder.setCarrier(deviceInfo.telephonyNetworkOperatorName);
             }
         }
         if (restrictions.canSendGeoPosition()) {
