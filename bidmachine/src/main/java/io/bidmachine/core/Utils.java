@@ -231,27 +231,6 @@ public class Utils {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public static final int INDEX_CRR = 0;
-    public static final int INDEX_OPERATOR_NAME = 1;
-    public static final int INDEX_SIM_CRR = 2;
-    public static final int INDEX_SIM_OPERATOR_NAME = 3;
-
-    public static void getOperatorInfo(Context context, String[] outArray) {
-        TelephonyManager tel = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (tel != null) {
-            String networkOperator = tel.getNetworkOperator();
-            if (networkOperator != null && networkOperator.length() >= 3) {
-                outArray[INDEX_CRR] = networkOperator.substring(0, 3) + '-' + networkOperator.substring(3);
-            }
-            outArray[INDEX_OPERATOR_NAME] = tel.getNetworkOperatorName();
-            String simOperator = tel.getSimOperator();
-            if (simOperator != null && simOperator.length() >= 3) {
-                outArray[INDEX_SIM_CRR] = simOperator.substring(0, 3) + '-' + simOperator.substring(3);
-            }
-            outArray[INDEX_SIM_OPERATOR_NAME] = tel.getSimOperatorName();
-        }
-    }
-
     @NonNull
     public static String obtainHttpAgentString(final Context context) {
         final CountDownLatch latch = new CountDownLatch(1);

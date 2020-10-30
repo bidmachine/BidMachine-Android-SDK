@@ -4,8 +4,10 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
@@ -15,15 +17,25 @@ import java.io.RandomAccessFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.bidmachine.core.Logger;
+
 public class DeviceInfo {
 
-    private static DeviceInfo cachedInfo;
+    private static volatile DeviceInfo instance;
 
+    @NonNull
     public static DeviceInfo obtain(Context context) {
-        if (cachedInfo == null) {
-            cachedInfo = new DeviceInfo(context);
+        DeviceInfo deviceInfo = instance;
+        if (deviceInfo == null) {
+            synchronized (DeviceInfo.class) {
+                deviceInfo = instance;
+                if (deviceInfo == null) {
+                    deviceInfo = new DeviceInfo(context);
+                    instance = deviceInfo;
+                }
+            }
         }
-        return cachedInfo;
+        return deviceInfo;
     }
 
     public final String osName;
@@ -39,6 +51,9 @@ public class DeviceInfo {
     public final int screenDpi;
     public final float screenDensity;
     public final boolean isTablet;
+    public final String telephonyNetworkOperator;
+    public String telephonyNetworkOperatorName;
+
 
     private Boolean isRooted;
     @Nullable
@@ -66,6 +81,25 @@ public class DeviceInfo {
         screenDpi = io.bidmachine.core.Utils.getScreenDpi(context);
         screenDensity = io.bidmachine.core.Utils.getScreenDensity(context);
         isTablet = io.bidmachine.core.Utils.isTablet(context);
+
+        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephonyManager != null) {
+            String networkOperator = telephonyManager.getNetworkOperator();
+            if (networkOperator != null && networkOperator.length() >= 3) {
+                telephonyNetworkOperator = networkOperator.substring(0, 3)
+                        + '-'
+                        + networkOperator.substring(3);
+            } else {
+                telephonyNetworkOperator = null;
+            }
+            try {
+                telephonyNetworkOperatorName = telephonyManager.getNetworkOperatorName();
+            } catch (Exception e) {
+                Logger.log(e);
+            }
+        } else {
+            telephonyNetworkOperator = null;
+        }
     }
 
     boolean isDeviceRooted() {
