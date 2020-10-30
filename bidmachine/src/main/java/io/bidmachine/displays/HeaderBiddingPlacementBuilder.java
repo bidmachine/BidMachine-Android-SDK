@@ -225,11 +225,16 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
 
         @Override
         public void run() {
-            adapter.collectHeaderBiddingParams(contextProvider,
-                                               adRequestParams,
-                                               this,
-                                               this,
-                                               mediationConfig);
+            try {
+                adapter.collectHeaderBiddingParams(contextProvider,
+                                                   adRequestParams,
+                                                   this,
+                                                   this,
+                                                   mediationConfig);
+            } catch (Exception e) {
+                Logger.log(e);
+                onCollectFail(BMError.Internal);
+            }
         }
 
         @Override

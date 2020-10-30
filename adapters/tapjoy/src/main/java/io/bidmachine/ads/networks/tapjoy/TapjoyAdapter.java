@@ -65,7 +65,7 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull UnifiedAdRequestParams adRequestParams,
                                            @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
                                            @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
-                                           @NonNull Map<String, String> mediationConfig) {
+                                           @NonNull Map<String, String> mediationConfig) throws Exception {
         final String sdkKey = mediationConfig.get(TapjoyConfig.KEY_SDK);
         if (TextUtils.isEmpty(sdkKey)) {
             collectCallback.onCollectFail(BMError.requestError("sdk_key not provided"));
