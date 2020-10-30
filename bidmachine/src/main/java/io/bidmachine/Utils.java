@@ -83,7 +83,10 @@ public class Utils {
                     }
                 }
             }
-            languageSet.add(Locale.getDefault().getLanguage());
+            String defaultLanguage = Locale.getDefault().getLanguage();
+            if (!TextUtils.isEmpty(defaultLanguage)) {
+                languageSet.add(defaultLanguage);
+            }
         } catch (Exception ignore) {
         }
         return languageSet;
