@@ -86,9 +86,11 @@ final class DeviceParams extends RequestParams<DeviceParams> {
         if (inputLanguageSet.size() > 0) {
             ListValue.Builder listValueBuilder = ListValue.newBuilder();
             for (String inputLanguage : inputLanguageSet) {
-                listValueBuilder.addValues(Value.newBuilder()
-                                                   .setStringValue(inputLanguage)
-                                                   .build());
+                if (inputLanguage != null) {
+                    listValueBuilder.addValues(Value.newBuilder()
+                                                       .setStringValue(inputLanguage)
+                                                       .build());
+                }
             }
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.INPUT_LANGUAGE,
                                        Value.newBuilder()
@@ -195,10 +197,12 @@ final class DeviceParams extends RequestParams<DeviceParams> {
         Set<String> bluetoothConnectedHeadsets = BluetoothUtils.getConnectedHeadsets(context);
         if (bluetoothConnectedHeadsets != null && bluetoothConnectedHeadsets.size() > 0) {
             String headset = bluetoothConnectedHeadsets.iterator().next();
-            deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.HEADSET_NAME,
-                                       Value.newBuilder()
-                                               .setStringValue(headset)
-                                               .build());
+            if (headset != null) {
+                deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.HEADSET_NAME,
+                                           Value.newBuilder()
+                                                   .setStringValue(headset)
+                                                   .build());
+            }
         }
         Long totalRAMInB = deviceInfo.getTotalRAMInB();
         if (totalRAMInB != null) {

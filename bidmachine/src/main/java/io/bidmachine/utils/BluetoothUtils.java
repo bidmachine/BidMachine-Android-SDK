@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -104,7 +105,10 @@ public class BluetoothUtils {
                     BluetoothProfile bluetoothProfile = entry.getValue();
                     if (bluetoothProfile != null) {
                         for (BluetoothDevice bluetoothDevice : bluetoothProfile.getConnectedDevices()) {
-                            connectedDeviceSet.add(bluetoothDevice.getName());
+                            String name = bluetoothDevice.getName();
+                            if (!TextUtils.isEmpty(name)) {
+                                connectedDeviceSet.add(name);
+                            }
                         }
                     }
                 }
