@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
@@ -30,8 +31,8 @@ public class DownloadImageTask implements Runnable {
     private static final int RESULT_PATH_SUCCESS = 1;
     private static final int RESULT_IMAGE_SUCCESS = 2;
 
+    private final Handler handler;
     private Context context;
-    private Handler handler;
     private String url;
     private File cacheDir;
     private boolean checkAspectRatio;
@@ -131,6 +132,7 @@ public class DownloadImageTask implements Runnable {
 
     private void downloadImage(Context context, String url) {
         BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
         options.inJustDecodeBounds = true;
         File file = null;
         if (cacheDir != null) {
@@ -156,13 +158,10 @@ public class DownloadImageTask implements Runnable {
             while ((len = inputStream.read(buffer)) != -1) {
                 byteBuffer.write(buffer, 0, len);
             }
-
             byte[] imageByte = byteBuffer.toByteArray();
-
             BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length, options);
             if (!isAspectRatioCorrect(options)) {
                 sendFail();
-
                 return;
             }
             if (file != null) {
@@ -181,14 +180,12 @@ public class DownloadImageTask implements Runnable {
                     sendFail();
                 }
             }
-        } catch (Exception e) {
-            Logger.log(e);
-
+        } catch (Throwable t) {
+            Logger.log(t);
             sendFail();
         } finally {
             Utils.flush(byteBuffer);
             Utils.close(byteBuffer);
-
             Utils.close(inputStream);
         }
     }
@@ -208,8 +205,7 @@ public class DownloadImageTask implements Runnable {
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(file);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(byteImage, 0, byteImage.length, options);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fileOutputStream);
+            writeBitmap(byteImage, options, fileOutputStream);
         } catch (Exception e) {
             Logger.log(e);
         } finally {
@@ -223,9 +219,7 @@ public class DownloadImageTask implements Runnable {
         ByteArrayOutputStream byteArrayOutputStream = null;
         try {
             byteArrayOutputStream = new ByteArrayOutputStream(byteImage.length);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(byteImage, 0, byteImage.length, options);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, byteArrayOutputStream);
-            bitmap.recycle();
+            writeBitmap(byteImage, options, byteArrayOutputStream);
             return BitmapFactory.decodeStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
         } catch (Exception e) {
             Logger.log(e);
@@ -234,6 +228,14 @@ public class DownloadImageTask implements Runnable {
             Utils.close(byteArrayOutputStream);
         }
         return null;
+    }
+
+    private void writeBitmap(byte[] byteImage,
+                             BitmapFactory.Options options,
+                             OutputStream outputStream) {
+        Bitmap bitmap = BitmapFactory.decodeByteArray(byteImage, 0, byteImage.length, options);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
+        bitmap.recycle();
     }
 
     public interface OnCacheImageListener {

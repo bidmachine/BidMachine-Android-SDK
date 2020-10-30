@@ -60,9 +60,7 @@ public class ImageHelper {
                 try {
                     BitmapFactory.decodeStream(stream, null, options);
                 } finally {
-                    if (stream != null) {
-                        stream.close();
-                    }
+                    Utils.close(stream);
                 }
 
                 if (options.outWidth == 0 || options.outHeight == 0) {
@@ -79,9 +77,7 @@ public class ImageHelper {
                 try {
                     image = BitmapFactory.decodeStream(stream, null, options);
                 } finally {
-                    if (stream != null) {
-                        stream.close();
-                    }
+                    Utils.close(stream);
                 }
                 Utils.onUiThread(new Runnable() {
                     @Override
@@ -94,11 +90,11 @@ public class ImageHelper {
                         }
                     }
                 });
-            } catch (Exception e) {
-                if (e.getMessage() == null) {
-                    onImageHelperListener.onError("ImagePreparation error");
+            } catch (Throwable t) {
+                if (t.getMessage() != null) {
+                    onImageHelperListener.onError(t.getMessage());
                 } else {
-                    onImageHelperListener.onError(e.getMessage());
+                    onImageHelperListener.onError("ImagePreparation error");
                 }
             }
         }
