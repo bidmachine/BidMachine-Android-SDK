@@ -23,7 +23,7 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
     public void load(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback,
                      @NonNull UnifiedFullscreenAdRequestParams requestParams,
-                     @NonNull UnifiedMediationParams mediationParams) {
+                     @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         MyTargetParams params = new MyTargetParams(mediationParams);
         if (!params.isValid(callback)) {
             return;

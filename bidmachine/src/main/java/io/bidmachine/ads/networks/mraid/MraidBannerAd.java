@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.explorestack.iab.mraid.MRAIDView;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.core.Logger;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;
@@ -23,9 +24,9 @@ class MraidBannerAd extends UnifiedBannerAd {
 
     @Override
     public void load(@NonNull final ContextProvider contextProvider,
-                     @NonNull UnifiedBannerAdCallback callback,
+                     @NonNull final UnifiedBannerAdCallback callback,
                      @NonNull UnifiedBannerAdRequestParams requestParams,
-                     @NonNull UnifiedMediationParams mediationParams) {
+                     @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         final Activity activity = contextProvider.getActivity();
         if (activity == null) {
             callback.onAdLoadFailed(BMError.requestError("Activity not provided"));
@@ -40,15 +41,20 @@ class MraidBannerAd extends UnifiedBannerAd {
         onUiThread(new Runnable() {
             @Override
             public void run() {
-                mraidView = new MRAIDView.builder(activity,
-                                                  mraidParams.creativeAdm,
-                                                  mraidParams.width,
-                                                  mraidParams.height)
-                        .setPreload(true)
-                        .setListener(mraidBannerAdListener)
-                        .setNativeFeatureListener(mraidBannerAdListener)
-                        .build();
-                mraidView.load();
+                try {
+                    mraidView = new MRAIDView.builder(activity,
+                                                      mraidParams.creativeAdm,
+                                                      mraidParams.width,
+                                                      mraidParams.height)
+                            .setPreload(true)
+                            .setListener(mraidBannerAdListener)
+                            .setNativeFeatureListener(mraidBannerAdListener)
+                            .build();
+                    mraidView.load();
+                } catch (Throwable t) {
+                    Logger.log(t);
+                    callback.onAdLoadFailed(BMError.Internal);
+                }
             }
         });
     }

@@ -10,6 +10,7 @@ import com.explorestack.iab.mraid.MRAIDInterstitial;
 import com.explorestack.iab.vast.VideoType;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.core.Logger;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
@@ -20,7 +21,8 @@ import static io.bidmachine.core.Utils.onUiThread;
 
 class MraidFullScreenAd extends UnifiedFullscreenAd {
 
-    private VideoType videoType;
+    private final VideoType videoType;
+
     private MRAIDInterstitial mraidInterstitial;
     private MraidActivity showingActivity;
     private MraidFullScreenAdapterListener adapterListener;
@@ -33,9 +35,9 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
 
     @Override
     public void load(@NonNull final ContextProvider contextProvider,
-                     @NonNull UnifiedFullscreenAdCallback callback,
+                     @NonNull final UnifiedFullscreenAdCallback callback,
                      @NonNull UnifiedFullscreenAdRequestParams requestParams,
-                     @NonNull UnifiedMediationParams mediationParams) {
+                     @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         final Activity activity = contextProvider.getActivity();
         if (activity == null) {
             callback.onAdLoadFailed(BMError.requestError("Activity not provided"));
@@ -50,18 +52,23 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         onUiThread(new Runnable() {
             @Override
             public void run() {
-                mraidInterstitial = MRAIDInterstitial
-                        .newBuilder(activity,
-                                    mraidParams.creativeAdm,
-                                    mraidParams.width,
-                                    mraidParams.height)
-                        .setPreload(true)
-                        .setCloseTime(mraidParams.skipOffset)
-                        .forceUseNativeCloseButton(mraidParams.useNativeClose)
-                        .setListener(adapterListener)
-                        .setNativeFeatureListener(adapterListener)
-                        .build();
-                mraidInterstitial.load();
+                try {
+                    mraidInterstitial = MRAIDInterstitial
+                            .newBuilder(activity,
+                                        mraidParams.creativeAdm,
+                                        mraidParams.width,
+                                        mraidParams.height)
+                            .setPreload(true)
+                            .setCloseTime(mraidParams.skipOffset)
+                            .forceUseNativeCloseButton(mraidParams.useNativeClose)
+                            .setListener(adapterListener)
+                            .setNativeFeatureListener(adapterListener)
+                            .build();
+                    mraidInterstitial.load();
+                } catch (Throwable t) {
+                    Logger.log(t);
+                    callback.onAdLoadFailed(BMError.Internal);
+                }
             }
         });
     }

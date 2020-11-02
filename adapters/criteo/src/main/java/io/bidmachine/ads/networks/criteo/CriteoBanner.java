@@ -11,6 +11,7 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.model.BannerAdUnit;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
@@ -41,9 +42,14 @@ public class CriteoBanner extends UnifiedBannerAd {
         Utils.onUiThread(new Runnable() {
             @Override
             public void run() {
-                criteoBannerView = new CriteoBannerView(context.getContext(), bannerAdUnit);
-                criteoBannerView.setCriteoBannerAdListener(new Listener(callback));
-                criteoBannerView.loadAd(bidToken);
+                try {
+                    criteoBannerView = new CriteoBannerView(context.getContext(), bannerAdUnit);
+                    criteoBannerView.setCriteoBannerAdListener(new Listener(callback));
+                    criteoBannerView.loadAd(bidToken);
+                } catch (Throwable t) {
+                    Logger.log(t);
+                    callback.onAdLoadFailed(BMError.Internal);
+                }
             }
         });
     }
