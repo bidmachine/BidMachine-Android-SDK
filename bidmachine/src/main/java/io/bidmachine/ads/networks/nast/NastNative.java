@@ -18,7 +18,7 @@ class NastNative extends UnifiedNativeAd {
     public void load(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedNativeAdCallback callback,
                      @NonNull UnifiedNativeAdRequestParams adRequestParams,
-                     @NonNull UnifiedMediationParams mediationParams) {
+                     @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         NastParams nastParams = new NastParams(mediationParams);
         if (!nastParams.isValid(adRequestParams, callback)) {
             return;

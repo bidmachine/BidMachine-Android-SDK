@@ -22,7 +22,7 @@ class MyTargetBanner extends UnifiedBannerAd {
     public void load(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedBannerAdCallback callback,
                      @NonNull UnifiedBannerAdRequestParams requestParams,
-                     @NonNull UnifiedMediationParams mediationParams) {
+                     @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         MyTargetParams params = new MyTargetParams(mediationParams);
         if (!params.isValid(callback)) {
             return;

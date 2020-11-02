@@ -18,7 +18,8 @@ import io.bidmachine.utils.BMError;
 class VastFullScreenAd extends UnifiedFullscreenAd {
 
     @NonNull
-    private VideoType videoType;
+    private final VideoType videoType;
+
     @Nullable
     private VastRequest vastRequest;
     private VastFullScreenAdapterListener vastListener;
@@ -31,7 +32,7 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     public void load(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback,
                      @NonNull UnifiedFullscreenAdRequestParams requestParams,
-                     @NonNull UnifiedMediationParams mediationParams) {
+                     @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         VastParams vastParams = new VastParams(mediationParams);
         if (!vastParams.isValid(callback)) {
             return;
