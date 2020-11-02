@@ -128,176 +128,183 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     @VisibleForTesting
+    @Nullable
     Object build(final android.content.Context context, AdsType adsType) {
-        final String sellerId = BidMachineImpl.get().getSellerId();
-        if (TextUtils.isEmpty(sellerId)) {
-            return BMError.paramError("Seller Id not provided");
-        }
-        assert sellerId != null;
-
-        BMError implVerifyError = verifyRequest();
-        if (implVerifyError != null) {
-            return implVerifyError;
-        }
-
-        final BidMachineImpl bidMachine = BidMachineImpl.get();
-
-        AdvertisingPersonalData.syncUpdateInfo(context);
-
-        final Request.Builder requestBuilder = Request.newBuilder();
-        final TargetingParams targetingParams =
-                RequestParams.resolveParams(this.targetingParams, bidMachine.getTargetingParams());
-        final SessionAdParams sessionAdParams =
-                RequestParams.resolveParams(this.sessionAdParams,
-                                            bidMachine.getSessionAdParams(adsType)
-                                                    .setSessionDuration((int) SessionManager.get()
-                                                            .getSessionDuration()));
-        final BlockedParams blockedParams = targetingParams.getBlockedParams();
-        final UserRestrictionParams userRestrictionParams =
-                RequestParams.resolveParams(this.userRestrictionParams,
-                                            bidMachine.getUserRestrictionParams());
-        unifiedAdRequestParams = createUnifiedAdRequestParams(targetingParams,
-                                                              userRestrictionParams);
-
-        //PriceFloor params
-        final PriceFloorParams priceFloorParams = oneOf(this.priceFloorParams,
-                                                        bidMachine.getPriceFloorParams());
-        final Map<String, Double> priceFloorsMap =
-                priceFloorParams.getPriceFloors() == null
-                        || priceFloorParams.getPriceFloors().size() == 0
-                        ? bidMachine.getPriceFloorParams().getPriceFloors()
-                        : priceFloorParams.getPriceFloors();
-
-        if (priceFloorsMap == null) {
-            return BMError.paramError("PriceFloors not provided");
-        }
-
-        final ArrayList<Message.Builder> placements = new ArrayList<>();
-        adsType.collectDisplayPlacements(new SimpleContextProvider(context),
-                                         this,
-                                         unifiedAdRequestParams,
-                                         placements,
-                                         networkConfigMap);
-
-        final Request.Item.Builder itemBuilder = Request.Item.newBuilder();
-        itemBuilder.setId(UUID.randomUUID().toString());
-        itemBuilder.setQty(1);
-
-        for (Map.Entry<String, Double> bid : priceFloorsMap.entrySet()) {
-            final Request.Item.Deal.Builder dealBuilder = Request.Item.Deal.newBuilder();
-            dealBuilder.setId(bid.getKey());
-            dealBuilder.setFlr(bid.getValue());
-            dealBuilder.setFlrcur("USD");
-            itemBuilder.addDeal(dealBuilder);
-        }
-
-        final Placement.Builder placementBuilder = Placement.newBuilder();
-        placementBuilder.setSsai(0);
-        placementBuilder.setSdk(BidMachine.NAME);
-        placementBuilder.setSdkver(BidMachine.VERSION);
-        placementBuilder.setSecure(!io.bidmachine.core.Utils.canUseCleartextTraffic());
-        for (Message.Builder displayBuilder : placements) {
-            if (displayBuilder instanceof Placement.DisplayPlacement.Builder) {
-                placementBuilder.setDisplay((Placement.DisplayPlacement.Builder) displayBuilder);
-            } else if (displayBuilder instanceof Placement.VideoPlacement.Builder) {
-                placementBuilder.setVideo((Placement.VideoPlacement.Builder) displayBuilder);
-            } else {
-                throw new IllegalArgumentException("Unsupported display type: " + displayBuilder);
+        try {
+            final String sellerId = BidMachineImpl.get().getSellerId();
+            if (TextUtils.isEmpty(sellerId)) {
+                return BMError.paramError("Seller Id not provided");
             }
+            assert sellerId != null;
+
+            BMError implVerifyError = verifyRequest();
+            if (implVerifyError != null) {
+                return implVerifyError;
+            }
+
+            final BidMachineImpl bidMachine = BidMachineImpl.get();
+
+            AdvertisingPersonalData.syncUpdateInfo(context);
+
+            final Request.Builder requestBuilder = Request.newBuilder();
+            final TargetingParams targetingParams =
+                    RequestParams.resolveParams(this.targetingParams,
+                                                bidMachine.getTargetingParams());
+            final SessionAdParams sessionAdParams =
+                    RequestParams.resolveParams(this.sessionAdParams,
+                                                bidMachine.getSessionAdParams(adsType)
+                                                        .setSessionDuration((int) SessionManager.get()
+                                                                .getSessionDuration()));
+            final BlockedParams blockedParams = targetingParams.getBlockedParams();
+            final UserRestrictionParams userRestrictionParams =
+                    RequestParams.resolveParams(this.userRestrictionParams,
+                                                bidMachine.getUserRestrictionParams());
+            unifiedAdRequestParams = createUnifiedAdRequestParams(targetingParams,
+                                                                  userRestrictionParams);
+
+            //PriceFloor params
+            final PriceFloorParams priceFloorParams = oneOf(this.priceFloorParams,
+                                                            bidMachine.getPriceFloorParams());
+            final Map<String, Double> priceFloorsMap =
+                    priceFloorParams.getPriceFloors() == null
+                            || priceFloorParams.getPriceFloors().size() == 0
+                            ? bidMachine.getPriceFloorParams().getPriceFloors()
+                            : priceFloorParams.getPriceFloors();
+
+            if (priceFloorsMap == null) {
+                return BMError.paramError("PriceFloors not provided");
+            }
+
+            final ArrayList<Message.Builder> placements = new ArrayList<>();
+            adsType.collectDisplayPlacements(new SimpleContextProvider(context),
+                                             this,
+                                             unifiedAdRequestParams,
+                                             placements,
+                                             networkConfigMap);
+
+            final Request.Item.Builder itemBuilder = Request.Item.newBuilder();
+            itemBuilder.setId(UUID.randomUUID().toString());
+            itemBuilder.setQty(1);
+
+            for (Map.Entry<String, Double> bid : priceFloorsMap.entrySet()) {
+                final Request.Item.Deal.Builder dealBuilder = Request.Item.Deal.newBuilder();
+                dealBuilder.setId(bid.getKey());
+                dealBuilder.setFlr(bid.getValue());
+                dealBuilder.setFlrcur("USD");
+                itemBuilder.addDeal(dealBuilder);
+            }
+
+            final Placement.Builder placementBuilder = Placement.newBuilder();
+            placementBuilder.setSsai(0);
+            placementBuilder.setSdk(BidMachine.NAME);
+            placementBuilder.setSdkver(BidMachine.VERSION);
+            placementBuilder.setSecure(!io.bidmachine.core.Utils.canUseCleartextTraffic());
+            for (Message.Builder displayBuilder : placements) {
+                if (displayBuilder instanceof Placement.DisplayPlacement.Builder) {
+                    placementBuilder.setDisplay((Placement.DisplayPlacement.Builder) displayBuilder);
+                } else if (displayBuilder instanceof Placement.VideoPlacement.Builder) {
+                    placementBuilder.setVideo((Placement.VideoPlacement.Builder) displayBuilder);
+                } else {
+                    throw new IllegalArgumentException("Unsupported display type: " + displayBuilder);
+                }
+            }
+
+            onBuildPlacement(placementBuilder);
+            itemBuilder.setSpec(Any.pack(placementBuilder.build()));
+
+            requestBuilder.addItem(itemBuilder.build());
+
+            //Context
+            final Context.Builder contextBuilder = Context.newBuilder();
+
+            //Context -> App
+            final Context.App.Builder appBuilder = Context.App.newBuilder();
+            Publisher publisher = bidMachine.getPublisher();
+            if (publisher != null) {
+                publisher.build(appBuilder);
+            }
+            targetingParams.build(context, appBuilder);
+
+            //Context -> App -> Extension
+            Struct.Builder appExtBuilder = Struct.newBuilder();
+            targetingParams.fillAppExtension(appExtBuilder);
+            if (appExtBuilder.getFieldsCount() > 0) {
+                appBuilder.setExt(appExtBuilder.build());
+            }
+
+            contextBuilder.setApp(appBuilder);
+
+            //Context -> Restrictions
+            if (blockedParams != null) {
+                final Context.Restrictions.Builder restrictionsBuilder = Context.Restrictions.newBuilder();
+                blockedParams.build(restrictionsBuilder);
+                contextBuilder.setRestrictions(restrictionsBuilder);
+            }
+
+            //Context -> User
+            final Context.User.Builder userBuilder = Context.User.newBuilder();
+            userRestrictionParams.build(userBuilder);
+            if (userRestrictionParams.canSendUserInfo()) {
+                targetingParams.build(userBuilder);
+            }
+
+            //Context -> User -> Extension
+            Struct.Builder userExtBuilder = Struct.newBuilder();
+            sessionAdParams.fillUserExtension(userExtBuilder);
+            if (userExtBuilder.getFieldsCount() > 0) {
+                userBuilder.setExt(userExtBuilder.build());
+            }
+            bidMachine.getSessionAdParams(adsType).setIsUserClickedOnLastAd(false);
+
+            contextBuilder.setUser(userBuilder);
+
+            //Context -> Regs
+            final Context.Regs.Builder regsBuilder = Context.Regs.newBuilder();
+            userRestrictionParams.build(regsBuilder);
+            contextBuilder.setRegs(regsBuilder);
+
+            //Context -> Device
+            final Context.Device.Builder deviceBuilder = Context.Device.newBuilder();
+            bidMachine.getDeviceParams().build(context,
+                                               deviceBuilder,
+                                               targetingParams,
+                                               bidMachine.getTargetingParams(),
+                                               userRestrictionParams);
+
+            //Context -> Device -> Extension
+            Struct.Builder deviceExtBuilder = Struct.newBuilder();
+            bidMachine.getDeviceParams().fillDeviceExtension(context,
+                                                             deviceExtBuilder,
+                                                             userRestrictionParams);
+            if (deviceExtBuilder.getFieldsCount() > 0) {
+                deviceBuilder.setExt(deviceExtBuilder.build());
+            }
+
+            contextBuilder.setDevice(deviceBuilder);
+
+            requestBuilder.setContext(Any.pack(contextBuilder.build()));
+
+            requestBuilder.setTest(bidMachine.isTestMode());
+            requestBuilder.addCur("USD");
+            requestBuilder.setAt(2);
+            requestBuilder.setTmax(10000);
+
+            //Request
+            final RequestExtension.Builder requestExtensionBuilder = RequestExtension.newBuilder();
+            requestExtensionBuilder.setSellerId(sellerId);
+            requestExtensionBuilder.setHeaderBiddingType(
+                    headerBiddingEnabled
+                            ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
+                            : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
+            requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
+
+            requestBuilder.addExtProto(Any.pack(requestExtensionBuilder.build()));
+
+            return requestBuilder.build();
+        } catch (Throwable t) {
+            Logger.log(t);
+            return null;
         }
-
-        onBuildPlacement(placementBuilder);
-        itemBuilder.setSpec(Any.pack(placementBuilder.build()));
-
-        requestBuilder.addItem(itemBuilder.build());
-
-        //Context
-        final Context.Builder contextBuilder = Context.newBuilder();
-
-        //Context -> App
-        final Context.App.Builder appBuilder = Context.App.newBuilder();
-        Publisher publisher = bidMachine.getPublisher();
-        if (publisher != null) {
-            publisher.build(appBuilder);
-        }
-        targetingParams.build(context, appBuilder);
-
-        //Context -> App -> Extension
-        Struct.Builder appExtBuilder = Struct.newBuilder();
-        targetingParams.fillAppExtension(appExtBuilder);
-        if (appExtBuilder.getFieldsCount() > 0) {
-            appBuilder.setExt(appExtBuilder.build());
-        }
-
-        contextBuilder.setApp(appBuilder);
-
-        //Context -> Restrictions
-        if (blockedParams != null) {
-            final Context.Restrictions.Builder restrictionsBuilder = Context.Restrictions.newBuilder();
-            blockedParams.build(restrictionsBuilder);
-            contextBuilder.setRestrictions(restrictionsBuilder);
-        }
-
-        //Context -> User
-        final Context.User.Builder userBuilder = Context.User.newBuilder();
-        userRestrictionParams.build(userBuilder);
-        if (userRestrictionParams.canSendUserInfo()) {
-            targetingParams.build(userBuilder);
-        }
-
-        //Context -> User -> Extension
-        Struct.Builder userExtBuilder = Struct.newBuilder();
-        sessionAdParams.fillUserExtension(userExtBuilder);
-        if (userExtBuilder.getFieldsCount() > 0) {
-            userBuilder.setExt(userExtBuilder.build());
-        }
-        bidMachine.getSessionAdParams(adsType).setIsUserClickedOnLastAd(false);
-
-        contextBuilder.setUser(userBuilder);
-
-        //Context -> Regs
-        final Context.Regs.Builder regsBuilder = Context.Regs.newBuilder();
-        userRestrictionParams.build(regsBuilder);
-        contextBuilder.setRegs(regsBuilder);
-
-        //Context -> Device
-        final Context.Device.Builder deviceBuilder = Context.Device.newBuilder();
-        bidMachine.getDeviceParams().build(context,
-                                           deviceBuilder,
-                                           targetingParams,
-                                           bidMachine.getTargetingParams(),
-                                           userRestrictionParams);
-
-        //Context -> Device -> Extension
-        Struct.Builder deviceExtBuilder = Struct.newBuilder();
-        bidMachine.getDeviceParams().fillDeviceExtension(context,
-                                                         deviceExtBuilder,
-                                                         userRestrictionParams);
-        if (deviceExtBuilder.getFieldsCount() > 0) {
-            deviceBuilder.setExt(deviceExtBuilder.build());
-        }
-
-        contextBuilder.setDevice(deviceBuilder);
-
-        requestBuilder.setContext(Any.pack(contextBuilder.build()));
-
-        requestBuilder.setTest(bidMachine.isTestMode());
-        requestBuilder.addCur("USD");
-        requestBuilder.setAt(2);
-        requestBuilder.setTmax(10000);
-
-        //Request
-        final RequestExtension.Builder requestExtensionBuilder = RequestExtension.newBuilder();
-        requestExtensionBuilder.setSellerId(sellerId);
-        requestExtensionBuilder.setHeaderBiddingType(
-                headerBiddingEnabled
-                        ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
-                        : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
-        requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
-
-        requestBuilder.addExtProto(Any.pack(requestExtensionBuilder.build()));
-
-        return requestBuilder.build();
     }
 
     protected void onBuildPlacement(Placement.Builder builder) {
