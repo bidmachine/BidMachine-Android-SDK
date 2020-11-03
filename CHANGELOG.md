@@ -1,3 +1,7 @@
+## Version 1.6.1 (November 3, 2020)
+**Features**:
+* SDK improvement
+
 ## Version 1.6.0 (September 11, 2020)
 **Features**:
 * SDK improvement
