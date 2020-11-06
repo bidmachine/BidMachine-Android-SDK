@@ -76,9 +76,10 @@ dependencies {
 
     implementation "androidx.multidex:multidex:2.0.1"
     implementation "androidx.appcompat:appcompat:1.2.0"
-    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
+    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     implementation "org.jsoup:jsoup:1.11.3"
-    implementation "com.google.android.material:material:1.2.0"
+    implementation "com.google.android.material:material:1.2.1"
     implementation "com.wefika:flowlayout:0.4.1"
     implementation "com.google.code.gson:gson:2.8.5"
 

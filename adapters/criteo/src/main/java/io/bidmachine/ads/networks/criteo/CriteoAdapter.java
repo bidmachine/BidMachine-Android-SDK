@@ -8,7 +8,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.model.AdUnit;
@@ -38,7 +37,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     CriteoAdapter() {
         super("criteo",
-              "3.9.0",
+              Criteo.getVersion(),
               BuildConfig.VERSION_NAME,
               new AdsType[]{AdsType.Banner, AdsType.Interstitial});
         BidMachine.registerAdRequestListener(new AdRequest.AdRequestListener() {
@@ -46,18 +45,18 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             public void onRequestSuccess(@NonNull AdRequest adRequest,
                                          @NonNull AuctionResult auctionResult) {
                 if (!getKey().equals(auctionResult.getNetworkKey())) {
-                    CriteoBidTokenController.takeBidToken(adRequest);
+                    CriteoBidTokenController.takeBid(adRequest);
                 }
             }
 
             @Override
             public void onRequestFailed(@NonNull AdRequest adRequest, @NonNull BMError error) {
-                CriteoBidTokenController.takeBidToken(adRequest);
+                CriteoBidTokenController.takeBid(adRequest);
             }
 
             @Override
             public void onRequestExpired(@NonNull AdRequest adRequest) {
-                CriteoBidTokenController.takeBidToken(adRequest);
+                CriteoBidTokenController.takeBid(adRequest);
             }
         });
     }
@@ -119,27 +118,24 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             return;
         }
         assert adUnitId != null;
-
-        Criteo criteo = Criteo.getInstance();
         AdUnit adUnit = CriteoAdUnitController.getAdUnit(adUnitId);
         if (adUnit == null) {
             collectCallback.onCollectFail(BMError.requestError("AdUnit not found"));
             return;
         }
-        BidResponse bidResponse = criteo.getBidResponse(adUnit);
-        if (bidResponse != null
-                && bidResponse.isBidSuccess()
-                && bidResponse.getBidToken() != null) {
-            CriteoBidTokenController.storeBidToken(
-                    adRequestParams.getAdRequest(),
-                    bidResponse.getBidToken());
-            Map<String, String> params = new HashMap<>();
-            params.put(CriteoConfig.AD_UNIT_ID, adUnitId);
-            params.put(CriteoConfig.PRICE, String.valueOf(bidResponse.getPrice()));
-            collectCallback.onCollectFinished(params);
-        } else {
-            collectCallback.onCollectFail(BMError.NotLoaded);
-        }
+        Criteo criteo = Criteo.getInstance();
+        criteo.loadBid(adUnit, bid -> {
+            if (bid != null) {
+                CriteoBidTokenController.storeBid(adRequestParams.getAdRequest(), bid);
+
+                Map<String, String> params = new HashMap<>();
+                params.put(CriteoConfig.AD_UNIT_ID, adUnitId);
+                params.put(CriteoConfig.PRICE, String.valueOf(bid.getPrice()));
+                collectCallback.onCollectFinished(params);
+            } else {
+                collectCallback.onCollectFail(BMError.NotLoaded);
+            }
+        });
     }
 
     private boolean isInitialized() {

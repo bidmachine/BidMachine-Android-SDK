@@ -1,10 +1,8 @@
 package io.bidmachine.ads.networks.criteo;
 
-import android.view.View;
-
 import androidx.annotation.NonNull;
 
-import com.criteo.publisher.BidToken;
+import com.criteo.publisher.Bid;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
@@ -34,22 +32,19 @@ public class CriteoBanner extends UnifiedBannerAd {
             callback.onAdLoadFailed(BMError.requestError("AdUnit not found"));
             return;
         }
-        final BidToken bidToken = CriteoBidTokenController.takeBidToken(requestParams.getAdRequest());
-        if (bidToken == null) {
-            callback.onAdLoadFailed(BMError.requestError("BidToken not found"));
+        final Bid bid = CriteoBidTokenController.takeBid(requestParams.getAdRequest());
+        if (bid == null) {
+            callback.onAdLoadFailed(BMError.requestError("Bid not found"));
             return;
         }
-        Utils.onUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    criteoBannerView = new CriteoBannerView(context.getContext(), bannerAdUnit);
-                    criteoBannerView.setCriteoBannerAdListener(new Listener(callback));
-                    criteoBannerView.loadAd(bidToken);
-                } catch (Throwable t) {
-                    Logger.log(t);
-                    callback.onAdLoadFailed(BMError.Internal);
-                }
+        Utils.onUiThread(() -> {
+            try {
+                criteoBannerView = new CriteoBannerView(context.getContext(), bannerAdUnit);
+                criteoBannerView.setCriteoBannerAdListener(new Listener(callback));
+                criteoBannerView.loadAd(bid);
+            } catch (Throwable t) {
+                Logger.log(t);
+                callback.onAdLoadFailed(BMError.Internal);
             }
         });
     }
@@ -71,18 +66,13 @@ public class CriteoBanner extends UnifiedBannerAd {
         }
 
         @Override
-        public void onAdReceived(View view) {
-            callback.onAdLoaded(view);
+        public void onAdReceived(@NonNull CriteoBannerView criteoBannerView) {
+            callback.onAdLoaded(criteoBannerView);
         }
 
         @Override
-        public void onAdFailedToReceive(CriteoErrorCode criteoErrorCode) {
+        public void onAdFailedToReceive(@NonNull CriteoErrorCode criteoErrorCode) {
             callback.onAdLoadFailed(CriteoAdapter.mapError(criteoErrorCode));
-        }
-
-        @Override
-        public void onAdLeftApplication() {
-
         }
 
         @Override
@@ -91,12 +81,7 @@ public class CriteoBanner extends UnifiedBannerAd {
         }
 
         @Override
-        public void onAdOpened() {
-
-        }
-
-        @Override
-        public void onAdClosed() {
+        public void onAdLeftApplication() {
 
         }
 

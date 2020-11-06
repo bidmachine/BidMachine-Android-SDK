@@ -4,9 +4,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.criteo.publisher.BidToken;
+import com.criteo.publisher.Bid;
 import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.InterstitialAdUnit;
 
@@ -33,18 +32,14 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
             callback.onAdLoadFailed(BMError.requestError("AdUnit not found"));
             return;
         }
-        BidToken bidToken = CriteoBidTokenController.takeBidToken(requestParams.getAdRequest());
-        if (bidToken == null) {
-            callback.onAdLoadFailed(BMError.requestError("BidToken not found"));
+        Bid bid = CriteoBidTokenController.takeBid(requestParams.getAdRequest());
+        if (bid == null) {
+            callback.onAdLoadFailed(BMError.requestError("Bid not found"));
             return;
         }
-        Listener listener = new Listener(callback);
-        criteoInterstitial = new com.criteo.publisher.CriteoInterstitial(
-                context.getContext(),
-                interstitialAdUnit);
-        criteoInterstitial.setCriteoInterstitialAdListener(listener);
-        criteoInterstitial.setCriteoInterstitialAdDisplayListener(listener);
-        criteoInterstitial.loadAd(bidToken);
+        criteoInterstitial = new com.criteo.publisher.CriteoInterstitial(interstitialAdUnit);
+        criteoInterstitial.setCriteoInterstitialAdListener(new Listener(callback));
+        criteoInterstitial.loadAd(bid);
     }
 
     @Override
@@ -60,12 +55,11 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
     public void onDestroy() {
         if (criteoInterstitial != null) {
             criteoInterstitial.setCriteoInterstitialAdListener(null);
-            criteoInterstitial.setCriteoInterstitialAdDisplayListener(null);
             criteoInterstitial = null;
         }
     }
 
-    private static final class Listener implements CriteoInterstitialAdListener, CriteoInterstitialAdDisplayListener {
+    private static final class Listener implements CriteoInterstitialAdListener {
 
         private final UnifiedFullscreenAdCallback callback;
 
@@ -74,23 +68,13 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
         }
 
         @Override
-        public void onAdReceived() {
-
-        }
-
-        @Override
-        public void onAdFailedToReceive(CriteoErrorCode criteoErrorCode) {
-            callback.onAdLoadFailed(CriteoAdapter.mapError(criteoErrorCode));
-        }
-
-        @Override
-        public void onAdReadyToDisplay() {
+        public void onAdReceived(@NonNull com.criteo.publisher.CriteoInterstitial criteoInterstitial) {
             callback.onAdLoaded();
         }
 
         @Override
-        public void onAdLeftApplication() {
-
+        public void onAdFailedToReceive(@NonNull CriteoErrorCode criteoErrorCode) {
+            callback.onAdLoadFailed(CriteoAdapter.mapError(criteoErrorCode));
         }
 
         @Override
@@ -109,9 +93,10 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
         }
 
         @Override
-        public void onAdFailedToDisplay(CriteoErrorCode criteoErrorCode) {
-            callback.onAdShowFailed(CriteoAdapter.mapError(criteoErrorCode));
+        public void onAdLeftApplication() {
+
         }
+
     }
 
 }
