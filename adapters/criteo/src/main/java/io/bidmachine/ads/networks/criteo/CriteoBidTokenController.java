@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
-import com.criteo.publisher.BidToken;
+import com.criteo.publisher.Bid;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -14,22 +14,21 @@ import io.bidmachine.AdRequest;
 class CriteoBidTokenController {
 
     @VisibleForTesting
-    static final Map<AdRequest, BidToken> bidTokenMap = new WeakHashMap<>();
+    static final Map<AdRequest, Bid> bidMap = new WeakHashMap<>();
 
-    static synchronized void storeBidToken(@Nullable AdRequest adRequest,
-                                           @NonNull BidToken bidToken) {
+    static synchronized void storeBid(@Nullable AdRequest adRequest, @NonNull Bid bid) {
         if (adRequest == null) {
             return;
         }
-        bidTokenMap.put(adRequest, bidToken);
+        bidMap.put(adRequest, bid);
     }
 
     @Nullable
-    static synchronized BidToken takeBidToken(@Nullable AdRequest adRequest) {
+    static synchronized Bid takeBid(@Nullable AdRequest adRequest) {
         if (adRequest == null) {
             return null;
         }
-        return bidTokenMap.remove(adRequest);
+        return bidMap.remove(adRequest);
     }
 
 }

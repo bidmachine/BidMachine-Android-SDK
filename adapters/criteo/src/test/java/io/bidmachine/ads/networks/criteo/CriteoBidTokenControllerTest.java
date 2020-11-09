@@ -38,9 +38,9 @@ public class CriteoBidTokenControllerTest {
         BidToken bidToken3 = CriteoUtils.createBidToken();
         AdRequest adRequest1 = createAdRequest();
         AdRequest adRequest2 = createAdRequest();
-        CriteoBidTokenController.storeBidToken(null, bidToken1);
-        CriteoBidTokenController.storeBidToken(adRequest1, bidToken2);
-        CriteoBidTokenController.storeBidToken(adRequest2, bidToken3);
+        CriteoBidTokenController.storeBid(null, bidToken1);
+        CriteoBidTokenController.storeBid(adRequest1, bidToken2);
+        CriteoBidTokenController.storeBid(adRequest2, bidToken3);
 
         Map<AdRequest, BidToken> bidTokenMap = CriteoBidTokenController.bidTokenMap;
         assertEquals(2, bidTokenMap.size());
@@ -50,15 +50,15 @@ public class CriteoBidTokenControllerTest {
 
     @Test
     public void takeBidToken() {
-        BidToken bidToken1 = CriteoBidTokenController.takeBidToken(null);
-        BidToken bidToken2 = CriteoBidTokenController.takeBidToken(createAdRequest());
+        BidToken bidToken1 = CriteoBidTokenController.takeBid(null);
+        BidToken bidToken2 = CriteoBidTokenController.takeBid(createAdRequest());
         assertNull(bidToken1);
         assertNull(bidToken2);
 
         BidToken bidToken3 = CriteoUtils.createBidToken();
         AdRequest adRequest1 = createAdRequest();
-        CriteoBidTokenController.storeBidToken(adRequest1, bidToken3);
-        assertEquals(bidToken3, CriteoBidTokenController.takeBidToken(adRequest1));
+        CriteoBidTokenController.storeBid(adRequest1, bidToken3);
+        assertEquals(bidToken3, CriteoBidTokenController.takeBid(adRequest1));
     }
 
     private AdRequest createAdRequest() {
