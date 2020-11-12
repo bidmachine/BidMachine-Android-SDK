@@ -19,6 +19,7 @@ import com.explorestack.protobuf.openrtb.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -91,12 +92,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     private boolean isExpired;
     private boolean isExpireTrackerSubscribed;
 
-    private final Runnable expiredRunnable = new Runnable() {
-        @Override
-        public void run() {
-            processExpired();
-        }
-    };
+    private final Runnable expiredRunnable = new ExpiredRunnable(this);
 
     private final Runnable timeOutRunnable = new Runnable() {
         @Override
@@ -483,11 +479,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     private void subscribeExpireTracker() {
         final long expTime = expirationTime * 1000;
-        if (expTime > 0) {
-            if (!isExpireTrackerSubscribed) {
-                isExpireTrackerSubscribed = true;
-                io.bidmachine.core.Utils.onBackgroundThread(expiredRunnable, expTime);
-            }
+        if (expTime > 0 && !isExpireTrackerSubscribed) {
+            isExpireTrackerSubscribed = true;
+            io.bidmachine.core.Utils.onBackgroundThread(expiredRunnable, expTime);
         }
     }
 
@@ -657,6 +651,24 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
          * @param request - AdRequest instance
          */
         void onRequestExpired(@NonNull AdRequestType request);
+    }
+
+    private static class ExpiredRunnable implements Runnable {
+
+        private final WeakReference<AdRequest> weakAdRequest;
+
+        public ExpiredRunnable(@NonNull AdRequest adRequest) {
+            this.weakAdRequest = new WeakReference<>(adRequest);
+        }
+
+        @Override
+        public void run() {
+            AdRequest adRequest = weakAdRequest.get();
+            if (adRequest != null) {
+                adRequest.processExpired();
+            }
+        }
+
     }
 
     protected static abstract class AdRequestBuilderImpl<
