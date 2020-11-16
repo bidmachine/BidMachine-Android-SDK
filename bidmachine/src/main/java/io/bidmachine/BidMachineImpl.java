@@ -206,53 +206,59 @@ final class BidMachineImpl {
                                  @Nullable final InitializationCallback callback) {
         if (currentInitRequest != null) return;
         BidMachineEvents.eventStart(trackingObject, TrackEventType.InitLoading, null);
-        currentInitRequest = new ApiRequest.Builder<InitRequest, InitResponse>()
-                .url(currentInitUrl)
-                .setDataBinder(new ApiRequest.ApiInitDataBinder())
-                .setRequestData(OrtbUtils.obtainInitRequest(context,
-                                                            sellerId,
-                                                            targetingParams,
-                                                            userRestrictionParams))
-                .setCallback(new NetworkRequest.Callback<InitResponse, BMError>() {
-                    @Override
-                    public void onSuccess(@Nullable InitResponse result) {
-                        currentInitRequest = null;
-                        if (result != null) {
-                            handleInitResponse(context, result);
-                            storeInitResponse(context, result);
-                        }
-                        initRequestDelayMs = 0;
-                        Utils.cancelBackgroundThreadTask(rescheduleInitRunnable);
-                        notifyInitializationFinished(callback);
-                        BidMachineEvents.eventFinish(trackingObject,
-                                                     TrackEventType.InitLoading,
-                                                     null,
-                                                     null);
-                    }
-
-                    @Override
-                    public void onFail(@Nullable BMError result) {
-                        currentInitRequest = null;
-                        if (initRequestDelayMs <= 0) {
-                            initRequestDelayMs = MIN_INIT_REQUEST_DELAY_MS;
-                        } else {
-                            initRequestDelayMs *= 2;
-                            if (initRequestDelayMs >= MAX_INIT_REQUEST_DELAY_MS) {
-                                initRequestDelayMs = MAX_INIT_REQUEST_DELAY_MS;
+        Utils.onBackgroundThread(new Runnable() {
+            @Override
+            public void run() {
+                currentInitRequest = new ApiRequest.Builder<InitRequest, InitResponse>()
+                        .url(currentInitUrl)
+                        .setDataBinder(new ApiRequest.ApiInitDataBinder())
+                        .setRequestData(OrtbUtils.obtainInitRequest(context,
+                                                                    sellerId,
+                                                                    targetingParams,
+                                                                    userRestrictionParams))
+                        .setCallback(new NetworkRequest.Callback<InitResponse, BMError>() {
+                            @Override
+                            public void onSuccess(@Nullable InitResponse result) {
+                                currentInitRequest = null;
+                                if (result != null) {
+                                    handleInitResponse(context, result);
+                                    storeInitResponse(context, result);
+                                }
+                                initRequestDelayMs = 0;
+                                Utils.cancelBackgroundThreadTask(rescheduleInitRunnable);
+                                notifyInitializationFinished(callback);
+                                BidMachineEvents.eventFinish(trackingObject,
+                                                             TrackEventType.InitLoading,
+                                                             null,
+                                                             null);
                             }
-                        }
-                        Logger.log("reschedule init request (" + initRequestDelayMs + ")");
-                        Utils.onBackgroundThread(rescheduleInitRunnable, initRequestDelayMs);
-                        // According requirements we should notify that SDK is initialized event if init request fail
-                        notifyInitializationFinished(callback);
-                        BidMachineEvents.eventFinish(
-                                trackingObject,
-                                TrackEventType.InitLoading,
-                                null,
-                                result);
-                    }
-                })
-                .request();
+
+                            @Override
+                            public void onFail(@Nullable BMError result) {
+                                currentInitRequest = null;
+                                if (initRequestDelayMs <= 0) {
+                                    initRequestDelayMs = MIN_INIT_REQUEST_DELAY_MS;
+                                } else {
+                                    initRequestDelayMs *= 2;
+                                    if (initRequestDelayMs >= MAX_INIT_REQUEST_DELAY_MS) {
+                                        initRequestDelayMs = MAX_INIT_REQUEST_DELAY_MS;
+                                    }
+                                }
+                                Logger.log("reschedule init request (" + initRequestDelayMs + ")");
+                                Utils.onBackgroundThread(rescheduleInitRunnable,
+                                                         initRequestDelayMs);
+                                // According requirements we should notify that SDK is initialized event if init request fail
+                                notifyInitializationFinished(callback);
+                                BidMachineEvents.eventFinish(
+                                        trackingObject,
+                                        TrackEventType.InitLoading,
+                                        null,
+                                        result);
+                            }
+                        })
+                        .request();
+            }
+        });
     }
 
     private void notifyInitializationFinished(@Nullable final InitializationCallback callback) {

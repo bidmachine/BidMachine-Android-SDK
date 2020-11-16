@@ -104,7 +104,7 @@ public class Utils {
     private static String httpAgentString;
 
     public static void onUiThread(Runnable runnable) {
-        if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
             runnable.run();
         } else {
             uiHandler.post(runnable);
