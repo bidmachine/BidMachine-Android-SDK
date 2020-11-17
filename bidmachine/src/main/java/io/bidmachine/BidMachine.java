@@ -9,7 +9,7 @@ import io.bidmachine.core.Logger;
 
 public class BidMachine {
 
-    public static final String NAME = "BidMachine SDK";
+    public static final String NAME = "BidMachine";
     public static final String VERSION = BuildConfig.VERSION_NAME;
     public static final int VERSION_CODE = BuildConfig.VERSION_CODE;
 
