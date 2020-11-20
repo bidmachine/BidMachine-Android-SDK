@@ -1,7 +1,8 @@
 package io.bidmachine;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
+
+import java.util.UUID;
 
 public class SessionManager {
 
@@ -19,32 +20,58 @@ public class SessionManager {
         return sessionManager;
     }
 
+    private String sessionId;
+    private long sessionResetAfterSec;
     private long sessionDuration;
+    private long pauseTime;
     private long resumeTime;
 
-    public synchronized void resume() {
-        resumeTime = System.currentTimeMillis();
+    public SessionManager() {
+        startNewSession();
     }
 
-    public synchronized void pause() {
+    void startNewSession() {
+        sessionId = UUID.randomUUID().toString();
+        sessionDuration = 0;
+        pauseTime = 0;
+        resumeTime = 0;
+
+        for (AdsType adsType : AdsType.values()) {
+            BidMachineImpl.get().getSessionAdParams(adsType).clear();
+        }
+    }
+
+    String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionResetAfter(long sessionResetAfterSec) {
+        this.sessionResetAfterSec = sessionResetAfterSec;
+    }
+
+    public void resume() {
+        resumeTime = System.currentTimeMillis();
+        if (sessionResetAfterSec > 0
+                && pauseTime > 0
+                && resumeTime - pauseTime >= sessionResetAfterSec * 1000) {
+            startNewSession();
+        }
+    }
+
+    public void pause() {
         if (resumeTime == 0) {
             return;
         }
-        sessionDuration += System.currentTimeMillis() - resumeTime;
+        pauseTime = System.currentTimeMillis();
+        sessionDuration += pauseTime - resumeTime;
     }
 
-    public synchronized long getSessionDuration() {
+    public int getSessionDuration() {
         if (resumeTime == 0) {
             return 0;
         }
         long afterResume = System.currentTimeMillis() - resumeTime;
-        return (sessionDuration + afterResume) / 1000;
-    }
-
-    @VisibleForTesting
-    void clear() {
-        sessionDuration = 0;
-        resumeTime = 0;
+        return (int) ((sessionDuration + afterResume) / 1000);
     }
 
 }

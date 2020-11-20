@@ -278,6 +278,7 @@ final class BidMachineImpl {
         }
         trackingEventTypes.clear();
         OrtbUtils.prepareEvents(trackingEventTypes, response.getEventList());
+        SessionManager.get().setSessionResetAfter(response.getSessionResetAfter());
     }
 
     private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {

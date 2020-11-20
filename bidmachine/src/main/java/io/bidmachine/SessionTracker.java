@@ -17,8 +17,6 @@ import io.bidmachine.utils.BMError;
 
 abstract class SessionTracker {
 
-    abstract String getSessionId();
-
     abstract void trackEventStart(@Nullable TrackingObject trackingObject,
                                   @Nullable TrackEventType trackEventType,
                                   @Nullable TrackEventInfo trackEventInfo,

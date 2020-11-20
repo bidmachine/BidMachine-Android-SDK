@@ -146,11 +146,11 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             final TargetingParams targetingParams =
                     RequestParams.resolveParams(this.targetingParams,
                                                 bidMachine.getTargetingParams());
+            SessionAdParams bidMachineSessionAdParams = bidMachine.getSessionAdParams(adsType)
+                    .setSessionDuration(SessionManager.get().getSessionDuration());
             final SessionAdParams sessionAdParams =
                     RequestParams.resolveParams(this.sessionAdParams,
-                                                bidMachine.getSessionAdParams(adsType)
-                                                        .setSessionDuration((int) SessionManager.get()
-                                                                .getSessionDuration()));
+                                                bidMachineSessionAdParams);
             final BlockedParams blockedParams = targetingParams.getBlockedParams();
             final UserRestrictionParams userRestrictionParams =
                     RequestParams.resolveParams(this.userRestrictionParams,
@@ -293,6 +293,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
                             : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
             requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
+            requestExtensionBuilder.setSessionId(SessionManager.get().getSessionId());
 
             requestBuilder.addExtProto(Any.pack(requestExtensionBuilder.build()));
 

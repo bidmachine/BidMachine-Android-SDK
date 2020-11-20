@@ -2,7 +2,6 @@ package io.bidmachine;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 import com.explorestack.protobuf.Struct;
 import com.explorestack.protobuf.Value;
@@ -218,7 +217,6 @@ public class SessionAdParams extends RequestParams<SessionAdParams> implements I
         completionRate = (float) completedVideosCount / videoImpressionCount * 100;
     }
 
-    @VisibleForTesting
     void clear() {
         sessionDuration = null;
         impressionCount = null;

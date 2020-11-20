@@ -6,7 +6,6 @@ import androidx.annotation.VisibleForTesting;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,8 +41,6 @@ class SessionTrackerImpl extends SessionTracker {
         }
     }
 
-    private final String sessionId = UUID.randomUUID().toString();
-
     @VisibleForTesting
     final Map<AdsType, EventsHolder> trackingMap = new ConcurrentHashMap<>();
 
@@ -51,11 +48,6 @@ class SessionTrackerImpl extends SessionTracker {
     final Map<Object, EnumMap<TrackEventType, TrackEventInfo>> intervalHolders = new ConcurrentHashMap<>();
 
     private final EventsHolder totalHolder = new EventsHolder(null);
-
-    @Override
-    public String getSessionId() {
-        return sessionId;
-    }
 
     @Override
     public void trackEventStart(@Nullable TrackingObject trackingObject,
