@@ -8,7 +8,7 @@ include ':bidmachine', ':bidmachine-test-app', ':adapters'
  */
 gradle.ext {
 //    includingAdNetworks = ["adcolony"]
-    excludingAdNetworks = ["mintegral"]
+//    excludingAdNetworks = ["adcolony"]
 }
 
 /**
