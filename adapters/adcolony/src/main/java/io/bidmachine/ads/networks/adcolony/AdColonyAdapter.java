@@ -8,9 +8,6 @@ import androidx.annotation.NonNull;
 
 import com.adcolony.sdk.AdColony;
 import com.adcolony.sdk.AdColonyAppOptions;
-import com.adcolony.sdk.AdColonyInterstitial;
-import com.adcolony.sdk.AdColonyInterstitialListener;
-import com.adcolony.sdk.AdColonyZone;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -116,23 +113,9 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             final Map<String, String> params = new HashMap<>();
             params.put(AdColonyConfig.KEY_APP_ID, appId);
             params.put(AdColonyConfig.KEY_ZONE_ID, zoneId);
+            params.put(AdColonyConfig.KEY_TOKEN, AdColony.collectSignals());
 
-            AdColonyZone zone = AdColony.getZone(zoneId);
-            if (zone != null && zone.isValid()) {
-                collectCallback.onCollectFinished(params);
-            } else {
-                AdColony.requestInterstitial(zoneId, new AdColonyInterstitialListener() {
-                    @Override
-                    public void onRequestFilled(AdColonyInterstitial adColonyInterstitial) {
-                        collectCallback.onCollectFinished(params);
-                    }
-
-                    @Override
-                    public void onRequestNotFilled(AdColonyZone zone) {
-                        collectCallback.onCollectFail(BMError.NoContent);
-                    }
-                });
-            }
+            collectCallback.onCollectFinished(params);
         }
     }
 
