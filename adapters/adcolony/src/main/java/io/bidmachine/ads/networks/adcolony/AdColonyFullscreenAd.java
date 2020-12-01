@@ -1,11 +1,11 @@
 package io.bidmachine.ads.networks.adcolony;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
 import com.adcolony.sdk.AdColony;
+import com.adcolony.sdk.AdColonyAdOptions;
 import com.adcolony.sdk.AdColonyInterstitial;
 
 import io.bidmachine.ContextProvider;
@@ -17,9 +17,10 @@ import io.bidmachine.utils.BMError;
 
 class AdColonyFullscreenAd extends UnifiedFullscreenAd {
 
+    private final boolean isRewarded;
+
     private AdColonyInterstitial adColonyInterstitial;
     private AdColonyFullscreenAdListener listener;
-    private boolean isRewarded;
 
     AdColonyFullscreenAd(boolean rewarded) {
         isRewarded = rewarded;
@@ -30,17 +31,20 @@ class AdColonyFullscreenAd extends UnifiedFullscreenAd {
                      @NonNull UnifiedFullscreenAdCallback callback,
                      @NonNull UnifiedFullscreenAdRequestParams requestParams,
                      @NonNull UnifiedMediationParams mediationParams) throws Throwable {
-        String zoneId = mediationParams.getString("zone_id");
-        if (TextUtils.isEmpty(zoneId)) {
-            callback.onAdLoadFailed(BMError.requestError("zone id not provided"));
+        AdColonyParams params = new AdColonyParams(mediationParams);
+        if (!params.isValid(callback)) {
             return;
         }
-        assert zoneId != null;
-        listener = new AdColonyFullscreenAdListener(zoneId, this, callback);
+        assert params.zoneId != null;
+        assert params.adm != null;
+
+        listener = new AdColonyFullscreenAdListener(params.zoneId, this, callback);
         if (isRewarded) {
             AdColonyRewardListenerWrapper.get().addListener(listener);
         }
-        AdColony.requestInterstitial(zoneId, listener);
+        AdColony.requestInterstitial(params.zoneId,
+                                     listener,
+                                     new AdColonyAdOptions().setOption("adm", params.adm));
     }
 
     @Override
@@ -56,15 +60,19 @@ class AdColonyFullscreenAd extends UnifiedFullscreenAd {
     @Override
     public void onDestroy() {
         if (adColonyInterstitial != null) {
+            adColonyInterstitial.destroy();
+            adColonyInterstitial = null;
+        }
+        if (listener != null) {
             if (isRewarded) {
                 AdColonyRewardListenerWrapper.get().removeListener(listener);
             }
-            adColonyInterstitial.destroy();
-            adColonyInterstitial = null;
+            listener = null;
         }
     }
 
     void setAdColonyInterstitial(AdColonyInterstitial adColonyInterstitial) {
         this.adColonyInterstitial = adColonyInterstitial;
     }
+
 }

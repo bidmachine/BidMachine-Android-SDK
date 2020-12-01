@@ -17,6 +17,8 @@ public class AdColonyConfig extends NetworkConfig {
     static final String KEY_APP_ID = "app_id";
     static final String KEY_ZONE_ID = "zone_id";
     static final String KEY_STORE_ID = "store_id";
+    static final String KEY_TOKEN = "data";
+    static final String KEY_ADM = "adm";
 
     private static final String DEFAULT_STORE_ID = "google";
 
