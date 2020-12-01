@@ -14,11 +14,12 @@ import io.bidmachine.utils.BMError;
 final class AdColonyFullscreenAdListener extends AdColonyInterstitialListener implements AdColonyRewardListener {
 
     @NonNull
-    private String zoneId;
+    private final String zoneId;
     @NonNull
-    private AdColonyFullscreenAd adColonyFullscreenAd;
+    private final AdColonyFullscreenAd adColonyFullscreenAd;
     @NonNull
-    private UnifiedFullscreenAdCallback callback;
+    private final UnifiedFullscreenAdCallback callback;
+
     private boolean isLoaded;
     private boolean isShown;
 
