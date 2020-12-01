@@ -734,24 +734,6 @@ public class MainActivity extends AppCompatActivity {
                             + "        \"facebook_key\": \"1525692904128549_2386753464689151\""
                             + "    }]"
                             + "}"),
-//            new OptionalNetwork(
-//                    5, "Mintegral",
-//                    new MintegralConfig("117852", "936dcbdd57fe235fd7cf61c2e93da3c4")
-//                            .withMediationConfig(AdsFormat.InterstitialVideo, "140146")
-//                            .withMediationConfig(AdsFormat.RewardedVideo, "140144"),
-//                    "{"
-//                            + "    \"network\": \"mintegral\","
-//                            + "    \"app_id\": \"117852\","
-//                            + "    \"api_key\": \"936dcbdd57fe235fd7cf61c2e93da3c4\","
-//                            + "    \"ad_units\": [{"
-//                            + "        \"format\": \"interstitial_video\","
-//                            + "        \"unit_id\": \"140146\""
-//                            + "    }, {"
-//                            + "        \"format\": \"rewarded_video\","
-//                            + "        \"unit_id\": \"140144\","
-//                            + "        \"reward_id\": \"12817\""
-//                            + "    }]"
-//                            + "}"),
             new OptionalNetwork(
                     5, "Amazon",
                     new AmazonConfig("a9_onboarding_app_id")
