@@ -2,6 +2,8 @@ package io.bidmachine;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,9 +12,13 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import io.bidmachine.banner.BannerBridge;
 import io.bidmachine.interstitial.InterstitialAd;
+import io.bidmachine.interstitial.InterstitialRequest;
+import io.bidmachine.utils.BMError;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -32,6 +38,34 @@ public class BidMachineAdTest {
         for (AdsType adsType : AdsType.values()) {
             BidMachineImpl.get().getSessionAdParams(adsType).clear();
         }
+    }
+
+    @Test
+    public void load_requestIsNull_onAdLoadFailedWithNoRequest() throws Exception {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        InterstitialAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.setListener(new SimpleInterstitialListener() {
+            @Override
+            public void onAdLoadFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
+                String message = error.getMessage();
+                if (message != null && message.contains("No Request")) {
+                    countDownLatch.countDown();
+                }
+            }
+        });
+        interstitialAd.load(null);
+
+        assertTrue(countDownLatch.await(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void load_requestIsNull_onAdLoadFailedWithDestroyed() {
+        InterstitialRequest interstitialRequest = new InterstitialRequest.Builder().build();
+        InterstitialAd interstitialAd = new InterstitialAd(context);
+        interstitialAd.load(interstitialRequest);
+        interstitialRequest.destroy();
+
+        assertTrue(interstitialAd.isDestroyed());
     }
 
     @Test

@@ -78,7 +78,11 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     @Nullable
     private ApiRequest<Request, Response> currentApiRequest;
     @Nullable
-    private List<AdRequestListener<SelfType>> adRequestListeners;
+    @VisibleForTesting
+    List<AdRequestListener<SelfType>> adRequestListeners;
+    @Nullable
+    @VisibleForTesting
+    List<InternalAdRequestListener<SelfType>> internalAdRequestListeners;
     @Nullable
     private UnifiedAdRequestParamsType unifiedAdRequestParams;
     @Nullable
@@ -91,6 +95,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     private final AtomicBoolean isApiRequestCompleted = new AtomicBoolean(false);
     private boolean isExpired;
     private boolean isExpireTrackerSubscribed;
+    private boolean isDestroyed;
 
     private final Runnable expiredRunnable = new ExpiredRunnable(this);
 
@@ -335,6 +340,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             processRequestFail(BMError.NotInitialized);
             return;
         }
+        if (isDestroyed) {
+            processRequestFail(BMError.RequestDestroyed);
+            return;
+        }
         BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest, getType());
         try {
             unsubscribeExpireTracker();
@@ -393,14 +402,76 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         if (!isApiRequestCompleted.get()) {
             return;
         }
-        BidMachineEvents.eventFinish(trackingObject, TrackEventType.MediationWin, getType(), null);
+
+        BMError bmError;
+        if (isDestroyed) {
+            bmError = BMError.RequestDestroyed;
+        } else if (isExpired) {
+            bmError = BMError.RequestExpired;
+        } else {
+            bmError = null;
+        }
+        BidMachineEvents.eventFinish(trackingObject,
+                                     TrackEventType.MediationWin,
+                                     getType(),
+                                     bmError);
     }
 
     public void notifyMediationLoss() {
         if (!isApiRequestCompleted.get()) {
             return;
         }
-        BidMachineEvents.eventFinish(trackingObject, TrackEventType.MediationLoss, getType(), null);
+
+        BMError bmError;
+        if (isDestroyed) {
+            bmError = BMError.RequestDestroyed;
+        } else if (isExpired) {
+            bmError = BMError.RequestExpired;
+        } else {
+            bmError = null;
+        }
+        BidMachineEvents.eventFinish(trackingObject,
+                                     TrackEventType.MediationLoss,
+                                     getType(),
+                                     bmError);
+    }
+
+    public boolean isDestroyed() {
+        return isDestroyed;
+    }
+
+    public void destroy() {
+        if (isDestroyed) {
+            return;
+        }
+        isDestroyed = true;
+
+        cancel();
+        unsubscribeExpireTracker();
+        BidMachineEvents.clear(trackingObject);
+        BidMachineFetcher.release(this);
+        notifyRequestDestroyed();
+
+        priceFloorParams = null;
+        targetingParams = null;
+        sessionAdParams = null;
+        networkConfigMap = null;
+        userRestrictionParams = null;
+        extraParams = null;
+
+        adResult = null;
+        seatBidResult = null;
+        bidResult = null;
+        auctionResult = null;
+
+        unifiedAdRequestParams = null;
+        trackUrls = null;
+
+        BidMachineEvents.eventFinish(
+                trackingObject,
+                TrackEventType.AuctionRequestDestroy,
+                getType(),
+                null);
     }
 
     void cancel() {
@@ -445,10 +516,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     @SuppressWarnings("WeakerAccess")
     public void addListener(@Nullable AdRequestListener<SelfType> listener) {
-        if (adRequestListeners == null) {
-            adRequestListeners = new CopyOnWriteArrayList<>();
-        }
         if (listener != null) {
+            if (adRequestListeners == null) {
+                adRequestListeners = new CopyOnWriteArrayList<>();
+            }
             adRequestListeners.add(listener);
         }
     }
@@ -457,6 +528,30 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     public void removeListener(@Nullable AdRequestListener<SelfType> listener) {
         if (adRequestListeners != null && listener != null) {
             adRequestListeners.remove(listener);
+        }
+    }
+
+    void addInternalListener(@Nullable InternalAdRequestListener<SelfType> listener) {
+        if (listener != null) {
+            if (internalAdRequestListeners == null) {
+                internalAdRequestListeners = new CopyOnWriteArrayList<>();
+            }
+            internalAdRequestListeners.add(listener);
+        }
+    }
+
+    void removeInternalListener(@Nullable InternalAdRequestListener<SelfType> listener) {
+        if (internalAdRequestListeners != null && listener != null) {
+            internalAdRequestListeners.remove(listener);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    void notifyRequestDestroyed() {
+        if (internalAdRequestListeners != null) {
+            for (InternalAdRequestListener<SelfType> listener : internalAdRequestListeners) {
+                listener.onRequestDestroyed((SelfType) this);
+            }
         }
     }
 
@@ -652,6 +747,12 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
          * @param request - AdRequest instance
          */
         void onRequestExpired(@NonNull AdRequestType request);
+    }
+
+    interface InternalAdRequestListener<AdRequestType extends AdRequest> {
+
+        void onRequestDestroyed(@NonNull AdRequestType request);
+
     }
 
     private static class ExpiredRunnable implements Runnable {

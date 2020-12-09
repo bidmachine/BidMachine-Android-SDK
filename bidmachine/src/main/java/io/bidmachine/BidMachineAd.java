@@ -196,7 +196,7 @@ public abstract class BidMachineAd<
         if (auctionResult != null) {
             if (request.isExpired()) {
                 processCallback.log("AuctionResult expired, please request new one");
-                processRequestFail(BMError.Expired);
+                processRequestFail(BMError.RequestExpired);
             } else {
                 processRequestSuccess(request,
                                       request.seatBidResult,
@@ -229,12 +229,14 @@ public abstract class BidMachineAd<
     private void attachRequest(@Nullable AdRequestType request) {
         if (request != null) {
             request.addListener(adRequestListener);
+            request.addInternalListener(internalAdRequestListener);
         }
     }
 
     private void detachRequest(@Nullable AdRequestType request) {
         if (request != null) {
             request.removeListener(adRequestListener);
+            request.removeInternalListener(internalAdRequestListener);
         }
     }
 
@@ -310,6 +312,16 @@ public abstract class BidMachineAd<
                 public void onRequestExpired(@NonNull AdRequestType request) {
                     if (request == adRequest) {
                         processCallback.processExpired();
+                    }
+                }
+            };
+
+    private final AdRequest.InternalAdRequestListener<AdRequestType> internalAdRequestListener =
+            new AdRequest.InternalAdRequestListener<AdRequestType>() {
+                @Override
+                public void onRequestDestroyed(@NonNull AdRequest request) {
+                    if (request == adRequest) {
+                        destroy();
                     }
                 }
             };

@@ -14,7 +14,7 @@ import io.bidmachine.models.AuctionResult;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 
-public class TestAdRequest extends AdRequest {
+public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestParams> {
 
     private TestAdRequest(final Builder builder) {
         super(builder.adsType);
@@ -106,7 +106,7 @@ public class TestAdRequest extends AdRequest {
     @Override
     protected UnifiedAdRequestParams createUnifiedAdRequestParams(@NonNull TargetingParams targetingParams,
                                                                   @NonNull DataRestrictions dataRestrictions) {
-        return null;
+        return new BaseUnifiedAdRequestParams(targetingParams, dataRestrictions);
     }
 
     public static class Builder {
