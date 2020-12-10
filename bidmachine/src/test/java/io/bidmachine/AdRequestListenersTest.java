@@ -25,7 +25,7 @@ public class AdRequestListenersTest extends MultiThreadingTest {
 
     @Override
     void writeAction(int actionNumber, int totalActions) {
-        testAdRequest.addListener(new TestAdRequestListener());
+        testAdRequest.addListener(new SimpleAdRequestListener());
     }
 
     @Override

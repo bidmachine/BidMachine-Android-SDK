@@ -16,11 +16,13 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import io.bidmachine.models.DataRestrictions;
+import io.bidmachine.protobuf.ErrorReason;
 import io.bidmachine.protobuf.HeaderBiddingType;
 import io.bidmachine.protobuf.RequestExtension;
-import io.bidmachine.unified.UnifiedAdRequestParams;
+import io.bidmachine.utils.BMError;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,6 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -36,12 +39,12 @@ import static org.mockito.Mockito.verify;
 public class AdRequestTest {
 
     private android.content.Context context;
-    private AdRequest adRequest;
+    private TestAdRequest adRequest;
 
     @Before
     public void setUp() throws Exception {
         context = RuntimeEnvironment.application;
-        adRequest = new TestAdRequest(AdsType.Interstitial);
+        adRequest = new TestAdRequest.Builder(AdsType.Interstitial).build();
         BidMachine.setConsentConfig(true, null);
         BidMachine.setSubjectToGDPR(null);
         BidMachine.initialize(context, "1");
@@ -166,6 +169,83 @@ public class AdRequestTest {
     }
 
     @Test
+    public void adRequestListeners() {
+        AdRequest.AdRequestListener adRequestListener1 = mock(AdRequest.AdRequestListener.class);
+        AdRequest.AdRequestListener adRequestListener2 = mock(AdRequest.AdRequestListener.class);
+        AdRequest.AdRequestListener adRequestListener3 = mock(AdRequest.AdRequestListener.class);
+        adRequest.addListener(adRequestListener1);
+        adRequest.addListener(adRequestListener2);
+        adRequest.addListener(adRequestListener3);
+        adRequest.addListener(null);
+
+        assertNotNull(adRequest.adRequestListeners);
+        assertEquals(3, adRequest.adRequestListeners.size());
+        assertEquals(adRequestListener1, adRequest.adRequestListeners.get(0));
+        assertEquals(adRequestListener2, adRequest.adRequestListeners.get(1));
+        assertEquals(adRequestListener3, adRequest.adRequestListeners.get(2));
+
+        adRequest.removeListener(adRequestListener2);
+        adRequest.removeListener(null);
+
+        assertEquals(2, adRequest.adRequestListeners.size());
+        assertEquals(adRequestListener1, adRequest.adRequestListeners.get(0));
+        assertEquals(adRequestListener3, adRequest.adRequestListeners.get(1));
+    }
+
+    @Test
+    public void internalAdRequestListeners() {
+        AdRequest.InternalAdRequestListener internalAdRequestListener1 = mock(AdRequest.InternalAdRequestListener.class);
+        AdRequest.InternalAdRequestListener internalAdRequestListener2 = mock(AdRequest.InternalAdRequestListener.class);
+        AdRequest.InternalAdRequestListener internalAdRequestListener3 = mock(AdRequest.InternalAdRequestListener.class);
+        adRequest.addInternalListener(internalAdRequestListener1);
+        adRequest.addInternalListener(internalAdRequestListener2);
+        adRequest.addInternalListener(internalAdRequestListener3);
+        adRequest.addInternalListener(null);
+
+        assertNotNull(adRequest.internalAdRequestListeners);
+        assertEquals(3, adRequest.internalAdRequestListeners.size());
+        assertEquals(internalAdRequestListener1, adRequest.internalAdRequestListeners.get(0));
+        assertEquals(internalAdRequestListener2, adRequest.internalAdRequestListeners.get(1));
+        assertEquals(internalAdRequestListener3, adRequest.internalAdRequestListeners.get(2));
+
+        adRequest.removeInternalListener(internalAdRequestListener2);
+        adRequest.removeInternalListener(null);
+
+        assertEquals(2, adRequest.internalAdRequestListeners.size());
+        assertEquals(internalAdRequestListener1, adRequest.internalAdRequestListeners.get(0));
+        assertEquals(internalAdRequestListener3, adRequest.internalAdRequestListeners.get(1));
+    }
+
+    @Test
+    public void request_isDestroyed_processRequestFailWithRequestDestroyed() throws Exception {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        adRequest.addListener(new SimpleAdRequestListener() {
+            @Override
+            public void onRequestFailed(@NonNull TestAdRequest request, @NonNull BMError error) {
+                if (error.getCode() == ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE) {
+                    countDownLatch.countDown();
+                }
+            }
+        });
+        adRequest.destroy();
+        adRequest.request(context);
+        assertTrue(countDownLatch.await(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void destroy_internalListenerPresent_notifyListeners() throws Exception {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        adRequest.addInternalListener(new AdRequest.InternalAdRequestListener<TestAdRequest>() {
+            @Override
+            public void onRequestDestroyed(@NonNull TestAdRequest request) {
+                countDownLatch.countDown();
+            }
+        });
+        adRequest.destroy();
+        assertTrue(countDownLatch.await(5, TimeUnit.SECONDS));
+    }
+
+    @Test
     public void headerBidding() throws Exception {
         //Default HeaderBidding
         Request request = (Request) adRequest.build(context, adRequest.getType());
@@ -234,21 +314,6 @@ public class AdRequestTest {
         assertNotNull(urlList);
         assertEquals(1, urlList.size());
         assertEquals("test_url_loss", urlList.get(0));
-    }
-
-    private static class TestAdRequest extends AdRequest {
-
-        TestAdRequest(@NonNull AdsType adsType) {
-            super(adsType);
-        }
-
-        @NonNull
-        @Override
-        protected UnifiedAdRequestParams createUnifiedAdRequestParams(@NonNull TargetingParams targetingParams,
-                                                                      @NonNull DataRestrictions dataRestrictions) {
-            return new BaseUnifiedAdRequestParams(targetingParams, dataRestrictions);
-        }
-
     }
 
 }

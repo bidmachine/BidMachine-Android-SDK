@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.utils.BMError;
 
-class TestAdRequestListener implements AdRequest.AdRequestListener<TestAdRequest> {
+class SimpleAdRequestListener implements AdRequest.AdRequestListener<TestAdRequest> {
 
     @Override
     public void onRequestSuccess(@NonNull TestAdRequest request,
