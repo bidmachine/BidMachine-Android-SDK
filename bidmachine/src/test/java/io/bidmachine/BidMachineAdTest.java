@@ -59,13 +59,31 @@ public class BidMachineAdTest {
     }
 
     @Test
-    public void load_requestIsNull_onAdLoadFailedWithDestroyed() {
+    public void load_requestWillDestroyed_onAdLoadFailedWithDestroyed() {
         InterstitialRequest interstitialRequest = new InterstitialRequest.Builder().build();
         InterstitialAd interstitialAd = new InterstitialAd(context);
         interstitialAd.load(interstitialRequest);
         interstitialRequest.destroy();
 
         assertTrue(interstitialAd.isDestroyed());
+    }
+
+    @Test
+    public void load_requestWasShown_onAdLoadFailedWithAlreadyShown() throws Exception {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Interstitial).build();
+        testAdRequest.onShown();
+        BidMachineAd bidMachineAd = new InterstitialAd(context);
+        bidMachineAd.setListener(new SimpleInterstitialListener() {
+            @Override
+            public void onAdLoadFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
+                if ("AdRequest already shown".equals(error.getBrief())) {
+                    countDownLatch.countDown();
+                }
+            }
+        });
+        bidMachineAd.load(testAdRequest);
+        assertTrue(countDownLatch.await(5, TimeUnit.SECONDS));
     }
 
     @Test

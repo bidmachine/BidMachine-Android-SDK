@@ -93,6 +93,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     private final AtomicBoolean isApiRequestCanceled = new AtomicBoolean(false);
     private final AtomicBoolean isApiRequestCompleted = new AtomicBoolean(false);
+    private boolean isAdWasShown;
     private boolean isExpired;
     private boolean isExpireTrackerSubscribed;
     private boolean isDestroyed;
@@ -346,6 +347,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest, getType());
         try {
+            isAdWasShown = false;
             unsubscribeExpireTracker();
             if (currentApiRequest != null) {
                 currentApiRequest.cancel();
@@ -556,7 +558,12 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     void onShown() {
+        isAdWasShown = true;
         unsubscribeExpireTracker();
+    }
+
+    protected boolean isAdWasShown() {
+        return isAdWasShown;
     }
 
     void onExpired() {
