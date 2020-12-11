@@ -598,8 +598,9 @@ public abstract class BidMachineAd<
             trackEvent(TrackEventType.Destroy, null);
             currentState = State.Destroyed;
             if (adRequest != null) {
-                adRequest.cancel();
                 detachRequest(adRequest);
+                adRequest.destroy();
+                adRequest = null;
             }
             Utils.onUiThread(new Runnable() {
                 @Override

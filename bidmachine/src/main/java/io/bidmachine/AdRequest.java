@@ -405,6 +405,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             return;
         }
 
+        Logger.log(toString() + ": notifyMediationWin");
+
         BMError bmError;
         if (isDestroyed) {
             bmError = BMError.RequestDestroyed;
@@ -423,6 +425,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         if (!isApiRequestCompleted.get()) {
             return;
         }
+
+        Logger.log(toString() + ": notifyMediationLoss");
 
         BMError bmError;
         if (isDestroyed) {
@@ -448,6 +452,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         isDestroyed = true;
 
+        Logger.log(toString() + ": destroy");
+
         cancel();
         unsubscribeExpireTracker();
         BidMachineEvents.clear(trackingObject);
@@ -467,7 +473,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         auctionResult = null;
 
         unifiedAdRequestParams = null;
-        trackUrls = null;
 
         BidMachineEvents.eventFinish(
                 trackingObject,
