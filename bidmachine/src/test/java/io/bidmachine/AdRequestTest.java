@@ -316,4 +316,12 @@ public class AdRequestTest {
         assertEquals("test_url_loss", urlList.get(0));
     }
 
+    @Test
+    public void onShown() {
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner).build();
+        assertFalse(testAdRequest.isAdWasShown());
+        testAdRequest.onShown();
+        assertTrue(testAdRequest.isAdWasShown());
+    }
+
 }

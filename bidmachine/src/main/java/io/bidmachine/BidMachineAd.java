@@ -156,7 +156,7 @@ public abstract class BidMachineAd<
 
     @Override
     public boolean canShow() {
-        return isLoaded() && !isShownTracked;
+        return isLoaded() && !isShownTracked && isAdRequestCanShowAd();
     }
 
     @Override
@@ -179,11 +179,18 @@ public abstract class BidMachineAd<
         } else if (!isLoaded() || loadedObject == null) {
             processCallback.processShowFail(BMError.NotLoaded);
             return false;
+        } else if (!isAdRequestCanShowAd()) {
+            processCallback.processShowFail(BMError.RequestAlreadyShown);
+            return false;
         } else if (isShownTracked) {
             processCallback.processShowFail(BMError.AlreadyShown);
             return false;
         }
         return true;
+    }
+
+    boolean isAdRequestCanShowAd() {
+        return adRequest != null && !adRequest.isAdWasShown();
     }
 
     /*
@@ -195,8 +202,9 @@ public abstract class BidMachineAd<
         final AuctionResult auctionResult = getAuctionResult();
         if (auctionResult != null) {
             if (request.isExpired()) {
-                processCallback.log("AuctionResult expired, please request new one");
                 processRequestFail(BMError.RequestExpired);
+            } else if (request.isAdWasShown()) {
+                processRequestFail(BMError.RequestAlreadyShown);
             } else {
                 processRequestSuccess(request,
                                       request.seatBidResult,
@@ -590,8 +598,9 @@ public abstract class BidMachineAd<
             trackEvent(TrackEventType.Destroy, null);
             currentState = State.Destroyed;
             if (adRequest != null) {
-                adRequest.cancel();
                 detachRequest(adRequest);
+                adRequest.destroy();
+                adRequest = null;
             }
             Utils.onUiThread(new Runnable() {
                 @Override

@@ -93,6 +93,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     private final AtomicBoolean isApiRequestCanceled = new AtomicBoolean(false);
     private final AtomicBoolean isApiRequestCompleted = new AtomicBoolean(false);
+    private boolean isAdWasShown;
     private boolean isExpired;
     private boolean isExpireTrackerSubscribed;
     private boolean isDestroyed;
@@ -346,6 +347,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest, getType());
         try {
+            isAdWasShown = false;
             unsubscribeExpireTracker();
             if (currentApiRequest != null) {
                 currentApiRequest.cancel();
@@ -403,6 +405,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             return;
         }
 
+        Logger.log(toString() + ": notifyMediationWin");
+
         BMError bmError;
         if (isDestroyed) {
             bmError = BMError.RequestDestroyed;
@@ -421,6 +425,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         if (!isApiRequestCompleted.get()) {
             return;
         }
+
+        Logger.log(toString() + ": notifyMediationLoss");
 
         BMError bmError;
         if (isDestroyed) {
@@ -446,6 +452,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         isDestroyed = true;
 
+        Logger.log(toString() + ": destroy");
+
         cancel();
         unsubscribeExpireTracker();
         BidMachineEvents.clear(trackingObject);
@@ -465,7 +473,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         auctionResult = null;
 
         unifiedAdRequestParams = null;
-        trackUrls = null;
 
         BidMachineEvents.eventFinish(
                 trackingObject,
@@ -556,7 +563,12 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     void onShown() {
+        isAdWasShown = true;
         unsubscribeExpireTracker();
+    }
+
+    protected boolean isAdWasShown() {
+        return isAdWasShown;
     }
 
     void onExpired() {
