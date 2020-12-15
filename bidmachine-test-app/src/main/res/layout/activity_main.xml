@@ -205,18 +205,6 @@
 
                     <Button
                         style="@style/MainActionButtonStyle.Secondary"
-                        android:onClick="showBannerAutoLoad"
-                        android:text="Show AutoLoad"
-                        tools:ignore="HardcodedText" />
-
-                    <Button
-                        style="@style/MainActionButtonStyle.Secondary"
-                        android:onClick="showBannerScrollable"
-                        android:text="Show Scrollable"
-                        tools:ignore="HardcodedText" />
-
-                    <Button
-                        style="@style/MainActionButtonStyle.Secondary"
                         android:onClick="requestBanner"
                         android:text="Request Banner"
                         tools:ignore="HardcodedText" />

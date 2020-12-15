@@ -29,7 +29,6 @@
     </declare-styleable>
 
     <declare-styleable name="AdView">
-        <attr name="autoLoad" format="boolean" />
         <attr name="priceFloors" />
         <attr name="targetUserId" />
         <attr name="targetGender" />

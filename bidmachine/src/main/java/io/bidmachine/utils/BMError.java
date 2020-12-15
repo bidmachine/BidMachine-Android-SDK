@@ -35,7 +35,7 @@ public class BMError {
     public static final BMError AlreadyShown = new BMError(-1,
             "Ads already shown", "Ads was already shown, load new one please");
     public static final BMError RequestAlreadyShown = new BMError(-1,
-            "AdRequest already shown", "Ad connected with AdRequest already shown, load new AdRequest please");
+            "AdRequest already shown", "AdRequest that related with ad has already been shown, load new AdRequest please");
     public static final BMError RequestDestroyed = new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
             "AdRequest destroyed", "AdRequest destroyed, create new one please");
     public static final BMError RequestExpired = new BMError(ErrorReason.ERROR_REASON_WAS_EXPIRED_VALUE,
