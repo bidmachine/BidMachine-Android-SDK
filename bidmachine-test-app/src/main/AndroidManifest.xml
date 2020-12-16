@@ -27,8 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BannerAutoLoadActivity" />
-        <activity android:name=".BannerScrollableActivity" />
         <activity android:name=".NativeActivity" />
     </application>
 

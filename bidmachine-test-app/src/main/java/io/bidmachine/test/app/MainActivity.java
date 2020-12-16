@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
         if (bannerView.getParent() instanceof ViewGroup) {
             ((ViewGroup) bannerView.getParent()).removeView(bannerView);
         }
-        bannerFrame.addView(requestHelper.getBannerView());
+        bannerFrame.addView(bannerView);
     }
 
     @Override
@@ -322,10 +322,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void hideBanner(View view) {
         requestHelper.hideBanner();
-    }
-
-    public void showBannerAutoLoad(View view) {
-        startActivity(new Intent(this, BannerAutoLoadActivity.class));
     }
 
     public void loadInterstitial(View view) {
@@ -601,10 +597,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             txtLocation.setText("Location not available");
         }
-    }
-
-    public void showBannerScrollable(View view) {
-        startActivityForResult(new Intent(this, BannerScrollableActivity.class), 0);
     }
 
     public void configureNetworks(View view) {
