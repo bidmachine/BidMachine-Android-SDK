@@ -1,8 +1,5 @@
 package io.bidmachine;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.adcom.Context;
 
@@ -26,66 +23,103 @@ import static org.junit.Assert.assertTrue;
 public class UserRestrictionParamsTest {
 
     private android.content.Context context;
-    private SharedPreferences defaultSharedPreferences;
+    private DefaultSharedPreferencesEditor defaultSharedPreferences;
     private UserRestrictionParams userRestrictionParams;
 
     @Before
     public void setUp() throws Exception {
         context = RuntimeEnvironment.application;
-        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        defaultSharedPreferences.edit().clear().apply();
+        defaultSharedPreferences = new DefaultSharedPreferencesEditor(context);
         userRestrictionParams = BidMachineImpl.get().getUserRestrictionParams();
         BidMachine.setConsentConfig(false, null);
+        BidMachine.setSubjectToGDPR(null);
         BidMachine.setUSPrivacyString(null);
     }
 
     @Test
-    public void buildUser_bidMachineAndSharedPrefProvidedConsentString_returnBidMachineConsentString() {
-        defaultSharedPreferences.edit()
-                .putString(IABSharedPreference.IAB_CONSENT_STRING, "iab_consent_string")
-                .apply();
+    public void buildUser_bidMachineAndSharedPrefProvidedAndTCFNotProvidedConsentString_returnBidMachineConsentString() {
         BidMachine.setConsentConfig(true, "bid_machine_consent_string");
+        defaultSharedPreferences.setGdprConsent("iab_consent_string");
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.User.Builder builder = Context.User.newBuilder();
-        assertEquals("", builder.getConsent());
         userRestrictionParams.build(builder);
+
         assertEquals("bid_machine_consent_string", builder.getConsent());
     }
 
     @Test
-    public void buildUser_bidMachineProvidedAndSharedPrefNotProvidedConsentString_returnBidMachineConsentString() {
+    public void buildUser_bidMachineProvidedAndSharedPrefAndTCFNotProvidedConsentString_returnBidMachineConsentString() {
         BidMachine.setConsentConfig(true, "bid_machine_consent_string");
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.User.Builder builder = Context.User.newBuilder();
-        assertEquals("", builder.getConsent());
         userRestrictionParams.build(builder);
+
         assertEquals("bid_machine_consent_string", builder.getConsent());
     }
 
     @Test
-    public void buildUser_bidMachineNotProvidedAndSharedPrefProvidedConsentString_returnIABConsentString() {
-        defaultSharedPreferences.edit()
-                .putString(IABSharedPreference.IAB_CONSENT_STRING, "iab_consent_string")
-                .apply();
-        BidMachine.setConsentConfig(true, null);
+    public void buildUser_bidMachineAndTCFNotProvidedAndSharedPrefProvidedConsentString_returnIABConsentString() {
+        defaultSharedPreferences.setGdprConsent("iab_consent_string");
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.User.Builder builder = Context.User.newBuilder();
-        assertEquals("", builder.getConsent());
         userRestrictionParams.build(builder);
+
         assertEquals("iab_consent_string", builder.getConsent());
+    }
+
+    @Test
+    public void buildUser_bidMachineAndSharedPrefAndTCFProvidedConsentString_returnBidMachineConsentString() {
+        BidMachine.setConsentConfig(true, "bid_machine_consent_string");
+        defaultSharedPreferences
+                .setTcfTcString("tcf_string")
+                .setGdprConsent("iab_consent_string");
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.User.Builder builder = Context.User.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertEquals("bid_machine_consent_string", builder.getConsent());
+    }
+
+    @Test
+    public void buildUser_bidMachineAndTCFProvidedAndSharedPrefNotProvidedConsentString_returnBidMachineConsentString() {
+        BidMachine.setConsentConfig(true, "bid_machine_consent_string");
+        defaultSharedPreferences.setTcfTcString("tcf_string");
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.User.Builder builder = Context.User.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertEquals("bid_machine_consent_string", builder.getConsent());
+    }
+
+    @Test
+    public void buildUser_bidMachineNotProvidedAndSharedPrefAndTCFProvidedConsentString_returnTCFString() {
+        defaultSharedPreferences
+                .setTcfTcString("tcf_string")
+                .setGdprConsent("iab_consent_string");
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.User.Builder builder = Context.User.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertEquals("tcf_string", builder.getConsent());
+    }
+
+    @Test
+    public void buildUser_bidMachineAndSharedPrefNotProvidedAndTCFProvidedConsentString_returnTCFString() {
+        defaultSharedPreferences.setTcfTcString("tcf_string");
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.User.Builder builder = Context.User.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertEquals("tcf_string", builder.getConsent());
     }
 
     @Test
     public void buildUser_bidMachineAndSharedPrefNotProvidedConsentString_returnDefaultConsentStringOneString() {
         BidMachine.setConsentConfig(true, null);
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.User.Builder builder = Context.User.newBuilder();
-        assertEquals("", builder.getConsent());
         userRestrictionParams.build(builder);
+
         assertEquals("1", builder.getConsent());
     }
 
@@ -93,61 +127,96 @@ public class UserRestrictionParamsTest {
     public void buildUser_bidMachineAndSharedPrefNotProvidedConsentString_returnDefaultConsentStringZeroString() {
         BidMachine.setConsentConfig(false, null);
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.User.Builder builder = Context.User.newBuilder();
-        assertEquals("", builder.getConsent());
         userRestrictionParams.build(builder);
+
         assertEquals("0", builder.getConsent());
     }
 
     @Test
-    public void buildRegs_bidMachineAndSharedPrefProvidedSubjectToGDPR_returnBidMachineSubjectToGDPR() {
-        defaultSharedPreferences.edit()
-                .putString(IABSharedPreference.IAB_SUBJECT_TO_GDPR, "0")
-                .apply();
+    public void buildRegs_bidMachineAndSharedPrefProvidedAndTCFNotProvidedSubjectToGDPR_returnBidMachineSubjectToGDPR() {
+        BidMachine.setSubjectToGDPR(true);
+        defaultSharedPreferences.setSubjectToGdpr("0");
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.Regs.Builder builder = Context.Regs.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertTrue(builder.getGdpr());
+    }
+
+    @Test
+    public void buildRegs_bidMachineProvidedAndSharedPrefAndTCFNotProvidedSubjectToGDPR_returnBidMachineSubjectToGDPR() {
         BidMachine.setSubjectToGDPR(true);
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        assertFalse(builder.getGdpr());
         userRestrictionParams.build(builder);
+
         assertTrue(builder.getGdpr());
     }
 
     @Test
-    public void buildRegs_bidMachineProvidedAndSharedPrefNotProvidedSubjectToGDPR_returnBidMachineSubjectToGDPR() {
+    public void buildRegs_bidMachineAndTCFNotProvidedAndSharedPrefProvidedSubjectToGDPR_returnIABSubjectToGDPR() {
+        defaultSharedPreferences.setSubjectToGdpr("1");
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.Regs.Builder builder = Context.Regs.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertTrue(builder.getGdpr());
+    }
+
+    @Test
+    public void buildRegs_bidMachineAndSharedPrefAndTCFNotProvidedSubjectToGDPR_returnDefaultSubjectToGDPR() {
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.Regs.Builder builder = Context.Regs.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertFalse(builder.getGdpr());
+    }
+
+    @Test
+    public void buildRegs_bidMachineAndSharedPrefAndTCFProvidedSubjectToGDPR_returnBidMachineSubjectToGDPR() {
         BidMachine.setSubjectToGDPR(true);
+        defaultSharedPreferences
+                .setTcfGdprApplies(0)
+                .setSubjectToGdpr("0");
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        assertFalse(builder.getGdpr());
         userRestrictionParams.build(builder);
+
         assertTrue(builder.getGdpr());
     }
 
     @Test
-    public void buildRegs_bidMachineNotProvidedAndSharedPrefProvidedSubjectToGDPR_returnIABSubjectToGDPR() {
-        defaultSharedPreferences.edit()
-                .putString(IABSharedPreference.IAB_SUBJECT_TO_GDPR, "1")
-                .apply();
-        BidMachine.setSubjectToGDPR(null);
+    public void buildRegs_bidMachineAndTCFProvidedAndSharedPrefNotProvidedSubjectToGDPR_returnBidMachineSubjectToGDPR() {
+        BidMachine.setSubjectToGDPR(true);
+        defaultSharedPreferences.setTcfGdprApplies(0);
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        assertFalse(builder.getGdpr());
         userRestrictionParams.build(builder);
+
         assertTrue(builder.getGdpr());
     }
 
     @Test
-    public void buildRegs_bidMachineAndSharedPrefNotProvidedSubjectToGDPR_returnDefaultSubjectToGDPR() {
-        BidMachine.setSubjectToGDPR(null);
+    public void buildRegs_bidMachineNotProvidedAndSharedPrefAndTCFProvidedSubjectToGDPR_returnTCFApplies() {
+        defaultSharedPreferences
+                .setTcfGdprApplies(1)
+                .setSubjectToGdpr("0");
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
-
         Context.Regs.Builder builder = Context.Regs.newBuilder();
-        assertFalse(builder.getGdpr());
         userRestrictionParams.build(builder);
-        assertFalse(builder.getGdpr());
+
+        assertTrue(builder.getGdpr());
+    }
+
+    @Test
+    public void buildRegs_bidMachineAndSharedPrefNotProvidedAndTCFProvidedSubjectToGDPR_returnTCFApplies() {
+        defaultSharedPreferences.setTcfGdprApplies(1);
+        BidMachineImpl.get().getIabSharedPreference().initialize(context);
+        Context.Regs.Builder builder = Context.Regs.newBuilder();
+        userRestrictionParams.build(builder);
+
+        assertTrue(builder.getGdpr());
     }
 
     @Test
@@ -161,9 +230,7 @@ public class UserRestrictionParamsTest {
 
     @Test
     public void buildRegs_ccpaIsEmptyInSharedPreference_extensionIsNotSet() {
-        defaultSharedPreferences.edit()
-                .putString(IABSharedPreference.IAB_US_PRIVACY_STRING, "")
-                .apply();
+        defaultSharedPreferences.setUsPrivacy("");
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         userRestrictionParams.build(builder);
@@ -174,9 +241,7 @@ public class UserRestrictionParamsTest {
     @Test
     public void buildRegs_ccpaIsPresentInSharedPreference_extensionIsSet() throws Exception {
         String ccpaString = "test_string";
-        defaultSharedPreferences.edit()
-                .putString(IABSharedPreference.IAB_US_PRIVACY_STRING, ccpaString)
-                .apply();
+        defaultSharedPreferences.setUsPrivacy(ccpaString);
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         userRestrictionParams.build(builder);
@@ -188,10 +253,8 @@ public class UserRestrictionParamsTest {
     }
 
     @Test
-    public void buildRegs_ccpaIsPresentInSharedPreferenceButWrongType_extensionNotSet() throws Exception {
-        defaultSharedPreferences.edit()
-                .putInt(IABSharedPreference.IAB_US_PRIVACY_STRING, 123)
-                .apply();
+    public void buildRegs_ccpaIsPresentInSharedPreferenceButWrongType_extensionNotSet() {
+        defaultSharedPreferences.setCustomInt(IABSharedPreference.IAB_US_PRIVACY_STRING, 123);
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         userRestrictionParams.build(builder);
@@ -216,9 +279,7 @@ public class UserRestrictionParamsTest {
     public void buildRegs_ccpaPassedThroughBidMachineAndSharedPreference_extensionIsSet() throws Exception {
         String ccpaString = "test_string";
         BidMachine.setUSPrivacyString(ccpaString);
-        defaultSharedPreferences.edit()
-                .putString(IABSharedPreference.IAB_US_PRIVACY_STRING, "test_string_2")
-                .apply();
+        defaultSharedPreferences.setUsPrivacy("test_string_2");
         BidMachineImpl.get().getIabSharedPreference().initialize(context);
         Context.Regs.Builder builder = Context.Regs.newBuilder();
         userRestrictionParams.build(builder);
