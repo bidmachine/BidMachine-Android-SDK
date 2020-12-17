@@ -36,7 +36,7 @@ final class UserRestrictionParams
 
     void build(@NonNull Context.Regs.Builder builder) {
         builder.setGdpr(subjectToGDPR());
-        builder.setCoppa(hasCoppa != null && hasCoppa);
+        builder.setCoppa(hasCoppa());
 
         String iabUsPrivacyString = getUSPrivacyString();
         if (!TextUtils.isEmpty(iabUsPrivacyString)) {
@@ -78,8 +78,10 @@ final class UserRestrictionParams
     }
 
     private boolean subjectToGDPR() {
+        IABSharedPreference iabSharedPreference = BidMachineImpl.get().getIabSharedPreference();
         Boolean subject = oneOf(subjectToGDPR,
-                                BidMachineImpl.get().getIabSharedPreference().getSubjectToGDPR());
+                                iabSharedPreference.getTcfGdprApplies(),
+                                iabSharedPreference.getSubjectToGDPR());
         return subject != null && subject;
     }
 
@@ -159,9 +161,10 @@ final class UserRestrictionParams
     @NonNull
     @Override
     public String getIABGDPRString() {
-        String consentString = oneOf(
-                gdprConsentString,
-                BidMachineImpl.get().getIabSharedPreference().getGDPRConsentString());
+        IABSharedPreference iabSharedPreference = BidMachineImpl.get().getIabSharedPreference();
+        String consentString = oneOf(gdprConsentString,
+                                     iabSharedPreference.getTcfTcString(),
+                                     iabSharedPreference.getGDPRConsentString());
         if (TextUtils.isEmpty(consentString)) {
             consentString = hasConsent() ? "1" : "0";
         }
