@@ -18,10 +18,19 @@ class IABSharedPreference {
     @VisibleForTesting
     static final String IAB_US_PRIVACY_STRING = "IABUSPrivacy_String";
 
+    @VisibleForTesting
+    static final String IAB_TCF_TC_STRING = "IABTCF_TCString";
+    @VisibleForTesting
+    static final String IAB_TCF_GDPR_APPLIES = "IABTCF_gdprApplies";
+
     private final SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceListener;
+
     private String iabGDPRConsentString;
     private Boolean iabSubjectToGDPR;
     private String iabUSPrivacyString;
+
+    private String iabTcfTcString;
+    private Boolean iabTcfGdprApplies;
 
     IABSharedPreference() {
         sharedPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -40,6 +49,12 @@ class IABSharedPreference {
                     case IAB_US_PRIVACY_STRING:
                         updateUSPrivacyString(sharedPreferences);
                         break;
+                    case IAB_TCF_TC_STRING:
+                        updateTcfTcString(sharedPreferences);
+                        break;
+                    case IAB_TCF_GDPR_APPLIES:
+                        updateTcfGdprApplies(sharedPreferences);
+                        break;
                 }
             }
         };
@@ -51,6 +66,8 @@ class IABSharedPreference {
         updateConsentString(sharedPreferences);
         updateGDPRSubject(sharedPreferences);
         updateUSPrivacyString(sharedPreferences);
+        updateTcfTcString(sharedPreferences);
+        updateTcfGdprApplies(sharedPreferences);
     }
 
     @Nullable
@@ -84,18 +101,56 @@ class IABSharedPreference {
     }
 
     @Nullable
+    String getTcfTcString() {
+        return iabTcfTcString;
+    }
+
+    private void updateTcfTcString(@NonNull SharedPreferences sharedPreferences) {
+        iabTcfTcString = readString(sharedPreferences, IAB_TCF_TC_STRING, null);
+    }
+
+    @Nullable
+    Boolean getTcfGdprApplies() {
+        return iabTcfGdprApplies;
+    }
+
+    private void updateTcfGdprApplies(@NonNull SharedPreferences sharedPreferences) {
+        int gdprApplies = readInt(sharedPreferences, IAB_TCF_GDPR_APPLIES, -1);
+        if (gdprApplies == 1) {
+            iabTcfGdprApplies = true;
+        } else if (gdprApplies == 0) {
+            iabTcfGdprApplies = false;
+        } else {
+            iabTcfGdprApplies = null;
+        }
+    }
+
+    @Nullable
     @VisibleForTesting
     String readString(@NonNull SharedPreferences sharedPreferences,
                       @NonNull String key,
                       @Nullable String defValue) {
         try {
             String result = sharedPreferences.getString(key, defValue);
-            return result != null
-                    ? result
-                    : defValue;
-        } catch (Exception e) {
-            return defValue;
+            if (result != null) {
+                return result;
+            }
+        } catch (Exception ignore) {
         }
+        return defValue;
+    }
+
+    @VisibleForTesting
+    int readInt(@NonNull SharedPreferences sharedPreferences,
+                @NonNull String key,
+                int defValue) {
+        try {
+            if (sharedPreferences.contains(key)) {
+                return sharedPreferences.getInt(key, defValue);
+            }
+        } catch (Exception ignore) {
+        }
+        return defValue;
     }
 
 }
