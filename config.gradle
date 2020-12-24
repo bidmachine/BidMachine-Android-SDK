@@ -7,7 +7,7 @@ ext {
     mockitoVersion = '2.0.57-beta'
     jUnitVersion = '4.12'
     mockwebserver = '3.3.0'
-    protobufModelsVersion = '1.1.1'
+    protobufModelsVersion = '1.1.2'
     stackIabVersion = '0.5.9'
 }
 

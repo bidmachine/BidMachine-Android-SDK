@@ -25,6 +25,7 @@ import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.DataRestrictions;
+import io.bidmachine.protobuf.AdNetwork;
 import io.bidmachine.protobuf.InitRequest;
 import io.bidmachine.protobuf.InitResponse;
 import io.bidmachine.utils.ActivityHelper;
@@ -156,17 +157,7 @@ final class BidMachineImpl {
             public void executed(@NonNull AdvertisingIdClientInfo.AdvertisingProfile advertisingProfile) {
                 AdvertisingPersonalData.setLimitAdTrackingEnabled(advertisingProfile.isLimitAdTrackingEnabled());
                 AdvertisingPersonalData.setDeviceAdvertisingId(advertisingProfile.getId());
-                final TargetingParams targetingParams = getTargetingParams();
-                final DataRestrictions dataRestrictions = getUserRestrictionParams();
-                NetworkRegistry.initializeNetworks(
-                        new SimpleContextProvider(context),
-                        new UnifiedAdRequestParamsImpl(targetingParams, dataRestrictions),
-                        new NetworkRegistry.NetworksInitializeCallback() {
-                            @Override
-                            public void onNetworksInitialized() {
-                                AdRequestExecutor.get().enable();
-                            }
-                        });
+
                 requestInitData(context, sellerId, callback);
             }
         });
@@ -223,6 +214,8 @@ final class BidMachineImpl {
                                 if (result != null) {
                                     handleInitResponse(context, result);
                                     storeInitResponse(context, result);
+
+                                    initializeNetworks(context, result.getAdNetworksList());
                                 }
                                 initRequestDelayMs = 0;
                                 Utils.cancelBackgroundThreadTask(rescheduleInitRunnable);
@@ -242,6 +235,13 @@ final class BidMachineImpl {
                                     initRequestDelayMs *= 2;
                                     if (initRequestDelayMs >= MAX_INIT_REQUEST_DELAY_MS) {
                                         initRequestDelayMs = MAX_INIT_REQUEST_DELAY_MS;
+                                    }
+                                }
+                                if (!NetworkRegistry.isNetworksInitialized()) {
+                                    InitResponse initResponse = getInitResponseFromPref(context);
+                                    if (initResponse != null) {
+                                        initializeNetworks(context,
+                                                           initResponse.getAdNetworksList());
                                     }
                                 }
                                 Logger.log("reschedule init request (" + initRequestDelayMs + ")");
@@ -281,6 +281,44 @@ final class BidMachineImpl {
         SessionManager.get().setSessionResetAfter(response.getSessionResetAfter());
     }
 
+    private void initializeNetworks(@NonNull Context context,
+                                    @Nullable List<AdNetwork> networkList) {
+        if (NetworkRegistry.isNetworksInitialized()) {
+            return;
+        }
+        final TargetingParams targetingParams = getTargetingParams();
+        final DataRestrictions dataRestrictions = getUserRestrictionParams();
+        if (networkList != null) {
+            for (AdNetwork adNetwork : networkList) {
+                if (NetworkRegistry.isNetworkRegistered(adNetwork.getName())) {
+                    continue;
+                }
+                NetworkConfig networkConfig = NetworkConfig.create(context,
+                                                                   adNetwork.getName(),
+                                                                   adNetwork.getCustomParamsMap());
+                if (networkConfig != null) {
+                    for (AdNetwork.AdUnit adUnit : adNetwork.getAdUnitsList()) {
+                        AdsFormat adsFormat = AdsFormat.byRemoteName(adUnit.getAdFormat());
+                        if (adsFormat != null) {
+                            networkConfig.withMediationConfig(adsFormat,
+                                                              adUnit.getCustomParamsMap());
+                        }
+                    }
+                    NetworkRegistry.registerNetwork(networkConfig);
+                }
+            }
+        }
+        NetworkRegistry.initializeNetworks(
+                new SimpleContextProvider(context),
+                new UnifiedAdRequestParamsImpl(targetingParams, dataRestrictions),
+                new NetworkRegistry.NetworksInitializeCallback() {
+                    @Override
+                    public void onNetworksInitialized() {
+                        AdRequestExecutor.get().enable();
+                    }
+                });
+    }
+
     private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {
         SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
                                                                      Context.MODE_PRIVATE);
@@ -291,17 +329,25 @@ final class BidMachineImpl {
     }
 
     private void loadStoredInitResponse(@NonNull Context context) {
+        InitResponse initResponse = getInitResponseFromPref(context);
+        if (initResponse != null) {
+            handleInitResponse(context, initResponse);
+        }
+    }
+
+    @Nullable
+    private InitResponse getInitResponseFromPref(@NonNull Context context) {
         SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
                                                                      Context.MODE_PRIVATE);
         if (preferences.contains(PREF_INIT_DATA)) {
             try {
-                InitResponse initResponse = InitResponse.parseFrom(
-                        Base64.decode(preferences.getString(PREF_INIT_DATA, null), Base64.DEFAULT));
-                handleInitResponse(context, initResponse);
+                String initResponse = preferences.getString(PREF_INIT_DATA, null);
+                return InitResponse.parseFrom(Base64.decode(initResponse, Base64.DEFAULT));
             } catch (Exception ignore) {
                 preferences.edit().remove(PREF_INIT_DATA).apply();
             }
         }
+        return null;
     }
 
     @Nullable

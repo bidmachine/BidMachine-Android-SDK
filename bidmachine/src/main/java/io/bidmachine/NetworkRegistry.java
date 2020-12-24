@@ -58,8 +58,10 @@ class NetworkRegistry {
     static final String Vast = "vast";
     static final String Nast = "nast";
 
-    private static Set<NetworkConfig> pendingNetworks;
-    private static Set<JSONObject> pendingNetworksJson;
+    @VisibleForTesting
+    static Set<NetworkConfig> pendingNetworks;
+    @VisibleForTesting
+    static Set<JSONObject> pendingNetworksJson;
 
     @VisibleForTesting
     static final Map<String, NetworkConfig> cache = new ConcurrentHashMap<>();
@@ -74,13 +76,34 @@ class NetworkRegistry {
         return cache.get(key);
     }
 
+    static boolean isNetworkRegistered(String name) {
+        try {
+            if (pendingNetworks != null) {
+                for (NetworkConfig networkConfig : pendingNetworks) {
+                    if (name.equals(networkConfig.getKey())) {
+                        return true;
+                    }
+                }
+            }
+            if (pendingNetworksJson != null) {
+                for (JSONObject networkConfig : pendingNetworksJson) {
+                    if (name.equals(networkConfig.getString(NetworkConfig.KEY_NETWORK))) {
+                        return true;
+                    }
+                }
+            }
+            if (cache.containsKey(name)) {
+                return true;
+            }
+        } catch (Throwable ignore) {
+        }
+        return false;
+    }
+
     static void registerNetworks(@Nullable NetworkConfig... networkConfigs) {
         if (networkConfigs != null && networkConfigs.length > 0) {
             for (NetworkConfig config : networkConfigs) {
-                if (pendingNetworks == null) {
-                    pendingNetworks = new HashSet<>();
-                }
-                pendingNetworks.add(config);
+                registerNetwork(config);
             }
         }
     }
@@ -92,14 +115,35 @@ class NetworkRegistry {
         try {
             JSONArray jsonArray = new JSONArray(jsonData);
             for (int i = 0; i < jsonArray.length(); i++) {
-                if (pendingNetworksJson == null) {
-                    pendingNetworksJson = new HashSet<>();
-                }
-                pendingNetworksJson.add(jsonArray.getJSONObject(i));
+                registerNetwork(jsonArray.getJSONObject(i));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    static void registerNetwork(@Nullable NetworkConfig networkConfig) {
+        if (networkConfig == null) {
+            return;
+        }
+        if (pendingNetworks == null) {
+            pendingNetworks = new HashSet<>();
+        }
+        pendingNetworks.add(networkConfig);
+    }
+
+    static void registerNetwork(@Nullable JSONObject jsonData) {
+        if (jsonData == null) {
+            return;
+        }
+        if (pendingNetworksJson == null) {
+            pendingNetworksJson = new HashSet<>();
+        }
+        pendingNetworksJson.add(jsonData);
+    }
+
+    static boolean isNetworksInitialized() {
+        return isNetworksInitialized;
     }
 
     static void initializeNetworks(@NonNull final ContextProvider contextProvider,

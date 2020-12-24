@@ -31,11 +31,11 @@ import io.bidmachine.unified.UnifiedAdRequestParams;
 public abstract class NetworkConfig {
 
     private static final String KEY_CLASSPATH = "classpath";
-    private static final String KEY_NETWORK = "network";
+    static final String KEY_NETWORK = "network";
     private static final String KEY_FORMAT = "format";
     private static final String KEY_AD_UNITS = "ad_units";
 
-    public static final List<String> PRIVATE_FIELDS = new ArrayList<String>(){{
+    public static final List<String> PRIVATE_FIELDS = new ArrayList<String>() {{
         add(KEY_NETWORK);
         add(KEY_FORMAT);
         add(KEY_AD_UNITS);
@@ -350,18 +350,14 @@ public abstract class NetworkConfig {
             return null;
         }
         String networkName = null;
-        InputStream inputStream = null;
         try {
             networkName = networkConfigJsonObject.getString(KEY_NETWORK);
-            String networkFileName = String.format("bm_networks/%s.bmnetwork", networkName);
-            inputStream = context.getAssets().open(networkFileName);
-            String networkAssetsJson = io.bidmachine.core.Utils.streamToString(inputStream);
-            JSONObject networkAssetConfig = new JSONObject(networkAssetsJson);
-            NetworkConfig networkConfig = (NetworkConfig)
-                    Class.forName(networkAssetConfig.getString(KEY_CLASSPATH))
-                            .getConstructor(Map.class)
-                            .newInstance(toMap(networkConfigJsonObject));
-
+            NetworkConfig networkConfig = create(context,
+                                                 networkName,
+                                                 toMap(networkConfigJsonObject));
+            if (networkConfig == null) {
+                return null;
+            }
             JSONArray params = networkConfigJsonObject.getJSONArray(KEY_AD_UNITS);
             for (int i = 0; i < params.length(); i++) {
                 JSONObject mediationConfig = params.getJSONObject(i);
@@ -382,6 +378,27 @@ public abstract class NetworkConfig {
         } catch (Throwable t) {
             Logger.log(String.format("Network (%s) load fail!", networkName));
             Logger.log(t);
+        }
+        return null;
+    }
+
+    @Nullable
+    static NetworkConfig create(@NonNull Context context,
+                                @NonNull String networkName,
+                                @Nullable Map<String, String> networkParams) {
+        InputStream inputStream = null;
+        try {
+            String networkFileName = String.format("bm_networks/%s.bmnetwork", networkName);
+            inputStream = context.getAssets().open(networkFileName);
+            String networkAssetsJson = io.bidmachine.core.Utils.streamToString(inputStream);
+            JSONObject networkAssetConfig = new JSONObject(networkAssetsJson);
+            String classPath = networkAssetConfig.getString(KEY_CLASSPATH);
+            return (NetworkConfig) Class.forName(classPath)
+                    .getConstructor(Map.class)
+                    .newInstance(networkParams);
+        } catch (Throwable t) {
+            Logger.log(String.format("Network (%s) load fail!", networkName));
+            Logger.log(t);
         } finally {
             io.bidmachine.core.Utils.close(inputStream);
         }
@@ -393,7 +410,7 @@ public abstract class NetworkConfig {
         Iterator<String> keys = jsonObject.keys();
         while (keys.hasNext()) {
             String key = keys.next();
-            Object value = jsonObject.get(key);
+            Object value = jsonObject.opt(key);
             if (value != null) {
                 map.put(key, value.toString());
             }
