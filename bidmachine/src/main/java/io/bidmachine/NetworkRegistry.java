@@ -58,8 +58,10 @@ class NetworkRegistry {
     static final String Vast = "vast";
     static final String Nast = "nast";
 
-    private static Set<NetworkConfig> pendingNetworks;
-    private static Set<JSONObject> pendingNetworksJson;
+    @VisibleForTesting
+    static Set<NetworkConfig> pendingNetworks;
+    @VisibleForTesting
+    static Set<JSONObject> pendingNetworksJson;
 
     @VisibleForTesting
     static final Map<String, NetworkConfig> cache = new ConcurrentHashMap<>();
