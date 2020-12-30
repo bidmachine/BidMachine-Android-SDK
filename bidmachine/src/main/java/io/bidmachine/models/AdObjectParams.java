@@ -23,9 +23,11 @@ public abstract class AdObjectParams {
 
     private static final long DEF_VIEWABILITY_TIME_THRESHOLD = 1;
     private static final float DEF_VIEWABILITY_PIXEL_THRESHOLD = 1;
+    private static final boolean DEF_VIEWABILITY_WINDOW_FOCUS = true;
 
     private long viewabilityTimeThresholdSec = DEF_VIEWABILITY_TIME_THRESHOLD;
     private float viewabilityPixelThreshold = DEF_VIEWABILITY_PIXEL_THRESHOLD;
+    private boolean viewabilityWindowFocus = DEF_VIEWABILITY_WINDOW_FOCUS;
 
     private Map<TrackEventType, List<String>> trackUrls = new EnumMap<>(TrackEventType.class);
 
@@ -56,6 +58,7 @@ public abstract class AdObjectParams {
         viewabilityPixelThreshold = Utils.getOrDefault(extension.getViewabilityPixelThreshold(),
                 AdExtension.getDefaultInstance().getViewabilityPixelThreshold(),
                 DEF_VIEWABILITY_PIXEL_THRESHOLD); //possibly should be multiplied by 100;
+        viewabilityWindowFocus = extension.getViewabilityWindowFocus();
         prepareEvents(extension.getEventList());
     }
 
@@ -90,6 +93,10 @@ public abstract class AdObjectParams {
 
     public float getViewabilityPixelThreshold() {
         return viewabilityPixelThreshold;
+    }
+
+    public boolean isViewabilityWindowFocus() {
+        return viewabilityWindowFocus;
     }
 
     @NonNull
