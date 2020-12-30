@@ -752,13 +752,14 @@ public class Utils {
      * @return {@code true} if view is match visible credentials
      */
 
-    public static boolean isOnTop(View view, float visibilityPercent) {
+    public static boolean isOnTop(View view, float visibilityPercent, boolean checkWindowFocus) {
         try {
             Rect viewRect = new Rect();
             boolean isAdVisible = view.getGlobalVisibleRect(viewRect);
             boolean isAdShown = view.isShown();
+            boolean hasWindowFocus = !checkWindowFocus || view.hasWindowFocus();
             boolean isAdTransparent = isViewTransparent(view);
-            boolean isAdOnScreen = isAdVisible && isAdShown && view.hasWindowFocus() && !isAdTransparent;
+            boolean isAdOnScreen = isAdVisible && isAdShown && hasWindowFocus && !isAdTransparent;
             if (!isAdOnScreen) {
                 Logger.log("Ad View is out of screen, show wasn't tracked");
                 return false;
