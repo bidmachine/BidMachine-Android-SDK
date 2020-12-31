@@ -135,22 +135,25 @@ public class AppParamsFragment extends BaseParamsFragment {
                                     }
                                 }));
 
-        Framework[] frameworks = Framework.values();
+        String[] frameworks = new String[]{
+                Framework.NATIVE,
+                Framework.UNITY
+        };
         SelectionContainer[] displayFrameworks = new SelectionContainer[frameworks.length + 1];
         displayFrameworks[0] = new SelectionContainer("null", null);
         for (int i = 0; i < frameworks.length; i++) {
-            displayFrameworks[i + 1] = new SelectionContainer(frameworks[i].name(), frameworks[i]);
+            displayFrameworks[i + 1] = new SelectionContainer(frameworks[i], frameworks[i]);
         }
-        Framework currentFramework = paramsHelper.getFramework();
+        String currentFramework = paramsHelper.getFramework();
         SelectionContainer displayFramework = currentFramework != null
-                ? new SelectionContainer(currentFramework.name(), currentFramework)
+                ? new SelectionContainer(currentFramework, currentFramework)
                 : null;
         bindParamWidget(context, parent, "Framework",
                         new SpinnerParamsWidget(
                                 "Framework", displayFrameworks, displayFramework,
                                 (widget, param) -> {
-                                    Framework framework = param.getReferenceObject() != null
-                                            ? (Framework) param.getReferenceObject()
+                                    String framework = param.getReferenceObject() != null
+                                            ? (String) param.getReferenceObject()
                                             : null;
                                     paramsHelper.setFramework(framework);
                                 }));
