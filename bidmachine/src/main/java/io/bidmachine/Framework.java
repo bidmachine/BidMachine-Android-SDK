@@ -1,7 +1,8 @@
 package io.bidmachine;
 
-public enum Framework {
+public class Framework {
 
-    Native, Unity
+    public static final String NATIVE = "native";
+    public static final String UNITY = "unity";
 
 }
