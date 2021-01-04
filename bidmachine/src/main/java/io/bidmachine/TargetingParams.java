@@ -106,7 +106,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
         if (framework != null) {
             appExtBuilder.putFields(ProtoExtConstants.Context.App.FRAMEWORK,
                                     Value.newBuilder()
-                                            .setStringValue(framework.toLowerCase())
+                                            .setStringValue(framework)
                                             .build());
         }
         appExtBuilder.putFields(ProtoExtConstants.Context.App.API_LEVEL, Value.newBuilder()
