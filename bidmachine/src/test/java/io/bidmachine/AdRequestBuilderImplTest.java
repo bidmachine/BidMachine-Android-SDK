@@ -47,7 +47,7 @@ public class AdRequestBuilderImplTest {
         assertNull(adRequestBuilder.params);
         adRequestBuilder.fillNetworkConfigs(new ArrayList<NetworkConfig>());
         assertNull(adRequestBuilder.params);
-        final TestNetworkConfig testNetworkConfig = new TestNetworkConfig(null);
+        final TestNetworkConfig testNetworkConfig = new TestNetworkConfig("TestAdapter", null);
         adRequestBuilder.fillNetworkConfigs(new ArrayList<NetworkConfig>() {{
             add(testNetworkConfig);
         }});
