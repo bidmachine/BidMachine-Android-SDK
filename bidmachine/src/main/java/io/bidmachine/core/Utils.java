@@ -752,12 +752,12 @@ public class Utils {
      * @return {@code true} if view is match visible credentials
      */
 
-    public static boolean isOnTop(View view, float visibilityPercent, boolean checkWindowFocus) {
+    public static boolean isOnTop(View view, float visibilityPercent, boolean ignoreCheckWindowFocus) {
         try {
             Rect viewRect = new Rect();
             boolean isAdVisible = view.getGlobalVisibleRect(viewRect);
             boolean isAdShown = view.isShown();
-            boolean hasWindowFocus = !checkWindowFocus || view.hasWindowFocus();
+            boolean hasWindowFocus = ignoreCheckWindowFocus || view.hasWindowFocus();
             boolean isAdTransparent = isViewTransparent(view);
             boolean isAdOnScreen = isAdVisible && isAdShown && hasWindowFocus && !isAdTransparent;
             if (!isAdOnScreen) {

@@ -249,7 +249,7 @@ public final class NativeAdObject
                         container,
                         getParams().getViewabilityTimeThresholdMs(),
                         getParams().getViewabilityPixelThreshold(),
-                        getParams().isViewabilityWindowFocus(),
+                        getParams().isViewabilityIgnoreWindowFocus(),
                         new VisibilityTracker.VisibilityChangeCallback() {
                             @Override
                             public void onViewShown() {
