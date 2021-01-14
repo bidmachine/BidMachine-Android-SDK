@@ -1,15 +1,9 @@
 package io.bidmachine.banner;
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import io.bidmachine.AdRequest;
 import io.bidmachine.AdsType;
-import io.bidmachine.R;
 import io.bidmachine.TargetingParams;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.IBannerRequestBuilder;
@@ -46,15 +40,6 @@ public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerA
     public static final class Builder extends AdRequestBuilderImpl<Builder, BannerRequest>
             implements IBannerRequestBuilder<Builder> {
 
-        public Builder() {
-        }
-
-        Builder(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-            TypedArray params = context.obtainStyledAttributes(attrs, R.styleable.BannerRequest, defStyleAttr, 0);
-            setSize(BannerSize.values()[params.getInt(R.styleable.BannerRequest_bannerSize, 0)]);
-            params.recycle();
-        }
-
         @Override
         protected BannerRequest createRequest() {
             return new BannerRequest();
@@ -66,6 +51,7 @@ public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerA
             params.bannerSize = bannerSize;
             return this;
         }
+
     }
 
     public interface AdRequestListener extends AdRequest.AdRequestListener<BannerRequest> {
