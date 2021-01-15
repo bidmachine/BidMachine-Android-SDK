@@ -25,6 +25,7 @@ public class VisibilityTracker {
         private final WeakReference<View> viewReference;
         private final long requiredOnScreenTime;
         private final float visibilityPercent;
+        private final boolean ignoreCheckWindowFocus;
         private final VisibilityChangeCallback callback;
 
         private ViewTreeObserver.OnPreDrawListener preDrawListener;
@@ -39,10 +40,12 @@ public class VisibilityTracker {
         TrackingHolder(@NonNull View view,
                        long requiredOnScreenTimeMs,
                        float visibilityPercent,
+                       boolean ignoreCheckWindowFocus,
                        @NonNull VisibilityChangeCallback callback) {
             this.viewReference = new WeakReference<>(view);
             this.requiredOnScreenTime = requiredOnScreenTimeMs;
             this.visibilityPercent = visibilityPercent;
+            this.ignoreCheckWindowFocus = ignoreCheckWindowFocus;
             this.callback = callback;
         }
 
@@ -92,7 +95,7 @@ public class VisibilityTracker {
                 release();
                 return true;
             }
-            if (isOnTop(view, visibilityPercent)) {
+            if (isOnTop(view, visibilityPercent, ignoreCheckWindowFocus)) {
                 if (!isShownTracked) {
                     callback.onViewShown();
                     isShownTracked = true;
@@ -275,12 +278,14 @@ public class VisibilityTracker {
     public static void startTracking(@NonNull View view,
                                      long requiredOnScreenTimeMs,
                                      float visibilityPercent,
+                                     boolean ignoreCheckWindowFocus,
                                      @NonNull VisibilityChangeCallback callback) {
         synchronized (holders) {
             stopTracking(view);
             TrackingHolder holder = new TrackingHolder(view,
                                                        requiredOnScreenTimeMs,
                                                        visibilityPercent,
+                                                       ignoreCheckWindowFocus,
                                                        callback);
             holders.add(holder);
             holder.start();

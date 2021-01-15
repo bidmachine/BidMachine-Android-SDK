@@ -1,47 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="PriceFloorParams">
-        <attr name="priceFloors" format="string" />
-    </declare-styleable>
-
-    <declare-styleable name="TargetParams">
-        <attr name="targetUserId" format="string" />
-        <attr name="targetGender" format="enum">
-            <enum name="other" value="0" />
-            <enum name="female" value="1" />
-            <enum name="male" value="2" />
-        </attr>
-        <attr name="targetBirthdayYear" format="integer" />
-        <attr name="targetCountry" format="string" />
-        <attr name="targetCity" format="string" />
-        <attr name="targetZip" format="string" />
-        <attr name="targetKeywords" format="string" />
-        <attr name="targetStoreUrl" format="string" />
-        <attr name="targetPaid" format="string" />
-        <attr name="deviceLocation" format="string" />
-    </declare-styleable>
-
-    <declare-styleable name="RestrictionParams">
-        <attr name="consentString" format="string" />
-        <attr name="subjectToGDPR" format="boolean" />
-        <attr name="restrictionConsent" format="boolean" />
-    </declare-styleable>
-
-    <declare-styleable name="AdView">
-        <attr name="priceFloors" />
-        <attr name="targetUserId" />
-        <attr name="targetGender" />
-        <attr name="targetBirthdayYear" />
-        <attr name="targetCountry" />
-        <attr name="targetCity" />
-        <attr name="targetZip" />
-        <attr name="targetKeywords" />
-        <attr name="deviceLocation" />
-        <attr name="targetStoreUrl" />
-        <attr name="targetPaid" />
-    </declare-styleable>
-
     <declare-styleable name="NativeAdContentLayout">
         <attr name="titleViewId" format="reference" />
         <attr name="descriptionViewId" format="reference" />
@@ -51,18 +10,6 @@
         <attr name="providerViewId" format="reference" />
         <attr name="ageRestrictionViewId" format="reference" />
         <attr name="mediaViewId" format="reference" />
-    </declare-styleable>
-
-    <declare-styleable name="BannerRequest">
-        <attr name="bannerSize" format="enum">
-            <enum name="size_320_50" value="0" />
-            <enum name="size_300_250" value="1" />
-            <enum name="size_728_90" value="2" />
-        </attr>
-    </declare-styleable>
-
-    <declare-styleable name="BannerView">
-        <attr name="bannerSize" />
     </declare-styleable>
 
 </resources>
