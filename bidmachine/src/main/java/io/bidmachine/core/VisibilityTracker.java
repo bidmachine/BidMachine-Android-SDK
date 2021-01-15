@@ -209,10 +209,11 @@ public class VisibilityTracker {
                                 }
                                 Logger.log(String.format(
                                         "Show wasn't tracked: ad view is overlapped by another " +
-                                                "visible view (type: %s, id: %s), visible percent: %s",
+                                                "visible view (type: %s, id: %s), visible percent: %s / %s",
                                         child.getClass().getSimpleName(),
                                         resourceName,
-                                        visiblePercent));
+                                        visiblePercent,
+                                        visibilityPercent));
                                 if (visiblePercent < visibilityPercent) {
                                     Logger.log(
                                             "Show wasn't tracked: ad view is covered by another view");
@@ -253,7 +254,7 @@ public class VisibilityTracker {
             int xOverlap = Math.max(0, minRight - maxLeft);
             int yOverlap = Math.max(0, minBottom - maxTop);
             int overlapArea = xOverlap * yOverlap;
-            return ((float) (viewArea - overlapArea) / viewArea) * 100;
+            return ((float) (viewArea - overlapArea) / viewArea);
         }
 
         private final Runnable checkRunnable = new Runnable() {
