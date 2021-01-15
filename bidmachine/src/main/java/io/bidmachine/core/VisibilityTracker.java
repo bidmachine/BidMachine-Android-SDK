@@ -137,7 +137,7 @@ public class VisibilityTracker {
             }
         }
 
-        public boolean isOnTop(View view, float visibilityPercent) {
+        public boolean isOnTop(View view, float visibilityPercent, boolean ignoreCheckWindowFocus) {
             try {
                 Rect viewRect = new Rect();
                 if (!view.getGlobalVisibleRect(viewRect)) {
@@ -152,7 +152,7 @@ public class VisibilityTracker {
                     Logger.log("Show wasn't tracked: view transparent verification failed");
                     return false;
                 }
-                if (!view.hasWindowFocus()) {
+                if (!ignoreCheckWindowFocus && !view.hasWindowFocus()) {
                     Logger.log("Show wasn't tracked: window focus verification failed");
                     return false;
                 }
