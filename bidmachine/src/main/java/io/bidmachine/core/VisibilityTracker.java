@@ -219,21 +219,11 @@ public class VisibilityTracker {
                             if (Rect.intersects(viewRect, childRect)) {
                                 float visiblePercent = viewNotOverlappedAreaPercent(viewRect,
                                                                                     childRect);
-                                String resourceName = String.valueOf(child.getId());
-                                try {
-                                    resourceName = view.getContext()
-                                            .getResources()
-                                            .getResourceEntryName(child.getId());
-                                } catch (Exception ignore) {
-                                }
                                 Logger.log(String.format(
-                                        "Show wasn't tracked: ad view is overlapped by another " +
-                                                "visible view (type: %s, id: %s), visible percent: %s / %s - %s",
-                                        child.getClass().getSimpleName(),
-                                        resourceName,
+                                        "Show wasn't tracked: ad view is overlapped by another visible view (%s), visible percent: %s / %s",
+                                        child.toString(),
                                         visiblePercent,
-                                        visibilityPercent,
-                                        view.toString()));
+                                        visibilityPercent));
                                 if (visiblePercent < visibilityPercent) {
                                     Logger.log(String.format(
                                             "Show wasn't tracked: ad view is covered by another view - %s",
@@ -320,7 +310,6 @@ public class VisibilityTracker {
             for (TrackingHolder holder : holders) {
                 if (holder.viewReference.get() == view) {
                     holder.release();
-                    holders.remove(holder);
                     break;
                 }
             }
