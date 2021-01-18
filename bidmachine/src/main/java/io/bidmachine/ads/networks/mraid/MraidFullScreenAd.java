@@ -6,31 +6,27 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.explorestack.iab.mraid.MRAIDInterstitial;
-import com.explorestack.iab.vast.VideoType;
+import com.explorestack.iab.mraid.MraidActivity;
+import com.explorestack.iab.mraid.MraidInterstitial;
 
 import io.bidmachine.ContextProvider;
 import io.bidmachine.core.Logger;
+import io.bidmachine.core.Utils;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
 import io.bidmachine.unified.UnifiedMediationParams;
 import io.bidmachine.utils.BMError;
 
-import static io.bidmachine.core.Utils.onUiThread;
-
 class MraidFullScreenAd extends UnifiedFullscreenAd {
 
-    private final VideoType videoType;
+    private final MraidActivity.MraidType mraidType;
 
-    private MRAIDInterstitial mraidInterstitial;
-    private MraidActivity showingActivity;
-    private MraidFullScreenAdapterListener adapterListener;
     @Nullable
-    private UnifiedFullscreenAdCallback callback;
+    private MraidInterstitial mraidInterstitial;
 
-    MraidFullScreenAd(VideoType videoType) {
-        this.videoType = videoType;
+    MraidFullScreenAd(MraidActivity.MraidType mraidType) {
+        this.mraidType = mraidType;
     }
 
     @Override
@@ -47,24 +43,25 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         if (!mraidParams.isValid(callback)) {
             return;
         }
-        this.callback = callback;
-        adapterListener = new MraidFullScreenAdapterListener(this, callback);
-        onUiThread(new Runnable() {
+
+        Utils.onUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mraidInterstitial = MRAIDInterstitial
-                            .newBuilder(activity,
-                                        mraidParams.creativeAdm,
-                                        mraidParams.width,
-                                        mraidParams.height)
+                    mraidInterstitial = MraidInterstitial.newBuilder()
                             .setPreload(true)
                             .setCloseTime(mraidParams.skipOffset)
                             .forceUseNativeCloseButton(mraidParams.useNativeClose)
-                            .setListener(adapterListener)
-                            .setNativeFeatureListener(adapterListener)
-                            .build();
-                    mraidInterstitial.load();
+                            .setListener(new MraidFullScreenAdListener(contextProvider, callback))
+                            .setR1(mraidParams.r1)
+                            .setR2(mraidParams.r2)
+                            .setDurationSec(mraidParams.progressDuration)
+                            .setProductLink(mraidParams.storeUrl)
+                            .setCloseStyle(mraidParams.closeableViewStyle)
+                            .setCountDownStyle(mraidParams.countDownStyle)
+                            .setProgressStyle(mraidParams.progressStyle)
+                            .build(contextProvider.getContext());
+                    mraidInterstitial.load(mraidParams.creativeAdm);
                 } catch (Throwable t) {
                     Logger.log(t);
                     callback.onAdLoadFailed(BMError.Internal);
@@ -77,7 +74,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
     public void show(@NonNull Context context,
                      @NonNull UnifiedFullscreenAdCallback callback) {
         if (mraidInterstitial != null && mraidInterstitial.isReady()) {
-            MraidActivity.show(context, this, videoType);
+            MraidActivity.show(context, mraidInterstitial, mraidType);
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }
@@ -89,23 +86,6 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
             mraidInterstitial.destroy();
             mraidInterstitial = null;
         }
-    }
-
-    MRAIDInterstitial getMraidInterstitial() {
-        return mraidInterstitial;
-    }
-
-    MraidActivity getShowingActivity() {
-        return showingActivity;
-    }
-
-    void setShowingActivity(MraidActivity showingActivity) {
-        this.showingActivity = showingActivity;
-    }
-
-    @Nullable
-    public UnifiedFullscreenAdCallback getCallback() {
-        return callback;
     }
 
 }

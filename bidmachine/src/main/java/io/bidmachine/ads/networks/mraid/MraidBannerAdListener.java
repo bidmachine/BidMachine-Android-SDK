@@ -1,80 +1,81 @@
 package io.bidmachine.ads.networks.mraid;
 
-import android.webkit.WebView;
+import androidx.annotation.NonNull;
 
-import com.explorestack.iab.mraid.MRAIDNativeFeatureListener;
-import com.explorestack.iab.mraid.MRAIDView;
-import com.explorestack.iab.mraid.MRAIDViewListener;
+import com.explorestack.iab.mraid.MraidError;
+import com.explorestack.iab.mraid.MraidView;
+import com.explorestack.iab.mraid.MraidViewListener;
+import com.explorestack.iab.utils.IabClickCallback;
 import com.explorestack.iab.utils.Utils;
 
+import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
 import io.bidmachine.utils.BMError;
 
-class MraidBannerAdListener implements MRAIDViewListener, MRAIDNativeFeatureListener {
+class MraidBannerAdListener implements MraidViewListener {
 
-    private MraidBannerAd adObject;
-    private UnifiedBannerAdCallback callback;
+    @NonNull
+    private final ContextProvider contextProvider;
+    @NonNull
+    private final UnifiedBannerAdCallback callback;
 
-    MraidBannerAdListener(MraidBannerAd adObject, UnifiedBannerAdCallback callback) {
-        this.adObject = adObject;
+    MraidBannerAdListener(@NonNull ContextProvider contextProvider,
+                          @NonNull UnifiedBannerAdCallback callback) {
+        this.contextProvider = contextProvider;
         this.callback = callback;
     }
 
     @Override
-    public void mraidViewLoaded(MRAIDView mraidView) {
-        adObject.processMraidViewLoaded(callback);
-    }
-
-    @Override
-    public void mraidViewExpand(MRAIDView mraidView) {
-    }
-
-    @Override
-    public void mraidViewClose(MRAIDView mraidView) {
-    }
-
-    @Override
-    public boolean mraidViewResize(MRAIDView mraidView, int width, int height, int offsetX, int offsetY) {
-        return false;
-    }
-
-    @Override
-    public void mraidViewNoFill(MRAIDView mraidView) {
-        callback.onAdLoadFailed(BMError.noFillError(null));
-    }
-
-    @Override
-    public void mraidNativeFeatureCallTel(String url) {
-    }
-
-    @Override
-    public void mraidNativeFeatureCreateCalendarEvent(String eventJSON) {
-    }
-
-    @Override
-    public void mraidNativeFeaturePlayVideo(String url) {
-    }
-
-    @Override
-    public void mraidNativeFeatureOpenBrowser(String url, WebView view) {
-        callback.onAdClicked();
-        if (url != null && adObject.mraidView != null) {
-            Utils.addBannerSpinnerView(adObject.mraidView);
-            Utils.openBrowser(adObject.mraidView.getContext(), url, new Runnable() {
-                @Override
-                public void run() {
-                    Utils.hideBannerSpinnerView(adObject.mraidView);
-                }
-            });
+    public void onLoaded(@NonNull MraidView mraidView) {
+        if (contextProvider.getActivity() != null && mraidView.getParent() == null) {
+            mraidView.show(contextProvider.getActivity());
+            callback.onAdLoaded(mraidView);
+        } else {
+            callback.onAdLoadFailed(BMError.Internal);
         }
     }
 
     @Override
-    public void mraidNativeFeatureStorePicture(String url) {
+    public void onError(@NonNull MraidView mraidView, int i) {
+        if (i == MraidError.SHOW_ERROR) {
+            callback.onAdShowFailed(BMError.Internal);
+        } else {
+            callback.onAdLoadFailed(BMError.noFillError(null));
+        }
     }
 
     @Override
-    public void mraidNativeFeatureSendSms(String url) {
+    public void onShown(@NonNull MraidView mraidView) {
+
+    }
+
+    @Override
+    public void onOpenBrowser(@NonNull final MraidView mraidView,
+                              @NonNull String url,
+                              @NonNull final IabClickCallback iabClickCallback) {
+        callback.onAdClicked();
+
+        Utils.openBrowser(mraidView.getContext(), url, new Runnable() {
+            @Override
+            public void run() {
+                iabClickCallback.clickHandled();
+            }
+        });
+    }
+
+    @Override
+    public void onExpand(@NonNull MraidView mraidView) {
+
+    }
+
+    @Override
+    public void onPlayVideo(@NonNull MraidView mraidView, @NonNull String s) {
+
+    }
+
+    @Override
+    public void onClose(@NonNull MraidView mraidView) {
+
     }
 
 }

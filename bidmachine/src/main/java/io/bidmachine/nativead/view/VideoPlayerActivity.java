@@ -65,7 +65,7 @@ public class VideoPlayerActivity extends Activity implements MediaPlayer.OnCompl
         videoView.setVideoPath(fileUri);
         rootLayout.addView(videoView);
 
-        CircleCountdownView closeButton = new CircleCountdownView(this, Assets.mainAssetsColor, Assets.backgroundColor);
+        CircleCountdownView closeButton = new CircleCountdownView(this);
         int closeButtonSize = Math.round(50 * getScreenDensity(this));
         RelativeLayout.LayoutParams closeButtonParams = new RelativeLayout.LayoutParams(closeButtonSize, closeButtonSize);
         closeButtonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);

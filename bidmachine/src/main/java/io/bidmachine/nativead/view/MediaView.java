@@ -604,9 +604,7 @@ public class MediaView extends RelativeLayout implements
     }
 
     private void createMuteButton() {
-        muteButton = new CircleCountdownView(getContext(),
-                                             Assets.mainAssetsColor,
-                                             Assets.backgroundColor);
+        muteButton = new CircleCountdownView(getContext());
         int muteButtonSize = Math.round(50 * getScreenDensity(getContext()));
         LayoutParams muteButtonParams = new LayoutParams(muteButtonSize, muteButtonSize);
         muteButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);

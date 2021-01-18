@@ -51,6 +51,14 @@ public abstract class UnifiedMediationParams {
 
     public abstract boolean contains(@Nullable String key);
 
+    public <T> T getObject(@Nullable String key) {
+        return getObject(key, null);
+    }
+
+    public <T> T getObject(@Nullable String key, T fallback) {
+        return null;
+    }
+
     public static class MappedUnifiedMediationParams extends UnifiedMediationParams {
 
         public interface DataProvider {
@@ -68,32 +76,32 @@ public abstract class UnifiedMediationParams {
         @Nullable
         @Override
         public String getString(@Nullable String key, String fallback) {
-            return resolve(key, fallback);
+            return getObject(key, fallback);
         }
 
         @Override
         public int getInt(@Nullable String key, int fallback) {
-            return resolve(key, fallback);
+            return getObject(key, fallback);
         }
 
         @Override
         public Integer getInteger(@Nullable String key, @Nullable Integer fallback) {
-            return resolve(key, fallback);
+            return getObject(key, fallback);
         }
 
         @Override
         public boolean getBool(@Nullable String key, boolean fallback) {
-            return resolve(key, fallback);
+            return getObject(key, fallback);
         }
 
         @Override
         public double getDouble(@Nullable String key, double fallback) {
-            return resolve(key, fallback);
+            return getObject(key, fallback);
         }
 
         @Override
         public float getFloat(@Nullable String key, float fallback) {
-            return resolve(key, fallback);
+            return getObject(key, fallback);
         }
 
         @Override
@@ -102,7 +110,8 @@ public abstract class UnifiedMediationParams {
         }
 
         @SuppressWarnings("unchecked")
-        private <T> T resolve(@Nullable String key, Object fallback) {
+        @Override
+        public <T> T getObject(@Nullable String key, T fallback) {
             if (key != null) {
                 Object value = dataProvider.getData().get(key);
                 if (value != null) {
@@ -113,7 +122,7 @@ public abstract class UnifiedMediationParams {
                     }
                 }
             }
-            return (T) fallback;
+            return fallback;
         }
     }
 

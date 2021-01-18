@@ -22,4 +22,13 @@ public class IabUtils {
     public static final String KEY_SKIP_OFFSET = "skipOffset";
     public static final String KEY_COMPANION_SKIP_OFFSET = "companionSkipOffset";
 
+    public static final String KEY_R1 = "r1";
+    public static final String KEY_R2 = "r2";
+    public static final String KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE = "ignores_safe_area_layout_guide";
+    public static final String KEY_STORE_URL = "store_url";
+    public static final String KEY_PROGRESS_DURATION = "progress_duration";
+    public static final String KEY_CLOSABLE_VIEW_STYLE = "closeable_view_style";
+    public static final String KEY_COUNTDOWN_STYLE = "countdown_style";
+    public static final String KEY_PROGRESS_STYLE = "progress_style";
+
 }

@@ -5,9 +5,9 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.explorestack.iab.utils.IabClickCallback;
 import com.explorestack.iab.utils.Utils;
 import com.explorestack.iab.vast.VastActivityListener;
-import com.explorestack.iab.vast.VastClickCallback;
 import com.explorestack.iab.vast.VastError;
 import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.VastRequestListener;
@@ -19,7 +19,7 @@ import io.bidmachine.utils.BMError;
 class VastFullScreenAdapterListener implements VastRequestListener, VastActivityListener {
 
     @NonNull
-    private UnifiedFullscreenAdCallback callback;
+    private final UnifiedFullscreenAdCallback callback;
 
     VastFullScreenAdapterListener(@NonNull UnifiedFullscreenAdCallback callback) {
         this.callback = callback;
@@ -53,28 +53,31 @@ class VastFullScreenAdapterListener implements VastRequestListener, VastActivity
     @Override
     public void onVastClick(@NonNull VastActivity vastActivity,
                             @NonNull VastRequest vastRequest,
-                            @NonNull final VastClickCallback vastClickCallback,
+                            @NonNull final IabClickCallback iabClickCallback,
                             @Nullable String url) {
         callback.onAdClicked();
         if (url != null) {
             Utils.openBrowser(vastActivity, url, new Runnable() {
                 @Override
                 public void run() {
-                    vastClickCallback.clickHandled();
+                    iabClickCallback.clickHandled();
                 }
             });
         } else {
-            vastClickCallback.clickHandleCanceled();
+            iabClickCallback.clickHandleCanceled();
         }
     }
 
     @Override
-    public void onVastComplete(@NonNull VastActivity vastActivity, @NonNull VastRequest vastRequest) {
+    public void onVastComplete(@NonNull VastActivity vastActivity,
+                               @NonNull VastRequest vastRequest) {
         callback.onAdFinished();
     }
 
     @Override
-    public void onVastDismiss(@NonNull VastActivity vastActivity, @Nullable VastRequest vastRequest, boolean finished) {
+    public void onVastDismiss(@NonNull VastActivity vastActivity,
+                              @Nullable VastRequest vastRequest,
+                              boolean finished) {
         callback.onAdClosed();
     }
 
