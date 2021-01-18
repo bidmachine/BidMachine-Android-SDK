@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +107,7 @@ final class BidMachineImpl {
     @VisibleForTesting
     private final Map<TrackEventType, List<String>> trackingEventTypes =
             new EnumMap<>(TrackEventType.class);
+    private final List<NetworkConfig> initNetworkConfigList = new ArrayList<>();
 
     private long initRequestDelayMs = 0;
     private static final long MIN_INIT_REQUEST_DELAY_MS = TimeUnit.SECONDS.toMillis(2);
@@ -281,8 +283,9 @@ final class BidMachineImpl {
         SessionManager.get().setSessionResetAfter(response.getSessionResetAfter());
     }
 
-    private void initializeNetworks(@NonNull Context context,
-                                    @Nullable List<AdNetwork> networkList) {
+    @VisibleForTesting
+    void initializeNetworks(@NonNull Context context,
+                            @Nullable List<AdNetwork> networkList) {
         if (NetworkRegistry.isNetworksInitialized()) {
             return;
         }
@@ -304,7 +307,10 @@ final class BidMachineImpl {
                                                               adUnit.getCustomParamsMap());
                         }
                     }
+                    networkConfig.setRegisterSource(RegisterSource.Init);
+
                     NetworkRegistry.registerNetwork(networkConfig);
+                    initNetworkConfigList.add(networkConfig);
                 }
             }
         }
@@ -353,6 +359,11 @@ final class BidMachineImpl {
     @Nullable
     List<String> getTrackingUrls(@NonNull TrackEventType eventType) {
         return trackingEventTypes.get(eventType);
+    }
+
+    @NonNull
+    List<NetworkConfig> getInitNetworkConfigList() {
+        return initNetworkConfigList;
     }
 
     boolean isInitialized() {
