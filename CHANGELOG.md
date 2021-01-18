@@ -1,3 +1,7 @@
+## Version 1.6.3 (January 18, 2020)
+**Features**:
+* Banner improvement
+
 ## Version 1.6.2 (December 17, 2020)
 **Features**:
 * Added support TCF 2.0 - ```IABTCF_TCString``` and ```IABTCF_gdprApplies```

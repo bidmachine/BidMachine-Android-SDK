@@ -196,6 +196,7 @@ public abstract class AdView<
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         isAttachedToWindow = false;
+        isShowPending = true;
     }
 
     @Override

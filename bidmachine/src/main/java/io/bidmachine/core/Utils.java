@@ -85,8 +85,6 @@ public class Utils {
     private static final String UUID_ID = "uuid";
     private static final String SHARED_PREFERENCES_NAME = "ad_core_preferences";
 
-    private static final int AFD_MAX_COUNT_OVERLAPPED_VIEWS = 3;
-
     private static final Handler uiHandler = new Handler(Looper.getMainLooper());
 
     @NonNull
@@ -744,110 +742,6 @@ public class Utils {
             }
         }
         return null;
-    }
-
-    /**
-     * @param view              required view for track visibility
-     * @param visibilityPercent value between 0.0 - 1.0 which match 0% - 100%
-     * @return {@code true} if view is match visible credentials
-     */
-
-    public static boolean isOnTop(View view, float visibilityPercent) {
-        try {
-            Rect viewRect = new Rect();
-            boolean isAdVisible = view.getGlobalVisibleRect(viewRect);
-            boolean isAdShown = view.isShown();
-            boolean isAdTransparent = isViewTransparent(view);
-            boolean isAdOnScreen = isAdVisible && isAdShown && view.hasWindowFocus() && !isAdTransparent;
-            if (!isAdOnScreen) {
-                Logger.log("Ad View is out of screen, show wasn't tracked");
-                return false;
-            }
-
-            float totalAdViewArea = view.getWidth() * view.getHeight();
-            if (totalAdViewArea == 0.0F) {
-                Logger.log("Ad View width or height is zero, show wasn't tracked");
-                return false;
-            }
-
-            int viewArea = viewRect.width() * viewRect.height();
-            float percentOnScreen = (viewArea / totalAdViewArea);
-            if (percentOnScreen < visibilityPercent) {// AFD_VISIBILITY_PERCENT) {
-                Logger.log("Ad View is not completely visible (" + percentOnScreen + "), show wasn't tracked");
-                return false;
-            }
-
-            View content = (View) view.getParent();
-            while (content != null && content.getId() != android.R.id.content) {
-                content = (View) content.getParent();
-            }
-            if (content == null) {
-                Logger.log("Activity content layout not found, is your activity running?");
-                return false;
-            }
-            Rect rootViewRect = new Rect();
-            content.getGlobalVisibleRect(rootViewRect);
-            if (!Rect.intersects(viewRect, rootViewRect)) {
-                Logger.log("Ad View is out of current window, show wasn't tracked");
-                return false;
-            }
-
-            ViewGroup rootView = (ViewGroup) view.getRootView();
-            int countOverlappedViews = 0;
-            ViewGroup parent = (ViewGroup) view.getParent();
-            while (parent != null) {
-                int index = parent.indexOfChild(view);
-                for (int i = index + 1; i < parent.getChildCount(); i++) {
-                    View child = parent.getChildAt(i);
-                    if (child.getVisibility() == View.VISIBLE) {
-                        int[] childLoc = new int[2];
-                        child.getLocationInWindow(childLoc);
-                        Rect childRect = getViewRectangle(child);
-                        if (Rect.intersects(viewRect, childRect)) {
-                            float visiblePercent = viewNotOverlappedAreaPercent(viewRect, childRect);
-                            String resourceName = String.valueOf(child.getId());
-                            try {
-                                resourceName = view.getContext().getResources().getResourceEntryName(child.getId());
-                            } catch (Exception ignore) {
-                            }
-                            Logger.log(String.format("Ad view is overlapped by another " +
-                                            "visible view (type: %s, id: %s), visible percent: %s",
-                                    child.getClass().getSimpleName(), resourceName, visiblePercent));
-                            if (visiblePercent < visibilityPercent) {
-                                Logger.log("Ad View is covered by another view, show wasn't tracked");
-                                return false;
-                            } else {
-                                countOverlappedViews++;
-                                if (countOverlappedViews >= AFD_MAX_COUNT_OVERLAPPED_VIEWS) {
-                                    Logger.log("Ad View is covered by too many views, show wasn't tracked");
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (parent != rootView) {
-                    view = parent;
-                    parent = (ViewGroup) view.getParent();
-                } else {
-                    parent = null;
-                }
-            }
-        } catch (Exception e) {
-            Logger.log(e.getMessage());
-        }
-        return true;
-    }
-
-    private static float viewNotOverlappedAreaPercent(Rect viewRect, Rect coverRect) {
-        int viewArea = viewRect.width() * viewRect.height();
-        if (viewArea == 0) {
-            return 0;
-        }
-        int xOverlap = Math.max(0, Math.min(viewRect.right, coverRect.right) - Math.max(viewRect.left, coverRect.left));
-        int yOverlap = Math.max(0, Math.min(viewRect.bottom, coverRect.bottom) - Math.max(viewRect.top, coverRect.top));
-        int overlapArea = xOverlap * yOverlap;
-        return ((float) (viewArea - overlapArea) / viewArea) * 100;
     }
 
     private static final Integer currentYear;
