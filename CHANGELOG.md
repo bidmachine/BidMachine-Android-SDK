@@ -1,4 +1,4 @@
-## Version 1.6.3 (January 18, 2020)
+## Version 1.6.3 (January 18, 2021)
 **Features**:
 * Banner improvement
 
