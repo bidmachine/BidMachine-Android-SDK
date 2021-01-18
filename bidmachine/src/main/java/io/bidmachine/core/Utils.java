@@ -85,8 +85,6 @@ public class Utils {
     private static final String UUID_ID = "uuid";
     private static final String SHARED_PREFERENCES_NAME = "ad_core_preferences";
 
-    private static final int AFD_MAX_COUNT_OVERLAPPED_VIEWS = 3;
-
     private static final Handler uiHandler = new Handler(Looper.getMainLooper());
 
     @NonNull
