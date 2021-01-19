@@ -145,10 +145,11 @@ public class BidMachine {
     /**
      * Adds 3rd party network configuration, which will be used for mediation, loading and displaying ads
      *
+     * @param context - your application context
      * @param jsonData - Json array which contains info about required networks
      */
-    public static void registerNetworks(@NonNull String jsonData) {
-        NetworkRegistry.registerNetworks(jsonData);
+    public static void registerNetworks(@NonNull Context context, @NonNull String jsonData) {
+        NetworkRegistry.registerNetworks(context, jsonData);
     }
 
     public static void registerAdRequestListener(@NonNull AdRequest.AdRequestListener adRequestListener) {

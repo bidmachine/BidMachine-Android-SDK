@@ -45,6 +45,8 @@ public abstract class NetworkConfig {
     static final String CONFIG_ORIENTATION = "orientation";
 
     @Nullable
+    private RegisterSource registerSource = RegisterSource.Publisher;
+    @Nullable
     private NetworkAdapter networkAdapter;
     @Nullable
     private Map<String, String> networkParams;
@@ -103,6 +105,15 @@ public abstract class NetworkConfig {
 
     protected NetworkConfig(@Nullable Map<String, String> networkParams) {
         withNetworkParams(networkParams);
+    }
+
+    @Nullable
+    RegisterSource getRegisterSource() {
+        return registerSource;
+    }
+
+    void setRegisterSource(@Nullable RegisterSource registerSource) {
+        this.registerSource = registerSource;
     }
 
     @NonNull
@@ -344,6 +355,7 @@ public abstract class NetworkConfig {
         return resultConfig;
     }
 
+    @Nullable
     static NetworkConfig create(@Nullable Context context,
                                 @NonNull JSONObject networkConfigJsonObject) {
         if (context == null) {
@@ -386,18 +398,33 @@ public abstract class NetworkConfig {
     static NetworkConfig create(@NonNull Context context,
                                 @NonNull String networkName,
                                 @Nullable Map<String, String> networkParams) {
-        InputStream inputStream = null;
+        String networkAssetJson = readAssetByNetworkName(context, networkName);
+        if (TextUtils.isEmpty(networkAssetJson)) {
+            return null;
+        }
+        assert networkAssetJson != null;
         try {
-            String networkFileName = String.format("bm_networks/%s.bmnetwork", networkName);
-            inputStream = context.getAssets().open(networkFileName);
-            String networkAssetsJson = io.bidmachine.core.Utils.streamToString(inputStream);
-            JSONObject networkAssetConfig = new JSONObject(networkAssetsJson);
+            JSONObject networkAssetConfig = new JSONObject(networkAssetJson);
             String classPath = networkAssetConfig.getString(KEY_CLASSPATH);
             return (NetworkConfig) Class.forName(classPath)
                     .getConstructor(Map.class)
                     .newInstance(networkParams);
         } catch (Throwable t) {
             Logger.log(String.format("Network (%s) load fail!", networkName));
+            Logger.log(t);
+        }
+        return null;
+    }
+
+    @Nullable
+    private static String readAssetByNetworkName(@NonNull Context context,
+                                                 @NonNull String networkName) {
+        InputStream inputStream = null;
+        try {
+            String networkFileName = String.format("bm_networks/%s.bmnetwork", networkName);
+            inputStream = context.getAssets().open(networkFileName);
+            return io.bidmachine.core.Utils.streamToString(inputStream);
+        } catch (Throwable t) {
             Logger.log(t);
         } finally {
             io.bidmachine.core.Utils.close(inputStream);

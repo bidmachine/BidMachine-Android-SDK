@@ -535,7 +535,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            BidMachine.registerNetworks(array.toString());
+            BidMachine.registerNetworks(this, array.toString());
         } else {
             for (OptionalNetwork network : checkedOptionalNetworks) {
                 BidMachine.registerNetworks(network.networkConfig);

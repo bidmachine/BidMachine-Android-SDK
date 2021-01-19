@@ -857,8 +857,19 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 prepareRequest();
 
                 params.networkConfigMap = new HashMap<String, NetworkConfig>();
-                for (NetworkConfig networkConfig : networkConfigList) {
+                for (NetworkConfig networkConfig : BidMachineImpl.get().getInitNetworkConfigList()) {
                     params.networkConfigMap.put(networkConfig.getKey(), networkConfig);
+                }
+                for (NetworkConfig networkConfig : networkConfigList) {
+                    String networkKey = networkConfig.getKey();
+                    if (NetworkRegistry.isNetworkInitialized(networkKey, RegisterSource.Publisher)) {
+                        params.networkConfigMap.put(networkConfig.getKey(), networkConfig);
+                    } else {
+                        Logger.log(String.format(
+                                "%s: %s was removed from AdRequest. Please register network before initialize BidMachine",
+                                toString(),
+                                networkKey));
+                    }
                 }
             }
         }
