@@ -265,10 +265,11 @@ class NetworkRegistry {
                     type.addNetworkConfig(key, networkConfig);
                 }
                 Logger.log(
-                        String.format("Load network from config finish: %s, %s, %s",
+                        String.format("Load network from config finish: %s, %s, %s. Register source - %s",
                                       networkName,
                                       networkAdapter.getVersion(),
-                                      networkAdapter.getAdapterVersion()));
+                                      networkAdapter.getAdapterVersion(),
+                                      networkConfig.getRegisterSource()));
                 if (networkAdapter instanceof HeaderBiddingAdapter) {
                     BidMachineEvents.eventFinish(trackingObject,
                                                  TrackEventType.HeaderBiddingNetworkInitialize,
