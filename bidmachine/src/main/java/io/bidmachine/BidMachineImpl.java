@@ -283,9 +283,8 @@ final class BidMachineImpl {
         SessionManager.get().setSessionResetAfter(response.getSessionResetAfter());
     }
 
-    @VisibleForTesting
-    void initializeNetworks(@NonNull Context context,
-                            @Nullable List<AdNetwork> networkList) {
+    private void initializeNetworks(@NonNull Context context,
+                                    @Nullable List<AdNetwork> networkList) {
         if (NetworkRegistry.isNetworksInitialized()) {
             return;
         }
