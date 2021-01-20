@@ -99,7 +99,10 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             Log.e(TAG, "Initialize failed: adUnits not found");
             return;
         }
-        configure(contextProvider.getContext(), publisherId, adUnitList);
+        configure(contextProvider.getContext(),
+                  publisherId,
+                  adUnitList,
+                  adRequestParams.isTestMode());
     }
 
     @Override
@@ -148,11 +151,13 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     private void configure(@NonNull Context context,
                            @NonNull String publisherId,
-                           @NonNull List<AdUnit> adUnitList) {
+                           @NonNull List<AdUnit> adUnitList,
+                           boolean isTestMode) {
         try {
             Application application = (Application) context.getApplicationContext();
             if (application != null) {
                 new Criteo.Builder(application, publisherId)
+                        .debugLogsEnabled(isTestMode)
                         .adUnits(adUnitList)
                         .init();
             } else {
