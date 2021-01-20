@@ -5,15 +5,15 @@ This folder contains mediation adapter used to mediate `Criteo`.
 ## Integration
 
 [<img src="https://img.shields.io/badge/Min%20SDK%20version-1.6.3-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
-[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.6.3.6-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.criteo/1.6.3.6/)
-[<img src="https://img.shields.io/badge/Network%20version-4.0.0-blue">](https://publisherdocs.criteotilt.com/app/android/get-started/)
+[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.6.3.7-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.criteo/1.6.3.7/)
+[<img src="https://img.shields.io/badge/Network%20version-4.2.0-blue">](https://publisherdocs.criteotilt.com/app/android/get-started/)
 
 Add next dependency to you `build.gradle`:
 
 ```groovy
 dependencies {
     // ... other dependencies
-    implementation 'io.bidmachine:ads.networks.criteo:1.6.3.6'
+    implementation 'io.bidmachine:ads.networks.criteo:1.6.3.7'
 }
 ```
 
