@@ -30,7 +30,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     private String storeUrl;
     private String storeCategory;
     private String[] storeSubCategories;
-    private Framework framework;
+    private String framework;
     private Boolean isPaid;
     private BlockedParams blockedParams;
 
@@ -106,7 +106,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
         if (framework != null) {
             appExtBuilder.putFields(ProtoExtConstants.Context.App.FRAMEWORK,
                                     Value.newBuilder()
-                                            .setStringValue(framework.toString().toLowerCase())
+                                            .setStringValue(framework)
                                             .build());
         }
         appExtBuilder.putFields(ProtoExtConstants.Context.App.API_LEVEL, Value.newBuilder()
@@ -219,7 +219,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     }
 
     @Override
-    public TargetingParams setFramework(Framework framework) {
+    public TargetingParams setFramework(String framework) {
         this.framework = framework;
         return this;
     }

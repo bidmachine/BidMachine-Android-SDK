@@ -1,3 +1,6 @@
+## Version 1.6.3.8
+* Updated AdColony version to 4.4.0
+
 ## Version 1.6.1.7
 * Support AdColony Advanced Bidding 3.0
 

@@ -30,25 +30,29 @@ class MyTargetBanner extends UnifiedBannerAd {
         assert params.slotId != null;
         assert params.bidId != null;
 
+        MyTargetView.setDebugMode(requestParams.isTestMode());
+
         BannerSize size = requestParams.getBannerSize();
-        int adSize;
+        MyTargetView.AdSize adSize;
         switch (size) {
             case Size_728x90: {
-                adSize = MyTargetView.AdSize.BANNER_728x90;
+                adSize = MyTargetView.AdSize.ADSIZE_728x90;
                 break;
             }
             case Size_300x250: {
-                adSize = MyTargetView.AdSize.BANNER_300x250;
+                adSize = MyTargetView.AdSize.ADSIZE_300x250;
                 break;
             }
             default: {
-                adSize = MyTargetView.AdSize.BANNER_320x50;
+                adSize = MyTargetView.AdSize.ADSIZE_320x50;
                 break;
             }
         }
         adView = new MyTargetView(contextProvider.getContext());
-        adView.init(params.slotId, adSize, false);
-        adView.setListener(new MyTargetListener(callback));
+        adView.setSlotId(params.slotId);
+        adView.setAdSize(adSize);
+        adView.setRefreshAd(false);
+        adView.setListener(new Listener(callback));
         MyTargetAdapter.updateTargeting(requestParams, adView.getCustomParams());
         adView.loadFromBid(params.bidId);
     }
@@ -61,11 +65,13 @@ class MyTargetBanner extends UnifiedBannerAd {
         }
     }
 
-    private static final class MyTargetListener implements MyTargetView.MyTargetViewListener {
 
-        private UnifiedBannerAdCallback callback;
+    private static final class Listener implements MyTargetView.MyTargetViewListener {
 
-        MyTargetListener(UnifiedBannerAdCallback callback) {
+        @NonNull
+        private final UnifiedBannerAdCallback callback;
+
+        Listener(@NonNull UnifiedBannerAdCallback callback) {
             this.callback = callback;
         }
 

@@ -90,8 +90,8 @@ abstract class MultiThreadingTest {
         assertEquals(readThreadCount + 1, countSuccess.get());
     }
 
-    abstract void writeAction(int actionNumber, int totalActions);
+    abstract void writeAction(int actionNumber, int totalActions) throws Exception;
 
-    abstract void readAction(int actionNumber, int totalActions);
+    abstract void readAction(int actionNumber, int totalActions) throws Exception;
 
 }

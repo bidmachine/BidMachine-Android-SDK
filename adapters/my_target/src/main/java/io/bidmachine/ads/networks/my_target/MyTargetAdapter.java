@@ -48,12 +48,12 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     @Override
     public UnifiedFullscreenAd createInterstitial() {
-        return new MyTargetFullscreenAd();
+        return new MyTargetInterstitial();
     }
 
     @Override
     public UnifiedFullscreenAd createRewarded() {
-        return new MyTargetFullscreenAd();
+        return new MyTargetRewarded();
     }
 
     @Override

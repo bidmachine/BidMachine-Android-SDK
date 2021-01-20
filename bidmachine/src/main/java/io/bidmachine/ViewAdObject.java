@@ -73,6 +73,7 @@ public final class ViewAdObject<
                 adView,
                 getParams().getViewabilityTimeThresholdMs(),
                 getParams().getViewabilityPixelThreshold(),
+                getParams().isViewabilityIgnoreWindowFocus(),
                 new VisibilityTracker.VisibilityChangeCallback() {
                     @Override
                     public void onViewShown() {

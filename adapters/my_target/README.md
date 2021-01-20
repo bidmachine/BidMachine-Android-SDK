@@ -4,16 +4,16 @@ This folder contains mediation adapter used to mediate `myTarget`.
 
 ## Integration
 
-[<img src="https://img.shields.io/badge/Min%20SDK%20version-1.6.2-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
-[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.6.2.4-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.my_target/1.6.2.4/)
-[<img src="https://img.shields.io/badge/Network%20version-5.11.5-blue">](https://github.com/myTargetSDK/mytarget-android)
+[<img src="https://img.shields.io/badge/Min%20SDK%20version-1.6.3-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
+[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.6.3.5-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.my_target/1.6.3.5/)
+[<img src="https://img.shields.io/badge/Network%20version-5.11.9-blue">](https://github.com/myTargetSDK/mytarget-android)
 
 Add next dependency to you `build.gradle`:
 
 ```groovy
 dependencies {
     // ... other dependencies
-    implementation 'io.bidmachine:ads.networks.my_target:1.6.2.4'
+    implementation 'io.bidmachine:ads.networks.my_target:1.6.3.5'
 }
 ```
 

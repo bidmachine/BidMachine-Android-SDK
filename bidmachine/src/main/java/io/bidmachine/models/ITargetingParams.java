@@ -107,13 +107,13 @@ public interface ITargetingParams<SelfType> extends IBlockedParams<SelfType> {
     SelfType setStoreSubCategories(String... storeSubCategories);
 
     /**
-     * Sets app framework definitions. For example, If the app is using the Unity, put {@link Framework#Unity}
+     * Sets app framework definitions. For example, If the app is using the Unity, put {@link Framework#UNITY}
      *
      * @param framework App framework
      * @return Self instance
      */
     @SuppressWarnings("UnusedReturnValue")
-    SelfType setFramework(Framework framework);
+    SelfType setFramework(String framework);
 
     /**
      * Sets if it is paid app version

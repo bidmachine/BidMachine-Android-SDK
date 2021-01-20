@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.adcolony.sdk.AdColony;
 import com.adcolony.sdk.AdColonyAppOptions;
+import com.adcolony.sdk.AdColonySignalsListener;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import io.bidmachine.utils.BMError;
 
 class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
-    private static final String AD_COLONY_VERSION = "4.3.0";
+    private static final String AD_COLONY_VERSION = "4.4.0";
     private static HashSet<String> zonesCache = new HashSet<>();
     private boolean isAdapterInitialized = false;
 
@@ -78,13 +79,13 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
                                            @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
                                            @NonNull Map<String, String> mediationConfig) throws Exception {
-        String appId = mediationConfig.get(AdColonyConfig.KEY_APP_ID);
+        final String appId = mediationConfig.get(AdColonyConfig.KEY_APP_ID);
         if (TextUtils.isEmpty(appId)) {
             collectCallback.onCollectFail(BMError.requestError("App id not provided"));
             return;
         }
         assert appId != null;
-        String zoneId = extractZoneId(mediationConfig);
+        final String zoneId = extractZoneId(mediationConfig);
         if (TextUtils.isEmpty(zoneId)) {
             collectCallback.onCollectFail(BMError.requestError("Zone id not provided"));
             return;
@@ -110,12 +111,17 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                 isAdapterInitialized = true;
             }
 
-            final Map<String, String> params = new HashMap<>();
-            params.put(AdColonyConfig.KEY_APP_ID, appId);
-            params.put(AdColonyConfig.KEY_ZONE_ID, zoneId);
-            params.put(AdColonyConfig.KEY_TOKEN, AdColony.collectSignals());
+            AdColony.collectSignals(new AdColonySignalsListener() {
+                @Override
+                public void onSuccess(String signalString) {
+                    final Map<String, String> params = new HashMap<>();
+                    params.put(AdColonyConfig.KEY_APP_ID, appId);
+                    params.put(AdColonyConfig.KEY_ZONE_ID, zoneId);
+                    params.put(AdColonyConfig.KEY_TOKEN, signalString);
 
-            collectCallback.onCollectFinished(params);
+                    collectCallback.onCollectFinished(params);
+                }
+            });
         }
     }
 

@@ -83,7 +83,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     private String storeUrl;
     private String storeCategory;
     private String[] storeSubCategories;
-    private Framework framework;
+    private String framework;
     private Location currentDeviceLocation;
     private Boolean isPaid;
 
@@ -298,12 +298,12 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     }
 
     @Override
-    public ParamsHelper setFramework(Framework framework) {
+    public ParamsHelper setFramework(String framework) {
         this.framework = framework;
         return this;
     }
 
-    public Framework getFramework() {
+    public String getFramework() {
         return framework;
     }
 
