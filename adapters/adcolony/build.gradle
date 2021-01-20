@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 7
+        versionCode 8
     }
 }
 
@@ -17,6 +17,6 @@ rootProject.allprojects {
 }
 
 dependencies {
-    adapterDependency 'com.adcolony:sdk:4.3.0'
+    adapterDependency 'com.adcolony:sdk:4.4.0'
     adapterDependency 'com.google.android.gms:play-services-ads-identifier:17.0.0'
 }
