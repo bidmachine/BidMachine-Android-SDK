@@ -1,3 +1,8 @@
+## Version 1.7.0 (January 20, 2021)
+**Features**:
+* SDK improvement
+* Added API method ```AdRequest#destroy``` to destroy AdRequest
+
 ## Version 1.6.3 (January 18, 2021)
 **Features**:
 * Banner improvement
