@@ -1,7 +1,8 @@
 package io.bidmachine.ads.networks.mraid;
 
-import com.explorestack.iab.mraid.internal.MRAIDLog;
-import com.explorestack.iab.vast.VideoType;
+import com.explorestack.iab.mraid.MraidActivity;
+import com.explorestack.iab.mraid.MraidLog;
+import com.explorestack.iab.utils.Logger;
 
 import io.bidmachine.AdsType;
 import io.bidmachine.BuildConfig;
@@ -13,14 +14,14 @@ public class MraidAdapter extends NetworkAdapter {
 
     public MraidAdapter() {
         super("mraid",
-                "2.0",
-                BuildConfig.VERSION_NAME + ".1",
-                new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
+              "2.0",
+              BuildConfig.VERSION_NAME + ".1",
+              new AdsType[]{AdsType.Banner, AdsType.Interstitial, AdsType.Rewarded});
     }
 
     @Override
     public void setLogging(boolean enabled) {
-        MRAIDLog.setLoggingLevel(enabled ? MRAIDLog.LOG_LEVEL.verbose : MRAIDLog.LOG_LEVEL.none);
+        MraidLog.setLoggingLevel(enabled ? Logger.LogLevel.debug : Logger.LogLevel.none);
     }
 
     @Override
@@ -30,12 +31,12 @@ public class MraidAdapter extends NetworkAdapter {
 
     @Override
     public UnifiedFullscreenAd createInterstitial() {
-        return new MraidFullScreenAd(VideoType.NonRewarded);
+        return new MraidFullScreenAd(MraidActivity.MraidType.Static);
     }
 
     @Override
     public UnifiedFullscreenAd createRewarded() {
-        return new MraidFullScreenAd(VideoType.Rewarded);
+        return new MraidFullScreenAd(MraidActivity.MraidType.Rewarded);
     }
 
 }

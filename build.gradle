@@ -25,6 +25,13 @@ allprojects {
                 password = System.getenv("APD_USERPASSWORD")
             }
         }
+        maven {
+            url 'https://artifactory.bidmachine.io/explorestack-private'
+            credentials {
+                username = System.getenv("APD_USERNAME")
+                password = System.getenv("APD_USERPASSWORD")
+            }
+        }
     }
 }
 

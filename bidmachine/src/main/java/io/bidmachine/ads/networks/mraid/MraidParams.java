@@ -4,6 +4,8 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.explorestack.iab.utils.IabElementStyle;
+
 import io.bidmachine.unified.UnifiedAdCallback;
 import io.bidmachine.unified.UnifiedMediationParams;
 import io.bidmachine.unified.UnifiedParams;
@@ -20,6 +22,14 @@ class MraidParams extends UnifiedParams {
     final boolean useNativeClose;
     final int skipOffset;
     final int companionSkipOffset;
+    final boolean r1;
+    final boolean r2;
+    final boolean ignoresSafeAreaLayoutGuide;
+    final String storeUrl;
+    final int progressDuration;
+    final IabElementStyle closeableViewStyle;
+    final IabElementStyle countDownStyle;
+    final IabElementStyle progressStyle;
 
     MraidParams(@NonNull UnifiedMediationParams mediationParams) {
         super(mediationParams);
@@ -31,6 +41,14 @@ class MraidParams extends UnifiedParams {
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);
         companionSkipOffset = mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET);
         useNativeClose = mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE);
+        r1 = mediationParams.getBool(IabUtils.KEY_R1);
+        r2 = mediationParams.getBool(IabUtils.KEY_R2);
+        ignoresSafeAreaLayoutGuide = mediationParams.getBool(IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE);
+        storeUrl = mediationParams.getString(IabUtils.KEY_STORE_URL);
+        progressDuration = mediationParams.getInt(IabUtils.KEY_PROGRESS_DURATION);
+        closeableViewStyle = mediationParams.getObject(IabUtils.KEY_CLOSABLE_VIEW_STYLE);
+        countDownStyle = mediationParams.getObject(IabUtils.KEY_COUNTDOWN_STYLE);
+        progressStyle = mediationParams.getObject(IabUtils.KEY_PROGRESS_STYLE);
     }
 
     @Override
