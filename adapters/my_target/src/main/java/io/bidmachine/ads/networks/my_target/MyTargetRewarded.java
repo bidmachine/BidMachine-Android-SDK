@@ -5,7 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.my.target.ads.InterstitialAd;
+import com.my.target.ads.Reward;
+import com.my.target.ads.RewardedAd;
 
 import io.bidmachine.ContextProvider;
 import io.bidmachine.unified.UnifiedFullscreenAd;
@@ -14,10 +15,10 @@ import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
 import io.bidmachine.unified.UnifiedMediationParams;
 import io.bidmachine.utils.BMError;
 
-public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
+public class MyTargetRewarded extends UnifiedFullscreenAd {
 
     @Nullable
-    private InterstitialAd interstitialAd;
+    private RewardedAd rewardedAd;
 
     @Override
     public void load(@NonNull ContextProvider contextProvider,
@@ -31,16 +32,18 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
         assert params.slotId != null;
         assert params.bidId != null;
 
-        interstitialAd = new InterstitialAd(params.slotId, contextProvider.getContext());
-        interstitialAd.setListener(new MyTargetFullscreenListener(callback));
-        MyTargetAdapter.updateTargeting(requestParams, interstitialAd.getCustomParams());
-        interstitialAd.loadFromBid(params.bidId);
+        RewardedAd.setDebugMode(requestParams.isTestMode());
+
+        rewardedAd = new RewardedAd(params.slotId, contextProvider.getContext());
+        rewardedAd.setListener(new Listener(callback));
+        MyTargetAdapter.updateTargeting(requestParams, rewardedAd.getCustomParams());
+        rewardedAd.loadFromBid(params.bidId);
     }
 
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
-        if (interstitialAd != null) {
-            interstitialAd.show();
+        if (rewardedAd != null) {
+            rewardedAd.show();
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }
@@ -48,48 +51,50 @@ public class MyTargetFullscreenAd extends UnifiedFullscreenAd {
 
     @Override
     public void onDestroy() {
-        if (interstitialAd != null) {
-            interstitialAd.destroy();
-            interstitialAd = null;
+        if (rewardedAd != null) {
+            rewardedAd.destroy();
+            rewardedAd = null;
         }
     }
 
-    private static final class MyTargetFullscreenListener implements InterstitialAd.InterstitialAdListener {
 
-        private UnifiedFullscreenAdCallback callback;
+    private static final class Listener implements RewardedAd.RewardedAdListener {
 
-        MyTargetFullscreenListener(UnifiedFullscreenAdCallback callback) {
+        @NonNull
+        private final UnifiedFullscreenAdCallback callback;
+
+        Listener(@NonNull UnifiedFullscreenAdCallback callback) {
             this.callback = callback;
         }
 
         @Override
-        public void onLoad(@NonNull InterstitialAd interstitialAd) {
+        public void onLoad(@NonNull RewardedAd rewardedAd) {
             callback.onAdLoaded();
         }
 
         @Override
-        public void onNoAd(@NonNull String s, @NonNull InterstitialAd interstitialAd) {
+        public void onNoAd(@NonNull String s, @NonNull RewardedAd rewardedAd) {
             callback.onAdLoadFailed(BMError.noFillError(null));
         }
 
         @Override
-        public void onClick(@NonNull InterstitialAd interstitialAd) {
+        public void onClick(@NonNull RewardedAd rewardedAd) {
             callback.onAdClicked();
         }
 
         @Override
-        public void onDismiss(@NonNull InterstitialAd interstitialAd) {
+        public void onDisplay(@NonNull RewardedAd rewardedAd) {
+            callback.onAdShown();
+        }
+
+        @Override
+        public void onDismiss(@NonNull RewardedAd rewardedAd) {
             callback.onAdClosed();
         }
 
         @Override
-        public void onVideoCompleted(@NonNull InterstitialAd interstitialAd) {
+        public void onReward(@NonNull Reward reward, @NonNull RewardedAd rewardedAd) {
             callback.onAdFinished();
-        }
-
-        @Override
-        public void onDisplay(@NonNull InterstitialAd interstitialAd) {
-            callback.onAdShown();
         }
 
     }
