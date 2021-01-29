@@ -2,12 +2,11 @@ ext {
     androidCompileSdkVersion = 30
     androidMinSdkVersion = 15
     androidTargetSdkVersion = 30
-    playServicesVersion = '15.0.0'
     robolectricVersion = '3.1.2'
     mockitoVersion = '2.0.57-beta'
     jUnitVersion = '4.12'
     mockwebserver = '3.3.0'
-    protobufModelsVersion = '1.1.2'
+    protobufModelsVersion = '1.1.3'
     stackIabVersion = '0.9.0'
 }
 

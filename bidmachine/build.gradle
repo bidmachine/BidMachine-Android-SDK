@@ -36,7 +36,6 @@ dependencies {
     implementation "com.explorestack:iab:$stackIabVersion"
 
     compileOnly "androidx.annotation:annotation:1.1.0"
-    compileOnly "com.google.android.gms:play-services-ads:$playServicesVersion"
 
     androidTestImplementation "androidx.multidex:multidex:2.0.0"
     androidTestImplementation "androidx.test.ext:junit:1.1.1"
