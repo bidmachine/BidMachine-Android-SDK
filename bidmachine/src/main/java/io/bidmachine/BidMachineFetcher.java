@@ -140,7 +140,7 @@ public class BidMachineFetcher {
     }
 
     @NonNull
-    static Map<String, String> toMap(@NonNull AdRequest adRequest) {
+    public static Map<String, String> toMap(@NonNull AdRequest adRequest) {
         Map<String, String> result = new HashMap<>();
         AuctionResult auctionResult = adRequest.getAuctionResult();
         if (auctionResult == null) {
@@ -176,8 +176,10 @@ public class BidMachineFetcher {
         }
     }
 
+    @Deprecated
     public static final class AdManager {
 
+        @Deprecated
         @NonNull
         public static PublisherAdRequest.Builder createPublisherAdRequestBuilder(@NonNull AdRequest adRequest) {
             PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -185,6 +187,7 @@ public class BidMachineFetcher {
             return builder;
         }
 
+        @Deprecated
         public static void fillPublisherAdRequestBuilder(@NonNull PublisherAdRequest.Builder builder,
                                                          @NonNull AdRequest adRequest) {
             Map<String, String> result = toMap(adRequest);
@@ -195,14 +198,17 @@ public class BidMachineFetcher {
 
     }
 
+    @Deprecated
     public static final class MoPub {
 
+        @Deprecated
         @NonNull
         public static String toKeywords(@NonNull AdRequest adRequest) {
             Map<String, String> result = toMap(adRequest);
             return toKeywords(result);
         }
 
+        @Deprecated
         @NonNull
         public static String toKeywords(@NonNull Map<String, String> result) {
             StringBuilder builder = new StringBuilder();
