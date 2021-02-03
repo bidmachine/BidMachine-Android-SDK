@@ -38,10 +38,12 @@ public class BidMachineFetcher {
     @VisibleForTesting
     static EnumMap<AdsType, Map<String, AdRequest>> cachedRequests = new EnumMap<>(AdsType.class);
 
+    @Deprecated
     public static void setPriceRounding(double rounding) {
         setPriceRounding(rounding, DEF_PRICE_ROUNDING_MODE);
     }
 
+    @Deprecated
     public static void setPriceRounding(double rounding, RoundingMode roundingMode) {
         if (roundingMode == RoundingMode.UNNECESSARY) {
             throw new IllegalArgumentException("Invalid rounding mode");
@@ -124,6 +126,7 @@ public class BidMachineFetcher {
         }
     }
 
+    @Deprecated
     public static String roundPrice(double price) {
         BigDecimal value = new BigDecimal(String.valueOf(price));
         BigDecimal roundedValue = priceRounding.signum() == 0
@@ -132,6 +135,7 @@ public class BidMachineFetcher {
         return roundedValue.setScale(priceRounding.scale(), RoundingMode.HALF_UP).toString();
     }
 
+    @Deprecated
     public static void resetPriceRounding() {
         priceRounding = DEF_PRICE_ROUNDING;
         priceRoundingMode = DEF_PRICE_ROUNDING_MODE;
