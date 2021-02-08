@@ -65,11 +65,14 @@ public class VideoPlayerActivity extends Activity implements MediaPlayer.OnCompl
         videoView.setVideoPath(fileUri);
         rootLayout.addView(videoView);
 
+        int closeButtonSize = Math.round(24 * getScreenDensity(this));
+        int margin = Math.round(8 * getScreenDensity(this));
         CircleCountdownView closeButton = new CircleCountdownView(this);
-        int closeButtonSize = Math.round(50 * getScreenDensity(this));
+        closeButton.setColors(Assets.mainAssetsColor, Assets.backgroundColor);
         RelativeLayout.LayoutParams closeButtonParams = new RelativeLayout.LayoutParams(closeButtonSize, closeButtonSize);
         closeButtonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         closeButtonParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+        closeButtonParams.setMargins(margin, margin, margin, margin);
         closeButton.setImage(Assets.getBitmapFromBase64(Assets.close));
         closeButton.setLayoutParams(closeButtonParams);
         closeButton.setOnClickListener(new View.OnClickListener() {
