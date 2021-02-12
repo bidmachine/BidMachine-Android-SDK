@@ -28,7 +28,6 @@ public class VisibilityTracker {
         private final VisibilityChangeCallback callback;
 
         private ViewTreeObserver.OnPreDrawListener preDrawListener;
-        private View.OnAttachStateChangeListener attachStateChangeListener;
 
         private long lastShownTimeMs;
         private boolean isCheckerScheduled;
@@ -65,19 +64,6 @@ public class VisibilityTracker {
                     }
                 };
             }
-            if (attachStateChangeListener == null) {
-                attachStateChangeListener = new View.OnAttachStateChangeListener() {
-                    @Override
-                    public void onViewAttachedToWindow(View v) {
-                    }
-
-                    @Override
-                    public void onViewDetachedFromWindow(View v) {
-                        release();
-                    }
-                };
-            }
-            view.addOnAttachStateChangeListener(attachStateChangeListener);
             view.getViewTreeObserver().addOnPreDrawListener(preDrawListener);
         }
 
@@ -96,6 +82,10 @@ public class VisibilityTracker {
                 release();
                 return true;
             }
+            if (isShownTracked && isFinishedTracked) {
+                release();
+                return true;
+            }
             if (isOnTop(view, visibilityPercent, ignoreCheckWindowFocus)) {
                 if (!isShownTracked) {
                     callback.onViewShown();
@@ -106,15 +96,14 @@ public class VisibilityTracker {
                     lastShownTimeMs = System.currentTimeMillis();
                     isFinishedRequested = true;
                 }
-                return true;
             } else {
                 if (!isFinishedTracked) {
                     Utils.cancelUiThreadTask(finishRunnable);
                     isFinishedRequested = false;
                     lastShownTimeMs = 0;
                 }
-                return false;
             }
+            return false;
         }
 
         private void release() {
@@ -130,7 +119,6 @@ public class VisibilityTracker {
                     isFinishedTracked = true;
                     callback.onViewTrackingFinished();
                 }
-                view.removeOnAttachStateChangeListener(attachStateChangeListener);
                 view.getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
             }
             Utils.cancelUiThreadTask(checkRunnable);

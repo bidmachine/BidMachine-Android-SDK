@@ -486,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
             Utils.showToast(this, "Initialize BidMachine first");
             return;
         }
-        Intent intent = new Intent(this, NativeActivity.class);
+        Intent intent = NativeActivity.createIntent(this, collectMediaAssetType());
         startActivity(intent);
     }
 

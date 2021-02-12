@@ -1,5 +1,7 @@
 package io.bidmachine.test.app;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,17 +25,30 @@ import io.bidmachine.utils.BMError;
 
 public class NativeActivity extends AppCompatActivity implements NativeListener {
 
+    private static final String MEDIA_ASSET_TYPES = "media_asset_types";
     private static final int DEFAULT_PACK_SIZE = 20;
     private static final int DEFAULT_NATIVE_COUNT = 4;
 
+    private MediaAssetType[] mediaAssetTypes;
     private RecyclerView rvNative;
     private NativeAdapter nativeAdapter;
     private NativeWrapperAdapter nativeWrapperAdapter;
+
+    public static Intent createIntent(@NonNull Context context,
+                                      @Nullable MediaAssetType... mediaAssetTypes) {
+        Intent intent = new Intent(context, NativeActivity.class);
+        if (mediaAssetTypes != null) {
+            intent.putExtra(MEDIA_ASSET_TYPES, mediaAssetTypes);
+        }
+        return intent;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_native);
+
+        mediaAssetTypes = (MediaAssetType[]) getIntent().getSerializableExtra(MEDIA_ASSET_TYPES);
 
         SwipeRefreshLayout srlUpdateNative = findViewById(R.id.srl_update_native);
         srlUpdateNative.setOnRefreshListener(() -> {
@@ -94,12 +109,13 @@ public class NativeActivity extends AppCompatActivity implements NativeListener 
     }
 
     private void loadNative() {
-        NativeRequest nativeRequest = new NativeRequest.Builder()
-                .setMediaAssetTypes(MediaAssetType.All)
-                .build();
+        NativeRequest.Builder nativeRequestBuilder = new NativeRequest.Builder();
+        if (mediaAssetTypes != null) {
+            nativeRequestBuilder.setMediaAssetTypes(mediaAssetTypes);
+        }
         NativeAd nativeAd = new NativeAd(this);
         nativeAd.setListener(this);
-        nativeAd.load(nativeRequest);
+        nativeAd.load(nativeRequestBuilder.build());
     }
 
     @Override
