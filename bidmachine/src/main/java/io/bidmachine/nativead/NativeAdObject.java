@@ -61,7 +61,7 @@ public final class NativeAdObject
     private Handler progressDialogCanceller;
     private Runnable progressRunnable;
 
-    private boolean impressionTracked;
+    private boolean isImpressionTracked;
     private boolean viewRegistered;
 
     @Nullable
@@ -244,7 +244,7 @@ public final class NativeAdObject
             ImageView iconView = configureIconView(imageView);
             configureMediaView(nativeMediaView);
             container = nativeAdView;
-            if (!impressionTracked) {
+            if (!isImpressionTracked) {
                 VisibilityTracker.startTracking(
                         container,
                         getParams().getViewabilityTimeThresholdMs(),
@@ -253,12 +253,12 @@ public final class NativeAdObject
                         new VisibilityTracker.VisibilityChangeCallback() {
                             @Override
                             public void onViewShown() {
-                                impressionTracked = true;
                                 dispatchShown();
                             }
 
                             @Override
                             public void onViewTrackingFinished() {
+                                isImpressionTracked = true;
                                 dispatchImpression();
                             }
                         });
