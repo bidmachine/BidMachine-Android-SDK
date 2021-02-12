@@ -1,3 +1,7 @@
+## Version 1.6.4 (February 12, 2021)
+**Features**:
+* Improved visibility tracker
+
 ## Version 1.6.3 (January 18, 2021)
 **Features**:
 * Banner improvement
