@@ -759,7 +759,7 @@ public class MainActivity extends AppCompatActivity {
                             + "}"),
             new OptionalNetwork(
                     6, "Criteo",
-                    new CriteoConfig("B-057601")
+                    new CriteoConfig("B-000000")
                             .withMediationConfig(AdsFormat.Banner_320x50, "30s6zt3ayypfyemwjvmp")
                             .withMediationConfig(AdsFormat.Interstitial, "6yws53jyfjgoq1ghnuqb"),
                     "{"
