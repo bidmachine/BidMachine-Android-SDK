@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 7
+        versionCode 8
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -24,7 +24,7 @@ configurations {
 }
 
 dependencies {
-    adapterDependency 'com.criteo.publisher:criteo-publisher-sdk:4.2.0'
+    adapterDependency 'com.criteo.publisher:criteo-publisher-sdk:4.2.1'
     adapterDependency 'com.google.android.gms:play-services-ads-identifier:17.0.0'
     adapterDependency 'com.google.android.gms:play-services-base:17.0.0'
 }

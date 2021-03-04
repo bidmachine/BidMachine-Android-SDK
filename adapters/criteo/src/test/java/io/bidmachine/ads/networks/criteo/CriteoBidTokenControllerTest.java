@@ -2,7 +2,7 @@ package io.bidmachine.ads.networks.criteo;
 
 import androidx.annotation.NonNull;
 
-import com.criteo.publisher.BidToken;
+import com.criteo.publisher.Bid;
 import com.criteo.publisher.CriteoUtils;
 
 import org.junit.Before;
@@ -28,37 +28,37 @@ public class CriteoBidTokenControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        CriteoBidTokenController.bidTokenMap.clear();
+        CriteoBidTokenController.bidMap.clear();
     }
 
     @Test
     public void storeBidToken() {
-        BidToken bidToken1 = CriteoUtils.createBidToken();
-        BidToken bidToken2 = CriteoUtils.createBidToken();
-        BidToken bidToken3 = CriteoUtils.createBidToken();
+        Bid bid1 = CriteoUtils.createBidToken();
+        Bid bid2 = CriteoUtils.createBidToken();
+        Bid bid3 = CriteoUtils.createBidToken();
         AdRequest adRequest1 = createAdRequest();
         AdRequest adRequest2 = createAdRequest();
-        CriteoBidTokenController.storeBid(null, bidToken1);
-        CriteoBidTokenController.storeBid(adRequest1, bidToken2);
-        CriteoBidTokenController.storeBid(adRequest2, bidToken3);
+        CriteoBidTokenController.storeBid(null, bid1);
+        CriteoBidTokenController.storeBid(adRequest1, bid2);
+        CriteoBidTokenController.storeBid(adRequest2, bid3);
 
-        Map<AdRequest, BidToken> bidTokenMap = CriteoBidTokenController.bidTokenMap;
-        assertEquals(2, bidTokenMap.size());
-        assertEquals(bidToken2, bidTokenMap.get(adRequest1));
-        assertEquals(bidToken3, bidTokenMap.get(adRequest2));
+        Map<AdRequest, Bid> bidMap = CriteoBidTokenController.bidMap;
+        assertEquals(2, bidMap.size());
+        assertEquals(bid2, bidMap.get(adRequest1));
+        assertEquals(bid3, bidMap.get(adRequest2));
     }
 
     @Test
     public void takeBidToken() {
-        BidToken bidToken1 = CriteoBidTokenController.takeBid(null);
-        BidToken bidToken2 = CriteoBidTokenController.takeBid(createAdRequest());
-        assertNull(bidToken1);
-        assertNull(bidToken2);
+        Bid bid1 = CriteoBidTokenController.takeBid(null);
+        Bid bid2 = CriteoBidTokenController.takeBid(createAdRequest());
+        assertNull(bid1);
+        assertNull(bid2);
 
-        BidToken bidToken3 = CriteoUtils.createBidToken();
+        Bid bid3 = CriteoUtils.createBidToken();
         AdRequest adRequest1 = createAdRequest();
-        CriteoBidTokenController.storeBid(adRequest1, bidToken3);
-        assertEquals(bidToken3, CriteoBidTokenController.takeBid(adRequest1));
+        CriteoBidTokenController.storeBid(adRequest1, bid3);
+        assertEquals(bid3, CriteoBidTokenController.takeBid(adRequest1));
     }
 
     private AdRequest createAdRequest() {
