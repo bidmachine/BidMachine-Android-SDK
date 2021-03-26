@@ -1,24 +1,31 @@
 package io.bidmachine;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
+import java.util.EnumMap;
 import java.util.UUID;
 
 public class SessionManager {
 
-    private static volatile SessionManager sessionManager;
+    private static volatile SessionManager instance;
 
     @NonNull
     public static SessionManager get() {
+        SessionManager sessionManager = instance;
         if (sessionManager == null) {
             synchronized (SessionManager.class) {
+                sessionManager = instance;
                 if (sessionManager == null) {
                     sessionManager = new SessionManager();
+                    instance = sessionManager;
                 }
             }
         }
         return sessionManager;
     }
+
+    private final EnumMap<AdsType, SessionAdParams> sessionAdParamsMap = new EnumMap<>(AdsType.class);
 
     private String sessionId;
     private long sessionResetAfterSec;
@@ -26,10 +33,11 @@ public class SessionManager {
     private long pauseTime;
     private long resumeTime;
 
-    public SessionManager() {
+    private SessionManager() {
         startNewSession();
     }
 
+    @VisibleForTesting
     void startNewSession() {
         sessionId = UUID.randomUUID().toString();
         sessionDuration = 0;
@@ -37,7 +45,7 @@ public class SessionManager {
         resumeTime = 0;
 
         for (AdsType adsType : AdsType.values()) {
-            BidMachineImpl.get().getSessionAdParams(adsType).clear();
+            getSessionAdParams(adsType).clear();
         }
     }
 
@@ -72,6 +80,16 @@ public class SessionManager {
         }
         long afterResume = System.currentTimeMillis() - resumeTime;
         return (int) ((sessionDuration + afterResume) / 1000);
+    }
+
+    @NonNull
+    synchronized SessionAdParams getSessionAdParams(@NonNull AdsType adsType) {
+        SessionAdParams sessionAdParams = sessionAdParamsMap.get(adsType);
+        if (sessionAdParams == null) {
+            sessionAdParams = new SessionAdParams();
+            sessionAdParamsMap.put(adsType, sessionAdParams);
+        }
+        return sessionAdParams;
     }
 
 }

@@ -394,7 +394,7 @@ public abstract class BidMachineAd<
                 loadedObject.onShown();
             }
             log("processShown");
-            SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+            SessionAdParams sessionAdParams = SessionManager.get().getSessionAdParams(adsType);
             sessionAdParams.setLastBundle(null);
             sessionAdParams.setLastAdDomain(null);
             sessionAdParams.addImpression();
@@ -458,7 +458,7 @@ public abstract class BidMachineAd<
                 return;
             }
             if (!isClickTracked) {
-                SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(adsType);
+                SessionAdParams sessionAdParams = SessionManager.get().getSessionAdParams(adsType);
                 sessionAdParams.addClick();
             }
             isClickTracked = true;
@@ -521,7 +521,7 @@ public abstract class BidMachineAd<
                 AuctionResult auctionResult = adRequest.getAuctionResult();
                 if (auctionResult != null
                         && auctionResult.getCreativeFormat() == CreativeFormat.Video) {
-                    BidMachineImpl.get()
+                    SessionManager.get()
                             .getSessionAdParams(adsType)
                             .addCompletedVideo();
                 }
