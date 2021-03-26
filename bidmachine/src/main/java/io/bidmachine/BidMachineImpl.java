@@ -327,10 +327,13 @@ final class BidMachineImpl {
     private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {
         SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
                                                                      Context.MODE_PRIVATE);
-        preferences.edit()
-                .putString(PREF_INIT_DATA,
-                           Base64.encodeToString(response.toByteArray(), Base64.DEFAULT))
-                .apply();
+        try {
+            String initResponse = Base64.encodeToString(response.toByteArray(), Base64.DEFAULT);
+            preferences.edit()
+                    .putString(PREF_INIT_DATA, initResponse)
+                    .apply();
+        } catch (Exception ignore) {
+        }
     }
 
     private void loadStoredInitResponse(@NonNull Context context) {
