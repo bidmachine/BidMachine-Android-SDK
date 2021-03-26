@@ -296,34 +296,34 @@ public class Utils {
     @Nullable
     @SuppressLint("MissingPermission")
     public static Location getLocation(Context context) {
-        LocationManager locationManager =
-                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        if (locationManager != null) {
+        try {
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            if (locationManager == null) {
+                return null;
+            }
             Criteria criteria = new Criteria();
             String bestProvider = locationManager.getBestProvider(criteria, false);
-            if (bestProvider != null) {
-                try {
-                    Location location = locationManager.getLastKnownLocation(bestProvider);
-                    if (location == null) {
-                        List<String> allProviders = locationManager.getAllProviders();
-                        if (allProviders != null && allProviders.size() > 1) {
-                            for (String provider : allProviders) {
-                                if (provider != null && !provider.equals(bestProvider)) {
-                                    location = locationManager.getLastKnownLocation(provider);
-                                    if (location != null) {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+            if (bestProvider == null) {
+                return null;
+            }
+            Location location = locationManager.getLastKnownLocation(bestProvider);
+            if (location != null) {
+                return location;
+            }
+            List<String> allProviders = locationManager.getAllProviders();
+            if (allProviders == null || allProviders.size() <= 1) {
+                return null;
+            }
+            for (String provider : allProviders) {
+                if (provider != null && !provider.equals(bestProvider)) {
+                    location = locationManager.getLastKnownLocation(provider);
+                    if (location != null) {
+                        return location;
                     }
-                    return location;
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
