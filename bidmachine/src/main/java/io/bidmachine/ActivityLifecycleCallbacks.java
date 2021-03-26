@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import io.bidmachine.core.Utils;
+
 class ActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
@@ -19,12 +21,22 @@ class ActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbac
     @Override
     public void onActivityResumed(Activity activity) {
         BidMachineImpl.get().setTopActivity(activity);
-        SessionManager.get().resume();
+        Utils.onBackgroundThread(new Runnable() {
+            @Override
+            public void run() {
+                SessionManager.get().resume();
+            }
+        });
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-        SessionManager.get().pause();
+        Utils.onBackgroundThread(new Runnable() {
+            @Override
+            public void run() {
+                SessionManager.get().pause();
+            }
+        });
     }
 
     @Override

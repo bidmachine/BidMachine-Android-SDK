@@ -79,8 +79,6 @@ final class BidMachineImpl {
     @NonNull
     private TargetingParams targetingParams = new TargetingParams();
     @NonNull
-    private EnumMap<AdsType, SessionAdParams> sessionAdParamsMap = new EnumMap<>(AdsType.class);
-    @NonNull
     private ExtraParams extraParams = new ExtraParams();
     @NonNull
     private UserRestrictionParams userRestrictionParams = new UserRestrictionParams();
@@ -397,16 +395,6 @@ final class BidMachineImpl {
     @NonNull
     TargetingParams getTargetingParams() {
         return targetingParams;
-    }
-
-    @NonNull
-    synchronized SessionAdParams getSessionAdParams(AdsType adsType) {
-        SessionAdParams sessionAdParams = sessionAdParamsMap.get(adsType);
-        if (sessionAdParams == null) {
-            sessionAdParams = new SessionAdParams();
-            sessionAdParamsMap.put(adsType, sessionAdParams);
-        }
-        return sessionAdParams;
     }
 
     @Nullable
