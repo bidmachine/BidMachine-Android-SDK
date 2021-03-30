@@ -6,7 +6,7 @@ apply from: "$rootProject.projectDir/config.gradle"
 
 if (!hasProperty('minBidMachineSdkVersion')) {
     ext {
-        minBidMachineSdkVersion = '1.7.0'
+        minBidMachineSdkVersion = '1.7.1'
     }
 }
 
