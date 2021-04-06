@@ -16,6 +16,7 @@ import com.iab.omid.library.appodeal.adsession.AdSessionContext;
 import com.iab.omid.library.appodeal.adsession.CreativeType;
 import com.iab.omid.library.appodeal.adsession.ImpressionType;
 import com.iab.omid.library.appodeal.adsession.Owner;
+import com.iab.omid.library.appodeal.adsession.Partner;
 
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
@@ -41,7 +42,8 @@ public class MraidOMSDKAdMeasurer extends OMSDKAdMeasurer<WebView> implements Mr
             @Override
             public void run() {
                 try {
-                    if (isSessionPrepared()) {
+                    Partner partner = OMSDKSettings.getPartner();
+                    if (partner == null || isSessionPrepared()) {
                         return;
                     }
                     AdSessionConfiguration adSessionConfiguration = AdSessionConfiguration
@@ -51,7 +53,7 @@ public class MraidOMSDKAdMeasurer extends OMSDKAdMeasurer<WebView> implements Mr
                                                           Owner.NONE,
                                                           false);
                     AdSessionContext adSessionContext = AdSessionContext
-                            .createHtmlAdSessionContext(OMSDKSettings.getPartner(),
+                            .createHtmlAdSessionContext(partner,
                                                         webView,
                                                         OMSDKSettings.AD_SESSION_CONTEXT_CONTENT_URL,
                                                         OMSDKSettings.AD_SESSION_CONTEXT_CUSTOM_REFERENCE_DATA);

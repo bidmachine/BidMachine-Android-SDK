@@ -20,6 +20,7 @@ import com.iab.omid.library.appodeal.adsession.AdSessionContext;
 import com.iab.omid.library.appodeal.adsession.CreativeType;
 import com.iab.omid.library.appodeal.adsession.ImpressionType;
 import com.iab.omid.library.appodeal.adsession.Owner;
+import com.iab.omid.library.appodeal.adsession.Partner;
 import com.iab.omid.library.appodeal.adsession.VerificationScriptResource;
 import com.iab.omid.library.appodeal.adsession.media.InteractionType;
 import com.iab.omid.library.appodeal.adsession.media.MediaEvents;
@@ -100,7 +101,8 @@ public class VastOMSDKAdMeasurer extends OMSDKAdMeasurer<View> implements VastAd
             @Override
             public void run() {
                 try {
-                    if (isSessionPrepared()) {
+                    Partner partner = OMSDKSettings.getPartner();
+                    if (partner == null || isSessionPrepared()) {
                         return;
                     }
                     AdSessionConfiguration adSessionConfiguration = AdSessionConfiguration
@@ -110,7 +112,7 @@ public class VastOMSDKAdMeasurer extends OMSDKAdMeasurer<View> implements VastAd
                                                           Owner.NATIVE,
                                                           false);
                     AdSessionContext adSessionContext = AdSessionContext
-                            .createNativeAdSessionContext(OMSDKSettings.getPartner(),
+                            .createNativeAdSessionContext(partner,
                                                           OMSDKSettings.OM_JS,
                                                           resourceList,
                                                           OMSDKSettings.AD_SESSION_CONTEXT_CONTENT_URL,
