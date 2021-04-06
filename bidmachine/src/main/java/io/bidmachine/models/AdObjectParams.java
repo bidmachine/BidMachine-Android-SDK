@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.explorestack.protobuf.InvalidProtocolBufferException;
+import com.explorestack.protobuf.Value;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
 
@@ -46,6 +47,7 @@ public abstract class AdObjectParams {
                 }
             }
         }
+        prepareExtensions(seatbid, bid, ad.getExt().getFieldsMap());
     }
 
     @CallSuper
@@ -60,6 +62,13 @@ public abstract class AdObjectParams {
                 DEF_VIEWABILITY_PIXEL_THRESHOLD); //possibly should be multiplied by 100;
         viewabilityIgnoreWindowFocus = extension.getViewabilityIgnoreWindowFocus();
         prepareEvents(extension.getEventList());
+    }
+
+    @CallSuper
+    protected void prepareExtensions(@NonNull Response.Seatbid seatbid,
+                                     @NonNull Response.Seatbid.Bid bid,
+                                     @NonNull Map<String, Value> extensionMap) {
+
     }
 
     protected void prepareEvents(@Nullable List<Ad.Event> events) {

@@ -10,6 +10,7 @@ import com.explorestack.iab.mraid.MraidView;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
+import io.bidmachine.measurer.MraidOMSDKAdMeasurer;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;
@@ -20,6 +21,8 @@ class MraidBannerAd extends UnifiedBannerAd {
 
     @Nullable
     private MraidView mraidView;
+    @Nullable
+    private MraidOMSDKAdMeasurer mraidOMSDKAdMeasurer;
 
     @Override
     public void load(@NonNull final ContextProvider contextProvider,
@@ -35,7 +38,15 @@ class MraidBannerAd extends UnifiedBannerAd {
         if (!mraidParams.isValid(callback)) {
             return;
         }
+        assert mraidParams.creativeAdm != null;
 
+        final String creativeAdm;
+        if (mraidParams.omsdkEnabled) {
+            mraidOMSDKAdMeasurer = new MraidOMSDKAdMeasurer();
+            creativeAdm = mraidOMSDKAdMeasurer.injectMeasurerJS(mraidParams.creativeAdm);
+        } else {
+            creativeAdm = mraidParams.creativeAdm;
+        }
         Utils.onUiThread(new Runnable() {
             @Override
             public void run() {
@@ -43,8 +54,9 @@ class MraidBannerAd extends UnifiedBannerAd {
                     mraidView = new MraidView.Builder()
                             .setPreload(true)
                             .setListener(new MraidBannerAdListener(contextProvider, callback))
+                            .setAdMeasurer(mraidOMSDKAdMeasurer)
                             .build(contextProvider.getContext());
-                    mraidView.load(mraidParams.creativeAdm);
+                    mraidView.load(creativeAdm);
                 } catch (Throwable t) {
                     Logger.log(t);
                     callback.onAdLoadFailed(BMError.Internal);
@@ -54,10 +66,27 @@ class MraidBannerAd extends UnifiedBannerAd {
     }
 
     @Override
+    public void onShown() {
+        super.onShown();
+
+        if (mraidOMSDKAdMeasurer != null) {
+            mraidOMSDKAdMeasurer.onAdShown();
+        }
+    }
+
+    @Override
     public void onDestroy() {
-        if (mraidView != null) {
-            mraidView.destroy();
-            mraidView = null;
+        if (mraidOMSDKAdMeasurer != null) {
+            mraidOMSDKAdMeasurer.destroy(new Runnable() {
+                @Override
+                public void run() {
+                    if (mraidView != null) {
+                        mraidView.destroy();
+                        mraidView = null;
+                    }
+                }
+            });
+            mraidOMSDKAdMeasurer = null;
         }
     }
 

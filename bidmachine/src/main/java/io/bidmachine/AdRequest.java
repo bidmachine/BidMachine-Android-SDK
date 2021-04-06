@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
 import io.bidmachine.displays.PlacementBuilder;
+import io.bidmachine.measurer.OMSDKSettings;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.RequestBuilder;
@@ -209,6 +210,12 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 } else {
                     throw new IllegalArgumentException("Unsupported display type: " + displayBuilder);
                 }
+            }
+            // Request -> Item -> Spec -> Placement -> Extension
+            Struct.Builder placementExtBuilder = Struct.newBuilder();
+            OMSDKSettings.fillExtension(placementExtBuilder);
+            if (placementExtBuilder.getFieldsCount() > 0) {
+                placementBuilder.setExt(placementExtBuilder);
             }
 
             onBuildPlacement(placementBuilder);
