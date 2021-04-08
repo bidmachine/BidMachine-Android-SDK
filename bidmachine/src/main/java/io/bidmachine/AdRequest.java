@@ -146,6 +146,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             }
 
             final BidMachineImpl bidMachine = BidMachineImpl.get();
+            final SessionManager sessionManager = SessionManager.get();
 
             AdvertisingPersonalData.syncUpdateInfo(context);
 
@@ -153,8 +154,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             final TargetingParams targetingParams =
                     RequestParams.resolveParams(this.targetingParams,
                                                 bidMachine.getTargetingParams());
-            SessionAdParams bidMachineSessionAdParams = bidMachine.getSessionAdParams(adsType)
-                    .setSessionDuration(SessionManager.get().getSessionDuration());
+            SessionAdParams bidMachineSessionAdParams = sessionManager.getSessionAdParams(adsType)
+                    .setSessionDuration(sessionManager.getSessionDuration());
             final SessionAdParams sessionAdParams =
                     RequestParams.resolveParams(this.sessionAdParams,
                                                 bidMachineSessionAdParams);
@@ -263,7 +264,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             if (userExtBuilder.getFieldsCount() > 0) {
                 userBuilder.setExt(userExtBuilder.build());
             }
-            bidMachine.getSessionAdParams(adsType).setIsUserClickedOnLastAd(false);
+            bidMachineSessionAdParams.setIsUserClickedOnLastAd(false);
 
             contextBuilder.setUser(userBuilder);
 
@@ -306,7 +307,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
                             : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
             requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
-            requestExtensionBuilder.setSessionId(SessionManager.get().getSessionId());
+            requestExtensionBuilder.setSessionId(sessionManager.getSessionId());
 
             requestBuilder.addExtProto(Any.pack(requestExtensionBuilder.build()));
 

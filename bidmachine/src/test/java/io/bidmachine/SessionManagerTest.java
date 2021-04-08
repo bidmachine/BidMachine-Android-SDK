@@ -8,6 +8,7 @@ import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
@@ -83,6 +84,18 @@ public class SessionManagerTest {
         Thread.sleep(10000);
         sessionManager.resume();
         assertEquals(oldSessionId, sessionManager.getSessionId());
+    }
+
+    @Test
+    public void getSessionAdParams() {
+        SessionAdParams bannerSessionAdParams1 = sessionManager.getSessionAdParams(AdsType.Banner);
+        assertNotNull(bannerSessionAdParams1);
+        SessionAdParams bannerSessionAdParams2 = sessionManager.getSessionAdParams(AdsType.Banner);
+        assertNotNull(bannerSessionAdParams1);
+        assertEquals(bannerSessionAdParams1, bannerSessionAdParams2);
+        SessionAdParams interstitialSessionAdParams1 = sessionManager.getSessionAdParams(AdsType.Interstitial);
+        assertNotNull(bannerSessionAdParams1);
+        assertNotEquals(interstitialSessionAdParams1, bannerSessionAdParams1);
     }
 
 }
