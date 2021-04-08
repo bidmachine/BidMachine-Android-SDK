@@ -107,10 +107,10 @@ public class OMSDKSettings {
         Utils.onUiThread(new Runnable() {
             @Override
             public void run() {
-                if (Omid.isActive()) {
-                    return;
-                }
                 try {
+                    if (Omid.isActive()) {
+                        return;
+                    }
                     Omid.activate(applicationContext);
                     partner = Partner.createPartner(PARTNER_NAME, PARTNER_VERSION);
                 } catch (Throwable t) {

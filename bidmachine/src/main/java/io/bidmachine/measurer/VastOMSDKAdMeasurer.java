@@ -50,22 +50,26 @@ public class VastOMSDKAdMeasurer extends OMSDKAdMeasurer<View> implements VastAd
         Utils.onUiThread(new Runnable() {
             @Override
             public void run() {
-                for (AdVerificationsExtensionTag adVerificationsExtensionTag : adVerificationsExtensionTagList) {
-                    if (adVerificationsExtensionTag == null) {
-                        continue;
-                    }
-                    for (VerificationTag verificationTag : adVerificationsExtensionTag.getVerificationTagList()) {
-                        JavaScriptResourceTag javaScriptResourceTag = verificationTag.getJavaScriptResourceTag();
-                        String resourceUrl = javaScriptResourceTag != null
-                                ? javaScriptResourceTag.getText()
-                                : null;
-                        String vendorKey = verificationTag.getVendor();
-                        String params = verificationTag.getVerificationParameters();
-                        if (!TextUtils.isEmpty(resourceUrl)) {
-                            assert resourceUrl != null;
-                            addVerificationScriptResource(resourceUrl, vendorKey, params);
+                try {
+                    for (AdVerificationsExtensionTag adVerificationsExtensionTag : adVerificationsExtensionTagList) {
+                        if (adVerificationsExtensionTag == null) {
+                            continue;
+                        }
+                        for (VerificationTag verificationTag : adVerificationsExtensionTag.getVerificationTagList()) {
+                            JavaScriptResourceTag javaScriptResourceTag = verificationTag.getJavaScriptResourceTag();
+                            String resourceUrl = javaScriptResourceTag != null
+                                    ? javaScriptResourceTag.getText()
+                                    : null;
+                            String vendorKey = verificationTag.getVendor();
+                            String params = verificationTag.getVerificationParameters();
+                            if (!TextUtils.isEmpty(resourceUrl)) {
+                                assert resourceUrl != null;
+                                addVerificationScriptResource(resourceUrl, vendorKey, params);
+                            }
                         }
                     }
+                } catch (Throwable t) {
+                    Logger.log(t);
                 }
             }
         });
