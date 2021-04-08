@@ -2,6 +2,8 @@ package io.bidmachine.banner;
 
 import androidx.annotation.NonNull;
 
+import com.explorestack.protobuf.adcom.Placement;
+
 import io.bidmachine.AdRequest;
 import io.bidmachine.AdsType;
 import io.bidmachine.TargetingParams;
@@ -9,6 +11,7 @@ import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.IBannerRequestBuilder;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;
 import io.bidmachine.utils.BMError;
+import io.bidmachine.utils.ProtoUtils;
 
 public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerAdRequestParams> {
 
@@ -28,6 +31,11 @@ public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerA
             return BMError.paramError("BannerSize not provided");
         }
         return super.verifyRequest();
+    }
+
+    @Override
+    protected boolean isPlacementObjectValid(@NonNull Placement placement) throws Throwable {
+        return ProtoUtils.isBannerPlacement(placement, bannerSize);
     }
 
     @NonNull

@@ -192,7 +192,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         }
     }
 
-    public static class ApiAuctionDataBinder extends ApiDataBinder<Request, Response> {
+    public static class ApiResponseAuctionDataBinder extends ApiDataBinder<Request, Response> {
 
         @Override
         protected void prepareHeaders(NetworkRequest<Request, Response, BMError> request,
@@ -203,6 +203,14 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
                 connection.setRequestProperty("Content-Type", "application/x-protobuf");
             }
             Logger.log("Auction request headers", connection.getRequestProperties());
+        }
+
+        @Nullable
+        @Override
+        protected byte[] obtainData(NetworkRequest<Request, Response, BMError> request,
+                                    URLConnection connection,
+                                    @Nullable Request requestData) throws Exception {
+            return null;
         }
 
         @Override
@@ -218,6 +226,10 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
             return null;
         }
 
+    }
+
+    public static class ApiAuctionDataBinder extends ApiResponseAuctionDataBinder {
+
         @Nullable
         @Override
         protected byte[] obtainData(NetworkRequest<Request, Response, BMError> request,
@@ -232,6 +244,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
             OrtbUtils.dump("Auction request", openrtb);
             return openrtb.build().toByteArray();
         }
+
     }
 
 }
