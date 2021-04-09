@@ -254,21 +254,20 @@ public abstract class BidMachineAd<
                                            @NonNull Response.Seatbid.Bid bid,
                                            @NonNull Ad ad) {
         try {
-            UnifiedAdRequestParamsType adRequestParams = adRequest.getUnifiedRequestParams();
-            if (adRequestParams == null) {
-                return BMError.Internal;
-            }
+            UnifiedAdRequestParamsType adRequestParams = adRequest.obtainUnifiedRequestParams();
             NetworkConfig networkConfig = getType().obtainNetworkConfig(ad);
             if (networkConfig != null) {
-                AdObjectParams adObjectParams = getType().createAdObjectParams(
-                        contextProvider, adRequestParams, seatbid, bid, ad);
+                AdObjectParams adObjectParams = getType().createAdObjectParams(contextProvider,
+                                                                               adRequestParams,
+                                                                               seatbid,
+                                                                               bid,
+                                                                               ad);
                 if (adObjectParams != null && adObjectParams.isValid()) {
-                    loadedObject = createAdObject(
-                            contextProvider,
-                            adRequest,
-                            networkConfig.obtainNetworkAdapter(),
-                            adObjectParams,
-                            processCallback);
+                    loadedObject = createAdObject(contextProvider,
+                                                  adRequest,
+                                                  networkConfig.obtainNetworkAdapter(),
+                                                  adObjectParams,
+                                                  processCallback);
                     if (loadedObject != null) {
                         loadedObject.load(contextProvider, adRequestParams);
                         return null;

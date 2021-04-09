@@ -2,6 +2,8 @@ package io.bidmachine.nativead;
 
 import androidx.annotation.NonNull;
 
+import com.explorestack.protobuf.adcom.Placement;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +15,11 @@ import io.bidmachine.TargetingParams;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.INativeRequestBuilder;
 import io.bidmachine.unified.UnifiedNativeAdRequestParams;
+import io.bidmachine.utils.ProtoUtils;
 
 public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeAdRequestParams> {
 
-    private List<MediaAssetType> mediaAssetTypes = new ArrayList<MediaAssetType>(MediaAssetType.values().length) {{
+    private final List<MediaAssetType> mediaAssetTypes = new ArrayList<MediaAssetType>(MediaAssetType.values().length) {{
         add(MediaAssetType.Icon);
         add(MediaAssetType.Image);
     }};
@@ -30,6 +33,11 @@ public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeA
         return mediaAssetTypes.isEmpty()
                 || mediaAssetTypes.contains(assetType)
                 || mediaAssetTypes.contains(MediaAssetType.All);
+    }
+
+    @Override
+    protected boolean isPlacementObjectValid(@NonNull Placement placement) throws Throwable {
+        return ProtoUtils.isNativePlacement(placement);
     }
 
     @NonNull

@@ -31,6 +31,9 @@ public interface RequestBuilder<SelfType extends RequestBuilder, ReturnType exte
     SelfType setLoadingTimeOut(int timeOutMs);
 
     @SuppressWarnings("UnusedReturnValue")
+    SelfType setBidPayload(@Nullable String bidPayload);
+
+    @SuppressWarnings("UnusedReturnValue")
     SelfType disableHeaderBidding();
 
     @SuppressWarnings("UnusedReturnValue")

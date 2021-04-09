@@ -3,12 +3,15 @@ package io.bidmachine;
 import androidx.annotation.NonNull;
 
 import com.explorestack.protobuf.adcom.Context;
+import com.explorestack.protobuf.adcom.Placement;
+import com.explorestack.protobuf.openrtb.Openrtb;
 import com.explorestack.protobuf.openrtb.Request;
 import com.explorestack.protobuf.openrtb.Response;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.verification.Times;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -22,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import io.bidmachine.protobuf.ErrorReason;
 import io.bidmachine.protobuf.HeaderBiddingType;
 import io.bidmachine.protobuf.RequestExtension;
+import io.bidmachine.protobuf.ResponsePayload;
 import io.bidmachine.utils.BMError;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -44,7 +49,7 @@ public class AdRequestTest {
     @Before
     public void setUp() throws Exception {
         context = RuntimeEnvironment.application;
-        adRequest = new TestAdRequest.Builder(AdsType.Interstitial).build();
+        adRequest = spy(new TestAdRequest.Builder(AdsType.Interstitial).build());
         BidMachine.setConsentConfig(true, null);
         BidMachine.setSubjectToGDPR(null);
         BidMachine.initialize(context, "1");
@@ -54,25 +59,22 @@ public class AdRequestTest {
     public void build_userRestrictionParamsNotSet_useDefaultValues() throws Exception {
         Request request = (Request) adRequest.build(context, adRequest.getType());
         Context requestContext = request.getContext().unpack(Context.class);
-        assertEquals(
-                Context.User.getDefaultInstance().getConsent(),
-                requestContext.getUser().getConsent());
+        assertEquals(Context.User.getDefaultInstance().getConsent(),
+                     requestContext.getUser().getConsent());
         assertFalse(requestContext.getRegs().getGdpr());
     }
 
     @Test
     public void build_userRestrictionParamsIsSet_useValuesFromUserRestrictionParams() throws Exception {
         UserRestrictionParams userRestrictionParams = new UserRestrictionParams();
-        userRestrictionParams.setConsentConfig(
-                true,
-                "private_consent_string");
+        userRestrictionParams.setConsentConfig(true,
+                                               "private_consent_string");
         userRestrictionParams.setSubjectToGDPR(true);
         adRequest.userRestrictionParams = userRestrictionParams;
         Request request = (Request) adRequest.build(context, adRequest.getType());
         Context requestContext = request.getContext().unpack(Context.class);
-        assertEquals(
-                "private_consent_string",
-                requestContext.getUser().getConsent());
+        assertEquals("private_consent_string",
+                     requestContext.getUser().getConsent());
         assertTrue(requestContext.getRegs().getGdpr());
     }
 
@@ -82,9 +84,8 @@ public class AdRequestTest {
         BidMachine.setSubjectToGDPR(true);
         Request request = (Request) adRequest.build(context, adRequest.getType());
         Context requestContext = request.getContext().unpack(Context.class);
-        assertEquals(
-                "public_consent_string",
-                requestContext.getUser().getConsent());
+        assertEquals("public_consent_string",
+                     requestContext.getUser().getConsent());
         assertTrue(requestContext.getRegs().getGdpr());
     }
 
@@ -93,16 +94,14 @@ public class AdRequestTest {
         BidMachine.setConsentConfig(false, "public_consent_string");
         BidMachine.setSubjectToGDPR(true);
         UserRestrictionParams userRestrictionParams = new UserRestrictionParams();
-        userRestrictionParams.setConsentConfig(
-                true,
-                "private_consent_string");
+        userRestrictionParams.setConsentConfig(true,
+                                               "private_consent_string");
         userRestrictionParams.setSubjectToGDPR(false);
         adRequest.userRestrictionParams = userRestrictionParams;
         Request request = (Request) adRequest.build(context, adRequest.getType());
         Context requestContext = request.getContext().unpack(Context.class);
-        assertEquals(
-                "private_consent_string",
-                requestContext.getUser().getConsent());
+        assertEquals("private_consent_string",
+                     requestContext.getUser().getConsent());
         assertFalse(requestContext.getRegs().getGdpr());
     }
 
@@ -322,6 +321,95 @@ public class AdRequestTest {
         assertFalse(testAdRequest.isAdWasShown());
         testAdRequest.onShown();
         assertTrue(testAdRequest.isAdWasShown());
+    }
+
+    @Test
+    public void isBidPayloadValid_responsePayloadIsEmpty_returnTrue() {
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setPlacementObjectValid(false)
+                .build();
+        ResponsePayload responsePayload = ResponsePayload.newBuilder().build();
+        boolean result = testAdRequest.isBidPayloadValid(responsePayload);
+        assertTrue(result);
+    }
+
+    @Test
+    public void isBidPayloadValid_responsePayloadNotEmptyAndPlacementValid_returnTrue() {
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setPlacementObjectValid(true)
+                .build();
+        ResponsePayload responsePayload = ResponsePayload.newBuilder()
+                .setRequestItemSpec(Placement.newBuilder().build())
+                .build();
+        boolean result = testAdRequest.isBidPayloadValid(responsePayload);
+        assertTrue(result);
+    }
+
+    @Test
+    public void isBidPayloadValid_responsePayloadNotEmptyAndPlacementInvalid_returnFalse() {
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setPlacementObjectValid(false)
+                .build();
+        ResponsePayload responsePayload = ResponsePayload.newBuilder()
+                .setRequestItemSpec(Placement.newBuilder().build())
+                .build();
+        boolean result = testAdRequest.isBidPayloadValid(responsePayload);
+        assertFalse(result);
+    }
+
+    @Test
+    public void processBidPayload_responsePayloadInvalid_processRequestFail() {
+        ResponsePayload responsePayload = ResponsePayload.newBuilder().build();
+        doReturn(false).when(adRequest).isBidPayloadValid(responsePayload);
+        adRequest.processBidPayload(responsePayload);
+        verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
+        verify(adRequest, new Times(0)).retrieveBody(any(String.class));
+        verify(adRequest).processRequestFail(BMError.IncorrectContent);
+    }
+
+    @Test
+    public void processBidPayload_responsePayloadIsEmpty_processRequestFail() {
+        ResponsePayload responsePayload = ResponsePayload.newBuilder().build();
+        adRequest.processBidPayload(responsePayload);
+        verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
+        verify(adRequest, new Times(0)).retrieveBody(any(String.class));
+        verify(adRequest).processRequestFail(BMError.IncorrectContent);
+    }
+
+    @Test
+    public void processBidPayload_responsePayloadContainsResponseCache_processApiRequestSuccess() {
+        Openrtb openrtb = Openrtb.newBuilder().build();
+        ResponsePayload responsePayload = ResponsePayload.newBuilder()
+                .setResponseCache(openrtb)
+                .build();
+        adRequest.processBidPayload(responsePayload);
+        verify(adRequest).processApiRequestSuccess(openrtb.getResponse());
+        verify(adRequest, new Times(0)).retrieveBody(any(String.class));
+        verify(adRequest, new Times(0)).processRequestFail(BMError.IncorrectContent);
+    }
+
+    @Test
+    public void processBidPayload_responsePayloadContainsResponseCacheUrlWithText_processRequestFail() {
+        String responseCacheUrl = "test_link";
+        ResponsePayload responsePayload = ResponsePayload.newBuilder()
+                .setResponseCacheUrl(responseCacheUrl)
+                .build();
+        adRequest.processBidPayload(responsePayload);
+        verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
+        verify(adRequest, new Times(0)).retrieveBody(any(String.class));
+        verify(adRequest).processRequestFail(BMError.IncorrectContent);
+    }
+
+    @Test
+    public void processBidPayload_responsePayloadContainsResponseCacheUrlWithUrl_retrieveBody() {
+        String responseCacheUrl = "http://test.com";
+        ResponsePayload responsePayload = ResponsePayload.newBuilder()
+                .setResponseCacheUrl(responseCacheUrl)
+                .build();
+        adRequest.processBidPayload(responsePayload);
+        verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
+        verify(adRequest).retrieveBody(responseCacheUrl);
+        verify(adRequest, new Times(0)).processRequestFail(BMError.IncorrectContent);
     }
 
 }

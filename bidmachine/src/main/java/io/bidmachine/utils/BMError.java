@@ -26,6 +26,8 @@ public class BMError {
             "No content", "No content");
     public static final BMError IncorrectAdUnit = new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
             "Incorrect ad unit", "Incorrect ad unit");
+    public static final BMError IncorrectContent = new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
+            "Incorrect content", "Incorrect content");
     public static final BMError Internal = new BMError(ErrorReason.ERROR_REASON_INTERNAL_VALUE,
             "Internal error", "internal error acquired");
     public static final BMError Server = new BMError(ErrorReason.ERROR_REASON_HTTP_SERVER_ERROR_VALUE,
