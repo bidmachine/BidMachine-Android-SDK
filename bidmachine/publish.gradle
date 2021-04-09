@@ -55,6 +55,11 @@ publishing {
                 dependencyNode.appendNode('groupId', 'com.explorestack')
                 dependencyNode.appendNode('artifactId', 'iab')
                 dependencyNode.appendNode('version', stackIabVersion)
+                // Lib OMSDK
+                dependencyNode = dependenciesNode.appendNode('dependency')
+                dependencyNode.appendNode('groupId', 'io.bidmachine.libs')
+                dependencyNode.appendNode('artifactId', 'omsdk')
+                dependencyNode.appendNode('version', omsdkVersion)
             }
         }
     }

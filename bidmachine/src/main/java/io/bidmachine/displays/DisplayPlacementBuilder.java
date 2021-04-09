@@ -45,6 +45,8 @@ public class DisplayPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedA
                                 @NonNull PlacementCreateCallback callback) throws Exception {
         Placement.DisplayPlacement.Builder builder = Placement.DisplayPlacement.newBuilder();
         builder.addApi(ApiFramework.API_FRAMEWORK_MRAID_2_0);
+        builder.addApi(ApiFramework.API_FRAMEWORK_OMID_1_0);
+
         builder.setUnit(SizeUnit.SIZE_UNIT_DIPS);
         builder.addAllMime(Arrays.asList(Constants.IMAGE_MIME_TYPES));
         if (isFullscreen) {

@@ -20,6 +20,7 @@ class MraidParams extends UnifiedParams {
     final boolean canPreload;
     final int loadSkipOffset;
     final boolean useNativeClose;
+    final boolean omsdkEnabled;
     final int skipOffset;
     final int companionSkipOffset;
     final boolean r1;
@@ -41,6 +42,7 @@ class MraidParams extends UnifiedParams {
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);
         companionSkipOffset = mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET);
         useNativeClose = mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE);
+        omsdkEnabled = mediationParams.getBool(IabUtils.KEY_OM_SDK_ENABLED, true);
         r1 = mediationParams.getBool(IabUtils.KEY_R1);
         r2 = mediationParams.getBool(IabUtils.KEY_R2);
         ignoresSafeAreaLayoutGuide = mediationParams.getBool(IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE);

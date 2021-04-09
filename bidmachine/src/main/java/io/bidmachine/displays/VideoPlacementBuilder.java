@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.explorestack.protobuf.Any;
 import com.explorestack.protobuf.Message;
 import com.explorestack.protobuf.adcom.Ad;
+import com.explorestack.protobuf.adcom.ApiFramework;
 import com.explorestack.protobuf.adcom.Placement;
 import com.explorestack.protobuf.adcom.PlacementPosition;
 import com.explorestack.protobuf.adcom.SizeUnit;
@@ -43,6 +44,8 @@ public class VideoPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdR
                                 @NonNull Collection<NetworkConfig> networkConfigs,
                                 @NonNull PlacementCreateCallback callback) throws Exception {
         Placement.VideoPlacement.Builder builder = Placement.VideoPlacement.newBuilder();
+        builder.addApi(ApiFramework.API_FRAMEWORK_OMID_1_0);
+
         builder.setSkip(canSkip);
         builder.setUnit(SizeUnit.SIZE_UNIT_DIPS);
         builder.setPos(PlacementPosition.PLACEMENT_POSITION_FULLSCREEN);

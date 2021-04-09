@@ -12,6 +12,7 @@ import com.explorestack.iab.mraid.MraidInterstitial;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
+import io.bidmachine.measurer.MraidOMSDKAdMeasurer;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
@@ -24,6 +25,8 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
 
     @Nullable
     private MraidInterstitial mraidInterstitial;
+    @Nullable
+    private MraidOMSDKAdMeasurer mraidOMSDKAdMeasurer;
 
     MraidFullScreenAd(MraidActivity.MraidType mraidType) {
         this.mraidType = mraidType;
@@ -43,7 +46,15 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         if (!mraidParams.isValid(callback)) {
             return;
         }
+        assert mraidParams.creativeAdm != null;
 
+        final String creativeAdm;
+        if (mraidParams.omsdkEnabled) {
+            mraidOMSDKAdMeasurer = new MraidOMSDKAdMeasurer();
+            creativeAdm = mraidOMSDKAdMeasurer.injectMeasurerJS(mraidParams.creativeAdm);
+        } else {
+            creativeAdm = mraidParams.creativeAdm;
+        }
         Utils.onUiThread(new Runnable() {
             @Override
             public void run() {
@@ -52,7 +63,9 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                             .setPreload(true)
                             .setCloseTime(mraidParams.skipOffset)
                             .forceUseNativeCloseButton(mraidParams.useNativeClose)
-                            .setListener(new MraidFullScreenAdListener(contextProvider, callback))
+                            .setListener(new MraidFullScreenAdListener(contextProvider,
+                                                                       callback,
+                                                                       mraidOMSDKAdMeasurer))
                             .setR1(mraidParams.r1)
                             .setR2(mraidParams.r2)
                             .setDurationSec(mraidParams.progressDuration)
@@ -60,8 +73,9 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                             .setCloseStyle(mraidParams.closeableViewStyle)
                             .setCountDownStyle(mraidParams.countDownStyle)
                             .setProgressStyle(mraidParams.progressStyle)
+                            .setAdMeasurer(mraidOMSDKAdMeasurer)
                             .build(contextProvider.getContext());
-                    mraidInterstitial.load(mraidParams.creativeAdm);
+                    mraidInterstitial.load(creativeAdm);
                 } catch (Throwable t) {
                     Logger.log(t);
                     callback.onAdLoadFailed(BMError.Internal);
@@ -82,9 +96,17 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
 
     @Override
     public void onDestroy() {
-        if (mraidInterstitial != null) {
-            mraidInterstitial.destroy();
-            mraidInterstitial = null;
+        if (mraidOMSDKAdMeasurer != null) {
+            mraidOMSDKAdMeasurer.destroy(new Runnable() {
+                @Override
+                public void run() {
+                    if (mraidInterstitial != null) {
+                        mraidInterstitial.destroy();
+                        mraidInterstitial = null;
+                    }
+                }
+            });
+            mraidOMSDKAdMeasurer = null;
         }
     }
 
