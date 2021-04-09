@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.explorestack.protobuf.adcom.Ad;
+import com.explorestack.protobuf.adcom.Placement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 
 public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestParams> {
+
+    private final boolean isPlacementObjectValid;
 
     private TestAdRequest(final Builder builder) {
         super(builder.adsType);
@@ -94,12 +97,19 @@ public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestPara
                 .addAllBundle(builder.bundleList)
                 .addAllAdomain(builder.adDomainList)
                 .build();
+
+        isPlacementObjectValid = builder.isPlacementObjectValid;
     }
 
     @NonNull
     public AuctionResult getAuctionResult() {
         assert auctionResult != null;
         return auctionResult;
+    }
+
+    @Override
+    protected boolean isPlacementObjectValid(@NonNull Placement placement) throws Throwable {
+        return isPlacementObjectValid;
     }
 
     @NonNull
@@ -127,6 +137,8 @@ public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestPara
 
         List<String> bundleList = new ArrayList<>();
         List<String> adDomainList = new ArrayList<>();
+
+        boolean isPlacementObjectValid;
 
         public Builder(@NonNull AdsType adsType) {
             this.adsType = adsType;
@@ -199,6 +211,11 @@ public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestPara
 
         public Builder setAdDomainList(List<String> adDomainList) {
             this.adDomainList = adDomainList;
+            return this;
+        }
+
+        public Builder setPlacementObjectValid(boolean isPlacementObjectValid) {
+            this.isPlacementObjectValid = isPlacementObjectValid;
             return this;
         }
 

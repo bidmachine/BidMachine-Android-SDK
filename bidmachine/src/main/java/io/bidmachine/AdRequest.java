@@ -387,20 +387,13 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
     }
 
-    private void processBidPayload(@NonNull final String bidPayload) {
+    private void processBidPayload(@NonNull String bidPayload) {
         try {
             byte[] bytes = Base64.decode(bidPayload, Base64.DEFAULT);
             ResponsePayload responsePayload = ResponsePayload.parseFrom(bytes);
-            if (responsePayload != null && isBidPayloadValid(responsePayload)) {
-                String url = responsePayload.getResponseCacheUrl();
-                Openrtb openrtb = responsePayload.getResponseCache();
-                if (openrtb != null) {
-                    processApiRequestSuccess(openrtb.getResponse());
-                    return;
-                } else if (!TextUtils.isEmpty(url)) {
-                    retrieveBody(url);
-                    return;
-                }
+            if (responsePayload != null) {
+                processBidPayload(responsePayload);
+                return;
             }
         } catch (Throwable t) {
             Logger.log(t);
@@ -408,7 +401,25 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         processRequestFail(BMError.IncorrectContent);
     }
 
-    private boolean isBidPayloadValid(@NonNull ResponsePayload responsePayload) {
+    @VisibleForTesting
+    void processBidPayload(@NonNull ResponsePayload responsePayload) {
+        if (isBidPayloadValid(responsePayload)) {
+            Openrtb openrtb = responsePayload.getResponseCache();
+            if (openrtb != null && openrtb != Openrtb.getDefaultInstance()) {
+                processApiRequestSuccess(openrtb.getResponse());
+                return;
+            }
+            String url = responsePayload.getResponseCacheUrl();
+            if (!TextUtils.isEmpty(url) && io.bidmachine.core.Utils.isHttpUrl(url)) {
+                retrieveBody(url);
+                return;
+            }
+        }
+        processRequestFail(BMError.IncorrectContent);
+    }
+
+    @VisibleForTesting
+    boolean isBidPayloadValid(@NonNull ResponsePayload responsePayload) {
         Placement placement = responsePayload.getRequestItemSpec();
         try {
             return placement == Placement.getDefaultInstance() || isPlacementObjectValid(placement);
@@ -418,7 +429,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         return false;
     }
 
-    private void retrieveBody(@NonNull String url) {
+    @VisibleForTesting
+    void retrieveBody(@NonNull String url) {
         ApiRequest.Builder<Request, Response> requestBuilder = new ApiRequest.Builder<Request, Response>()
                 .url(url)
                 .setLoadingTimeOut(timeOut)
@@ -687,7 +699,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     @SuppressWarnings("unchecked")
-    private void processApiRequestSuccess(@Nullable Response response) {
+    @VisibleForTesting
+    void processApiRequestSuccess(@Nullable Response response) {
         if (isCanceled()) {
             return;
         }
@@ -781,7 +794,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     @SuppressWarnings("unchecked")
-    private void processRequestFail(@NonNull BMError error) {
+    @VisibleForTesting
+    void processRequestFail(@NonNull BMError error) {
         if (adRequestListeners != null) {
             for (AdRequestListener listener : adRequestListeners) {
                 listener.onRequestFailed(this, error);
