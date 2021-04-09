@@ -79,8 +79,6 @@ final class BidMachineImpl {
     @NonNull
     private TargetingParams targetingParams = new TargetingParams();
     @NonNull
-    private EnumMap<AdsType, SessionAdParams> sessionAdParamsMap = new EnumMap<>(AdsType.class);
-    @NonNull
     private ExtraParams extraParams = new ExtraParams();
     @NonNull
     private UserRestrictionParams userRestrictionParams = new UserRestrictionParams();
@@ -327,10 +325,13 @@ final class BidMachineImpl {
     private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {
         SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
                                                                      Context.MODE_PRIVATE);
-        preferences.edit()
-                .putString(PREF_INIT_DATA,
-                           Base64.encodeToString(response.toByteArray(), Base64.DEFAULT))
-                .apply();
+        try {
+            String initResponse = Base64.encodeToString(response.toByteArray(), Base64.DEFAULT);
+            preferences.edit()
+                    .putString(PREF_INIT_DATA, initResponse)
+                    .apply();
+        } catch (Exception ignore) {
+        }
     }
 
     private void loadStoredInitResponse(@NonNull Context context) {
@@ -394,16 +395,6 @@ final class BidMachineImpl {
     @NonNull
     TargetingParams getTargetingParams() {
         return targetingParams;
-    }
-
-    @NonNull
-    synchronized SessionAdParams getSessionAdParams(AdsType adsType) {
-        SessionAdParams sessionAdParams = sessionAdParamsMap.get(adsType);
-        if (sessionAdParams == null) {
-            sessionAdParams = new SessionAdParams();
-            sessionAdParamsMap.put(adsType, sessionAdParams);
-        }
-        return sessionAdParams;
     }
 
     @Nullable

@@ -9,6 +9,7 @@ import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.VideoType;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.measurer.VastOMSDKAdMeasurer;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
@@ -23,6 +24,8 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     @Nullable
     private VastRequest vastRequest;
     private VastFullScreenAdapterListener vastListener;
+    @Nullable
+    private VastOMSDKAdMeasurer vastOMSDKAdMeasurer;
 
     VastFullScreenAd(@NonNull VideoType videoType) {
         this.videoType = videoType;
@@ -39,7 +42,10 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         }
         assert vastParams.creativeAdm != null;
 
-        vastListener = new VastFullScreenAdapterListener(callback);
+        if (vastParams.omsdkEnabled) {
+            vastOMSDKAdMeasurer = new VastOMSDKAdMeasurer();
+        }
+        vastListener = new VastFullScreenAdapterListener(callback, vastOMSDKAdMeasurer);
         vastRequest = VastRequest.newBuilder()
                 .setPreCache(true)
                 .setVideoCloseTime(vastParams.skipOffset)
@@ -55,7 +61,11 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
         if (vastRequest != null && vastRequest.checkFile()) {
-            vastRequest.display(context, videoType, vastListener);
+            vastRequest.display(context,
+                                videoType,
+                                vastListener,
+                                vastOMSDKAdMeasurer,
+                                vastOMSDKAdMeasurer);
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }
@@ -63,6 +73,10 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
 
     @Override
     public void onDestroy() {
+        if (vastOMSDKAdMeasurer != null) {
+            vastOMSDKAdMeasurer.destroy();
+            vastOMSDKAdMeasurer = null;
+        }
         if (vastRequest != null) {
             vastRequest = null;
         }

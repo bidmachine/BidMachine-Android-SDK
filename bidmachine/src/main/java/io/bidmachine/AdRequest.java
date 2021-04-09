@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
 import io.bidmachine.displays.PlacementBuilder;
+import io.bidmachine.measurer.OMSDKSettings;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.RequestBuilder;
@@ -144,6 +145,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             assert sellerId != null;
 
             final BidMachineImpl bidMachine = BidMachineImpl.get();
+            final SessionManager sessionManager = SessionManager.get();
 
             AdvertisingPersonalData.syncUpdateInfo(context);
 
@@ -156,8 +158,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             unifiedAdRequestParams = createUnifiedAdRequestParams(targetingParams,
                                                                   userRestrictionParams);
 
-            SessionAdParams bidMachineSessionAdParams = bidMachine.getSessionAdParams(adsType)
-                    .setSessionDuration(SessionManager.get().getSessionDuration());
+            SessionAdParams bidMachineSessionAdParams = sessionManager.getSessionAdParams(adsType)
+                    .setSessionDuration(sessionManager.getSessionDuration());
             final SessionAdParams sessionAdParams =
                     RequestParams.resolveParams(this.sessionAdParams,
                                                 bidMachineSessionAdParams);
@@ -210,6 +212,12 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     throw new IllegalArgumentException("Unsupported display type: " + displayBuilder);
                 }
             }
+            // Request -> Item -> Spec -> Placement -> Extension
+            Struct.Builder placementExtBuilder = Struct.newBuilder();
+            OMSDKSettings.fillExtension(placementExtBuilder);
+            if (placementExtBuilder.getFieldsCount() > 0) {
+                placementBuilder.setExt(placementExtBuilder);
+            }
 
             onBuildPlacement(placementBuilder);
             itemBuilder.setSpec(Any.pack(placementBuilder.build()));
@@ -257,7 +265,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             if (userExtBuilder.getFieldsCount() > 0) {
                 userBuilder.setExt(userExtBuilder.build());
             }
-            bidMachine.getSessionAdParams(adsType).setIsUserClickedOnLastAd(false);
+            bidMachineSessionAdParams.setIsUserClickedOnLastAd(false);
 
             contextBuilder.setUser(userBuilder);
 
@@ -300,7 +308,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
                             : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
             requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
-            requestExtensionBuilder.setSessionId(SessionManager.get().getSessionId());
+            requestExtensionBuilder.setSessionId(sessionManager.getSessionId());
 
             requestBuilder.addExtProto(Any.pack(requestExtensionBuilder.build()));
 

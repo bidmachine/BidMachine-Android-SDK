@@ -1,6 +1,7 @@
 package io.bidmachine.ads.networks.mraid;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.explorestack.iab.mraid.MraidError;
 import com.explorestack.iab.mraid.MraidInterstitial;
@@ -9,6 +10,7 @@ import com.explorestack.iab.utils.IabClickCallback;
 import com.explorestack.iab.utils.Utils;
 
 import io.bidmachine.ContextProvider;
+import io.bidmachine.measurer.MraidOMSDKAdMeasurer;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.utils.BMError;
 
@@ -18,11 +20,15 @@ class MraidFullScreenAdListener implements MraidInterstitialListener {
     private final ContextProvider contextProvider;
     @NonNull
     private final UnifiedFullscreenAdCallback callback;
+    @Nullable
+    private final MraidOMSDKAdMeasurer mraidOMSDKAdMeasurer;
 
     MraidFullScreenAdListener(@NonNull ContextProvider contextProvider,
-                              @NonNull UnifiedFullscreenAdCallback callback) {
+                              @NonNull UnifiedFullscreenAdCallback callback,
+                              @Nullable MraidOMSDKAdMeasurer mraidOMSDKAdMeasurer) {
         this.contextProvider = contextProvider;
         this.callback = callback;
+        this.mraidOMSDKAdMeasurer = mraidOMSDKAdMeasurer;
     }
 
     @Override
@@ -41,6 +47,10 @@ class MraidFullScreenAdListener implements MraidInterstitialListener {
 
     @Override
     public void onShown(@NonNull MraidInterstitial mraidInterstitial) {
+        if (mraidOMSDKAdMeasurer != null) {
+            mraidOMSDKAdMeasurer.onAdShown();
+        }
+
         callback.onAdShown();
     }
 
@@ -65,6 +75,10 @@ class MraidFullScreenAdListener implements MraidInterstitialListener {
 
     @Override
     public void onClose(@NonNull MraidInterstitial mraidInterstitial) {
+        if (mraidOMSDKAdMeasurer != null) {
+            mraidOMSDKAdMeasurer.destroy();
+        }
+
         callback.onAdFinished();
         callback.onAdClosed();
     }

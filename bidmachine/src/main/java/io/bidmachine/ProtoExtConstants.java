@@ -2,6 +2,13 @@ package io.bidmachine;
 
 public class ProtoExtConstants {
 
+    public static final class Source {
+
+        public static final String OMID_PN = "omidpn";
+        public static final String OMID_PV = "omidpv";
+
+    }
+
     static final class Context {
 
         static final class App {

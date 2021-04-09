@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import com.explorestack.iab.utils.IabElementStyle;
+import com.explorestack.protobuf.Value;
 import com.explorestack.protobuf.adcom.Ad;
 import com.explorestack.protobuf.openrtb.Response;
 
@@ -25,11 +26,12 @@ import static io.bidmachine.utils.IabUtils.KEY_COMPANION_SKIP_OFFSET;
 import static io.bidmachine.utils.IabUtils.KEY_COUNTDOWN_STYLE;
 import static io.bidmachine.utils.IabUtils.KEY_CREATIVE_ADM;
 import static io.bidmachine.utils.IabUtils.KEY_CREATIVE_ID;
-import static io.bidmachine.utils.IabUtils.KEY_PROGRESS_DURATION;
 import static io.bidmachine.utils.IabUtils.KEY_HEIGHT;
 import static io.bidmachine.utils.IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE;
 import static io.bidmachine.utils.IabUtils.KEY_LOAD_SKIP_OFFSET;
+import static io.bidmachine.utils.IabUtils.KEY_OM_SDK_ENABLED;
 import static io.bidmachine.utils.IabUtils.KEY_PRELOAD;
+import static io.bidmachine.utils.IabUtils.KEY_PROGRESS_DURATION;
 import static io.bidmachine.utils.IabUtils.KEY_PROGRESS_STYLE;
 import static io.bidmachine.utils.IabUtils.KEY_R1;
 import static io.bidmachine.utils.IabUtils.KEY_R2;
@@ -89,6 +91,18 @@ abstract class IabAdObjectParams
         IabElementStyle progressIabElementStyle = transform(extension.getProgress());
         if (progressIabElementStyle != null) {
             getData().put(KEY_PROGRESS_STYLE, progressIabElementStyle);
+        }
+    }
+
+    @Override
+    protected void prepareExtensions(@NonNull Response.Seatbid seatbid,
+                                     @NonNull Response.Seatbid.Bid bid,
+                                     @NonNull Map<String, Value> extensionMap) {
+        super.prepareExtensions(seatbid, bid, extensionMap);
+
+        Value omsdkEnabledValue = extensionMap.get(KEY_OM_SDK_ENABLED);
+        if (omsdkEnabledValue != null) {
+            getData().put(KEY_OM_SDK_ENABLED, omsdkEnabledValue.getBoolValue());
         }
     }
 

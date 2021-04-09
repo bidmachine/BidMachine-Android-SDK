@@ -30,14 +30,15 @@ import static org.junit.Assert.assertTrue;
 public class BidMachineAdTest {
 
     private Context context;
+    private SessionManager sessionManager;
 
     @Before
     public void setUp() throws Exception {
         context = RuntimeEnvironment.application;
         BidMachine.initialize(context, "5");
-        for (AdsType adsType : AdsType.values()) {
-            BidMachineImpl.get().getSessionAdParams(adsType).clear();
-        }
+
+        sessionManager = SessionManager.get();
+        sessionManager.startNewSession();
     }
 
     @Test
@@ -88,13 +89,13 @@ public class BidMachineAdTest {
 
     @Test
     public void impressionCountByAdsType_oneImpressionPerAdInstance() {
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Banner)
                            .getImpressionCount());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Interstitial)
                            .getImpressionCount());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Rewarded)
                            .getImpressionCount());
 
@@ -105,13 +106,13 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getImpressionCount());
         assertEquals(1, sessionAdParams.getImpressionCount().intValue());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getImpressionCount());
         assertEquals(1, sessionAdParams.getImpressionCount().intValue());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getImpressionCount());
 
         bannerAd = BannerBridge.createBannerAd(context);
@@ -121,25 +122,25 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getImpressionCount());
         assertEquals(2, sessionAdParams.getImpressionCount().intValue());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getImpressionCount());
         assertEquals(2, sessionAdParams.getImpressionCount().intValue());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getImpressionCount());
     }
 
     @Test
     public void clickCountByAdsType_oneClickPerAdInstance() {
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getClickCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getClickCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getClickCount());
 
@@ -150,13 +151,13 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processClicked();
         interstitialAd.processCallback.processClicked();
 
-        assertEquals(1, BidMachineImpl.get()
+        assertEquals(1, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getClickCount());
-        assertEquals(1, BidMachineImpl.get()
+        assertEquals(1, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getClickCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getClickCount());
 
@@ -167,26 +168,26 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processClicked();
         interstitialAd.processCallback.processClicked();
 
-        assertEquals(2, BidMachineImpl.get()
+        assertEquals(2, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getClickCount());
-        assertEquals(2, BidMachineImpl.get()
+        assertEquals(2, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getClickCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getClickCount());
     }
 
     @Test
     public void clickRateByAdsType() {
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Banner)
                            .getClickRate());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Interstitial)
                            .getClickRate());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Rewarded)
                            .getClickRate());
 
@@ -195,37 +196,37 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(0.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(0.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getClickRate());
 
         bannerAd.processCallback.processClicked();
         interstitialAd.processCallback.processClicked();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(100.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(100.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getClickRate());
 
         bannerAd.processCallback.processClicked();
         interstitialAd.processCallback.processClicked();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(100.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(100.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getClickRate());
 
         bannerAd = BannerBridge.createBannerAd(context);
@@ -233,25 +234,25 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(50.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getClickRate());
         assertEquals(50.0F, sessionAdParams.getClickRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getClickRate());
     }
 
     @Test
     public void isUserClickedOnLastAd() {
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Banner)
                            .getUserClickedOnLastAd());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Interstitial)
                            .getUserClickedOnLastAd());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Rewarded)
                            .getUserClickedOnLastAd());
 
@@ -260,25 +261,25 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processClicked();
         interstitialAd.processCallback.processClicked();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getUserClickedOnLastAd());
         assertTrue(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getUserClickedOnLastAd());
         assertTrue(sessionAdParams.getUserClickedOnLastAd());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getUserClickedOnLastAd());
     }
 
     @Test
     public void videoImpressionCountByAdsType_oneImpressionPerAdInstance() {
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getVideoImpressionCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getVideoImpressionCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getVideoImpressionCount());
 
@@ -295,13 +296,13 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getVideoImpressionCount());
-        assertEquals(1, BidMachineImpl.get()
+        assertEquals(1, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getVideoImpressionCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getVideoImpressionCount());
 
@@ -318,13 +319,13 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getVideoImpressionCount());
-        assertEquals(2, BidMachineImpl.get()
+        assertEquals(2, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getVideoImpressionCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getVideoImpressionCount());
 
@@ -341,26 +342,26 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getVideoImpressionCount());
-        assertEquals(2, BidMachineImpl.get()
+        assertEquals(2, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getVideoImpressionCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getVideoImpressionCount());
     }
 
     @Test
     public void completedVideosCountByAdsType_oneCompletedVideoPerAdInstance() {
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getCompletedVideosCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getCompletedVideosCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getCompletedVideosCount());
 
@@ -377,13 +378,13 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processFinished();
         interstitialAd.processCallback.processFinished();
 
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getCompletedVideosCount());
-        assertEquals(1, BidMachineImpl.get()
+        assertEquals(1, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getCompletedVideosCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getCompletedVideosCount());
 
@@ -400,26 +401,26 @@ public class BidMachineAdTest {
         interstitialAd.processCallback.processFinished();
         interstitialAd.processCallback.processFinished();
 
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Banner)
                 .getCompletedVideosCount());
-        assertEquals(2, BidMachineImpl.get()
+        assertEquals(2, sessionManager
                 .getSessionAdParams(AdsType.Interstitial)
                 .getCompletedVideosCount());
-        assertEquals(0, BidMachineImpl.get()
+        assertEquals(0, sessionManager
                 .getSessionAdParams(AdsType.Rewarded)
                 .getCompletedVideosCount());
     }
 
     @Test
     public void completionRateByAdsType() {
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Banner)
                            .getCompletionRate());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Interstitial)
                            .getCompletionRate());
-        assertNull(BidMachineImpl.get()
+        assertNull(sessionManager
                            .getSessionAdParams(AdsType.Rewarded)
                            .getCompletionRate());
 
@@ -434,34 +435,34 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getCompletionRate());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getCompletionRate());
         assertEquals(0.0F, sessionAdParams.getCompletionRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getCompletionRate());
 
         bannerAd.processCallback.processFinished();
         interstitialAd.processCallback.processFinished();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getCompletionRate());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getCompletionRate());
         assertEquals(100.0F, sessionAdParams.getCompletionRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getCompletionRate());
 
         bannerAd.processCallback.processFinished();
         interstitialAd.processCallback.processFinished();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getCompletionRate());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getCompletionRate());
         assertEquals(100.0F, sessionAdParams.getCompletionRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getCompletionRate());
 
         bannerAd = BannerBridge.createBannerAd(context);
@@ -475,12 +476,12 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getCompletionRate());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getCompletionRate());
         assertEquals(50.0F, sessionAdParams.getCompletionRate(), 0);
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getCompletionRate());
     }
 
@@ -493,11 +494,11 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNull(sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastBundle());
     }
 
@@ -522,13 +523,13 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getLastBundle());
         assertEquals("test_banner_bundle_1", sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getLastBundle());
         assertEquals("test_interstitial_bundle_1", sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastBundle());
     }
 
@@ -553,13 +554,13 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getLastBundle());
         assertEquals("test_banner_bundle_2", sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getLastBundle());
         assertEquals("test_interstitial_bundle_2", sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastBundle());
     }
 
@@ -580,13 +581,13 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getLastBundle());
         assertEquals("test_banner_bundle_1", sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getLastBundle());
         assertEquals("test_interstitial_bundle_1", sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastBundle());
 
         bannerAd = BannerBridge.createBannerAd(context);
@@ -596,11 +597,11 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNull(sessionAdParams.getLastBundle());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastBundle());
     }
 
@@ -613,11 +614,11 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNull(sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastAdDomain());
     }
 
@@ -642,13 +643,13 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getLastAdDomain());
         assertEquals("test_banner_ad_domain_1", sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getLastAdDomain());
         assertEquals("test_interstitial_ad_domain_1", sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastAdDomain());
     }
 
@@ -673,13 +674,13 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getLastAdDomain());
         assertEquals("test_banner_ad_domain_2", sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getLastAdDomain());
         assertEquals("test_interstitial_ad_domain_2", sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastAdDomain());
     }
 
@@ -700,13 +701,13 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        SessionAdParams sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        SessionAdParams sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNotNull(sessionAdParams.getLastAdDomain());
         assertEquals("test_banner_ad_domain_1", sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNotNull(sessionAdParams.getLastAdDomain());
         assertEquals("test_interstitial_ad_domain_1", sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastAdDomain());
 
         bannerAd = BannerBridge.createBannerAd(context);
@@ -716,11 +717,11 @@ public class BidMachineAdTest {
         bannerAd.processCallback.processShown();
         interstitialAd.processCallback.processShown();
 
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Banner);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Banner);
         assertNull(sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Interstitial);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Interstitial);
         assertNull(sessionAdParams.getLastAdDomain());
-        sessionAdParams = BidMachineImpl.get().getSessionAdParams(AdsType.Rewarded);
+        sessionAdParams = sessionManager.getSessionAdParams(AdsType.Rewarded);
         assertNull(sessionAdParams.getLastAdDomain());
     }
 

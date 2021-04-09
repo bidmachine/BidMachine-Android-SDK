@@ -14,9 +14,10 @@ class VastParams extends UnifiedParams {
 
     final String creativeAdm;
     final int loadSkipOffset;
-    final boolean useNativeClose;
     final int skipOffset;
     final int companionSkipOffset;
+    final boolean useNativeClose;
+    final boolean omsdkEnabled;
 
     VastParams(@NonNull UnifiedMediationParams mediationParams) {
         super(mediationParams);
@@ -25,6 +26,7 @@ class VastParams extends UnifiedParams {
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);
         companionSkipOffset = mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET);
         useNativeClose = mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE);
+        omsdkEnabled = mediationParams.getBool(IabUtils.KEY_OM_SDK_ENABLED, true);
     }
 
     @Override

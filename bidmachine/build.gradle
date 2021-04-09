@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
-        versionCode 100100038
-        versionName "1.7.0"
+        versionCode 100100039
+        versionName "1.7.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         consumerProguardFiles 'proguard-rules.pro'
@@ -29,11 +29,9 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api fileTree(include: ['*.jar'], dir: 'libs_ext')
-
     implementation "io.bidmachine:protobuf-models:$protobufModelsVersion"
     implementation "com.explorestack:iab:$stackIabVersion"
+    implementation "io.bidmachine.libs:omsdk:$omsdkVersion"
 
     compileOnly "androidx.annotation:annotation:1.1.0"
 
