@@ -3,16 +3,12 @@ package io.bidmachine.core;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -31,15 +27,12 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Process;
 import android.security.NetworkSecurityPolicy;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
-import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -54,26 +47,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Flushable;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -88,7 +70,7 @@ public class Utils {
     private static final Handler uiHandler = new Handler(Looper.getMainLooper());
 
     @NonNull
-    private static Handler backgroundHandler;
+    private static final Handler backgroundHandler;
     private static String appName;
     private static String appVersion;
 
@@ -139,18 +121,6 @@ public class Utils {
         return result.toString("UTF-8");
     }
 
-    public static class ConnectionInfo {
-        public final String type;
-        public final String subtype;
-        public final boolean isFastType;
-
-        ConnectionInfo(String type, String subtype, boolean isFastType) {
-            this.type = type;
-            this.subtype = subtype;
-            this.isFastType = isFastType;
-        }
-    }
-
     @Nullable
     @SuppressLint("MissingPermission")
     public static NetworkInfo getActiveNetworkInfo(@NonNull Context context) {
@@ -161,66 +131,6 @@ public class Utils {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
-    }
-
-    @NonNull
-    @SuppressLint("MissingPermission")
-    public static ConnectionInfo obtainConnectionInfo(Context context) {
-        NetworkInfo info = getActiveNetworkInfo(context);
-        String connectionType = "unknown";
-        String connectionSubtype = null;
-        final boolean fast;
-        if (info != null && info.isConnected()) {
-            connectionType = info.getTypeName();
-            connectionSubtype = info.getSubtypeName();
-            switch (info.getType()) {
-                case ConnectivityManager.TYPE_MOBILE:
-                    switch (info.getSubtype()) {
-                        case TelephonyManager.NETWORK_TYPE_EVDO_0: // ~ 400-1000 kbps
-                        case TelephonyManager.NETWORK_TYPE_EVDO_A: // ~ 600-1400 kbps
-                        case TelephonyManager.NETWORK_TYPE_EVDO_B: // ~ 5 Mbps
-                        case TelephonyManager.NETWORK_TYPE_UMTS: // ~ 400-7000 kbps
-                        case TelephonyManager.NETWORK_TYPE_EHRPD: // ~ 1-2 Mbps
-                        case TelephonyManager.NETWORK_TYPE_HSPA: // ~ 700-1700 kbps
-                        case TelephonyManager.NETWORK_TYPE_HSDPA: // ~ 2-14 Mbps
-                        case TelephonyManager.NETWORK_TYPE_HSUPA: // ~ 1-23 Mbps
-                        case TelephonyManager.NETWORK_TYPE_HSPAP: // ~ 10-20 Mbps
-                        case TelephonyManager.NETWORK_TYPE_LTE: { // ~ 10+ Mbps
-                            fast = true;
-                            break;
-                        }
-                        default: {
-                            fast = false;
-                            break;
-                        }
-                    }
-                    break;
-                case ConnectivityManager.TYPE_WIFI:
-                case ConnectivityManager.TYPE_WIMAX:
-                case ConnectivityManager.TYPE_ETHERNET:
-                    fast = true;
-                    break;
-                default:
-                    fast = false;
-                    break;
-            }
-        } else {
-            fast = false;
-        }
-        if (connectionType != null) {
-            if (connectionType.equals("CELLULAR")) {
-                connectionType = "MOBILE";
-            }
-            connectionType = connectionType.toLowerCase(Locale.ENGLISH);
-        }
-        if (connectionSubtype != null) {
-            connectionSubtype = connectionSubtype.toLowerCase(Locale.ENGLISH);
-            if (connectionSubtype.isEmpty()) {
-                connectionSubtype = null;
-            }
-
-        }
-        return new ConnectionInfo(connectionType, connectionSubtype, fast);
     }
 
     @SuppressLint("MissingPermission")
@@ -270,23 +180,6 @@ public class Utils {
             }
         }
         return defaultHttpAgentString;
-    }
-
-    public static String getLocalIpAddress() {
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                        return inetAddress.getHostAddress();
-                    }
-                }
-            }
-        } catch (SocketException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 
     /*
@@ -348,24 +241,6 @@ public class Utils {
         return size;
     }
 
-    public static float getScreenWidthInDp(Context context) {
-        WindowManager window = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = window.getDefaultDisplay();
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        Point size = new Point();
-        display.getSize(size);
-        return size.x / displayMetrics.density;
-    }
-
-    public static float getScreenHeightInDp(Context context) {
-        WindowManager window = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = window.getDefaultDisplay();
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        Point size = new Point();
-        display.getSize(size);
-        return size.y / displayMetrics.density;
-    }
-
     public static int getScreenDpi(Context context) {
         WindowManager window = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = window.getDefaultDisplay();
@@ -382,42 +257,11 @@ public class Utils {
         return displayMetrics.density;
     }
 
-    public static int getScreenOrientation(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        int rotation = windowManager.getDefaultDisplay().getRotation();
-        int orientation = context.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            switch (rotation) {
-                case Surface.ROTATION_180:
-                case Surface.ROTATION_270:
-                    return ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-                case Surface.ROTATION_0:
-                case Surface.ROTATION_90:
-                default:
-                    return ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-            }
-        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            switch (rotation) {
-                case Surface.ROTATION_180:
-                case Surface.ROTATION_270:
-                    return ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-                case Surface.ROTATION_0:
-                case Surface.ROTATION_90:
-                default:
-                    return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-            }
-        } else {
-            Logger.log("Unknown screen orientation. Defaulting to portrait.");
-            return ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-        }
-    }
-
     public static boolean isTablet(Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         double width = metrics.widthPixels / metrics.xdpi;
         double height = metrics.heightPixels / metrics.ydpi;
-        Double screenSize = Math.sqrt(width * width + height * height);
-        return screenSize >= 6.6d;
+        return Math.sqrt(width * width + height * height) >= 6.6d;
     }
 
     /*
@@ -525,23 +369,17 @@ public class Utils {
         }
     }
 
-    public static boolean isViewInsideParentRect(Rect parentRect, View childView) {
-        Rect childRect = getViewRectangle(childView);
-        return parentRect.contains(childRect);
-    }
-
     public static Rect getViewRectangle(View adView) {
         int[] location = new int[2];
         adView.getLocationInWindow(location);
-        return new Rect(location[0], location[1], adView.getWidth() + location[0], adView.getHeight() + location[1]);
+        return new Rect(location[0],
+                        location[1],
+                        adView.getWidth() + location[0],
+                        adView.getHeight() + location[1]);
     }
 
     public static boolean isViewTransparent(View view) {
         return view.getAlpha() == 0.0F;
-    }
-
-    public static boolean isViewHaveSize(View view) {
-        return view.getMeasuredHeight() > 0 && view.getMeasuredWidth() > 0;
     }
 
     public static void httpGetURL(final String url, Executor executor) {
@@ -575,15 +413,11 @@ public class Utils {
         }
     }
 
-    public static void removeViewFromParent(View view) {
-        if (view.getParent() != null && view.getParent() instanceof ViewGroup) {
-            ViewGroup parent = (ViewGroup) view.getParent();
-            parent.removeView(view);
-        }
-    }
-
     public static boolean canAddWindowToActivity(Activity activity) {
-        return activity != null && activity.getWindow() != null && activity.getWindow().isActive() && activity.getWindow().getDecorView().getWindowToken() != null;
+        return activity != null
+                && activity.getWindow() != null
+                && activity.getWindow().isActive()
+                && activity.getWindow().getDecorView().getWindowToken() != null;
     }
 
     public static String retrieveAndSaveFrame(Context context, Uri videoFileUri, String dirName) {
@@ -591,11 +425,13 @@ public class Utils {
         mediaMetadataRetriever.setDataSource(context, videoFileUri);
         String time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         long duration = Long.parseLong(time);
-        Bitmap bitmapFrame = mediaMetadataRetriever.getFrameAtTime(duration, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+        Bitmap bitmapFrame = mediaMetadataRetriever.getFrameAtTime(duration,
+                                                                   MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
         if (bitmapFrame != null) {
             FileOutputStream fileOutputStream = null;
             try {
-                File file = new File(getCacheDir(context, dirName), generateFileName(videoFileUri.toString()));
+                File file = new File(getCacheDir(context, dirName),
+                                     generateFileName(videoFileUri.toString()));
                 fileOutputStream = new FileOutputStream(file);
                 bitmapFrame.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
 
@@ -627,7 +463,8 @@ public class Utils {
     }
 
     public static String getAdvertisingUUID(android.content.Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_NAME, context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_NAME,
+                                                                    Context.MODE_PRIVATE);
         if (sharedPref.contains(UUID_ID)) {
             return sharedPref.getString(UUID_ID, null);
         } else {
@@ -640,13 +477,18 @@ public class Utils {
     }
 
     @SafeVarargs
-    public static Object invokeMethodByName(Object object, String methodName, Pair<Class, Object>... parameterPairs) throws Exception {
+    public static Object invokeMethodByName(Object object,
+                                            String methodName,
+                                            Pair<Class<?>, Object>... parameterPairs) throws Exception {
         return invokeMethodByName(object, object.getClass(), methodName, parameterPairs);
     }
 
     @SafeVarargs
-    public static Object invokeMethodByName(Object object, Class<?> clazz, String methodName, Pair<Class, Object>... parameterPairs) throws Exception {
-        Class[] parameterTypes;
+    public static Object invokeMethodByName(Object object,
+                                            Class<?> clazz,
+                                            String methodName,
+                                            Pair<Class<?>, Object>... parameterPairs) throws Exception {
+        Class<?>[] parameterTypes;
         Object[] parameterObject;
 
         if (parameterPairs != null) {
@@ -687,7 +529,7 @@ public class Utils {
     }
 
     @Nullable
-    public static <T> T oneOf(T primary, T secondary) {
+    public static <T> T oneOf(@Nullable T primary, @Nullable T secondary) {
         return oneOf(primary, secondary, null);
     }
 
@@ -696,9 +538,16 @@ public class Utils {
         return primary != null ? primary : secondary != null ? secondary : otherwise;
     }
 
-    @NonNull
-    public static <T> List<T> resolveList(@Nullable List<T> primary, @Nullable List<T> secondary) {
-        return primary != null ? primary : secondary != null ? secondary : Collections.<T>emptyList();
+    public static long getOrDefault(long target, long targetDefault, long def) {
+        return target == targetDefault ? def : target;
+    }
+
+    public static float getOrDefault(float target, float targetDefault, float def) {
+        return target == targetDefault ? def : target;
+    }
+
+    public static String capitalize(String value) {
+        return value.substring(0, 1).toUpperCase() + value.substring(1).toLowerCase();
     }
 
     public static String getAppName(android.content.Context context) {
