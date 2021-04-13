@@ -33,7 +33,6 @@ import io.bidmachine.core.Utils;
 import io.bidmachine.core.VisibilityTracker;
 import io.bidmachine.models.AdObjectParams;
 import io.bidmachine.nativead.utils.ImageHelper;
-import io.bidmachine.nativead.utils.NativeNetworkExecutor;
 import io.bidmachine.nativead.view.MediaView;
 import io.bidmachine.nativead.view.NativeMediaView;
 import io.bidmachine.unified.UnifiedNativeAd;
@@ -522,15 +521,12 @@ public final class NativeAdObject
             return;
         }
         showProgressDialog(getContext());
-        Utils.openBrowser(getContext(),
-                          clickUrl,
-                          NativeNetworkExecutor.getInstance(),
-                          new Runnable() {
-                              @Override
-                              public void run() {
-                                  hideProgressDialog();
-                              }
-                          });
+        com.explorestack.iab.utils.Utils.openBrowser(getContext(), clickUrl, new Runnable() {
+            @Override
+            public void run() {
+                hideProgressDialog();
+            }
+        });
     }
 
     @Override
