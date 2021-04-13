@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.bidmachine.core.Logger;
+import io.bidmachine.core.Utils;
 import io.bidmachine.unified.UnifiedAdRequestParams;
+import io.bidmachine.utils.DeviceUtils;
 
 /**
  * Class to store and provide Network specific configuration.
@@ -308,7 +310,7 @@ public abstract class NetworkConfig {
         if (requiredOrientation == Orientation.Undefined) {
             return true;
         }
-        int currentOrientation = Utils.getOrientation();
+        int currentOrientation = DeviceUtils.getOrientation(BidMachineImpl.get().getAppContext());
         if (requiredOrientation == Orientation.Portrait
                 && currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
             return true;

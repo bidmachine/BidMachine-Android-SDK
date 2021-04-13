@@ -45,10 +45,15 @@ public class AdvertisingIdClientInfo implements Runnable {
         AdvertisingProfile advertisingProfile = new AdvertisingProfile();
         try {
             Class<?> advertisingIdClientClass = Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
-            Object advertisingIdInfoObject = Utils.invokeMethodByName(advertisingIdClientClass, advertisingIdClientClass, "getAdvertisingIdInfo", new Pair<Class, Object>(Context.class, context));
+            Object advertisingIdInfoObject = Utils.invokeMethodByName(advertisingIdClientClass,
+                                                                      advertisingIdClientClass,
+                                                                      "getAdvertisingIdInfo",
+                                                                      new Pair<Class<?>, Object>(Context.class, context));
             if (advertisingIdInfoObject != null) {
-                String id = (String) Utils.invokeMethodByName(advertisingIdInfoObject, "getId");
-                boolean limitAdTrackingEnabled = (boolean) Utils.invokeMethodByName(advertisingIdInfoObject, "isLimitAdTrackingEnabled");
+                String id = (String) Utils.invokeMethodByName(advertisingIdInfoObject,
+                                                              "getId");
+                boolean limitAdTrackingEnabled = (boolean) Utils.invokeMethodByName(advertisingIdInfoObject,
+                                                                                    "isLimitAdTrackingEnabled");
 
                 advertisingProfile.setId(id);
                 advertisingProfile.setLimitAdTrackingEnabled(limitAdTrackingEnabled);

@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
+import io.bidmachine.core.Utils;
 import io.bidmachine.displays.PlacementBuilder;
 import io.bidmachine.measurer.OMSDKSettings;
 import io.bidmachine.models.AuctionResult;
@@ -45,9 +46,6 @@ import io.bidmachine.protobuf.RequestExtension;
 import io.bidmachine.protobuf.ResponsePayload;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.utils.BMError;
-
-import static io.bidmachine.Utils.getOrDefault;
-import static io.bidmachine.core.Utils.oneOf;
 
 public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestParamsType extends UnifiedAdRequestParams> {
 
@@ -165,8 +163,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                                 bidMachineSessionAdParams);
 
             //PriceFloor params
-            final PriceFloorParams priceFloorParams = oneOf(this.priceFloorParams,
-                                                            bidMachine.getPriceFloorParams());
+            final PriceFloorParams priceFloorParams = Utils.oneOf(this.priceFloorParams,
+                                                                  bidMachine.getPriceFloorParams());
             final Map<String, Double> priceFloorsMap =
                     priceFloorParams.getPriceFloors() == null
                             || priceFloorParams.getPriceFloors().size() == 0
@@ -741,10 +739,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     bidResult = bid;
                     seatBidResult = seatbid;
                     auctionResult = new AuctionResultImpl(getType(), seatbid, bid, ad, networkConfig);
-                    expirationTime = getOrDefault(bid.getExp(),
-                                                  Response.Seatbid.Bid.getDefaultInstance()
-                                                          .getExp(),
-                                                  DEF_EXPIRATION_TIME);
+                    expirationTime = Utils.getOrDefault(bid.getExp(),
+                                                        Response.Seatbid.Bid.getDefaultInstance()
+                                                                .getExp(),
+                                                        DEF_EXPIRATION_TIME);
                     extractTrackUrls(bid);
                     subscribeExpireTracker();
                     Logger.log(toString() + ": Request finished (" + auctionResult + ")");

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.bidmachine.TrackEventType;
-import io.bidmachine.Utils;
+import io.bidmachine.core.Utils;
 import io.bidmachine.protobuf.AdExtension;
 import io.bidmachine.unified.UnifiedMediationParams;
 

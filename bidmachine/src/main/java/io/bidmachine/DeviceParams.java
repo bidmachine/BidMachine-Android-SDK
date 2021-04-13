@@ -21,6 +21,7 @@ import io.bidmachine.core.Utils;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.RequestParams;
 import io.bidmachine.utils.BluetoothUtils;
+import io.bidmachine.utils.DeviceUtils;
 
 final class DeviceParams extends RequestParams<DeviceParams> {
 
@@ -82,7 +83,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
     void fillDeviceExtension(android.content.Context context,
                              Struct.Builder deviceExtBuilder,
                              UserRestrictionParams userRestrictionParams) {
-        Set<String> inputLanguageSet = io.bidmachine.Utils.getInputLanguageSet(context);
+        Set<String> inputLanguageSet = DeviceUtils.getInputLanguageSet(context);
         if (inputLanguageSet.size() > 0) {
             ListValue.Builder listValueBuilder = ListValue.newBuilder();
             for (String inputLanguage : inputLanguageSet) {
@@ -112,14 +113,14 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                                .setNumberValue(totalDiskSpaceInMB)
                                                .build());
         }
-        Boolean isRingMuted = io.bidmachine.Utils.isRingMuted(context);
+        Boolean isRingMuted = DeviceUtils.isRingMuted(context);
         if (isRingMuted != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.RING_MUTE,
                                        Value.newBuilder()
                                                .setNumberValue(isRingMuted ? 0 : 1)
                                                .build());
         }
-        Boolean isCharging = io.bidmachine.Utils.isCharging(context);
+        Boolean isCharging = DeviceUtils.isCharging(context);
         if (isCharging != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.CHARGING,
                                        Value.newBuilder()
@@ -133,33 +134,33 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                                .setNumberValue(isHeadsetConnected ? 1 : 0)
                                                .build());
         }
-        Integer batteryLevel = io.bidmachine.Utils.getBatteryLevel(context);
+        Integer batteryLevel = DeviceUtils.getBatteryLevel(context);
         if (batteryLevel != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.BATTERY_LEVEL,
                                        Value.newBuilder()
                                                .setNumberValue(batteryLevel)
                                                .build());
         }
-        Boolean isBatterySaverEnabled = io.bidmachine.Utils.isBatterySaverEnabled(context);
+        Boolean isBatterySaverEnabled = DeviceUtils.isBatterySaverEnabled(context);
         if (isBatterySaverEnabled != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.BATTERY_SAVER,
                                        Value.newBuilder()
                                                .setNumberValue(isBatterySaverEnabled ? 1 : 0)
                                                .build());
         }
-        boolean isDarkModeEnabled = io.bidmachine.Utils.isDarkModeEnabled(context);
+        boolean isDarkModeEnabled = DeviceUtils.isDarkModeEnabled(context);
         deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.DARK_MODE,
                                    Value.newBuilder()
                                            .setNumberValue(isDarkModeEnabled ? 1 : 0)
                                            .build());
-        Boolean isAirplaneModeOn = io.bidmachine.Utils.isAirplaneModeOn(context);
+        Boolean isAirplaneModeOn = DeviceUtils.isAirplaneModeOn(context);
         if (isAirplaneModeOn != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.AIR_PLANE,
                                        Value.newBuilder()
                                                .setNumberValue(isAirplaneModeOn ? 1 : 0)
                                                .build());
         }
-        Boolean isDoNotDisturbOn = io.bidmachine.Utils.isDoNotDisturbOn(context);
+        Boolean isDoNotDisturbOn = DeviceUtils.isDoNotDisturbOn(context);
         if (isDoNotDisturbOn != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.DO_NOT_DISTURB,
                                        Value.newBuilder()
@@ -167,7 +168,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                                .build());
         }
         if (userRestrictionParams.canSendDeviceInfo()) {
-            String deviceName = io.bidmachine.Utils.getDeviceName(context);
+            String deviceName = DeviceUtils.getDeviceName(context);
             if (deviceName != null) {
                 deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.DEVICE_NAME,
                                            Value.newBuilder()
@@ -179,7 +180,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                    Value.newBuilder()
                                            .setNumberValue(System.currentTimeMillis())
                                            .build());
-        Float screenBrightnessRatio = io.bidmachine.Utils.getScreenBrightnessRatio(context);
+        Float screenBrightnessRatio = DeviceUtils.getScreenBrightnessRatio(context);
         if (screenBrightnessRatio != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.SCREEN_BRIGHT,
                                        Value.newBuilder()

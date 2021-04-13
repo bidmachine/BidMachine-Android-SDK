@@ -1,4 +1,4 @@
-package io.bidmachine;
+package io.bidmachine.utils;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.ContentResolver;
@@ -24,26 +24,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class Utils {
+public class DeviceUtils {
 
-    public static int getOrDefault(int target, int targetDefault, int def) {
-        return target == targetDefault ? def : target;
-    }
-
-    public static long getOrDefault(long target, long targetDefault, long def) {
-        return target == targetDefault ? def : target;
-    }
-
-    public static float getOrDefault(float target, float targetDefault, float def) {
-        return target == targetDefault ? def : target;
-    }
-
-    public static String capitalize(String value) {
-        return value.substring(0, 1).toUpperCase() + value.substring(1).toLowerCase();
-    }
-
-    public static int getOrientation() {
-        Context context = BidMachineImpl.get().getAppContext();
+    public static int getOrientation(@Nullable Context context) {
         if (context == null) {
             return Configuration.ORIENTATION_UNDEFINED;
         }

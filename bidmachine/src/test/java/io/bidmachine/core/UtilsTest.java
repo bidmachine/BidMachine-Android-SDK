@@ -11,6 +11,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -79,6 +80,13 @@ public class UtilsTest {
         Shadows.shadowOf(activity).grantPermissions("android.permission.ACCESS_NETWORK_STATE");
         result = Utils.isNetworkAvailable(activity);
         assertTrue(result);
+    }
+
+    @Test
+    public void capitalize() {
+        assertEquals("Test_string", Utils.capitalize("test_string"));
+        assertEquals("Test_string", Utils.capitalize("Test_string"));
+        assertEquals("Test_string", Utils.capitalize("tEST_STRING"));
     }
 
 }
