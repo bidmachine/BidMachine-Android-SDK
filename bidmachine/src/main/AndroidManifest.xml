@@ -7,11 +7,6 @@
     <application>
 
         <activity
-            android:name="io.bidmachine.ads.networks.mraid.MraidActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-
-        <activity
             android:name="io.bidmachine.nativead.view.VideoPlayerActivity"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
