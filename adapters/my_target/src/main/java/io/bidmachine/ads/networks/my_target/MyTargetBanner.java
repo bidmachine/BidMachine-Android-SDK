@@ -30,8 +30,6 @@ class MyTargetBanner extends UnifiedBannerAd {
         assert params.slotId != null;
         assert params.bidId != null;
 
-        MyTargetView.setDebugMode(requestParams.isTestMode());
-
         BannerSize size = requestParams.getBannerSize();
         MyTargetView.AdSize adSize;
         switch (size) {

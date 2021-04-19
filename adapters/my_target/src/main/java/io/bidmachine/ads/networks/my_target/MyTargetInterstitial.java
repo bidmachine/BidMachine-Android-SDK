@@ -31,8 +31,6 @@ public class MyTargetInterstitial extends UnifiedFullscreenAd {
         assert params.slotId != null;
         assert params.bidId != null;
 
-        InterstitialAd.setDebugMode(requestParams.isTestMode());
-
         interstitialAd = new InterstitialAd(params.slotId, contextProvider.getContext());
         interstitialAd.setListener(new Listener(callback));
         MyTargetAdapter.updateTargeting(requestParams, interstitialAd.getCustomParams());
@@ -42,7 +40,7 @@ public class MyTargetInterstitial extends UnifiedFullscreenAd {
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
         if (interstitialAd != null) {
-            interstitialAd.show();
+            interstitialAd.show(context);
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }

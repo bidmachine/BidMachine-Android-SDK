@@ -74,6 +74,7 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             collectCallback.onCollectFail(BMError.requestError("slot_id not provided"));
             return;
         }
+        MyTargetManager.setDebugMode(adRequestParams.isTestMode());
         updateRestrictions(adRequestParams);
         obtainBidderToken(contextProvider.getContext(), new TokenListener() {
             @Override
