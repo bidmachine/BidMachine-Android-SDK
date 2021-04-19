@@ -33,7 +33,7 @@ import io.bidmachine.utils.BMError;
 
 class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
-    private static final String AD_COLONY_VERSION = "4.4.0";
+    private static final String AD_COLONY_VERSION = "4.5.0";
     private static HashSet<String> zonesCache = new HashSet<>();
     private boolean isAdapterInitialized = false;
 
