@@ -2,19 +2,23 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 5
+        versionCode 6
     }
 }
 
 apply from: '../adapters.gradle'
 
-repositories {
-    maven {
-        name "TapjoyVideo's maven repo"
-        url "https://tapjoy.bintray.com/maven"
+rootProject.allprojects {
+    repositories {
+        google()
+        maven {
+            name "Tapjoy's maven repo"
+            url "https://sdk.tapjoy.com/"
+        }
     }
 }
 
 dependencies {
-    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.7.1@aar'
+    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.8.0@aar'
+    adapterDependency 'com.google.android.gms:play-services-ads-identifier:17.0.0'
 }
