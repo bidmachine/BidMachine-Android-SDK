@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 5
+        versionCode 6
     }
 }
 
 apply from: '../adapters.gradle'
 
 dependencies {
-    adapterDependency 'com.facebook.android:audience-network-sdk:6.2.0'
+    adapterDependency 'com.facebook.android:audience-network-sdk:6.3.0'
 }
