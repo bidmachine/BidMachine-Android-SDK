@@ -32,8 +32,6 @@ public class MyTargetRewarded extends UnifiedFullscreenAd {
         assert params.slotId != null;
         assert params.bidId != null;
 
-        RewardedAd.setDebugMode(requestParams.isTestMode());
-
         rewardedAd = new RewardedAd(params.slotId, contextProvider.getContext());
         rewardedAd.setListener(new Listener(callback));
         MyTargetAdapter.updateTargeting(requestParams, rewardedAd.getCustomParams());
@@ -43,7 +41,7 @@ public class MyTargetRewarded extends UnifiedFullscreenAd {
     @Override
     public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
         if (rewardedAd != null) {
-            rewardedAd.show();
+            rewardedAd.show(context);
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }
