@@ -48,12 +48,17 @@ class TapjoyFullscreenAdListener implements TJPlacementListener, TJPlacementVide
     }
 
     @Override
-    public void onPurchaseRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s) {
+    public void onPurchaseRequest(TJPlacement tjPlacement,
+                                  TJActionRequest tjActionRequest,
+                                  String s) {
         //ignore
     }
 
     @Override
-    public void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s, int i) {
+    public void onRewardRequest(TJPlacement tjPlacement,
+                                TJActionRequest tjActionRequest,
+                                String s,
+                                int i) {
         //ignore
     }
 
