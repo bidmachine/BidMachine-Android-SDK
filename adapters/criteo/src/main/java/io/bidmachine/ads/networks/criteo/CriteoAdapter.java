@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoErrorCode;
@@ -44,7 +45,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             @Override
             public void onRequestSuccess(@NonNull AdRequest adRequest,
                                          @NonNull AuctionResult auctionResult) {
-                if (!getKey().equals(auctionResult.getNetworkKey())) {
+                if (!isCriteoNetwork(getKey(), auctionResult)) {
                     CriteoBidTokenController.takeBid(adRequest);
                 }
             }
@@ -57,6 +58,15 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             @Override
             public void onRequestExpired(@NonNull AdRequest adRequest) {
                 CriteoBidTokenController.takeBid(adRequest);
+            }
+
+            private boolean isCriteoNetwork(@Nullable String networkKey,
+                                            @Nullable AuctionResult auctionResult) {
+                if (auctionResult == null || TextUtils.isEmpty(networkKey)) {
+                    return false;
+                }
+                assert networkKey != null;
+                return networkKey.equals(auctionResult.getNetworkKey());
             }
         });
     }
