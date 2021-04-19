@@ -34,7 +34,6 @@ public class AdColonyConfig extends NetworkConfig {
         }});
     }
 
-    @SuppressWarnings("unused")
     public AdColonyConfig(@Nullable Map<String, String> networkParams) {
         super(networkParams);
     }

@@ -40,7 +40,8 @@ public class AdColonyRewardListenerWrapper implements AdColonyRewardListener {
     @Override
     public void onReward(AdColonyReward adColonyReward) {
         for (AdColonyFullscreenAdListener listener : listeners) {
-            if (adColonyReward == null || TextUtils.equals(adColonyReward.getZoneID(), listener.getZoneId())) {
+            if (adColonyReward == null
+                    || TextUtils.equals(adColonyReward.getZoneID(), listener.getZoneId())) {
                 listener.onReward(adColonyReward);
             }
         }
