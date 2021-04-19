@@ -13,7 +13,7 @@ import io.bidmachine.utils.BMError;
 abstract class BaseFacebookListener<UnifiedAdCallbackType extends UnifiedAdCallback> implements AdListener {
 
     @NonNull
-    private UnifiedAdCallbackType callback;
+    private final UnifiedAdCallbackType callback;
 
     BaseFacebookListener(@NonNull UnifiedAdCallbackType callback) {
         this.callback = callback;
