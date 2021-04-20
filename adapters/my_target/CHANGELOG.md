@@ -1,4 +1,4 @@
-## Version 1.7.1.6
+## Version 1.7.2.6
 * Updated MyTarget version to 5.12.2
 
 ## Version 1.7.0.5

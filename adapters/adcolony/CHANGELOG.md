@@ -1,4 +1,4 @@
-## Version 1.7.1.9
+## Version 1.7.2.9
 * Updated AdColony version to 4.5.0
 * Changed AdColony repository to mavenCentral
 

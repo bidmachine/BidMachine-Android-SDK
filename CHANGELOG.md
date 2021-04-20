@@ -1,3 +1,9 @@
+## Version 1.7.2 (April 20, 2021)
+**Features**:
+* SDK improvement
+* Added API method ```AdRequest.Builder#setBidPayload``` to set BidPayload
+* Added support for OMSDK version 1.3.15
+
 ## Version 1.7.1 (March 30, 2021)
 **Features**:
 * SDK improvement
