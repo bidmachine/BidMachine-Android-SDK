@@ -59,8 +59,7 @@ public class AdRequestTest {
     public void build_userRestrictionParamsNotSet_useDefaultValues() throws Exception {
         Request request = (Request) adRequest.build(context, adRequest.getType());
         Context requestContext = request.getContext().unpack(Context.class);
-        assertEquals(Context.User.getDefaultInstance().getConsent(),
-                     requestContext.getUser().getConsent());
+        assertEquals("1", requestContext.getUser().getConsent());
         assertFalse(requestContext.getRegs().getGdpr());
     }
 

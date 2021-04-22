@@ -145,7 +145,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             final BidMachineImpl bidMachine = BidMachineImpl.get();
             final SessionManager sessionManager = SessionManager.get();
 
-            AdvertisingPersonalData.syncUpdateInfo(context);
+            AdvertisingPersonalData.updateInfo(context);
 
             final TargetingParams targetingParams =
                     RequestParams.resolveParams(this.targetingParams,

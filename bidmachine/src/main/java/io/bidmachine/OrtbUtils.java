@@ -127,6 +127,8 @@ class OrtbUtils {
                                          @NonNull String sellerId,
                                          @Nullable TargetingParams targetingParams,
                                          @NonNull DataRestrictions restrictions) {
+        AdvertisingPersonalData.updateInfo(context);
+
         final InitRequest.Builder initRequest = InitRequest.newBuilder();
         final String packageName = context.getPackageName();
         if (packageName != null) {

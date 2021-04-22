@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
-import io.bidmachine.core.AdvertisingIdClientInfo;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
 import io.bidmachine.core.Utils;
@@ -152,20 +151,12 @@ final class BidMachineImpl {
         sessionTracker = new SessionTrackerImpl();
         loadStoredInitResponse(context);
         iabSharedPreference.initialize(context);
-        AdvertisingIdClientInfo.executeTask(context, new AdvertisingIdClientInfo.Closure() {
-            @Override
-            public void executed(@NonNull AdvertisingIdClientInfo.AdvertisingProfile advertisingProfile) {
-                AdvertisingPersonalData.setLimitAdTrackingEnabled(advertisingProfile.isLimitAdTrackingEnabled());
-                AdvertisingPersonalData.setDeviceAdvertisingId(advertisingProfile.getId());
-
-                requestInitData(context, sellerId, callback);
-            }
-        });
         setTopActivity(ActivityHelper.getTopActivity());
         ((Application) context.getApplicationContext())
                 .registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks());
         SessionManager.get().resume();
         BluetoothUtils.register(context);
+        requestInitData(context, sellerId, callback);
         isInitialized = true;
     }
 

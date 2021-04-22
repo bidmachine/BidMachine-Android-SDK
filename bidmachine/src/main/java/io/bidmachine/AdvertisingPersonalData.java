@@ -1,35 +1,24 @@
 package io.bidmachine;
 
 import android.content.Context;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
-import java.util.concurrent.CountDownLatch;
-
-import io.bidmachine.core.AdvertisingIdClientInfo;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 
 class AdvertisingPersonalData {
 
+    private final static String ADVERTISING_CLIENT_CLASS = "com.google.android.gms.ads.identifier.AdvertisingIdClient";
+    private final static String DEFAULT_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000";
+
     private static String deviceAdvertisingId;
     private static boolean deviceAdvertisingIdWasGenerated;
     private static boolean limitAdTrackingEnabled = false;
 
-    @VisibleForTesting
-    public final static String DEFAULT_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000";
-
     static boolean isLimitAdTrackingEnabled() {
         return limitAdTrackingEnabled;
-    }
-
-    static void setLimitAdTrackingEnabled(boolean limitAdTrackingEnabled) {
-        AdvertisingPersonalData.limitAdTrackingEnabled = limitAdTrackingEnabled;
-    }
-
-    static void setDeviceAdvertisingId(String deviceAdvertisingId) {
-        AdvertisingPersonalData.deviceAdvertisingId = deviceAdvertisingId;
     }
 
     @NonNull
@@ -53,21 +42,22 @@ class AdvertisingPersonalData {
         return deviceAdvertisingIdWasGenerated;
     }
 
-    static void syncUpdateInfo(Context context) {
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
+    static void updateInfo(Context context) {
         try {
-            AdvertisingIdClientInfo.executeTask(context, new AdvertisingIdClientInfo.Closure() {
-                @Override
-                public void executed(@NonNull AdvertisingIdClientInfo.AdvertisingProfile advertisingProfile) {
-                    setLimitAdTrackingEnabled(advertisingProfile.isLimitAdTrackingEnabled());
-                    setDeviceAdvertisingId(advertisingProfile.getId());
-                    countDownLatch.countDown();
-                }
-            });
-            countDownLatch.await();
+            Class<?> advertisingClientClass = Class.forName(ADVERTISING_CLIENT_CLASS);
+            Object advertisingIdInfoObject = Utils.invokeMethodByName(
+                    advertisingClientClass,
+                    advertisingClientClass,
+                    "getAdvertisingIdInfo",
+                    new Pair<Class<?>, Object>(Context.class, context));
+            if (advertisingIdInfoObject != null) {
+                deviceAdvertisingId = (String) Utils.invokeMethodByName(advertisingIdInfoObject,
+                                                                        "getId");
+                limitAdTrackingEnabled = (boolean) Utils.invokeMethodByName(advertisingIdInfoObject,
+                                                                            "isLimitAdTrackingEnabled");
+            }
         } catch (Exception e) {
             Logger.log(e);
-            countDownLatch.countDown();
         }
     }
 
