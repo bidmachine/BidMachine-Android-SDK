@@ -557,6 +557,15 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         BidMachineFetcher.release(this);
         notifyRequestDestroyed();
 
+        if (adRequestListeners != null) {
+            adRequestListeners.clear();
+            adRequestListeners = null;
+        }
+        if (internalAdRequestListeners != null) {
+            internalAdRequestListeners.clear();
+            internalAdRequestListeners = null;
+        }
+
         priceFloorParams = null;
         targetingParams = null;
         sessionAdParams = null;
