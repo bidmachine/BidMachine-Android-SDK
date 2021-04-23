@@ -23,7 +23,8 @@ import static io.bidmachine.core.Utils.oneOf;
 
 public final class TargetingParams extends RequestParams<TargetingParams> implements ITargetingParams<TargetingParams> {
 
-    private static final String DATA_ID_EXTERNAL_USER_ID = "external_user_ids";
+    @VisibleForTesting
+    static final String DATA_ID_EXTERNAL_USER_ID = "external_user_ids";
 
     private String userId;
     private Gender gender;
@@ -164,7 +165,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
                                                .setId(sourceId)
                                                .setValue(value));
             }
-            builder.addData(dataBuilder.build());
+            builder.addData(dataBuilder);
         }
     }
 

@@ -2,6 +2,8 @@ package io.bidmachine;
 
 import android.location.Location;
 
+import com.explorestack.protobuf.adcom.Context;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -245,6 +247,52 @@ public class TargetingParamsTest {
                      publisherTargetingParams.getExternalUserIdList().get(0));
         assertEquals(publisherExternalUserIdList.get(1),
                      publisherTargetingParams.getExternalUserIdList().get(1));
+    }
+
+    @Test
+    public void build_externalUserIdListIsNull_dataNotAdded() {
+        Context.User.Builder builder = Context.User.newBuilder();
+        TargetingParams targetingParams = new TargetingParams();
+        targetingParams.build(builder);
+
+        assertEquals(0, builder.getDataCount());
+    }
+
+    @Test
+    public void build_externalUserIdListIsEmpty_dataNotAdded() {
+        Context.User.Builder builder = Context.User.newBuilder();
+        TargetingParams targetingParams = new TargetingParams()
+                .setExternalUserIds(new ArrayList<ExternalUserId>());
+        targetingParams.build(builder);
+
+        assertEquals(0, builder.getDataCount());
+    }
+
+    @Test
+    public void build_externalUserIdListIsFilled_dataAddedWithSegments() {
+        Context.User.Builder builder = Context.User.newBuilder();
+        TargetingParams targetingParams = new TargetingParams()
+                .setExternalUserIds(new ArrayList<ExternalUserId>() {{
+                    add(new ExternalUserId(null, null));
+                    add(new ExternalUserId("", ""));
+                    add(new ExternalUserId("", "value_3"));
+                    add(new ExternalUserId("source_id_4", ""));
+                    add(new ExternalUserId("source_id_5", "value_5"));
+                    add(new ExternalUserId("source_id_6", "value_6"));
+                }});
+        targetingParams.build(builder);
+
+        assertEquals(1, builder.getDataCount());
+        Context.Data data = builder.getData(0);
+        assertEquals(TargetingParams.DATA_ID_EXTERNAL_USER_ID, data.getId());
+        List<Context.Data.Segment> segmentList = data.getSegmentList();
+        assertEquals(2, segmentList.size());
+        Context.Data.Segment segment1 = segmentList.get(0);
+        assertEquals("source_id_5", segment1.getId());
+        assertEquals("value_5", segment1.getValue());
+        Context.Data.Segment segment2 = segmentList.get(1);
+        assertEquals("source_id_6", segment2.getId());
+        assertEquals("value_6", segment2.getValue());
     }
 
 }
