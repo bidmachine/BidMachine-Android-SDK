@@ -41,7 +41,6 @@ import io.bidmachine.models.AuctionResult;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.models.RequestBuilder;
 import io.bidmachine.models.RequestParams;
-import io.bidmachine.protobuf.HeaderBiddingType;
 import io.bidmachine.protobuf.RequestExtension;
 import io.bidmachine.protobuf.ResponsePayload;
 import io.bidmachine.unified.UnifiedAdRequestParams;
@@ -62,7 +61,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     Map<String, NetworkConfig> networkConfigMap;
     int timeOut = -1;
     String bidPayload;
-    boolean headerBiddingEnabled = true;
 
     @VisibleForTesting
     UserRestrictionParams userRestrictionParams;
@@ -301,10 +299,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             //Request
             final RequestExtension.Builder requestExtensionBuilder = RequestExtension.newBuilder();
             requestExtensionBuilder.setSellerId(sellerId);
-            requestExtensionBuilder.setHeaderBiddingType(
-                    headerBiddingEnabled
-                            ? HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED
-                            : HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED);
             requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
             requestExtensionBuilder.setSessionId(sessionManager.getSessionId());
 
@@ -1007,22 +1001,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public SelfType setBidPayload(@Nullable String bidPayload) {
             prepareRequest();
             params.bidPayload = bidPayload;
-            return (SelfType) this;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public SelfType disableHeaderBidding() {
-            prepareRequest();
-            params.headerBiddingEnabled = false;
-            return (SelfType) this;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public SelfType enableHeaderBidding() {
-            prepareRequest();
-            params.headerBiddingEnabled = true;
             return (SelfType) this;
         }
 
