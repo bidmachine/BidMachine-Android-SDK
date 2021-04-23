@@ -2,13 +2,17 @@ package io.bidmachine;
 
 import android.location.Location;
 import android.os.Build;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import com.explorestack.protobuf.ListValue;
 import com.explorestack.protobuf.Struct;
 import com.explorestack.protobuf.Value;
 import com.explorestack.protobuf.adcom.Context;
+
+import java.util.List;
 
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.ITargetingParams;
@@ -18,6 +22,8 @@ import io.bidmachine.utils.Gender;
 import static io.bidmachine.core.Utils.oneOf;
 
 public final class TargetingParams extends RequestParams<TargetingParams> implements ITargetingParams<TargetingParams> {
+
+    private static final String DATA_ID_EXTERNAL_USER_ID = "external_user_ids";
 
     private String userId;
     private Gender gender;
@@ -33,6 +39,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     private String framework;
     private Boolean isPaid;
     private BlockedParams blockedParams;
+    private List<ExternalUserId> externalUserIdList;
 
     Location getDeviceLocation() {
         return deviceLocation;
@@ -57,6 +64,7 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
         storeSubCategories = oneOf(storeSubCategories, instance.storeSubCategories);
         framework = oneOf(framework, instance.framework);
         isPaid = oneOf(isPaid, instance.isPaid);
+        externalUserIdList = oneOf(externalUserIdList, instance.externalUserIdList);
         if (instance.blockedParams != null) {
             if (blockedParams == null) {
                 blockedParams = new BlockedParams();
@@ -115,19 +123,19 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     }
 
     void build(Context.User.Builder builder) {
-        //User id
+        // User id
         if (userId != null) {
             builder.setId(userId);
         }
-        //Birthday year
+        // Birthday year
         if (birthdayYear != null) {
             builder.setYob(birthdayYear);
         }
-        //Gender
+        // Gender
         if (gender != null) {
             builder.setGender(gender.getOrtbValue());
         }
-        //Keywords
+        // Keywords
         if (keywords != null && keywords.length > 0) {
             final StringBuilder keywordsBuilder = new StringBuilder();
             for (String keyword : keywords) {
@@ -136,11 +144,28 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
             }
             builder.setKeywords(keywordsBuilder.toString());
         }
-        //Geo
+        // Geo
         final Context.Geo.Builder geoBuilder = Context.Geo.newBuilder();
         build(geoBuilder);
         OrtbUtils.locationToGeo(geoBuilder, null, false);
         builder.setGeo(geoBuilder);
+
+        // Data
+        if (externalUserIdList != null && externalUserIdList.size() > 0) {
+            Context.Data.Builder dataBuilder = Context.Data.newBuilder()
+                    .setId(DATA_ID_EXTERNAL_USER_ID);
+            for (ExternalUserId externalUserId : externalUserIdList) {
+                String sourceId = externalUserId.getSourceId();
+                String value = externalUserId.getValue();
+                if (TextUtils.isEmpty(sourceId) || TextUtils.isEmpty(value)) {
+                    continue;
+                }
+                dataBuilder.addSegment(Context.Data.Segment.newBuilder()
+                                               .setId(sourceId)
+                                               .setValue(value));
+            }
+            builder.addData(dataBuilder.build());
+        }
     }
 
     void build(Context.Geo.Builder builder) {
@@ -237,6 +262,12 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
     }
 
     @Override
+    public TargetingParams setExternalUserIds(List<ExternalUserId> externalUserIdList) {
+        this.externalUserIdList = externalUserIdList;
+        return this;
+    }
+
+    @Override
     public TargetingParams addBlockedApplication(String bundleOrPackage) {
         prepareBlockParams();
         blockedParams.addBlockedApplication(bundleOrPackage);
@@ -291,6 +322,26 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
 
     Boolean getPaid() {
         return isPaid;
+    }
+
+    @VisibleForTesting
+    String getStoreCategory() {
+        return storeCategory;
+    }
+
+    @VisibleForTesting
+    String[] getStoreSubCategories() {
+        return storeSubCategories;
+    }
+
+    @VisibleForTesting
+    String getFramework() {
+        return framework;
+    }
+
+    @VisibleForTesting
+    List<ExternalUserId> getExternalUserIdList() {
+        return externalUserIdList;
     }
 
     private void prepareBlockParams() {
