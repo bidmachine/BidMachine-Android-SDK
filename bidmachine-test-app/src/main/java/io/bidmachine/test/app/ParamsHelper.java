@@ -17,7 +17,6 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -25,8 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import io.bidmachine.BidMachine;
+import io.bidmachine.ExternalUserId;
 import io.bidmachine.ExtraParams;
-import io.bidmachine.Framework;
 import io.bidmachine.PriceFloorParams;
 import io.bidmachine.Publisher;
 import io.bidmachine.TargetingParams;
@@ -44,7 +43,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         Global, Banner, Interstitial, Rewarded, Native
     }
 
-    private static Map<AdsType, ParamsHelper> instances = new HashMap<>();
+    private static final Map<AdsType, ParamsHelper> instances = new HashMap<>();
 
     private static boolean isRestored = false;
 
@@ -86,6 +85,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     private String framework;
     private Location currentDeviceLocation;
     private Boolean isPaid;
+    private List<ExternalUserId> externalUserIdList;
 
     private List<String> blockedAdvertiserIABCategories;
     private List<String> blockedAdvertiserDomains;
@@ -168,7 +168,8 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                 .setStoreCategory(storeCategory)
                 .setStoreSubCategories(storeSubCategories)
                 .setFramework(framework)
-                .setPaid(isPaid);
+                .setPaid(isPaid)
+                .setExternalUserIds(externalUserIdList);
         if (blockedAdvertiserIABCategories != null) {
             for (String value : blockedAdvertiserIABCategories) {
                 params.addBlockedAdvertiserIABCategory(value);
@@ -277,6 +278,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     public String getStoreUrl() {
         return storeUrl;
     }
+
     @Override
     public ParamsHelper setStoreCategory(String storeCategory) {
         this.storeCategory = storeCategory;
@@ -310,6 +312,12 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
     @Override
     public ParamsHelper setPaid(Boolean paid) {
         this.isPaid = paid;
+        return this;
+    }
+
+    @Override
+    public ParamsHelper setExternalUserIds(List<ExternalUserId> externalUserIdList) {
+        this.externalUserIdList = externalUserIdList;
         return this;
     }
 
@@ -384,12 +392,8 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
                     addedCountries.add(locale.getCountry());
                 }
             }
-            Collections.sort(availableLocales, new Comparator<Locale>() {
-                @Override
-                public int compare(Locale o1, Locale o2) {
-                    return o1.getDisplayCountry().compareTo(o2.getDisplayCountry());
-                }
-            });
+            Collections.sort(availableLocales,
+                             (o1, o2) -> o1.getDisplayCountry().compareTo(o2.getDisplayCountry()));
         }
         return availableLocales;
     }
@@ -490,7 +494,7 @@ public class ParamsHelper implements ITargetingParams<ParamsHelper>,
         return priceFloorParams;
     }
 
-    private Map<String, Double> priceFloorParamsMap = new HashMap<>();
+    private final Map<String, Double> priceFloorParamsMap = new HashMap<>();
 
     @Override
     public ParamsHelper addPriceFloor(double value) {

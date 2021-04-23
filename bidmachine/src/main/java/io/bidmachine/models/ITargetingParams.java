@@ -2,6 +2,9 @@ package io.bidmachine.models;
 
 import android.location.Location;
 
+import java.util.List;
+
+import io.bidmachine.ExternalUserId;
 import io.bidmachine.Framework;
 import io.bidmachine.utils.Gender;
 
@@ -123,5 +126,14 @@ public interface ITargetingParams<SelfType> extends IBlockedParams<SelfType> {
      */
     @SuppressWarnings("UnusedReturnValue")
     SelfType setPaid(Boolean paid);
+
+    /**
+     * Set external user id list
+     *
+     * @param externalUserIdList List of external user ids
+     * @return Self instance
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setExternalUserIds(List<ExternalUserId> externalUserIdList);
 
 }
