@@ -45,21 +45,26 @@ publishing {
             artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
-                // Protobuf models
-                def dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', 'io.bidmachine')
-                dependencyNode.appendNode('artifactId', 'protobuf-models')
-                dependencyNode.appendNode('version', protobufModelsVersion)
-                // Stack IAB
-                dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', 'com.explorestack')
-                dependencyNode.appendNode('artifactId', 'iab')
-                dependencyNode.appendNode('version', stackIabVersion)
-                // Lib OMSDK
-                dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', 'io.bidmachine.libs')
-                dependencyNode.appendNode('artifactId', 'omsdk')
-                dependencyNode.appendNode('version', omsdkVersion)
+
+                project.configurations.implementation.getDependencies().each { dependency ->
+                    if (dependency instanceof ExternalModuleDependency) {
+                        println("implementation dependency: " + dependency.properties)
+
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', dependency.group)
+                        dependencyNode.appendNode('artifactId', dependency.name)
+                        dependencyNode.appendNode('version', dependency.version)
+                        if (dependency.artifacts != null && !dependency.artifacts.isEmpty()) {
+                            def type = dependency.artifacts.first().type
+                            // We are interested only in 'aar' types
+                            if ("aar" == type) {
+                                dependencyNode.appendNode('type', type)
+                            }
+                        }
+                    } else {
+                        throw new GradleException("implementation dependency can be used only for ExternalModuleDependencies")
+                    }
+                }
             }
         }
     }
