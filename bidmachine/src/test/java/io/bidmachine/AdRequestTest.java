@@ -23,8 +23,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import io.bidmachine.protobuf.ErrorReason;
-import io.bidmachine.protobuf.HeaderBiddingType;
-import io.bidmachine.protobuf.RequestExtension;
 import io.bidmachine.protobuf.ResponsePayload;
 import io.bidmachine.utils.BMError;
 
@@ -242,44 +240,6 @@ public class AdRequestTest {
         });
         adRequest.destroy();
         assertTrue(countDownLatch.await(5, TimeUnit.SECONDS));
-    }
-
-    @Test
-    public void headerBidding() throws Exception {
-        //Default HeaderBidding
-        Request request = (Request) adRequest.build(context, adRequest.getType());
-        RequestExtension requestExtension = request.getExtProto(0).unpack(RequestExtension.class);
-        assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED_VALUE,
-                     requestExtension.getHeaderBiddingTypeValue());
-
-        //Disabled HeaderBidding
-        adRequest.headerBiddingEnabled = false;
-        request = (Request) adRequest.build(context, adRequest.getType());
-        requestExtension = request.getExtProto(0).unpack(RequestExtension.class);
-        assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_DISABLED_VALUE,
-                     requestExtension.getHeaderBiddingTypeValue());
-
-        //Enabled HeaderBidding
-        adRequest.headerBiddingEnabled = true;
-        request = (Request) adRequest.build(context, adRequest.getType());
-        requestExtension = request.getExtProto(0).unpack(RequestExtension.class);
-        assertEquals(HeaderBiddingType.HEADER_BIDDING_TYPE_ENABLED_VALUE,
-                     requestExtension.getHeaderBiddingTypeValue());
-    }
-
-    @Test
-    public void headerBiddingBuilder() {
-        //Default HeaderBidding
-        TestAdRequestBuilder builder = new TestAdRequestBuilder();
-        assertTrue(builder.build().headerBiddingEnabled);
-
-        //Disabled HeaderBidding
-        builder.disableHeaderBidding();
-        assertFalse(builder.build().headerBiddingEnabled);
-
-        //Enabled HeaderBidding
-        builder.enableHeaderBidding();
-        assertTrue(builder.build().headerBiddingEnabled);
     }
 
     @Test
