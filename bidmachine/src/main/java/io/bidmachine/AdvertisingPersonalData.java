@@ -14,35 +14,15 @@ class AdvertisingPersonalData {
     private final static String DEFAULT_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000";
 
     private static String deviceAdvertisingId;
-    private static boolean deviceAdvertisingIdWasGenerated;
     private static boolean limitAdTrackingEnabled = false;
 
-    static boolean isLimitAdTrackingEnabled() {
-        return limitAdTrackingEnabled;
-    }
-
-    @NonNull
-    static String getAdvertisingId(Context context, boolean blocked) {
-        if (blocked) {
-            return DEFAULT_ADVERTISING_ID;
-        } else if (AdvertisingPersonalData.deviceAdvertisingId == null) {
-            deviceAdvertisingIdWasGenerated = true;
-            String uuid = Utils.getAdvertisingUUID(context);
-            if (uuid != null) {
-                return uuid;
-            }
-            return DEFAULT_ADVERTISING_ID;
-        } else {
-            deviceAdvertisingIdWasGenerated = false;
-            return AdvertisingPersonalData.deviceAdvertisingId;
-        }
-    }
-
-    public static boolean isDeviceAdvertisingIdWasGenerated() {
-        return deviceAdvertisingIdWasGenerated;
-    }
-
-    static void updateInfo(Context context) {
+    /**
+     * Updating current advertising information.
+     * Only execute this method on a background thread
+     *
+     * @param context - your application context
+     */
+    static void updateInfo(@NonNull Context context) {
         try {
             Class<?> advertisingClientClass = Class.forName(ADVERTISING_CLIENT_CLASS);
             Object advertisingIdInfoObject = Utils.invokeMethodByName(
@@ -58,6 +38,25 @@ class AdvertisingPersonalData {
             }
         } catch (Exception e) {
             Logger.log(e);
+        }
+    }
+
+    static boolean isLimitAdTrackingEnabled() {
+        return limitAdTrackingEnabled;
+    }
+
+    @NonNull
+    static String getAdvertisingId(Context context, boolean blocked) {
+        if (blocked) {
+            return DEFAULT_ADVERTISING_ID;
+        } else if (deviceAdvertisingId == null) {
+            String uuid = Utils.getAdvertisingUUID(context);
+            if (uuid != null) {
+                return uuid;
+            }
+            return DEFAULT_ADVERTISING_ID;
+        } else {
+            return deviceAdvertisingId;
         }
     }
 
