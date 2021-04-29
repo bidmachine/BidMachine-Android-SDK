@@ -32,7 +32,6 @@ import io.bidmachine.utils.DeviceUtils;
  */
 public abstract class NetworkConfig {
 
-    private static final String KEY_CLASSPATH = "classpath";
     static final String KEY_NETWORK = "network";
     private static final String KEY_FORMAT = "format";
     private static final String KEY_AD_UNITS = "ad_units";
@@ -400,36 +399,18 @@ public abstract class NetworkConfig {
     static NetworkConfig create(@NonNull Context context,
                                 @NonNull String networkName,
                                 @Nullable Map<String, String> networkParams) {
-        String networkAssetJson = readAssetByNetworkName(context, networkName);
-        if (TextUtils.isEmpty(networkAssetJson)) {
+        NetworkAssetParams networkAssetParams = NetworkAssetManager.getNetworkAssetParams(context,
+                                                                                          networkName);
+        if (networkAssetParams == null) {
             return null;
         }
-        assert networkAssetJson != null;
         try {
-            JSONObject networkAssetConfig = new JSONObject(networkAssetJson);
-            String classPath = networkAssetConfig.getString(KEY_CLASSPATH);
-            return (NetworkConfig) Class.forName(classPath)
+            return (NetworkConfig) Class.forName(networkAssetParams.getClasspath())
                     .getConstructor(Map.class)
                     .newInstance(networkParams);
         } catch (Throwable t) {
             Logger.log(String.format("Network (%s) load fail!", networkName));
             Logger.log(t);
-        }
-        return null;
-    }
-
-    @Nullable
-    private static String readAssetByNetworkName(@NonNull Context context,
-                                                 @NonNull String networkName) {
-        InputStream inputStream = null;
-        try {
-            String networkFileName = String.format("bm_networks/%s.bmnetwork", networkName);
-            inputStream = context.getAssets().open(networkFileName);
-            return io.bidmachine.core.Utils.streamToString(inputStream);
-        } catch (Throwable t) {
-            Logger.log(t);
-        } finally {
-            io.bidmachine.core.Utils.close(inputStream);
         }
         return null;
     }

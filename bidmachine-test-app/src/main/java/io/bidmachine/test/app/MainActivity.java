@@ -645,11 +645,11 @@ public class MainActivity extends AppCompatActivity {
                             + "    \"ad_units\": [{"
                             + "        \"format\": \"interstitial_video\","
                             + "        \"zone_id\": \"vz06e8c32a037749699e7050\","
-                            + "        \"store_id\": \"google\" // optional"
+                            + "        \"store_id\": \"google\"" // optional
                             + "    }, {"
                             + "        \"format\": \"rewarded_video\","
                             + "        \"zone_id\": \"vz1fd5a8b2bf6841a0a4b826\","
-                            + "        \"store_id\": \"google\" // optional"
+                            + "        \"store_id\": \"google\"" // optional
                             + "    }]"
                             + "}"),
             new OptionalNetwork(

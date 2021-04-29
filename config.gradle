@@ -2,7 +2,7 @@ ext {
     androidCompileSdkVersion = 30
     androidMinSdkVersion = 15
     androidTargetSdkVersion = 30
-    robolectricVersion = '3.1.2'
+    robolectricVersion = '3.8'
     mockitoVersion = '2.0.57-beta'
     jUnitVersion = '4.12'
     mockwebserver = '3.3.0'
