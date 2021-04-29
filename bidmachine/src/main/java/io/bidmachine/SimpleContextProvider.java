@@ -9,10 +9,16 @@ import androidx.annotation.Nullable;
 final class SimpleContextProvider implements ContextProvider {
 
     @NonNull
-    private Context context;
+    private final Context context;
 
     SimpleContextProvider(@NonNull Context context) {
         this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public Context getApplicationContext() {
+        return getContext().getApplicationContext();
     }
 
     @NonNull

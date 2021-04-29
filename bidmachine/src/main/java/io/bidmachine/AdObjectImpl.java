@@ -51,6 +51,12 @@ public abstract class AdObjectImpl<
 
     @NonNull
     @Override
+    public Context getApplicationContext() {
+        return contextProvider.getApplicationContext();
+    }
+
+    @NonNull
+    @Override
     public Context getContext() {
         return contextProvider.getContext();
     }

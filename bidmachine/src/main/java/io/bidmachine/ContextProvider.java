@@ -9,6 +9,9 @@ import androidx.annotation.Nullable;
 public interface ContextProvider {
 
     @NonNull
+    Context getApplicationContext();
+
+    @NonNull
     Context getContext();
 
     @Nullable
