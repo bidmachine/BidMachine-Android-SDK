@@ -7,17 +7,19 @@ import java.util.Map;
 
 public class TestNetworkConfig extends NetworkConfig {
 
+    private static final String DEFAULT_KEY = "test_network";
+
     private final String key;
 
-    TestNetworkConfig() {
-        this(null, null);
+    public TestNetworkConfig() {
+        this(DEFAULT_KEY, null);
     }
 
-    TestNetworkConfig(@Nullable Map<String, String> networkParams) {
-        this(null, networkParams);
+    public TestNetworkConfig(@Nullable Map<String, String> networkParams) {
+        this(DEFAULT_KEY, networkParams);
     }
 
-    TestNetworkConfig(String key, @Nullable Map<String, String> networkParams) {
+    public TestNetworkConfig(String key, @Nullable Map<String, String> networkParams) {
         super(networkParams);
         this.key = key;
     }

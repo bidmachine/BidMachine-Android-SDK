@@ -41,6 +41,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -55,7 +57,10 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -576,6 +581,20 @@ public class Utils {
     public static boolean canUseCleartextTraffic() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
                 || NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted();
+    }
+
+    @NonNull
+    public static Map<String, String> toMap(@NonNull JSONObject jsonObject) throws Exception {
+        Map<String, String> map = new HashMap<>();
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonObject.opt(key);
+            if (value != null) {
+                map.put(key, value.toString());
+            }
+        }
+        return map;
     }
 
 }

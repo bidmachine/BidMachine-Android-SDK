@@ -245,15 +245,7 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             HeaderBiddingPlacement.AdUnit.Builder builder = HeaderBiddingPlacement.AdUnit.newBuilder();
             builder.setBidder(adapter.getKey());
             builder.setBidderSdkver(adapter.getVersion());
-            for (Map.Entry<String, String> mediationEntry : mediationConfig.entrySet()) {
-                String key = mediationEntry.getKey();
-                String value = mediationEntry.getValue();
-                if (!TextUtils.isEmpty(key)
-                        && !TextUtils.isEmpty(value)
-                        && !NetworkConfig.PRIVATE_FIELDS.contains(key)) {
-                    builder.putClientParams(key, value);
-                }
-            }
+            builder.putAllClientParams(mediationConfig);
             builder.putAllClientParams(params);
             adUnit = builder.build();
             Logger.log(String.format("%s: %s: Header bidding collect finished",

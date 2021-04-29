@@ -940,7 +940,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     JSONArray networkConfigJsonArray = new JSONArray(jsonData);
                     for (int i = 0; i < networkConfigJsonArray.length(); i++) {
                         JSONObject networkConfigJsonObject = networkConfigJsonArray.getJSONObject(i);
-                        NetworkConfig networkConfig = NetworkConfig.create(
+                        NetworkConfig networkConfig = NetworkConfigFactory.create(
                                 BidMachineImpl.get().getAppContext(),
                                 networkConfigJsonObject);
                         if (networkConfig != null) {

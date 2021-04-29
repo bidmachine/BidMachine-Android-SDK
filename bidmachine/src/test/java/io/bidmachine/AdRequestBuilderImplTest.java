@@ -1,9 +1,11 @@
 package io.bidmachine;
 
+import org.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
@@ -22,11 +24,12 @@ public class AdRequestBuilderImplTest {
     @Before
     public void setUp() throws Exception {
         adRequestBuilder = new TestAdRequestBuilder();
+        BidMachine.initialize(RuntimeEnvironment.application, "1");
         BidMachineImpl.get().getInitNetworkConfigList().clear();
     }
 
     @Test
-    public void setNetworksJson() {
+    public void setNetworksJson_invalidParams_nothingAdded() {
         adRequestBuilder.setNetworks((String) null);
         assertNull(adRequestBuilder.params);
         adRequestBuilder.setNetworks("");
@@ -40,6 +43,49 @@ public class AdRequestBuilderImplTest {
         adRequestBuilder.setNetworks("[test_string]");
         assertNull(adRequestBuilder.params);
         adRequestBuilder.setNetworks("[]");
+        assertNull(adRequestBuilder.params);
+    }
+
+    @Test
+    @Config(manifest = "src/test/AndroidManifest.xml", sdk = 21)
+    public void setNetworksJson_validParams_configAdded() throws Exception {
+        JSONArray configArray = new JSONArray("[{"
+                                                      + "\"network\": \"test_network\","
+                                                      + "\"required_parameter_1\": \"required_value_1\","
+                                                      + "\"required_parameter_2\": \"required_value_2\","
+                                                      + "\"ad_units\": [{"
+                                                      + "        \"ad_unit_id\": \"test_value_1\","
+                                                      + "        \"format\": \"banner_320x50\""
+                                                      + "    }, {"
+                                                      + "        \"ad_unit_id\": \"test_value_2\","
+                                                      + "        \"format\": \"interstitial_static\""
+                                                      + "    }]"
+                                                      + "}]");
+        NetworkRegistry.cache.put("test_network", new TestNetworkConfig());
+        adRequestBuilder.setNetworks(configArray.toString());
+
+        assertNotNull(adRequestBuilder.params);
+        assertEquals(1, adRequestBuilder.params.networkConfigMap.size());
+    }
+
+    @Test
+    @Config(manifest = "src/test/AndroidManifest.xml", sdk = 21)
+    public void setNetworksJson_validParamsWithNotRegisteredNetwork_nothingAdded() throws Exception {
+        JSONArray configArray = new JSONArray("[{"
+                                                      + "\"network\": \"test_network_1\","
+                                                      + "\"required_parameter_1\": \"required_value_1\","
+                                                      + "\"required_parameter_2\": \"required_value_2\","
+                                                      + "\"ad_units\": [{"
+                                                      + "        \"ad_unit_id\": \"test_value_1\","
+                                                      + "        \"format\": \"banner_320x50\""
+                                                      + "    }, {"
+                                                      + "        \"ad_unit_id\": \"test_value_2\","
+                                                      + "        \"format\": \"interstitial_static\""
+                                                      + "    }]"
+                                                      + "}]");
+        NetworkRegistry.cache.put("test_network", new TestNetworkConfig());
+        adRequestBuilder.setNetworks(configArray.toString());
+
         assertNull(adRequestBuilder.params);
     }
 
