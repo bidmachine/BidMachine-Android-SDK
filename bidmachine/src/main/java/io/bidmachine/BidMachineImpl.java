@@ -284,17 +284,8 @@ final class BidMachineImpl {
                 if (NetworkRegistry.isNetworkRegistered(adNetwork.getName())) {
                     continue;
                 }
-                NetworkConfig networkConfig = NetworkConfig.create(context,
-                                                                   adNetwork.getName(),
-                                                                   adNetwork.getCustomParamsMap());
+                NetworkConfig networkConfig = NetworkConfigFactory.create(context, adNetwork);
                 if (networkConfig != null) {
-                    for (AdNetwork.AdUnit adUnit : adNetwork.getAdUnitsList()) {
-                        AdsFormat adsFormat = AdsFormat.byRemoteName(adUnit.getAdFormat());
-                        if (adsFormat != null) {
-                            networkConfig.withMediationConfig(adsFormat,
-                                                              adUnit.getCustomParamsMap());
-                        }
-                    }
                     networkConfig.setRegisterSource(RegisterSource.Init);
 
                     NetworkRegistry.registerNetwork(networkConfig);

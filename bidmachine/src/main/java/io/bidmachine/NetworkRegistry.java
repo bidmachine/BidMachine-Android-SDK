@@ -131,7 +131,7 @@ class NetworkRegistry {
             JSONArray jsonArray = new JSONArray(jsonData);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                NetworkConfig networkConfig = NetworkConfig.create(context, jsonObject);
+                NetworkConfig networkConfig = NetworkConfigFactory.create(context, jsonObject);
                 if (networkConfig != null) {
                     registerNetwork(networkConfig);
                 }
