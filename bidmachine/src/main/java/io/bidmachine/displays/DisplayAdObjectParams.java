@@ -7,6 +7,7 @@ final class DisplayAdObjectParams extends IabAdObjectParams {
 
     DisplayAdObjectParams(Response.Seatbid seatbid, Response.Seatbid.Bid bid, Ad ad) {
         super(seatbid, bid, ad);
+
         prepareEvents(ad.getDisplay().getEventList());
     }
 

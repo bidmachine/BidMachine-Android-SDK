@@ -29,7 +29,6 @@ import com.explorestack.protobuf.adcom.OS;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,7 +55,8 @@ class OrtbUtils {
         return LocationType.LOCATION_TYPE_INVALID;
     }
 
-    static Context.Geo.Builder locationToGeo(@Nullable Location location, boolean shouldProvideUtc) {
+    static Context.Geo.Builder locationToGeo(@Nullable Location location,
+                                             boolean shouldProvideUtc) {
         Context.Geo.Builder builder = Context.Geo.newBuilder();
         locationToGeo(builder, location, shouldProvideUtc);
         return builder;
@@ -143,7 +143,8 @@ class OrtbUtils {
         }
         initRequest.setSdk(BidMachine.NAME);
         initRequest.setSdkver(BidMachine.VERSION);
-        initRequest.setIfa(AdvertisingPersonalData.getAdvertisingId(context, !restrictions.canSendIfa()));
+        initRequest.setIfa(AdvertisingPersonalData.getAdvertisingId(context,
+                                                                    !restrictions.canSendIfa()));
         initRequest.setBmIfv(BidMachineImpl.get().obtainIFV(context));
         initRequest.setSessionId(SessionManager.get().getSessionId());
 
@@ -168,12 +169,14 @@ class OrtbUtils {
         return initRequest.build();
     }
 
-    static Location obtainBestLocation(android.content.Context context, Location first, Location second) {
+    static Location obtainBestLocation(android.content.Context context,
+                                       Location first,
+                                       Location second) {
         Location bestLocation = oneOf(first, second);
-        Location locationFromLocationService = Utils.getLocation(context);
-        if (locationFromLocationService != null &&
-                (bestLocation == null || locationFromLocationService.getTime() >= bestLocation.getTime())) {
-            bestLocation = locationFromLocationService;
+        Location location = Utils.getLocation(context);
+        if (location != null
+                && (bestLocation == null || location.getTime() >= bestLocation.getTime())) {
+            bestLocation = location;
         }
         return bestLocation;
     }
@@ -185,7 +188,9 @@ class OrtbUtils {
         }
         for (Ad.Event event : events) {
             TrackEventType eventType = TrackEventType.fromNumber(event.getTypeValue());
-            if (eventType == null) continue;
+            if (eventType == null) {
+                continue;
+            }
             addEvent(outMap, eventType, event.getUrl());
         }
     }
@@ -209,10 +214,9 @@ class OrtbUtils {
      */
 
     //TODO: optimize for different packages support
-    private static String protoRootPackage = "bidmachine";
-    private static String[] protoKnownPackages = {"io.bidmachine", "com.explorestack"};
-
-    private static Printer DEFAULT_PRINTER = new Printer();
+    private static final String PROTO_ROOT_PACKAGE = "bidmachine";
+    private static final String[] PROTO_KNOWN_PACKAGES = {"io.bidmachine", "com.explorestack"};
+    private static final Printer DEFAULT_PRINTER = new Printer();
 
     private static String printToString(MessageOrBuilder message) {
         try {
@@ -280,6 +284,7 @@ class OrtbUtils {
     }
 
     private static final class Printer {
+
         boolean singleLineMode;
         boolean escapeNonAscii;
 
@@ -299,24 +304,18 @@ class OrtbUtils {
         }
 
         private void print(MessageOrBuilder message, TextGenerator generator) throws IOException {
-            Iterator var3 = message.getAllFields().entrySet().iterator();
-
-            while (var3.hasNext()) {
-                Map.Entry<Descriptors.FieldDescriptor, Object> field = (Map.Entry) var3.next();
-                this.printField(field.getKey(), field.getValue(), generator);
+            for (Map.Entry<Descriptors.FieldDescriptor, Object> entry
+                    : message.getAllFields().entrySet()) {
+                printField(entry.getKey(), entry.getValue(), generator);
             }
-
-            this.printUnknownFields(message.getUnknownFields(), generator);
+            printUnknownFields(message.getUnknownFields(), generator);
         }
 
         private void printField(Descriptors.FieldDescriptor field,
                                 Object value,
                                 TextGenerator generator) throws IOException {
             if (field.isRepeated()) {
-                Iterator var4 = ((List) value).iterator();
-
-                while (var4.hasNext()) {
-                    Object element = var4.next();
+                for (Object element : (List<?>) value) {
                     this.printSingleField(field, element, generator);
                 }
             } else {
@@ -365,10 +364,11 @@ class OrtbUtils {
                     final String[] splits = typeUrl.split("/");
                     final String type = splits[splits.length - 1];
 
-                    for (String pkg : protoKnownPackages) {
+                    for (String pkg : PROTO_KNOWN_PACKAGES) {
                         try {
-                            String className = type.replace(protoRootPackage, pkg);
-                            OrtbUtils.print(any.unpack((Class<Message>) Class.forName(className)), tmp);
+                            String className = type.replace(PROTO_ROOT_PACKAGE, pkg);
+                            OrtbUtils.print(any.unpack((Class<Message>) Class.forName(className)),
+                                            tmp);
                             break;
                         } catch (ClassNotFoundException ignore) {
                         }
@@ -406,21 +406,13 @@ class OrtbUtils {
                                      TextGenerator generator) throws IOException {
             switch (field.getType()) {
                 case INT32:
-                case SINT32:
-                case SFIXED32:
-                    generator.print(value.toString());
-                    break;
                 case INT64:
+                case SINT32:
                 case SINT64:
+                case SFIXED32:
                 case SFIXED64:
-                    generator.print(value.toString());
-                    break;
                 case BOOL:
-                    generator.print(value.toString());
-                    break;
                 case FLOAT:
-                    generator.print(value.toString());
-                    break;
                 case DOUBLE:
                     generator.print(value.toString());
                     break;
@@ -437,7 +429,7 @@ class OrtbUtils {
                     generator.print(this.escapeNonAscii
                                             ? escapeBytes(ByteString.copyFromUtf8((String) value))
                                             : TextFormat.escapeDoubleQuotesAndBackslashes((String) value)
-                                                        .replace("\n", "\\n"));
+                                                    .replace("\n", "\\n"));
                     generator.print("\"");
                     break;
                 case BYTES:
@@ -460,20 +452,18 @@ class OrtbUtils {
 
         }
 
-        private void printUnknownFields(UnknownFieldSet unknownFields, TextGenerator generator) throws IOException {
-
-            for (Object o : unknownFields.asMap().entrySet()) {
-                Map.Entry<Integer, UnknownFieldSet.Field> entry = (Map.Entry) o;
+        private void printUnknownFields(UnknownFieldSet unknownFields,
+                                        TextGenerator generator) throws IOException {
+            for (Map.Entry<Integer, UnknownFieldSet.Field> entry
+                    : unknownFields.asMap().entrySet()) {
                 int number = entry.getKey();
                 UnknownFieldSet.Field field = entry.getValue();
                 this.printUnknownField(number, 0, field.getVarintList(), generator);
                 this.printUnknownField(number, 5, field.getFixed32List(), generator);
                 this.printUnknownField(number, 1, field.getFixed64List(), generator);
                 this.printUnknownField(number, 2, field.getLengthDelimitedList(), generator);
-                Iterator var7 = field.getGroupList().iterator();
 
-                while (var7.hasNext()) {
-                    UnknownFieldSet value = (UnknownFieldSet) var7.next();
+                for (UnknownFieldSet value : field.getGroupList()) {
                     generator.print(entry.getKey().toString());
                     if (this.singleLineMode) {
                         generator.print(" { ");
@@ -491,7 +481,6 @@ class OrtbUtils {
                     }
                 }
             }
-
         }
 
         private void printUnknownField(int number,
@@ -505,9 +494,12 @@ class OrtbUtils {
                 generator.print(this.singleLineMode ? " " : "\n");
             }
         }
+
     }
 
-    private static void printUnknownFieldValue(int tag, Object value, TextGenerator generator) throws IOException {
+    private static void printUnknownFieldValue(int tag,
+                                               Object value,
+                                               TextGenerator generator) throws IOException {
         switch (WireFormat.getTagWireType(tag)) {
             case 0:
                 generator.print(unsignedToString((Long) value));
@@ -533,9 +525,11 @@ class OrtbUtils {
     }
 
     private static String unsignedToString(long value) {
-        return value >= 0L ? Long.toString(value) : BigInteger.valueOf(value & 9223372036854775807L)
-                                                              .setBit(63)
-                                                              .toString();
+        return value >= 0L
+                ? Long.toString(value)
+                : BigInteger.valueOf(value & 9223372036854775807L)
+                        .setBit(63)
+                        .toString();
     }
 
 }

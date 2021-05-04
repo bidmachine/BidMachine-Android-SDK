@@ -48,7 +48,10 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory {
     }
 
     @Override
-    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+    public Socket createSocket(Socket s,
+                               String host,
+                               int port,
+                               boolean autoClose) throws IOException {
         return makeSocketSafe(delegate.createSocket(s, host, port, autoClose));
     }
 
@@ -58,7 +61,10 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory {
     }
 
     @Override
-    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
+    public Socket createSocket(String host,
+                               int port,
+                               InetAddress localHost,
+                               int localPort) throws IOException {
         return makeSocketSafe(delegate.createSocket(host, port, localHost, localPort));
     }
 
@@ -68,11 +74,15 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory {
     }
 
     @Override
-    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+    public Socket createSocket(InetAddress address,
+                               int port,
+                               InetAddress localAddress,
+                               int localPort) throws IOException {
         return makeSocketSafe(delegate.createSocket(address, port, localAddress, localPort));
     }
 
-    private class NoSSLv3SSLSocket extends DelegateSSLSocket {
+
+    private static class NoSSLv3SSLSocket extends DelegateSSLSocket {
 
         private NoSSLv3SSLSocket(SSLSocket delegate) {
             super(delegate);
@@ -86,15 +96,17 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory {
                     enabledProtocols.remove("SSLv3");
                     System.out.println("Removed SSLv3 from enabled protocols");
                 } else {
-                    System.out.println("SSL stuck with protocol available for " + String.valueOf(enabledProtocols));
+                    System.out.println("SSL stuck with protocol available for " + enabledProtocols);
                 }
-                protocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
+                protocols = enabledProtocols.toArray(new String[0]);
             }
+
             super.setEnabledProtocols(protocols);
         }
+
     }
 
-    public class DelegateSSLSocket extends SSLSocket {
+    public static class DelegateSSLSocket extends SSLSocket {
 
         final SSLSocket delegate;
 
@@ -402,6 +414,7 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory {
         public boolean equals(Object o) {
             return delegate.equals(o);
         }
+
     }
 
 }

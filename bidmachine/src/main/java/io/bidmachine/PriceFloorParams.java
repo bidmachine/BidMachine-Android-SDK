@@ -36,6 +36,7 @@ public final class PriceFloorParams extends RequestParams implements IPriceFloor
 
     @Override
     public void merge(@NonNull RequestParams instance) {
-        //ignore
+        // ignore
     }
+
 }

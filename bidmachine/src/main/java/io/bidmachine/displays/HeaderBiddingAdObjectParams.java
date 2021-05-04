@@ -22,6 +22,7 @@ class HeaderBiddingAdObjectParams extends AdObjectParams {
                                 @NonNull Ad ad,
                                 @NonNull HeaderBiddingAd headerBiddingAd) {
         super(seatbid, bid, ad);
+
         this.headerBiddingAd = headerBiddingAd;
     }
 
@@ -47,6 +48,7 @@ class HeaderBiddingAdObjectParams extends AdObjectParams {
     public UnifiedMediationParams toMediationParams() {
         return mediationParams;
     }
+
 
     private class HeaderBiddingUnifiedMediationParams extends UnifiedMediationParams {
 
@@ -126,7 +128,10 @@ class HeaderBiddingAdObjectParams extends AdObjectParams {
         @Override
         public boolean contains(@Nullable String key) {
             return key != null &&
-                    (headerBiddingAd.containsServerParams(key) || headerBiddingAd.containsClientParams(key));
+                    (headerBiddingAd.containsServerParams(key)
+                            || headerBiddingAd.containsClientParams(key));
         }
+
     }
+
 }

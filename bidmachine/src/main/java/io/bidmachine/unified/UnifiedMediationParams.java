@@ -67,7 +67,7 @@ public abstract class UnifiedMediationParams {
         }
 
         @NonNull
-        private DataProvider dataProvider;
+        private final DataProvider dataProvider;
 
         public MappedUnifiedMediationParams(@NonNull DataProvider dataProvider) {
             this.dataProvider = dataProvider;
@@ -124,6 +124,7 @@ public abstract class UnifiedMediationParams {
             }
             return fallback;
         }
+
     }
 
 }

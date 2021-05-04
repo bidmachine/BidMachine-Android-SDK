@@ -11,10 +11,10 @@ import java.util.List;
 
 public class Publisher {
 
-    private String id;
-    private String name;
-    private String domain;
-    private List<String> categories;
+    private final String id;
+    private final String name;
+    private final String domain;
+    private final List<String> categories;
 
     private Publisher(@Nullable String id,
                       @Nullable String name,

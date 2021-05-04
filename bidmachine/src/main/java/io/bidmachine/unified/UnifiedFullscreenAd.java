@@ -10,8 +10,11 @@ public abstract class UnifiedFullscreenAd extends UnifiedAd<UnifiedFullscreenAdC
                               @NonNull UnifiedFullscreenAdCallback callback);
 
     public void onFinished() {
+
     }
 
     public void onClosed(boolean finished) {
+
     }
+
 }

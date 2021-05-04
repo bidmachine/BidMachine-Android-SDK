@@ -30,10 +30,11 @@ public class DisplayPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedA
         extends PlacementBuilder<UnifiedAdRequestParamsType>
         implements ISizableDisplayPlacement<UnifiedAdRequestParamsType> {
 
-    private boolean isFullscreen;
+    private final boolean isFullscreen;
 
     public DisplayPlacementBuilder(boolean fullscreen, boolean supportHeaderBidding) {
         super(AdContentType.Static, supportHeaderBidding);
+
         this.isFullscreen = fullscreen;
     }
 
@@ -56,8 +57,10 @@ public class DisplayPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedA
         Point displaySize = getSize(contextProvider, adRequestParams);
         builder.setW(displaySize.x);
         builder.setH(displaySize.y);
-        Message.Builder headerBiddingPlacement =
-                createHeaderBiddingPlacement(contextProvider, adRequestParams, adsType, networkConfigs);
+        Message.Builder headerBiddingPlacement = createHeaderBiddingPlacement(contextProvider,
+                                                                              adRequestParams,
+                                                                              adsType,
+                                                                              networkConfigs);
         if (headerBiddingPlacement != null) {
             builder.addExtProto(Any.pack(headerBiddingPlacement.build()));
         }
@@ -65,20 +68,19 @@ public class DisplayPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedA
     }
 
     @Override
-    public Point getSize(ContextProvider contextProvider, UnifiedAdRequestParamsType adRequestParams) {
+    public Point getSize(ContextProvider contextProvider,
+                         UnifiedAdRequestParamsType adRequestParams) {
         return Utils.getScreenSize(contextProvider.getContext());
     }
 
     @Override
-    public AdObjectParams createAdObjectParams(@NonNull ContextProvider contextProvider,
-                                               @NonNull UnifiedAdRequestParamsType adRequest,
-                                               @NonNull Response.Seatbid seatbid,
+    public AdObjectParams createAdObjectParams(@NonNull Response.Seatbid seatbid,
                                                @NonNull Response.Seatbid.Bid bid,
                                                @NonNull Ad ad) {
         if (!ad.hasDisplay()) {
             return null;
         }
-        AdObjectParams params = createHeaderBiddingAdObjectParams(contextProvider, adRequest, seatbid, bid, ad);
+        AdObjectParams params = createHeaderBiddingAdObjectParams(seatbid, bid, ad);
         if (params == null) {
             Ad.Display display = ad.getDisplay();
             if (TextUtils.isEmpty(display.getAdm())) {

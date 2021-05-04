@@ -45,13 +45,15 @@ abstract class IabAdObjectParams
         implements UnifiedMediationParams.MappedUnifiedMediationParams.DataProvider {
 
     private Map<String, Object> params;
-    private UnifiedMediationParams mediationParams =
+
+    private final UnifiedMediationParams mediationParams =
             new UnifiedMediationParams.MappedUnifiedMediationParams(this);
 
     IabAdObjectParams(@NonNull Response.Seatbid seatbid,
                       @NonNull Response.Seatbid.Bid bid,
                       @NonNull Ad ad) {
         super(seatbid, bid, ad);
+
         getData().put(KEY_CREATIVE_ID, ad.getId());
     }
 
@@ -69,6 +71,7 @@ abstract class IabAdObjectParams
                                      @NonNull Response.Seatbid.Bid bid,
                                      @NonNull AdExtension extension) {
         super.prepareExtensions(seatbid, bid, extension);
+
         getData().put(KEY_PRELOAD, extension.getPreload());
         getData().put(KEY_LOAD_SKIP_OFFSET, extension.getLoadSkipoffset());
         getData().put(KEY_USE_NATIVE_CLOSE, extension.getUseNativeClose());

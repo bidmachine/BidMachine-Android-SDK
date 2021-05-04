@@ -26,6 +26,7 @@ class NastNative extends UnifiedNativeAd {
         callback.onAdLoaded(new NastAdapter(nastParams));
     }
 
+
     private static final class NastAdapter extends NativeNetworkAdapter {
 
         private final NastParams nastParams;

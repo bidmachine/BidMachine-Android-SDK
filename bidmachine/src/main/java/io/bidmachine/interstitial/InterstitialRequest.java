@@ -21,7 +21,9 @@ public final class InterstitialRequest extends FullScreenAdRequest<InterstitialR
         return ProtoUtils.isInterstitialPlacement(placement);
     }
 
+
     public static final class Builder extends FullScreenRequestBuilder<Builder, InterstitialRequest> {
+
         @Override
         protected InterstitialRequest createRequest() {
             return new InterstitialRequest();
@@ -31,9 +33,11 @@ public final class InterstitialRequest extends FullScreenAdRequest<InterstitialR
         public Builder setAdContentType(@NonNull AdContentType adContentType) {
             return super.setAdContentType(adContentType);
         }
+
     }
 
     public interface AdRequestListener extends AdRequest.AdRequestListener<InterstitialRequest> {
+
     }
 
 }

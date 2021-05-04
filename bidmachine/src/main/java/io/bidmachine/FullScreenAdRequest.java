@@ -18,7 +18,8 @@ public abstract class FullScreenAdRequest<SelfType extends FullScreenAdRequest>
 
     @Override
     boolean isPlacementBuilderMatch(PlacementBuilder placementBuilder) {
-        return (adContentType == AdContentType.All || adContentType == placementBuilder.getAdContentType())
+        return (adContentType == AdContentType.All
+                || adContentType == placementBuilder.getAdContentType())
                 && super.isPlacementBuilderMatch(placementBuilder);
     }
 
@@ -40,6 +41,7 @@ public abstract class FullScreenAdRequest<SelfType extends FullScreenAdRequest>
             params.adContentType = adContentType;
             return (SelfType) this;
         }
+
     }
 
     private class FullscreenUnifiedAdRequestParams extends BaseUnifiedAdRequestParams
@@ -55,6 +57,7 @@ public abstract class FullScreenAdRequest<SelfType extends FullScreenAdRequest>
             return FullScreenAdRequest.this.adContentType == AdContentType.All
                     || FullScreenAdRequest.this.adContentType == adContentType;
         }
+
     }
 
 }

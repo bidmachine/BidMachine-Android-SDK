@@ -16,61 +16,110 @@ public class BMError {
     @VisibleForTesting
     public static final int ERROR_NOT_INITIALIZED = 99;
 
-    public static final BMError NotInitialized = new BMError(ERROR_NOT_INITIALIZED,
-            "SDK not initialized", "Sdk not initialized properly, see docs: https://wiki.appodeal.com/display/BID/BidMachine+Android+SDK+Documentation");
-    public static final BMError Connection = new BMError(ErrorReason.ERROR_REASON_NO_CONNECTION_VALUE,
-            "Connection error", "BidMachine can't connect to server");
-    public static final BMError TimeoutError = new BMError(ErrorReason.ERROR_REASON_TIMEOUT_VALUE,
-            "Timeout error", "BidMachine timeout reached");
-    public static final BMError NoContent = new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
-            "No content", "No content");
-    public static final BMError IncorrectAdUnit = new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
-            "Incorrect ad unit", "Incorrect ad unit");
-    public static final BMError IncorrectContent = new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
-            "Incorrect content", "Incorrect content");
-    public static final BMError Internal = new BMError(ErrorReason.ERROR_REASON_INTERNAL_VALUE,
-            "Internal error", "internal error acquired");
-    public static final BMError Server = new BMError(ErrorReason.ERROR_REASON_HTTP_SERVER_ERROR_VALUE,
-            "Server error", "server error, please contact support");
-    public static final BMError NotLoaded = new BMError(ERROR_NOT_LOADED,
-            "Ads not loaded", "Ads not loaded");
-    public static final BMError AlreadyShown = new BMError(-1,
-            "Ads already shown", "Ads was already shown, load new one please");
-    public static final BMError RequestAlreadyShown = new BMError(-1,
-            "AdRequest already shown", "AdRequest that related with ad has already been shown, load new AdRequest please");
-    public static final BMError RequestDestroyed = new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
-            "AdRequest destroyed", "AdRequest destroyed, create new one please");
-    public static final BMError RequestExpired = new BMError(ErrorReason.ERROR_REASON_WAS_EXPIRED_VALUE,
-            "AdRequest expired", "AdRequest expired, load new one please");
-    public static final BMError Destroyed = new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
-            "Ads destroyed", "Ads destroyed, load new one please");
-    public static final BMError Expired = new BMError(ErrorReason.ERROR_REASON_WAS_EXPIRED_VALUE,
-            "Ads expired", "Ads was expired, load new one please");
+    public static final BMError NotInitialized =
+            new BMError(ERROR_NOT_INITIALIZED,
+                        "SDK not initialized",
+                        "Sdk not initialized properly, see docs: https://wiki.appodeal.com/display/BID/BidMachine+Android+SDK+Documentation");
+
+    public static final BMError Connection =
+            new BMError(ErrorReason.ERROR_REASON_NO_CONNECTION_VALUE,
+                        "Connection error",
+                        "BidMachine can't connect to server");
+
+    public static final BMError TimeoutError =
+            new BMError(ErrorReason.ERROR_REASON_TIMEOUT_VALUE,
+                        "Timeout error",
+                        "BidMachine timeout reached");
+
+    public static final BMError NoContent =
+            new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
+                        "No content",
+                        "No content");
+
+    public static final BMError IncorrectAdUnit =
+            new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
+                        "Incorrect ad unit",
+                        "Incorrect ad unit");
+
+    public static final BMError IncorrectContent =
+            new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
+                        "Incorrect content",
+                        "Incorrect content");
+
+    public static final BMError Internal =
+            new BMError(ErrorReason.ERROR_REASON_INTERNAL_VALUE,
+                        "Internal error",
+                        "internal error acquired");
+
+    public static final BMError Server =
+            new BMError(ErrorReason.ERROR_REASON_HTTP_SERVER_ERROR_VALUE,
+                        "Server error",
+                        "server error, please contact support");
+
+    public static final BMError NotLoaded =
+            new BMError(ERROR_NOT_LOADED,
+                        "Ads not loaded",
+                        "Ads not loaded");
+
+    public static final BMError AlreadyShown =
+            new BMError(-1,
+                        "Ads already shown",
+                        "Ads was already shown, load new one please");
+
+    public static final BMError RequestAlreadyShown =
+            new BMError(-1,
+                        "AdRequest already shown",
+                        "AdRequest that related with ad has already been shown, load new AdRequest please");
+
+    public static final BMError RequestDestroyed =
+            new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
+                        "AdRequest destroyed",
+                        "AdRequest destroyed, create new one please");
+
+    public static final BMError RequestExpired =
+            new BMError(ErrorReason.ERROR_REASON_WAS_EXPIRED_VALUE,
+                        "AdRequest expired",
+                        "AdRequest expired, load new one please");
+
+    public static final BMError Destroyed =
+            new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
+                        "Ads destroyed",
+                        "Ads destroyed, load new one please");
+
+    public static final BMError Expired =
+            new BMError(ErrorReason.ERROR_REASON_WAS_EXPIRED_VALUE,
+                        "Ads expired",
+                        "Ads was expired, load new one please");
 
     public static BMError noFillError(BMError origin) {
         if (origin != null && origin.getCode() != ErrorReason.ERROR_REASON_NO_CONTENT_VALUE) {
             return new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
-                    "No fill (" + origin.getBrief() + ")",
-                    "No ads fill (" + origin.getMessage() + ")",
-                    origin);
+                               "No fill (" + origin.getBrief() + ")",
+                               "No ads fill (" + origin.getMessage() + ")",
+                               origin);
         }
         return new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
-                "No fill", "No ads fill", origin);
+                           "No fill",
+                           "No ads fill",
+                           origin);
     }
 
     public static BMError paramError(String message) {
         return new BMError(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE,
-                "Param error", "Param error: " + message);
+                           "Param error",
+                           "Param error: " + message);
     }
 
     public static BMError adapterNotFoundError(String adapterName) {
         return new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
-                "Adapter not found", "Adapter not found (" + adapterName + ")");
+                           "Adapter not found",
+                           "Adapter not found (" + adapterName + ")");
     }
 
     public static BMError requestError(String message) {
         return new BMError(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE,
-                "Request Error", "Request error (" + message + ")");
+                           "Request Error",
+                           "Request error (" + message + ")");
     }
 
     public static BMError catchError(String message) {
@@ -79,13 +128,13 @@ public class BMError {
                            message);
     }
 
-    private int code;
-    private String brief;
-    private String message;
-    private boolean trackError = true;
-
+    private final int code;
+    private final String brief;
+    private final String message;
     @Nullable
-    private BMError originError;
+    private final BMError originError;
+
+    private boolean trackError = true;
 
     private BMError(int code, String brief, String message) {
         this(code, brief, message, null);
@@ -125,13 +174,20 @@ public class BMError {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BMError bmError = (BMError) o;
-
-        if (code != bmError.code) return false;
-        if (brief != null ? !brief.equals(bmError.brief) : bmError.brief != null) return false;
+        if (code != bmError.code) {
+            return false;
+        }
+        if (brief != null ? !brief.equals(bmError.brief) : bmError.brief != null) {
+            return false;
+        }
         return message != null ? message.equals(bmError.message) : bmError.message == null;
     }
 
@@ -146,6 +202,7 @@ public class BMError {
     @NonNull
     @Override
     public String toString() {
-        return "(" + code + ") " + brief + " - " + message;
+        return String.format("(%s) %s - %s", code, brief, message);
     }
+
 }

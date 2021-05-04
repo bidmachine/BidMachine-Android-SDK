@@ -52,7 +52,7 @@ public class SessionTrackerTest {
     @Test
     public void notifyEvent_sameObject_clearInstanceWhenIntervalsEmptyAfterFinish() {
         TrackingObject trackingObject = new TestTrackingObject("test_key");
-        tracker.trackEventStart(trackingObject, TrackEventType.AuctionRequest, null, null);
+        tracker.trackEventStart(trackingObject, TrackEventType.AuctionRequest, null);
         assertEquals(1, tracker.intervalHolders.size());
         assertEquals(1, tracker.intervalHolders.get(trackingObject.getTrackingKey()).size());
         tracker.trackEventFinish(trackingObject, TrackEventType.AuctionRequest, null, null);
@@ -62,8 +62,8 @@ public class SessionTrackerTest {
     @Test
     public void notifyEvent_sameObject_notEmptyInstanceAfterFinish() {
         TrackingObject trackingObject = new TestTrackingObject("test_key");
-        tracker.trackEventStart(trackingObject, TrackEventType.AuctionRequest, null, null);
-        tracker.trackEventStart(trackingObject, TrackEventType.Load, null, null);
+        tracker.trackEventStart(trackingObject, TrackEventType.AuctionRequest, null);
+        tracker.trackEventStart(trackingObject, TrackEventType.Load, null);
         assertEquals(1, tracker.intervalHolders.size());
         assertEquals(2, tracker.intervalHolders.get(trackingObject.getTrackingKey()).size());
         tracker.trackEventFinish(trackingObject, TrackEventType.Load, null, null);
@@ -75,8 +75,8 @@ public class SessionTrackerTest {
         TrackingObject trackingObject1 = new TestTrackingObject("test_key_1");
         TrackingObject trackingObject2 = new TestTrackingObject("test_key_2");
 
-        tracker.trackEventStart(trackingObject1, TrackEventType.AuctionRequest, null, null);
-        tracker.trackEventStart(trackingObject2, TrackEventType.AuctionRequest, null, null);
+        tracker.trackEventStart(trackingObject1, TrackEventType.AuctionRequest, null);
+        tracker.trackEventStart(trackingObject2, TrackEventType.AuctionRequest, null);
 
         assertEquals(2, tracker.intervalHolders.size());
         assertEquals(1, tracker.intervalHolders.get(trackingObject1.getTrackingKey()).size());

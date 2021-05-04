@@ -59,10 +59,7 @@ public abstract class BidMachineAd<
         @Override
         public Object getTrackingKey() {
             AuctionResult auctionResult = getAuctionResult();
-            if (auctionResult != null) {
-                return auctionResult.getId();
-            }
-            return "-1";
+            return auctionResult != null ? auctionResult.getId() : "-1";
         }
 
         @Nullable
@@ -221,8 +218,10 @@ public abstract class BidMachineAd<
                                        @Nullable Response.Seatbid seatbid,
                                        @Nullable Response.Seatbid.Bid bid,
                                        @Nullable Ad ad) {
-        if (currentState.ordinal() > State.Loading.ordinal()) return;
-        BidMachineEvents.eventStart(trackingObject, TrackEventType.Load, getType());
+        if (currentState.ordinal() > State.Loading.ordinal()) {
+            return;
+        }
+        BidMachineEvents.eventStart(trackingObject, TrackEventType.Load);
         currentState = State.Loading;
         if (request == null || seatbid == null || bid == null || ad == null) {
             processRequestFail(BMError.Internal);
@@ -257,11 +256,7 @@ public abstract class BidMachineAd<
             UnifiedAdRequestParamsType adRequestParams = adRequest.obtainUnifiedRequestParams();
             NetworkConfig networkConfig = getType().obtainNetworkConfig(ad);
             if (networkConfig != null) {
-                AdObjectParams adObjectParams = getType().createAdObjectParams(contextProvider,
-                                                                               adRequestParams,
-                                                                               seatbid,
-                                                                               bid,
-                                                                               ad);
+                AdObjectParams adObjectParams = getType().createAdObjectParams(seatbid, bid, ad);
                 if (adObjectParams != null && adObjectParams.isValid()) {
                     loadedObject = createAdObject(contextProvider,
                                                   adRequest,
@@ -289,8 +284,10 @@ public abstract class BidMachineAd<
                                                    @NonNull AdProcessCallback processCallback);
 
     private void processRequestFail(BMError error) {
-        if (currentState.ordinal() > State.Loading.ordinal()) return;
-        BidMachineEvents.eventStart(trackingObject, TrackEventType.Load, getType());
+        if (currentState.ordinal() > State.Loading.ordinal()) {
+            return;
+        }
+        BidMachineEvents.eventStart(trackingObject, TrackEventType.Load);
         processCallback.processLoadFail(error);
     }
 
@@ -326,7 +323,7 @@ public abstract class BidMachineAd<
     private final AdRequest.InternalAdRequestListener<AdRequestType> internalAdRequestListener =
             new AdRequest.InternalAdRequestListener<AdRequestType>() {
                 @Override
-                public void onRequestDestroyed(@NonNull AdRequest request) {
+                public void onRequestDestroyed(@NonNull AdRequestType request) {
                     if (request == adRequest) {
                         destroy();
                     }
@@ -335,6 +332,7 @@ public abstract class BidMachineAd<
 
     @CallSuper
     protected void onDestroy() {
+
     }
 
     final AdProcessCallback processCallback = new AdProcessCallback() {
@@ -556,7 +554,8 @@ public abstract class BidMachineAd<
                 public void run() {
                     if (listener instanceof AdFullScreenListener) {
                         log("notify AdClosed");
-                        ((AdFullScreenListener) listener).onAdClosed(BidMachineAd.this, isFinishTracked);
+                        ((AdFullScreenListener) listener).onAdClosed(BidMachineAd.this,
+                                                                     isFinishTracked);
                     }
                 }
             });
@@ -633,7 +632,10 @@ public abstract class BidMachineAd<
     @NonNull
     @Override
     public String toString() {
-        return toStringShort() + ": state=" + currentState + ", auctionResult=" + getAuctionResult();
+        return String.format("%s: state = %s, auctionResult = %s",
+                             toStringShort(),
+                             currentState,
+                             getAuctionResult());
     }
 
     /*
@@ -644,8 +646,9 @@ public abstract class BidMachineAd<
 
     protected String toStringShort() {
         if (cachedClassTag == null) {
-            cachedClassTag = getClass().getSimpleName() + "[@" + Integer.toHexString(
-                    hashCode()) + "]";
+            cachedClassTag = String.format("%s[@%s]",
+                                           getClass().getSimpleName(),
+                                           Integer.toHexString(hashCode()));
         }
         return cachedClassTag;
     }
@@ -655,7 +658,9 @@ public abstract class BidMachineAd<
      */
 
     enum State {
+
         Idle, Requesting, Loading, Success, Failed, Destroyed, Expired
+
     }
 
 }

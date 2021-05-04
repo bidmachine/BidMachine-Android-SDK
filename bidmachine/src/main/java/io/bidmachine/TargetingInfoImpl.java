@@ -14,9 +14,9 @@ import io.bidmachine.utils.Gender;
 class TargetingInfoImpl implements TargetingInfo {
 
     @NonNull
-    private DataRestrictions dataRestrictions;
+    private final DataRestrictions dataRestrictions;
     @NonNull
-    private TargetingParams targetingParams;
+    private final TargetingParams targetingParams;
 
     TargetingInfoImpl(@NonNull DataRestrictions dataRestrictions,
                       @NonNull TargetingParams targetingParams) {
@@ -117,4 +117,5 @@ class TargetingInfoImpl implements TargetingInfo {
     public Boolean isPaid() {
         return targetingParams.getPaid();
     }
+
 }

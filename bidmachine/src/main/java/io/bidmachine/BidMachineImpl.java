@@ -80,9 +80,9 @@ final class BidMachineImpl {
     @NonNull
     private ExtraParams extraParams = new ExtraParams();
     @NonNull
-    private UserRestrictionParams userRestrictionParams = new UserRestrictionParams();
+    private final UserRestrictionParams userRestrictionParams = new UserRestrictionParams();
     @NonNull
-    private PriceFloorParams priceFloorParams =
+    private final PriceFloorParams priceFloorParams =
             new PriceFloorParams()
                     .addPriceFloor(UUID.randomUUID().toString(), 0.01);
     @NonNull
@@ -186,7 +186,9 @@ final class BidMachineImpl {
     private void requestInitData(@NonNull final Context context,
                                  @NonNull final String sellerId,
                                  @Nullable final InitializationCallback callback) {
-        if (currentInitRequest != null) return;
+        if (currentInitRequest != null) {
+            return;
+        }
         BidMachineEvents.eventStart(trackingObject, TrackEventType.InitLoading, null);
         Utils.onBackgroundThread(new Runnable() {
             @Override
@@ -203,7 +205,7 @@ final class BidMachineImpl {
                             public void onSuccess(@Nullable InitResponse result) {
                                 currentInitRequest = null;
                                 if (result != null) {
-                                    handleInitResponse(context, result);
+                                    handleInitResponse(result);
                                     storeInitResponse(context, result);
 
                                     initializeNetworks(context, result.getAdNetworksList());
@@ -240,11 +242,10 @@ final class BidMachineImpl {
                                                          initRequestDelayMs);
                                 // According requirements we should notify that SDK is initialized event if init request fail
                                 notifyInitializationFinished(callback);
-                                BidMachineEvents.eventFinish(
-                                        trackingObject,
-                                        TrackEventType.InitLoading,
-                                        null,
-                                        result);
+                                BidMachineEvents.eventFinish(trackingObject,
+                                                             TrackEventType.InitLoading,
+                                                             null,
+                                                             result);
                             }
                         })
                         .request();
@@ -263,7 +264,7 @@ final class BidMachineImpl {
         }
     }
 
-    private void handleInitResponse(@NonNull Context context, @NonNull InitResponse response) {
+    private void handleInitResponse(@NonNull InitResponse response) {
         if (!TextUtils.isEmpty(response.getEndpoint())) {
             currentAuctionUrl = response.getEndpoint();
         }
@@ -293,15 +294,15 @@ final class BidMachineImpl {
                 }
             }
         }
-        NetworkRegistry.initializeNetworks(
-                new SimpleContextProvider(context),
-                new UnifiedAdRequestParamsImpl(targetingParams, dataRestrictions),
-                new NetworkRegistry.NetworksInitializeCallback() {
-                    @Override
-                    public void onNetworksInitialized() {
-                        AdRequestExecutor.get().enable();
-                    }
-                });
+        NetworkRegistry.initializeNetworks(new SimpleContextProvider(context),
+                                           new UnifiedAdRequestParamsImpl(targetingParams,
+                                                                          dataRestrictions),
+                                           new NetworkRegistry.NetworksInitializeCallback() {
+                                               @Override
+                                               public void onNetworksInitialized() {
+                                                   AdRequestExecutor.get().enable();
+                                               }
+                                           });
     }
 
     private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {
@@ -319,7 +320,7 @@ final class BidMachineImpl {
     private void loadStoredInitResponse(@NonNull Context context) {
         InitResponse initResponse = getInitResponseFromPref(context);
         if (initResponse != null) {
-            handleInitResponse(context, initResponse);
+            handleInitResponse(initResponse);
         }
     }
 

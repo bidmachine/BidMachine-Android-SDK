@@ -166,6 +166,7 @@ class NetworkRegistry {
             @Override
             public void run() {
                 super.run();
+
                 final List<NetworkLoadTask> loadTasks = new ArrayList<>();
                 if (pendingNetworks != null) {
                     for (NetworkConfig networkConfig : pendingNetworks) {
@@ -244,12 +245,10 @@ class NetworkRegistry {
             };
             Logger.log(String.format("Load network from config start: %s", networkName));
             try {
-                BidMachineEvents.eventStart(
-                        trackingObject,
-                        TrackEventType.HeaderBiddingNetworkInitialize,
-                        new TrackEventInfo()
-                                .withParameter("HB_NETWORK", networkName),
-                        null);
+                BidMachineEvents.eventStart(trackingObject,
+                                            TrackEventType.HeaderBiddingNetworkInitialize,
+                                            new TrackEventInfo()
+                                                    .withParameter("HB_NETWORK", networkName));
                 NetworkAdapter networkAdapter = networkConfig.obtainNetworkAdapter();
                 networkAdapter.setLogging(Logger.isLoggingEnabled());
                 networkAdapter.initialize(contextProvider,
@@ -265,11 +264,12 @@ class NetworkRegistry {
                     type.addNetworkConfig(key, networkConfig);
                 }
                 Logger.log(
-                        String.format("Load network from config finish: %s, %s, %s. Register source - %s",
-                                      networkName,
-                                      networkAdapter.getVersion(),
-                                      networkAdapter.getAdapterVersion(),
-                                      networkConfig.getRegisterSource()));
+                        String.format(
+                                "Load network from config finish: %s, %s, %s. Register source - %s",
+                                networkName,
+                                networkAdapter.getVersion(),
+                                networkAdapter.getAdapterVersion(),
+                                networkConfig.getRegisterSource()));
                 if (networkAdapter instanceof HeaderBiddingAdapter) {
                     BidMachineEvents.eventFinish(trackingObject,
                                                  TrackEventType.HeaderBiddingNetworkInitialize,

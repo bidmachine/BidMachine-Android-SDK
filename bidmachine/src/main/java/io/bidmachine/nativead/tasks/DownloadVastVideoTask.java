@@ -25,6 +25,7 @@ public class DownloadVastVideoTask implements Runnable {
 
     private final Handler handler;
 
+    // TODO: Not safe
     private Context context;
     private OnLoadedListener listener;
     private String videoTag;
@@ -33,9 +34,11 @@ public class DownloadVastVideoTask implements Runnable {
     private boolean initialized;
 
     public interface OnLoadedListener {
+
         void onVideoLoaded(DownloadVastVideoTask task, Uri videoFileUri, VastRequest vastRequest);
 
         void onVideoLoadingError(DownloadVastVideoTask task);
+
     }
 
     public DownloadVastVideoTask(Context context, OnLoadedListener listener, String tag) {

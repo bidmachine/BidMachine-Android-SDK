@@ -74,6 +74,7 @@ public class DownloadImageTask implements Runnable {
                 }
             }
         }
+
     }
 
     private DownloadImageTask() {
@@ -238,12 +239,15 @@ public class DownloadImageTask implements Runnable {
         bitmap.recycle();
     }
 
+
     public interface OnCacheImageListener {
+
         void onPathSuccess(DownloadImageTask task, Uri imagePath);
 
         void onImageSuccess(DownloadImageTask task, Bitmap imageBitmap);
 
         void onFail(DownloadImageTask task);
+
     }
 
 }

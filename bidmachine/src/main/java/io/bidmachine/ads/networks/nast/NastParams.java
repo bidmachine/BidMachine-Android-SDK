@@ -26,6 +26,7 @@ public class NastParams extends UnifiedParams {
 
     NastParams(@NonNull UnifiedMediationParams mediationParams) {
         super(mediationParams);
+
         title = mediationParams.getString(IabUtils.KEY_TITLE);
         description = mediationParams.getString(IabUtils.KEY_DESCRIPTION);
         callToAction = mediationParams.getString(IabUtils.KEY_CTA);
@@ -57,18 +58,21 @@ public class NastParams extends UnifiedParams {
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Icon)
                 && TextUtils.isEmpty(iconUrl)) {
-            callback.onAdLoadFailed(BMError.requestError("Your request settings require ICON, but it not provided in response"));
+            callback.onAdLoadFailed(BMError.requestError(
+                    "Your request settings require ICON, but it not provided in response"));
             return false;
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Image)
                 && TextUtils.isEmpty(imageUrl)) {
-            callback.onAdLoadFailed(BMError.requestError("Your request settings require IMAGE, but it not provided in response"));
+            callback.onAdLoadFailed(BMError.requestError(
+                    "Your request settings require IMAGE, but it not provided in response"));
             return false;
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Video)
                 && TextUtils.isEmpty(videoAdm)
                 && TextUtils.isEmpty(videoUrl)) {
-            callback.onAdLoadFailed(BMError.requestError("Your request settings require VIDEO, but it not provided in response"));
+            callback.onAdLoadFailed(BMError.requestError(
+                    "Your request settings require VIDEO, but it not provided in response"));
             return false;
         }
         return true;

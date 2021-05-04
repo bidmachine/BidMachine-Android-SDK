@@ -9,4 +9,5 @@ public interface HeaderBiddingAdRequestParams {
 
     @NonNull
     AdContentType getAdContentType();
+
 }

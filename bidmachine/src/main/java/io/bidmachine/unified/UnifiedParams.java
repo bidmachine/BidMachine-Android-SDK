@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 public abstract class UnifiedParams {
 
     @NonNull
-    private UnifiedMediationParams mediationParams;
+    private final UnifiedMediationParams mediationParams;
 
     public UnifiedParams(@NonNull UnifiedMediationParams mediationParams) {
         this.mediationParams = mediationParams;

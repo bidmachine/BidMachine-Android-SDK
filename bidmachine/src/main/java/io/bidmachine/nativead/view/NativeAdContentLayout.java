@@ -48,6 +48,7 @@ public class NativeAdContentLayout extends NativeAdContainer {
 
     public NativeAdContentLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
         if (attrs != null) {
             final TypedArray attrsArray = context.obtainStyledAttributes(attrs,
                                                                          R.styleable.NativeAdContentLayout,
@@ -74,6 +75,7 @@ public class NativeAdContentLayout extends NativeAdContainer {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
         setTitleView(findViewById(titleViewId));
         setCallToActionView(findViewById(callToActionViewId));
         setRatingView(findViewById(ratingViewId));

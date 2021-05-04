@@ -35,4 +35,5 @@ public interface AdObject<
     void onExpired();
 
     void onDestroy();
+
 }

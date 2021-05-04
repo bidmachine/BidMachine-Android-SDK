@@ -35,4 +35,5 @@ public class SimpleBannerListener implements BannerListener {
     public void onAdExpired(@NonNull BannerView ad) {
 
     }
+
 }

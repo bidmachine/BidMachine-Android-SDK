@@ -24,9 +24,11 @@ public class DownloadVideoTask implements Runnable {
     private boolean initialized;
 
     public interface OnLoadedListener {
+
         void onVideoLoaded(DownloadVideoTask task, Uri videoFileUri);
 
         void onVideoLoadingError(DownloadVideoTask task);
+
     }
 
     public DownloadVideoTask(Context context, OnLoadedListener listener, String url) {

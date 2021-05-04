@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import java.util.concurrent.ThreadFactory;
 
 final class ProcessPriorityThreadFactory implements ThreadFactory {
+
     private final int threadPriority;
 
     ProcessPriorityThreadFactory(int threadPriority) {

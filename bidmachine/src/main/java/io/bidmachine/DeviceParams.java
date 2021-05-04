@@ -31,8 +31,9 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                @NonNull TargetingParams defaultTargetingParams,
                @NonNull DataRestrictions restrictions) {
         final DeviceInfo deviceInfo = DeviceInfo.obtain(context);
-        builder.setType(deviceInfo.isTablet ? DeviceType.DEVICE_TYPE_TABLET :
-                DeviceType.DEVICE_TYPE_PHONE_DEVICE);
+        builder.setType(deviceInfo.isTablet
+                                ? DeviceType.DEVICE_TYPE_TABLET
+                                : DeviceType.DEVICE_TYPE_PHONE_DEVICE);
         builder.setOs(OS.OS_ANDROID);
         builder.setOsv(Build.VERSION.RELEASE);
 
@@ -43,7 +44,8 @@ final class DeviceParams extends RequestParams<DeviceParams> {
         builder.setW(screenSize.x);
         builder.setH(screenSize.y);
 
-        builder.setIfa(AdvertisingPersonalData.getAdvertisingId(context, !restrictions.canSendIfa()));
+        builder.setIfa(AdvertisingPersonalData.getAdvertisingId(context,
+                                                                !restrictions.canSendIfa()));
         builder.setLmt(AdvertisingPersonalData.isLimitAdTrackingEnabled());
 
         if (restrictions.canSendDeviceInfo()) {
@@ -74,8 +76,8 @@ final class DeviceParams extends RequestParams<DeviceParams> {
         }
         if (restrictions.canSendGeoPosition()) {
             Location location = OrtbUtils.obtainBestLocation(context,
-                    targetingParams.getDeviceLocation(),
-                    defaultTargetingParams.getDeviceLocation());
+                                                             targetingParams.getDeviceLocation(),
+                                                             defaultTargetingParams.getDeviceLocation());
             builder.setGeo(OrtbUtils.locationToGeo(location, true));
         }
     }

@@ -34,13 +34,18 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
     @VisibleForTesting
     int timeOut;
 
-    private ApiRequest(@Nullable String path, @NonNull Method method, @Nullable RequestDataType requestData) {
-        super(path, method, requestData);
+    private ApiRequest(@NonNull Method method,
+                       @Nullable String path,
+                       @Nullable RequestDataType requestData) {
+        super(method, path, requestData);
+
         addContentEncoder(new GZIPRequestDataEncoder<RequestDataType, ResponseType, BMError>());
     }
 
     @Override
-    protected BMError obtainError(URLConnection connection, @Nullable ResponseType adResponse, int responseCode) {
+    protected BMError obtainError(URLConnection connection,
+                                  @Nullable ResponseType adResponse,
+                                  int responseCode) {
         if (responseCode == HttpURLConnection.HTTP_OK) {
             return null;
         }
@@ -48,15 +53,17 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
     }
 
     @Override
-    protected BMError obtainError(URLConnection connection, @Nullable InputStream errorStream, int responseCode) {
+    protected BMError obtainError(URLConnection connection,
+                                  @Nullable InputStream errorStream,
+                                  int responseCode) {
         Logger.log("Request error (" + responseCode + "), headers:", connection.getHeaderFields());
         final String errorReason = connection.getHeaderField("ad-exchange-error-reason");
         final String errorMessage = connection.getHeaderField("ad-exchange-error-message");
         return !TextUtils.isEmpty(errorMessage) && !TextUtils.isEmpty(errorReason)
                 ? BMError.requestError(String.format("%s - %s", errorReason, errorMessage))
                 : !TextUtils.isEmpty(errorMessage) ? BMError.requestError(errorMessage)
-                : !TextUtils.isEmpty(errorReason) ? BMError.requestError(errorReason)
-                : getErrorFromCode(connection, responseCode);
+                        : !TextUtils.isEmpty(errorReason) ? BMError.requestError(errorReason)
+                                : getErrorFromCode(connection, responseCode);
     }
 
     @Override
@@ -79,6 +86,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
     @Override
     protected void prepareRequestParams(URLConnection connection) {
         super.prepareRequestParams(connection);
+
         connection.setConnectTimeout(timeOut);
         connection.setReadTimeout(timeOut);
     }
@@ -93,6 +101,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         }
         return BMError.Internal;
     }
+
 
     public static class Builder<RequestDataType, ResponseDataType> {
 
@@ -142,8 +151,9 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         }
 
         public ApiRequest<RequestDataType, ResponseDataType> build() {
-            ApiRequest<RequestDataType, ResponseDataType> request =
-                    new ApiRequest<>(null, method, requestData);
+            ApiRequest<RequestDataType, ResponseDataType> request = new ApiRequest<>(method,
+                                                                                     null,
+                                                                                     requestData);
             request.setCallback(callback);
             request.setCancelCallback(cancelCallback);
             request.setDataBinder(dataBinder);
@@ -169,7 +179,8 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         protected void prepareHeaders(NetworkRequest<InitRequest, InitResponse, BMError> networkRequest,
                                       URLConnection urlConnection) {
             if (BuildConfig.DEBUG) {
-                urlConnection.setRequestProperty("Content-Type", "application/x-protobuf; messageType=\"bidmachine.protobuf.InitRequest\"");
+                urlConnection.setRequestProperty("Content-Type",
+                                                 "application/x-protobuf; messageType=\"bidmachine.protobuf.InitRequest\"");
             } else {
                 urlConnection.setRequestProperty("Content-Type", "application/x-protobuf");
             }
@@ -198,7 +209,8 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         protected void prepareHeaders(NetworkRequest<Request, Response, BMError> request,
                                       URLConnection connection) {
             if (BuildConfig.DEBUG) {
-                connection.setRequestProperty("Content-Type", "application/x-protobuf; messageType=\"bidmachine.protobuf.openrtb.Openrtb\"");
+                connection.setRequestProperty("Content-Type",
+                                              "application/x-protobuf; messageType=\"bidmachine.protobuf.openrtb.Openrtb\"");
             } else {
                 connection.setRequestProperty("Content-Type", "application/x-protobuf");
             }
@@ -219,7 +231,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
                                                byte[] resultData) throws Exception {
             final Openrtb openrtb = Openrtb.parseFrom(resultData);
             if (openrtb != null) {
-                //Debug response dump
+                // Debug response dump
                 OrtbUtils.dump("Response", openrtb);
                 return openrtb.getResponse();
             }
@@ -240,7 +252,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
             openrtb.setVer("3.0");
             openrtb.setDomainspec("adcom");
             openrtb.setDomainver("1.0");
-            //Debug request dump
+            // Debug request dump
             OrtbUtils.dump("Auction request", openrtb);
             return openrtb.build().toByteArray();
         }

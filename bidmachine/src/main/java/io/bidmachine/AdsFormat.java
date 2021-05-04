@@ -12,6 +12,7 @@ import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
 import io.bidmachine.unified.UnifiedNativeAdRequestParams;
 
 public enum AdsFormat {
+
     Banner("banner",
            new AdsFormatMatcher<UnifiedBannerAdRequestParams>(AdsType.Banner) {
                @Override
@@ -102,9 +103,9 @@ public enum AdsFormat {
            });
 
     @NonNull
-    private String remoteName;
+    private final String remoteName;
     @NonNull
-    private AdsFormatMatcher matcher;
+    private final AdsFormatMatcher matcher;
 
     AdsFormat(@NonNull String remoteName, @NonNull AdsFormatMatcher matcher) {
         this.remoteName = remoteName;
@@ -133,7 +134,7 @@ public enum AdsFormat {
     private static abstract class AdsFormatMatcher<T extends UnifiedAdRequestParams> {
 
         @NonNull
-        private AdsType adsType;
+        private final AdsType adsType;
 
         AdsFormatMatcher(@NonNull AdsType adsType) {
             this.adsType = adsType;
@@ -149,4 +150,5 @@ public enum AdsFormat {
                                  @NonNull AdContentType adContentType);
 
     }
+
 }

@@ -60,10 +60,10 @@ public class NativeMediaView extends RelativeLayout {
         }
         if (Math.abs(finalHeight - curHeight) >= 2
                 || Math.abs(finalWidth - curWidth) >= 2) {
-//           Logger.log(String.format("Resetting mediaLayout size to w: %d h: %d", finalWidth, finalHeight));
             getLayoutParams().width = finalWidth;
             getLayoutParams().height = finalHeight;
         }
+
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 

@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 public class NativeNetworkExecutor implements Executor {
 
     private static NativeNetworkExecutor executor = null;
-    private ThreadPoolExecutor loaderExecutor;
+
+    private final ThreadPoolExecutor loaderExecutor;
 
     public static NativeNetworkExecutor getInstance() {
         if (executor == null) {
@@ -23,8 +24,11 @@ public class NativeNetworkExecutor implements Executor {
     private NativeNetworkExecutor() {
         int threadCount = Runtime.getRuntime().availableProcessors() * 2;
         BlockingQueue<Runnable> loaderQueue = new LinkedBlockingQueue<>();
-        loaderExecutor = new ThreadPoolExecutor(threadCount, threadCount, 0L,
-                TimeUnit.MICROSECONDS, loaderQueue);
+        loaderExecutor = new ThreadPoolExecutor(threadCount,
+                                                threadCount,
+                                                0L,
+                                                TimeUnit.MICROSECONDS,
+                                                loaderQueue);
     }
 
     @Override

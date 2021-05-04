@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.bidmachine.core.NetworkRequest;
 import io.bidmachine.utils.BMError;
-
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
@@ -57,16 +56,16 @@ public class ApiRequestTest {
     @Test
     public void request_fail_err400() throws InterruptedException {
         mockServer.enqueue(new MockResponse()
-                .setHeader("ad-exchange-error-message", "Test error message")
-                .setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST));
+                                   .setHeader("ad-exchange-error-message", "Test error message")
+                                   .setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST));
         performTest("Request", BMError.requestError("Test error message"));
     }
 
     @Test
     public void request_fail_with_message() throws InterruptedException {
         mockServer.enqueue(new MockResponse()
-                .setHeader("ad-exchange-error-message", "Test error message")
-                .setResponseCode(HttpURLConnection.HTTP_NOT_FOUND));
+                                   .setHeader("ad-exchange-error-message", "Test error message")
+                                   .setResponseCode(HttpURLConnection.HTTP_NOT_FOUND));
         performTest("Request", BMError.requestError("Test error message"));
     }
 
@@ -80,9 +79,9 @@ public class ApiRequestTest {
     public void request_fail_timeout_throttle() throws InterruptedException {
         ApiRequest.REQUEST_TIMEOUT = 2000;
         mockServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("Success")
-                .throttleBody(1, 1, TimeUnit.SECONDS));
+                                   .setResponseCode(200)
+                                   .setBody("Success")
+                                   .throttleBody(1, 1, TimeUnit.SECONDS));
         performTest("Request", BMError.TimeoutError);
     }
 
@@ -113,11 +112,15 @@ public class ApiRequestTest {
         assertEquals(timeOut, apiRequest.timeOut);
     }
 
-    private class ObjectContainer<ObjectType> {
+    private static class ObjectContainer<ObjectType> {
+
         ObjectType referenceObject;
+
     }
 
-    private void performTest(String requestData, final Object responseResult) throws InterruptedException {
+    @SuppressWarnings("SameParameterValue")
+    private void performTest(String requestData,
+                             final Object responseResult) throws InterruptedException {
         final CountDownLatch lock = new CountDownLatch(1);
         final AtomicBoolean requestResult = new AtomicBoolean();
 
@@ -127,18 +130,21 @@ public class ApiRequestTest {
                 .setRequestData(requestData)
                 .setDataBinder(new ApiRequest.ApiDataBinder<String, String>() {
                     @Override
-                    protected void prepareHeaders(NetworkRequest request, URLConnection connection) {
+                    protected void prepareHeaders(NetworkRequest<String, String, BMError> request,
+                                                  URLConnection connection) {
+
                     }
 
                     @Nullable
                     @Override
-                    protected byte[] obtainData(NetworkRequest request, URLConnection connection,
+                    protected byte[] obtainData(NetworkRequest<String, String, BMError> request,
+                                                URLConnection connection,
                                                 @Nullable String requestData) {
                         return requestData.getBytes();
                     }
 
                     @Override
-                    protected String createSuccessResult(NetworkRequest request,
+                    protected String createSuccessResult(NetworkRequest<String, String, BMError> request,
                                                          URLConnection connection,
                                                          byte[] resultData) {
                         return new String(resultData);

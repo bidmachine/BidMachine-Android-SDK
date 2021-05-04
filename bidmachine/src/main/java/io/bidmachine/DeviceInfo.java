@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.bidmachine.core.Logger;
+import io.bidmachine.core.Utils;
 
 public class DeviceInfo {
 
@@ -37,6 +38,8 @@ public class DeviceInfo {
         }
         return deviceInfo;
     }
+
+    private static final String OS_NAME = "android";
 
     public final String osName;
     public final String osVersion;
@@ -64,7 +67,7 @@ public class DeviceInfo {
     private Long totalDiskSpaceInMB;
 
     private DeviceInfo(Context context) {
-        osName = "android";
+        osName = OS_NAME;
         osVersion = String.valueOf(Build.VERSION.SDK_INT);
 
         model = Build.MANUFACTURER != null && Build.MODEL != null
@@ -76,11 +79,11 @@ public class DeviceInfo {
         deviceModel = Build.MODEL;
         manufacturer = Build.MANUFACTURER;
 
-        httpAgent = io.bidmachine.core.Utils.obtainHttpAgentString(context);
+        httpAgent = Utils.obtainHttpAgentString(context);
 
-        screenDpi = io.bidmachine.core.Utils.getScreenDpi(context);
-        screenDensity = io.bidmachine.core.Utils.getScreenDensity(context);
-        isTablet = io.bidmachine.core.Utils.isTablet(context);
+        screenDpi = Utils.getScreenDpi(context);
+        screenDensity = Utils.getScreenDensity(context);
+        isTablet = Utils.isTablet(context);
 
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager != null) {
@@ -161,7 +164,7 @@ public class DeviceInfo {
         } catch (Exception e) {
             return null;
         } finally {
-            io.bidmachine.core.Utils.close(reader);
+            Utils.close(reader);
         }
     }
 
@@ -178,8 +181,8 @@ public class DeviceInfo {
         } catch (Exception e) {
             return null;
         } finally {
-            io.bidmachine.core.Utils.close(bufferedReader);
-            io.bidmachine.core.Utils.close(inputStreamReader);
+            Utils.close(bufferedReader);
+            Utils.close(inputStreamReader);
             if (process != null) {
                 process.destroy();
             }
@@ -206,7 +209,7 @@ public class DeviceInfo {
             return totalRAMInB = Long.parseLong(value);
         } catch (Exception ignore) {
         } finally {
-            io.bidmachine.core.Utils.close(randomAccessFile);
+            Utils.close(randomAccessFile);
         }
         return null;
     }
@@ -217,7 +220,7 @@ public class DeviceInfo {
             return totalDiskSpaceInMB;
         }
         try {
-            if (!io.bidmachine.core.Utils.isExternalMemoryAvailable()) {
+            if (!Utils.isExternalMemoryAvailable()) {
                 return null;
             }
             StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
@@ -236,7 +239,7 @@ public class DeviceInfo {
     @Nullable
     Long getAvailableDiskSpaceInMB() {
         try {
-            if (!io.bidmachine.core.Utils.isExternalMemoryAvailable()) {
+            if (!Utils.isExternalMemoryAvailable()) {
                 return null;
             }
             StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());

@@ -97,9 +97,9 @@ public abstract class AdObjectImpl<
     public void load(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedAdRequestParamsType adRequestParams) throws Throwable {
         unifiedAd.load(contextProvider,
-                unifiedAdCallback,
-                adRequestParams,
-                adObjectParams.toMediationParams());
+                       unifiedAdCallback,
+                       adRequestParams,
+                       adObjectParams.toMediationParams());
     }
 
     @CallSuper
@@ -155,6 +155,7 @@ public abstract class AdObjectImpl<
         getUnifiedAd().onDestroy();
     }
 
+
     protected static class BaseUnifiedAdCallback implements UnifiedAdCallback {
 
         @NonNull
@@ -188,5 +189,7 @@ public abstract class AdObjectImpl<
         public void log(String message) {
             processCallback.log(message);
         }
+
     }
+
 }

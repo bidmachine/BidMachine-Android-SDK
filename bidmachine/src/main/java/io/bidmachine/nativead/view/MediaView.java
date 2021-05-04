@@ -91,7 +91,7 @@ public class MediaView extends RelativeLayout implements
 
     public static VideoPlayerActivity.VideoPlayerActivityListener listener;
 
-    private NativeState state = NativeState.IMAGE;
+    private NativeState state = NativeState.Image;
 
     public MediaView(Context context) {
         super(context);
@@ -204,7 +204,7 @@ public class MediaView extends RelativeLayout implements
                         && new File(nativeMediaData.getVideoUri().getPath()).exists()) {
                     startPlayVideoWhenReady = true;
                 } else if (nativeData != null) {
-                    updateViewState(NativeState.LOADING);
+                    updateViewState(NativeState.Loading);
                     if (!TextUtils.isEmpty(nativeData.getVideoUrl())) {
                         DownloadVideoTask.OnLoadedListener listener = new DownloadVideoTask.OnLoadedListener() {
                             @Override
@@ -217,7 +217,7 @@ public class MediaView extends RelativeLayout implements
                             @Override
                             public void onVideoLoadingError(DownloadVideoTask task) {
                                 Logger.log("MediaView video is not loaded");
-                                updateViewState(NativeState.IMAGE);
+                                updateViewState(NativeState.Image);
                                 hasVideo = false;
                             }
                         };
@@ -239,7 +239,7 @@ public class MediaView extends RelativeLayout implements
                             @Override
                             public void onVideoLoadingError(DownloadVastVideoTask task) {
                                 Logger.log("MediaView video is not loaded");
-                                updateViewState(NativeState.IMAGE);
+                                updateViewState(NativeState.Image);
                                 hasVideo = false;
                             }
                         };
@@ -249,15 +249,14 @@ public class MediaView extends RelativeLayout implements
                     }
                 }
             } else {
-                updateViewState(NativeState.IMAGE);
+                updateViewState(NativeState.Image);
             }
         }
         if (nativeMediaData != null) {
-            ImageHelper.fillImageView(
-                    getContext(),
-                    imageView,
-                    nativeMediaData.getImageUri(),
-                    nativeMediaData.getImageBitmap());
+            ImageHelper.fillImageView(getContext(),
+                                      imageView,
+                                      nativeMediaData.getImageUri(),
+                                      nativeMediaData.getImageBitmap());
         }
     }
 
@@ -279,6 +278,7 @@ public class MediaView extends RelativeLayout implements
         } else {
             pausePlayer();
         }
+
         super.onWindowVisibilityChanged(visibility);
     }
 
@@ -287,8 +287,8 @@ public class MediaView extends RelativeLayout implements
             if (isMediaPlayerAvailable() && mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
             }
-            if (state != NativeState.LOADING) {
-                updateViewState(NativeState.PAUSED);
+            if (state != NativeState.Loading) {
+                updateViewState(NativeState.Paused);
             }
         } catch (Exception e) {
             Logger.log(e);
@@ -361,8 +361,8 @@ public class MediaView extends RelativeLayout implements
                     startVideoVisibilityCheckerTimer();
                 }
             }
-            if (mediaPlayer.getCurrentPosition() > 0 && state != NativeState.PLAYING) {
-                updateViewState(NativeState.PLAYING);
+            if (mediaPlayer.getCurrentPosition() > 0 && state != NativeState.Playing) {
+                updateViewState(NativeState.Playing);
             }
         }
     }
@@ -370,7 +370,7 @@ public class MediaView extends RelativeLayout implements
     private void updateViewState(NativeState state) {
         this.state = state;
         switch (state) {
-            case IMAGE:
+            case Image:
                 if (imageView != null) {
                     imageView.setVisibility(VISIBLE);
                     imageView.bringToFront();
@@ -382,7 +382,7 @@ public class MediaView extends RelativeLayout implements
                     muteButton.setVisibility(INVISIBLE);
                 }
                 break;
-            case LOADING:
+            case Loading:
                 if (imageView != null) {
                     imageView.setVisibility(VISIBLE);
                     imageView.bringToFront();
@@ -395,7 +395,7 @@ public class MediaView extends RelativeLayout implements
                     muteButton.setVisibility(INVISIBLE);
                 }
                 break;
-            case PLAYING:
+            case Playing:
                 if (imageView != null) {
                     imageView.setVisibility(INVISIBLE);
                 }
@@ -409,7 +409,7 @@ public class MediaView extends RelativeLayout implements
                     playButton.setVisibility(INVISIBLE);
                 }
                 break;
-            case PAUSED:
+            case Paused:
                 if (imageView != null) {
                     imageView.setVisibility(VISIBLE);
                     imageView.bringToFront();
@@ -459,12 +459,14 @@ public class MediaView extends RelativeLayout implements
             getLayoutParams().width = finalWidth;
             getLayoutParams().height = finalHeight;
         }
+
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+
         updateTextureLayoutParams();
     }
 
@@ -479,13 +481,14 @@ public class MediaView extends RelativeLayout implements
             prepareMediaPlayer();
         } catch (Exception e) {
             Logger.log(e);
-            updateViewState(NativeState.IMAGE);
+            updateViewState(NativeState.Image);
             hasVideo = false;
         }
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
     }
 
     @Override
@@ -495,6 +498,7 @@ public class MediaView extends RelativeLayout implements
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
     }
 
     @Override
@@ -522,7 +526,7 @@ public class MediaView extends RelativeLayout implements
     private void clearPlayerOnError() {
         startPlayVideoWhenReady = false;
         cleanUpMediaPlayer();
-        updateViewState(NativeState.IMAGE);
+        updateViewState(NativeState.Image);
         stopVideoVisibilityCheckerTimer();
         error = true;
         hasVideo = false;
@@ -536,7 +540,7 @@ public class MediaView extends RelativeLayout implements
         if (startPlayVideoWhenReady) {
             tryPlayVideo();
         } else {
-            updateViewState(NativeState.PAUSED);
+            updateViewState(NativeState.Paused);
         }
     }
 
@@ -577,8 +581,8 @@ public class MediaView extends RelativeLayout implements
         if (startPlayVideoWhenReady) {
             tryPlayVideo();
         } else {
-            if (state != NativeState.LOADING) {
-                updateViewState(NativeState.PAUSED);
+            if (state != NativeState.Loading) {
+                updateViewState(NativeState.Paused);
             }
         }
     }

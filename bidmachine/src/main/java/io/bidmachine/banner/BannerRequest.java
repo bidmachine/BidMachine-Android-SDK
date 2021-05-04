@@ -45,6 +45,7 @@ public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerA
         return new BannerUnifiedAdRequestParams(targetingParams, dataRestrictions);
     }
 
+
     public static final class Builder extends AdRequestBuilderImpl<Builder, BannerRequest>
             implements IBannerRequestBuilder<Builder> {
 
@@ -63,6 +64,7 @@ public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerA
     }
 
     public interface AdRequestListener extends AdRequest.AdRequestListener<BannerRequest> {
+
     }
 
     private class BannerUnifiedAdRequestParams extends BaseUnifiedAdRequestParams
@@ -77,6 +79,7 @@ public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerA
         public BannerSize getBannerSize() {
             return BannerRequest.this.getSize();
         }
+
     }
 
 }

@@ -244,23 +244,22 @@ public final class NativeAdObject
             configureMediaView(nativeMediaView);
             container = nativeAdView;
             if (!isImpressionTracked) {
-                VisibilityTracker.startTracking(
-                        container,
-                        getParams().getViewabilityTimeThresholdMs(),
-                        getParams().getViewabilityPixelThreshold(),
-                        getParams().isViewabilityIgnoreWindowFocus(),
-                        new VisibilityTracker.VisibilityChangeCallback() {
-                            @Override
-                            public void onViewShown() {
-                                dispatchShown();
-                            }
+                VisibilityTracker.startTracking(container,
+                                                getParams().getViewabilityTimeThresholdMs(),
+                                                getParams().getViewabilityPixelThreshold(),
+                                                getParams().isViewabilityIgnoreWindowFocus(),
+                                                new VisibilityTracker.VisibilityChangeCallback() {
+                                                    @Override
+                                                    public void onViewShown() {
+                                                        dispatchShown();
+                                                    }
 
-                            @Override
-                            public void onViewTrackingFinished() {
-                                isImpressionTracked = true;
-                                dispatchImpression();
-                            }
-                        });
+                                                    @Override
+                                                    public void onViewTrackingFinished() {
+                                                        isImpressionTracked = true;
+                                                        dispatchImpression();
+                                                    }
+                                                });
             }
             if (mediaView != null) {
                 mediaView.onViewAppearOnScreen();
@@ -304,6 +303,7 @@ public final class NativeAdObject
     public void onDestroy() {
         try {
             super.onDestroy();
+
             unregisterView();
             if (iconBitmap != null) {
                 if (!iconBitmap.isRecycled()) {
@@ -320,7 +320,7 @@ public final class NativeAdObject
             if (videoUri != null && videoUri.getPath() != null) {
                 File file = new File(videoUri.getPath());
                 if (file.exists()) {
-                    //noinspection ResultOfMethodCallIgnored
+                    // noinspection ResultOfMethodCallIgnored
                     file.delete();
                 }
                 videoUri = null;
@@ -351,7 +351,8 @@ public final class NativeAdObject
                 return false;
             }
             if (nativeMediaView != null && !ViewHelper.belongTo(nativeAdView, nativeMediaView)) {
-                Logger.log("NativeMediaView should belong to NativeAdView. NativeAd is NOT registered");
+                Logger.log(
+                        "NativeMediaView should belong to NativeAdView. NativeAd is NOT registered");
                 return false;
             }
         }
@@ -407,9 +408,9 @@ public final class NativeAdObject
 
             ViewGroup viewGroup = ((ViewGroup) view);
             viewGroup.removeAllViews();
-            viewGroup.addView(iconView, new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT)
+            viewGroup.addView(iconView,
+                              new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                         ViewGroup.LayoutParams.MATCH_PARENT)
             );
         }
         if (iconView != null) {
@@ -426,12 +427,11 @@ public final class NativeAdObject
             nativeMediaView.removeAllViews();
             if (nativeNetworkAdapter != null
                     && !nativeNetworkAdapter.configureMediaView(nativeMediaView)) {
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT);
-                layoutParams.addRule(
-                        RelativeLayout.CENTER_IN_PARENT,
-                        RelativeLayout.TRUE);
+                RelativeLayout.LayoutParams layoutParams =
+                        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                        ViewGroup.LayoutParams.MATCH_PARENT);
+                layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT,
+                                     RelativeLayout.TRUE);
                 mediaView = new MediaView(nativeMediaView.getContext());
                 mediaView.setId(MEDIA_VIEW_ID);
 
@@ -516,6 +516,7 @@ public final class NativeAdObject
     @Override
     public void onClicked() {
         super.onClicked();
+
         String clickUrl = getClickUrl();
         if (TextUtils.isEmpty(clickUrl)) {
             return;
@@ -559,5 +560,7 @@ public final class NativeAdObject
                 processCallback.processLoadFail(BMError.Internal);
             }
         }
+
     }
+
 }

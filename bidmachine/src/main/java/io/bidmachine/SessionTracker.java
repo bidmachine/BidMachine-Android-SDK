@@ -19,8 +19,7 @@ abstract class SessionTracker {
 
     abstract void trackEventStart(@Nullable TrackingObject trackingObject,
                                   @Nullable TrackEventType trackEventType,
-                                  @Nullable TrackEventInfo trackEventInfo,
-                                  @Nullable AdsType adsType);
+                                  @Nullable TrackEventInfo trackEventInfo);
 
     abstract void trackEventFinish(@Nullable TrackingObject trackingObject,
                                    @Nullable TrackEventType trackEventType,
@@ -42,19 +41,17 @@ abstract class SessionTracker {
                             @Nullable BMError error) {
         if (error != null) {
             if (error.isTrackError()) {
-                notifyError(
-                        collectTrackingUrls(trackingObject, TrackEventType.Error),
-                        collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
-                        eventInfo,
-                        eventType.getOrtbActionValue(),
-                        error);
+                notifyError(collectTrackingUrls(trackingObject, TrackEventType.Error),
+                            collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
+                            eventInfo,
+                            eventType.getOrtbActionValue(),
+                            error);
             }
         } else {
-            notifyTrack(
-                    collectTrackingUrls(trackingObject, eventType),
-                    collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
-                    eventInfo,
-                    eventType);
+            notifyTrack(collectTrackingUrls(trackingObject, eventType),
+                        collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
+                        eventInfo,
+                        eventType);
         }
     }
 
@@ -91,18 +88,23 @@ abstract class SessionTracker {
         Logger.log("dispatching event to server: " + eventType);
         for (String url : urls) {
             executeNotify(replaceMacros(url, eventInfo, eventType.getOrtbActionValue(), -1),
-                    new NetworkRequest.Callback<String, BMError>() {
-                        @Override
-                        public void onSuccess(@Nullable String result) {
-                            //ignore
-                        }
+                          new NetworkRequest.Callback<String, BMError>() {
+                              @Override
+                              public void onSuccess(@Nullable String result) {
+                                  // ignore
+                              }
 
-                        @Override
-                        public void onFail(@Nullable BMError result) {
-                            if (result == null) result = BMError.Internal;
-                            notifyTrackingError(trackErrorUrls, eventInfo, eventType.getOrtbActionValue(), result);
-                        }
-                    });
+                              @Override
+                              public void onFail(@Nullable BMError result) {
+                                  if (result == null) {
+                                      result = BMError.Internal;
+                                  }
+                                  notifyTrackingError(trackErrorUrls,
+                                                      eventInfo,
+                                                      eventType.getOrtbActionValue(),
+                                                      result);
+                              }
+                          });
         }
 
     }
@@ -118,20 +120,29 @@ abstract class SessionTracker {
         if (error.getCode() == BMError.NOT_SET) {
             return;
         }
-        Logger.log("dispatching error event to server: (" + processCode + "-" + error.getCode() + ") - " + error.getMessage());
+        Logger.log(String.format("dispatching error event to server: (%s-%s) - %s",
+                                 processCode,
+                                 error.getCode(),
+                                 error.getMessage()));
         for (String url : urls) {
-            executeNotify(replaceMacros(url, info, processCode, error.getCode()), new NetworkRequest.Callback<String, BMError>() {
-                @Override
-                public void onSuccess(@Nullable String s) {
-                    //ignore
-                }
+            executeNotify(replaceMacros(url, info, processCode, error.getCode()),
+                          new NetworkRequest.Callback<String, BMError>() {
+                              @Override
+                              public void onSuccess(@Nullable String s) {
+                                  // ignore
+                              }
 
-                @Override
-                public void onFail(@Nullable BMError result) {
-                    if (result == null) result = BMError.Internal;
-                    notifyTrackingError(trackErrorUrls, info, TrackEventType.Error.getOrtbActionValue(), result);
-                }
-            });
+                              @Override
+                              public void onFail(@Nullable BMError result) {
+                                  if (result == null) {
+                                      result = BMError.Internal;
+                                  }
+                                  notifyTrackingError(trackErrorUrls,
+                                                      info,
+                                                      TrackEventType.Error.getOrtbActionValue(),
+                                                      result);
+                              }
+                          });
         }
     }
 
@@ -145,7 +156,9 @@ abstract class SessionTracker {
         if (error.getCode() == BMError.NOT_SET) {
             return;
         }
-        Logger.log("dispatching tracking fail to server: (" + error.getCode() + ")" + error.getMessage());
+        Logger.log(String.format("dispatching tracking fail to server: (%s) - %s",
+                                 error.getCode(),
+                                 error.getMessage()));
         for (String url : urls) {
             executeNotify(replaceMacros(url, eventInfo, processCode, error.getCode()), null);
         }
@@ -157,7 +170,9 @@ abstract class SessionTracker {
                                 @Nullable TrackEventInfo info,
                                 int processCode,
                                 int errorCode) {
-        if (TextUtils.isEmpty(url)) return null;
+        if (TextUtils.isEmpty(url)) {
+            return null;
+        }
         assert url != null;
         String outUrl = url;
         outUrl = replaceMacros(outUrl, "BM_EVENT_CODE", processCode);
@@ -176,7 +191,9 @@ abstract class SessionTracker {
         return outUrl;
     }
 
-    private static String replaceMacros(@NonNull String url, @NonNull String macros, @NonNull Object replace) {
+    private static String replaceMacros(@NonNull String url,
+                                        @NonNull String macros,
+                                        @NonNull Object replace) {
         return url
                 .replace("${" + macros + "}", String.valueOf(replace))
                 .replace("%24%7B" + macros + "%7D", String.valueOf(replace));
@@ -184,7 +201,9 @@ abstract class SessionTracker {
 
     private static void executeNotify(@Nullable String url,
                                       @Nullable NetworkRequest.Callback<String, BMError> callback) {
-        if (TextUtils.isEmpty(url)) return;
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
         new ApiRequest.Builder<Object, String>()
                 .url(url)
                 .setMethod(NetworkRequest.Method.Get)

@@ -21,17 +21,20 @@ public final class InterstitialAd
     }
 
     @Override
-    protected FullScreenAdObject<InterstitialRequest> createAdObject(
-            @NonNull ContextProvider contextProvider,
-            @NonNull InterstitialRequest adRequest,
-            @NonNull NetworkAdapter adapter,
-            @NonNull AdObjectParams adObjectParams,
-            @NonNull AdProcessCallback processCallback
-    ) {
+    protected FullScreenAdObject<InterstitialRequest> createAdObject(@NonNull ContextProvider contextProvider,
+                                                                     @NonNull InterstitialRequest adRequest,
+                                                                     @NonNull NetworkAdapter adapter,
+                                                                     @NonNull AdObjectParams adObjectParams,
+                                                                     @NonNull AdProcessCallback processCallback) {
         UnifiedFullscreenAd unifiedAd = adapter.createInterstitial();
         if (unifiedAd == null) {
             return null;
         }
-        return new FullScreenAdObject<>(contextProvider, processCallback, adRequest, adObjectParams, unifiedAd);
+        return new FullScreenAdObject<>(contextProvider,
+                                        processCallback,
+                                        adRequest,
+                                        adObjectParams,
+                                        unifiedAd);
     }
+
 }

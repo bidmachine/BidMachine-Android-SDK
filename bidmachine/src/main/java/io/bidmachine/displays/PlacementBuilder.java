@@ -19,11 +19,13 @@ import io.bidmachine.unified.UnifiedAdRequestParams;
 
 public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdRequestParams> {
 
-    private AdContentType contentType;
+    @NonNull
+    private final AdContentType contentType;
+
     @Nullable
     private HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType> headerBiddingPlacementBuilder;
 
-    PlacementBuilder(AdContentType contentType, boolean supportHeaderBidding) {
+    PlacementBuilder(@NonNull AdContentType contentType, boolean supportHeaderBidding) {
         this.contentType = contentType;
         if (supportHeaderBidding) {
             headerBiddingPlacementBuilder = new HeaderBiddingPlacementBuilder<>();
@@ -40,9 +42,7 @@ public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends Unifie
                                          @NonNull Collection<NetworkConfig> networkConfigs,
                                          @NonNull PlacementCreateCallback callback) throws Exception;
 
-    public abstract AdObjectParams createAdObjectParams(@NonNull ContextProvider contextProvider,
-                                                        @NonNull UnifiedAdRequestParamsType adRequest,
-                                                        @NonNull Response.Seatbid seatbid,
+    public abstract AdObjectParams createAdObjectParams(@NonNull Response.Seatbid seatbid,
                                                         @NonNull Response.Seatbid.Bid bid,
                                                         @NonNull Ad ad);
 
@@ -59,13 +59,11 @@ public abstract class PlacementBuilder<UnifiedAdRequestParamsType extends Unifie
                 : null;
     }
 
-    AdObjectParams createHeaderBiddingAdObjectParams(@NonNull ContextProvider contextProvider,
-                                                     @NonNull UnifiedAdRequestParamsType adRequest,
-                                                     @NonNull Response.Seatbid seatbid,
+    AdObjectParams createHeaderBiddingAdObjectParams(@NonNull Response.Seatbid seatbid,
                                                      @NonNull Response.Seatbid.Bid bid,
                                                      @NonNull Ad ad) {
         return headerBiddingPlacementBuilder != null
-                ? headerBiddingPlacementBuilder.createAdObjectParams(contextProvider, adRequest, seatbid, bid, ad)
+                ? headerBiddingPlacementBuilder.createAdObjectParams(seatbid, bid, ad)
                 : null;
     }
 

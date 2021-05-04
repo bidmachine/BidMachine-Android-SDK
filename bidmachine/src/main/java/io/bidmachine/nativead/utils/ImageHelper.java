@@ -21,7 +21,10 @@ public class ImageHelper {
     private static final int MAX_IMAGE_WIDTH = 1200;
     private static final int MAX_IMAGE_HEIGHT = 700;
 
-    private static void loadImageByPath(Context context, Uri imageUri, ImageView targetImageView, OnImageHelperListener onImageHelperListener) {
+    private static void loadImageByPath(Context context,
+                                        Uri imageUri,
+                                        ImageView targetImageView,
+                                        OnImageHelperListener onImageHelperListener) {
         if (onImageHelperListener == null) {
             return;
         }
@@ -33,18 +36,82 @@ public class ImageHelper {
             onImageHelperListener.onError("Target ImageView is null");
             return;
         }
-        NativeNetworkExecutor.getInstance().execute(new ImagePreparation(context, imageUri, targetImageView, onImageHelperListener));
+        NativeNetworkExecutor.getInstance().execute(new ImagePreparation(context,
+                                                                         imageUri,
+                                                                         targetImageView,
+                                                                         onImageHelperListener));
     }
 
-    static class ImagePreparation implements Runnable {
+    public static int calculateReqWidth(Context context) {
+        Point screenSize = Utils.getScreenSize(context);
+        return Math.min(MAX_IMAGE_WIDTH, Math.min(screenSize.x, screenSize.y));
+    }
+
+    public static int calculateReqHeight(int maxWidth, boolean checkAspectRatio) {
+        int maxHeight;
+        if (checkAspectRatio) {
+            maxHeight = (int) ((float) maxWidth / NativeConstants.MIN_MAIN_BITMAP_ASPECT_RATIO);
+        } else {
+            // noinspection SuspiciousNameCombination
+            maxHeight = maxWidth;
+        }
+        if (maxHeight > MAX_IMAGE_HEIGHT) {
+            maxHeight = MAX_IMAGE_HEIGHT;
+        }
+        return maxHeight;
+    }
+
+    public static int calculateInSamplesSize(BitmapFactory.Options options,
+                                             int reqWidth,
+                                             int reqHeight) {
+        int width = options.outWidth;
+        int height = options.outHeight;
+        int inSampleSize = 1;
+        while ((width / inSampleSize) > reqWidth || (height / inSampleSize) > reqHeight) {
+            inSampleSize *= 2;
+        }
+        return inSampleSize;
+    }
+
+    public static void fillImageView(Context context,
+                                     ImageView imageView,
+                                     Uri imageUri,
+                                     Bitmap imageBitmap) {
+        if (imageBitmap != null) {
+            imageView.setImageBitmap(imageBitmap);
+        } else {
+            ImageHelper.loadImageByPath(context,
+                                        imageUri,
+                                        imageView,
+                                        new ImageHelper.OnImageHelperListener() {
+                                            @Override
+                                            public void onImagePrepared(@NonNull ImageView targetView,
+                                                                        @NonNull Bitmap bitmap) {
+                                                targetView.setImageBitmap(bitmap);
+                                            }
+
+                                            @Override
+                                            public void onError(String errorMessage) {
+                                                Logger.log(errorMessage);
+                                            }
+                                        });
+        }
+    }
+
+
+    private static class ImagePreparation implements Runnable {
 
         private final Uri imageUri;
         private final Context context;
         private final WeakReference<ImageView> weakTargetImageView;
         private final OnImageHelperListener onImageHelperListener;
+
         private Bitmap image;
 
-        ImagePreparation(Context context, Uri imageUri, ImageView targetImageView, OnImageHelperListener onImageHelperListener) {
+        ImagePreparation(Context context,
+                         Uri imageUri,
+                         ImageView targetImageView,
+                         OnImageHelperListener onImageHelperListener) {
             this.context = context;
             this.imageUri = imageUri;
             this.weakTargetImageView = new WeakReference<>(targetImageView);
@@ -98,59 +165,15 @@ public class ImageHelper {
                 }
             }
         }
-    }
 
-    public static int calculateReqWidth(Context context) {
-        Point screenSize = Utils.getScreenSize(context);
-        return Math.min(MAX_IMAGE_WIDTH, Math.min(screenSize.x, screenSize.y));
-    }
-
-    public static int calculateReqHeight(int maxWidth, boolean checkAspectRatio) {
-        int maxHeight;
-        if (checkAspectRatio) {
-            maxHeight = (int) ((float) maxWidth / NativeConstants.MIN_MAIN_BITMAP_ASPECT_RATIO);
-        } else {
-            //noinspection SuspiciousNameCombination
-            maxHeight = maxWidth;
-        }
-        if (maxHeight > MAX_IMAGE_HEIGHT) {
-            maxHeight = MAX_IMAGE_HEIGHT;
-        }
-        return maxHeight;
-    }
-
-    public static int calculateInSamplesSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        int width = options.outWidth;
-        int height = options.outHeight;
-        int inSampleSize = 1;
-        while ((width / inSampleSize) > reqWidth || (height / inSampleSize) > reqHeight) {
-            inSampleSize *= 2;
-        }
-        return inSampleSize;
-    }
-
-    public static void fillImageView(Context context, ImageView imageView, Uri imageUri, Bitmap imageBitmap) {
-        if (imageBitmap != null) {
-            imageView.setImageBitmap(imageBitmap);
-        } else {
-            ImageHelper.loadImageByPath(context, imageUri, imageView, new ImageHelper.OnImageHelperListener() {
-                @Override
-                public void onImagePrepared(@NonNull ImageView targetView, @NonNull Bitmap bitmap) {
-                    targetView.setImageBitmap(bitmap);
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-                    Logger.log(errorMessage);
-                }
-            });
-        }
     }
 
     public interface OnImageHelperListener {
+
         void onImagePrepared(@NonNull ImageView targetView, @NonNull Bitmap bitmap);
 
         void onError(String errorMessage);
+
     }
 
 }

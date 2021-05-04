@@ -18,6 +18,7 @@ public final class RewardedRequest extends FullScreenAdRequest<RewardedRequest> 
     @Override
     protected void onBuildPlacement(Placement.Builder builder) {
         super.onBuildPlacement(builder);
+
         builder.setReward(true);
     }
 
@@ -27,13 +28,16 @@ public final class RewardedRequest extends FullScreenAdRequest<RewardedRequest> 
     }
 
     public static final class Builder extends FullScreenRequestBuilder<Builder, RewardedRequest> {
+
         @Override
         protected RewardedRequest createRequest() {
             return new RewardedRequest();
         }
+
     }
 
     public interface AdRequestListener extends AdRequest.AdRequestListener<RewardedRequest> {
+
     }
 
 }

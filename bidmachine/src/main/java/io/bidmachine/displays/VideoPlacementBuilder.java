@@ -30,10 +30,11 @@ public class VideoPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdR
         extends PlacementBuilder<UnifiedAdRequestParamsType>
         implements ISizableDisplayPlacement<UnifiedAdRequestParamsType> {
 
-    private boolean canSkip;
+    private final boolean canSkip;
 
     public VideoPlacementBuilder(boolean canSkip, boolean supportHeaderBidding) {
         super(AdContentType.Video, supportHeaderBidding);
+
         this.canSkip = canSkip;
     }
 
@@ -65,8 +66,10 @@ public class VideoPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdR
         builder.setMindur(Constants.VIDEO_MINDUR);
         builder.setMaxdur(Constants.VIDEO_MAXDUR);
         builder.setLinearValue(Constants.VIDEO_LINEARITY);
-        Message.Builder headerBiddingPlacement =
-                createHeaderBiddingPlacement(contextProvider, adRequestParams, adsType, networkConfigs);
+        Message.Builder headerBiddingPlacement = createHeaderBiddingPlacement(contextProvider,
+                                                                              adRequestParams,
+                                                                              adsType,
+                                                                              networkConfigs);
         if (headerBiddingPlacement != null) {
             builder.addExtProto(Any.pack(headerBiddingPlacement.build()));
         }
@@ -74,20 +77,19 @@ public class VideoPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAdR
     }
 
     @Override
-    public Point getSize(ContextProvider contextProvider, UnifiedAdRequestParamsType adRequestParams) {
+    public Point getSize(ContextProvider contextProvider,
+                         UnifiedAdRequestParamsType adRequestParams) {
         return Utils.getScreenSize(contextProvider.getContext());
     }
 
     @Override
-    public AdObjectParams createAdObjectParams(@NonNull ContextProvider contextProvider,
-                                               @NonNull UnifiedAdRequestParamsType adRequestParams,
-                                               @NonNull Response.Seatbid seatbid,
+    public AdObjectParams createAdObjectParams(@NonNull Response.Seatbid seatbid,
                                                @NonNull Response.Seatbid.Bid bid,
                                                @NonNull Ad ad) {
         if (!ad.hasVideo()) {
             return null;
         }
-        AdObjectParams params = createHeaderBiddingAdObjectParams(contextProvider, adRequestParams, seatbid, bid, ad);
+        AdObjectParams params = createHeaderBiddingAdObjectParams(seatbid, bid, ad);
         if (params == null) {
             Ad.Video video = ad.getVideo();
             VideoAdObjectParams videoParams = new VideoAdObjectParams(seatbid, bid, ad);

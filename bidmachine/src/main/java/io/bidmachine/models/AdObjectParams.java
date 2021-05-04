@@ -30,7 +30,7 @@ public abstract class AdObjectParams {
     private float viewabilityPixelThreshold = DEF_VIEWABILITY_PIXEL_THRESHOLD;
     private boolean viewabilityIgnoreWindowFocus = DEF_VIEWABILITY_IGNORE_WINDOW_FOCUS;
 
-    private Map<TrackEventType, List<String>> trackUrls = new EnumMap<>(TrackEventType.class);
+    private final Map<TrackEventType, List<String>> trackUrls = new EnumMap<>(TrackEventType.class);
 
     public AdObjectParams(@NonNull Response.Seatbid seatbid,
                           @NonNull Response.Seatbid.Bid bid,
@@ -54,12 +54,14 @@ public abstract class AdObjectParams {
     protected void prepareExtensions(@NonNull Response.Seatbid seatbid,
                                      @NonNull Response.Seatbid.Bid bid,
                                      @NonNull AdExtension extension) {
-        viewabilityTimeThresholdSec = Utils.getOrDefault(extension.getViewabilityTimeThreshold(),
-                AdExtension.getDefaultInstance().getViewabilityTimeThreshold(),
-                DEF_VIEWABILITY_TIME_THRESHOLD);
-        viewabilityPixelThreshold = Utils.getOrDefault(extension.getViewabilityPixelThreshold(),
-                AdExtension.getDefaultInstance().getViewabilityPixelThreshold(),
-                DEF_VIEWABILITY_PIXEL_THRESHOLD); //possibly should be multiplied by 100;
+        viewabilityTimeThresholdSec =
+                Utils.getOrDefault(extension.getViewabilityTimeThreshold(),
+                                   AdExtension.getDefaultInstance().getViewabilityTimeThreshold(),
+                                   DEF_VIEWABILITY_TIME_THRESHOLD);
+        viewabilityPixelThreshold =
+                Utils.getOrDefault(extension.getViewabilityPixelThreshold(),
+                                   AdExtension.getDefaultInstance().getViewabilityPixelThreshold(),
+                                   DEF_VIEWABILITY_PIXEL_THRESHOLD); // possibly should be multiplied by 100;
         viewabilityIgnoreWindowFocus = extension.getViewabilityIgnoreWindowFocus();
         prepareEvents(extension.getEventList());
     }
@@ -77,7 +79,9 @@ public abstract class AdObjectParams {
         }
         for (Ad.Event event : events) {
             TrackEventType eventType = TrackEventType.fromNumber(event.getTypeValue());
-            if (eventType == null) continue;
+            if (eventType == null) {
+                continue;
+            }
             addEvent(eventType, event.getUrl());
         }
     }
