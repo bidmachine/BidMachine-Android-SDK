@@ -9,9 +9,9 @@ public class NastAdapter extends NetworkAdapter {
 
     public NastAdapter() {
         super("nast",
-                "1.0",
-                BuildConfig.VERSION_NAME + ".1",
-                new AdsType[]{AdsType.Native});
+              "1.0",
+              BuildConfig.VERSION_NAME + ".1",
+              new AdsType[]{AdsType.Native});
     }
 
     @Override

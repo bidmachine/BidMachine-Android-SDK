@@ -59,14 +59,18 @@ public class Logger {
                 builder.append("Empty");
             } else {
                 for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    if (builder.length() > 0) builder.append("\n");
+                    if (builder.length() > 0) {
+                        builder.append("\n");
+                    }
                     String valueString = null;
                     if (entry.getValue() instanceof Collection) {
                         Collection items = (Collection) entry.getValue();
                         StringBuilder valueStringBuilder = new StringBuilder();
                         for (Object object : items) {
                             if (object != null) {
-                                if (valueStringBuilder.length() > 0) valueStringBuilder.append(",");
+                                if (valueStringBuilder.length() > 0) {
+                                    valueStringBuilder.append(",");
+                                }
                                 valueStringBuilder.append(object.toString());
                             }
                         }
@@ -89,6 +93,7 @@ public class Logger {
         Log.d(TAG, messageBuilder.buildMessage(message));
     }
 
+
     public interface LoggerMessageBuilder {
         String buildMessage(String origin);
     }
@@ -99,6 +104,7 @@ public class Logger {
         public String buildMessage(String origin) {
             return origin;
         }
+
     }
 
 }

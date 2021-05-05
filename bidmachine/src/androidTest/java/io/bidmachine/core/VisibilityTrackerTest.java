@@ -135,31 +135,40 @@ public class VisibilityTrackerTest {
         Assert.assertTrue(isVisibilityChanged.get());
     }
 
-    private void startTracking(boolean expectedResult, long requiredOnScreenTimeMs) throws InterruptedException {
+    @SuppressWarnings("SameParameterValue")
+    private void startTracking(boolean expectedResult,
+                               long requiredOnScreenTimeMs) throws InterruptedException {
         startTracking(expectedResult, expectedResult, requiredOnScreenTimeMs, 10);
     }
 
-    private void startTracking(boolean showExpectedResult, boolean finishExpectedResult, final long requiredOnScreenTimeMs, long timeOutSec) throws InterruptedException {
+    private void startTracking(boolean showExpectedResult,
+                               boolean finishExpectedResult,
+                               final long requiredOnScreenTimeMs,
+                               long timeOutSec) throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(requiredOnScreenTimeMs > 0 ? 2 : 1);
         final AtomicLong showReceivedTimeMs = new AtomicLong();
-        VisibilityTracker.startTracking(activity.getActivity().trackingView, requiredOnScreenTimeMs, 100,
-                new VisibilityTracker.VisibilityChangeCallback() {
-                    @Override
-                    public void onViewShown() {
-                        showReceivedTimeMs.set(System.currentTimeMillis());
-                        isShownCalled.set(true);
-                        latch.countDown();
-                    }
+        VisibilityTracker.startTracking(activity.getActivity().trackingView,
+                                        requiredOnScreenTimeMs,
+                                        100,
+                                        false,
+                                        new VisibilityTracker.VisibilityChangeCallback() {
+                                            @Override
+                                            public void onViewShown() {
+                                                showReceivedTimeMs.set(System.currentTimeMillis());
+                                                isShownCalled.set(true);
+                                                latch.countDown();
+                                            }
 
-                    @Override
-                    public void onViewTrackingFinished() {
-                        Assert.assertEquals(requiredOnScreenTimeMs,
-                                System.currentTimeMillis() - showReceivedTimeMs.get(),
-                                100);
-                        isFinishedCalled.set(true);
-                        latch.countDown();
-                    }
-                });
+                                            @Override
+                                            public void onViewTrackingFinished() {
+                                                Assert.assertEquals(requiredOnScreenTimeMs,
+                                                                    System.currentTimeMillis()
+                                                                            - showReceivedTimeMs.get(),
+                                                                    100);
+                                                isFinishedCalled.set(true);
+                                                latch.countDown();
+                                            }
+                                        });
 
         latch.await(timeOutSec, TimeUnit.SECONDS);
         Assert.assertEquals(showExpectedResult, isShownCalled.get());

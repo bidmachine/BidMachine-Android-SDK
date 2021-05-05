@@ -63,9 +63,9 @@ public enum TrackEventType {
     MediationWin(-1, -1, -1),
     MediationLoss(-1, -1, -1);
 
-    private int ortbValue;
-    private int ortbExtValue;
-    private int ortbActionValue;
+    private final int ortbValue;
+    private final int ortbExtValue;
+    private final int ortbActionValue;
 
     TrackEventType(int ortbValue, int ortbExtValue, int ortbActionValue) {
         this.ortbValue = ortbValue;

@@ -27,10 +27,13 @@ final class NativeAdObjectParams
         implements UnifiedMediationParams.MappedUnifiedMediationParams.DataProvider {
 
     private HashMap<String, Object> params;
-    private UnifiedMediationParams mediationParams = new UnifiedMediationParams.MappedUnifiedMediationParams(this);
+
+    private final UnifiedMediationParams mediationParams =
+            new UnifiedMediationParams.MappedUnifiedMediationParams(this);
 
     NativeAdObjectParams(Response.Seatbid seatbid, Response.Seatbid.Bid bid, Ad ad) {
         super(seatbid, bid, ad);
+
         prepareEvents(ad.getDisplay().getEventList());
 
         Ad.Display.Native ortbData = ad.getDisplay().getNative();
@@ -68,12 +71,12 @@ final class NativeAdObjectParams
                     break;
                 }
                 case NativePlacementBuilder.VIDEO_ASSET_ID: {
-                    if (!asset.getVideo().getCurl()
-                            .equals(Ad.Display.Native.Asset.VideoAsset.getDefaultInstance().getCurl())) {
+                    Ad.Display.Native.Asset.VideoAsset defaultVideoAsset =
+                            Ad.Display.Native.Asset.VideoAsset.getDefaultInstance();
+                    if (!asset.getVideo().getCurl().equals(defaultVideoAsset.getCurl())) {
                         getData().put(KEY_VIDEO_URL, asset.getVideo().getCurl());
                     }
-                    if (!asset.getVideo().getAdm()
-                            .equals(Ad.Display.Native.Asset.VideoAsset.getDefaultInstance().getAdm())) {
+                    if (!asset.getVideo().getAdm().equals(defaultVideoAsset.getAdm())) {
                         getData().put(KEY_VIDEO_ADM, asset.getVideo().getAdm());
                     }
                     break;

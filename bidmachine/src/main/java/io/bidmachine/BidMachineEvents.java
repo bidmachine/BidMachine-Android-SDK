@@ -7,18 +7,16 @@ import io.bidmachine.utils.BMError;
 public class BidMachineEvents {
 
     public static void eventStart(@Nullable TrackingObject trackingObject,
-                                  @Nullable TrackEventType trackEventType,
-                                  @Nullable AdsType adsType) {
-        eventStart(trackingObject, trackEventType, null, adsType);
+                                  @Nullable TrackEventType trackEventType) {
+        eventStart(trackingObject, trackEventType, null);
     }
 
     public static void eventStart(@Nullable TrackingObject trackingObject,
                                   @Nullable TrackEventType trackEventType,
-                                  @Nullable TrackEventInfo trackEventInfo,
-                                  @Nullable AdsType adsType) {
+                                  @Nullable TrackEventInfo trackEventInfo) {
         SessionTracker sessionTracker = BidMachineImpl.get().getSessionTracker();
         if (sessionTracker != null) {
-            sessionTracker.trackEventStart(trackingObject, trackEventType, trackEventInfo, adsType);
+            sessionTracker.trackEventStart(trackingObject, trackEventType, trackEventInfo);
         }
     }
 

@@ -34,6 +34,7 @@ class MraidParams extends UnifiedParams {
 
     MraidParams(@NonNull UnifiedMediationParams mediationParams) {
         super(mediationParams);
+
         creativeAdm = mediationParams.getString(IabUtils.KEY_CREATIVE_ADM);
         width = mediationParams.getInt(IabUtils.KEY_WIDTH);
         height = mediationParams.getInt(IabUtils.KEY_HEIGHT);

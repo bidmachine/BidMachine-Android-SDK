@@ -24,28 +24,30 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import io.bidmachine.core.Utils;
+
 public class DeviceUtils {
 
     public static int getOrientation(@Nullable Context context) {
-        if (context == null) {
-            return Configuration.ORIENTATION_UNDEFINED;
-        }
-        return context.getResources().getConfiguration().orientation;
+        return context != null
+                ? context.getResources().getConfiguration().orientation
+                : Configuration.ORIENTATION_UNDEFINED;
     }
 
     @NonNull
     public static Set<String> getInputLanguageSet(@NonNull Context context) {
         Set<String> languageSet = new HashSet<>();
         try {
-            InputMethodManager inputMethodManager = (InputMethodManager) context
-                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager inputMethodManager =
+                    (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             if (inputMethodManager == null) {
                 return languageSet;
             }
             List<InputMethodInfo> inputMethodInfoList = inputMethodManager.getEnabledInputMethodList();
             for (InputMethodInfo inputMethodInfo : inputMethodInfoList) {
-                List<InputMethodSubtype> inputMethodSubtypeList = inputMethodManager
-                        .getEnabledInputMethodSubtypeList(inputMethodInfo, true);
+                List<InputMethodSubtype> inputMethodSubtypeList =
+                        inputMethodManager.getEnabledInputMethodSubtypeList(inputMethodInfo,
+                                                                            true);
                 for (InputMethodSubtype inputMethodSubtype : inputMethodSubtypeList) {
                     if (inputMethodSubtype.getMode().equals("keyboard")) {
                         String locale = null;
@@ -107,7 +109,7 @@ public class DeviceUtils {
 
     @Nullable
     public static Integer getBatteryLevel(@NonNull Context context) {
-        float batteryPercent = io.bidmachine.core.Utils.getBatteryPercent(context);
+        float batteryPercent = Utils.getBatteryPercent(context);
         if (batteryPercent >= 85) {
             return 8;
         } else if (batteryPercent >= 70 && batteryPercent < 85) {

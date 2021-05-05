@@ -118,9 +118,10 @@ public final class TargetingParams extends RequestParams<TargetingParams> implem
                                             .setStringValue(framework)
                                             .build());
         }
-        appExtBuilder.putFields(ProtoExtConstants.Context.App.API_LEVEL, Value.newBuilder()
-                .setNumberValue(Build.VERSION.SDK_INT)
-                .build());
+        appExtBuilder.putFields(ProtoExtConstants.Context.App.API_LEVEL,
+                                Value.newBuilder()
+                                        .setNumberValue(Build.VERSION.SDK_INT)
+                                        .build());
     }
 
     void build(Context.User.Builder builder) {

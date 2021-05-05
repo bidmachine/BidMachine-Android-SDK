@@ -130,7 +130,8 @@ public class Utils {
     @SuppressLint("MissingPermission")
     public static NetworkInfo getActiveNetworkInfo(@NonNull Context context) {
         if (!Utils.isPermissionGranted(context, Manifest.permission.ACCESS_NETWORK_STATE)) {
-            Log.e("BidMachine", "Manifest permission not found: android.permission.ACCESS_NETWORK_STATE. Check the integration.");
+            Log.e("BidMachine",
+                  "Manifest permission not found: android.permission.ACCESS_NETWORK_STATE. Check the integration.");
             return null;
         }
         ConnectivityManager connectivityManager =
@@ -227,8 +228,8 @@ public class Utils {
     }
 
     public static int getUtcOffsetMinutes() {
-        return (int) TimeUnit.MILLISECONDS.toMinutes(
-                TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+        return (int) TimeUnit.MILLISECONDS.toMinutes(TimeZone.getDefault()
+                                                             .getOffset(System.currentTimeMillis()));
     }
 
     /*
@@ -293,7 +294,8 @@ public class Utils {
     }
 
     public static boolean canUseExternalFilesDir(Context context) {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT || writePermissionGranted(context))
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+                || writePermissionGranted(context))
                 && isExternalMemoryAvailable();
     }
 
@@ -303,8 +305,9 @@ public class Utils {
             return false;
         }
         try {
-            return context.checkPermission(permission, android.os.Process.myPid(), Process.myUid())
-                    == PackageManager.PERMISSION_GRANTED;
+            return context.checkPermission(permission,
+                                           android.os.Process.myPid(),
+                                           Process.myUid()) == PackageManager.PERMISSION_GRANTED;
         } catch (Exception e) {
             return false;
         }
@@ -459,7 +462,8 @@ public class Utils {
 
     public static void assertYear(int year) {
         if (!isYearValid(year)) {
-            throw new IllegalArgumentException("Wrong Birthday Year data: should be 4-digit integer, more or equal 1900 and less or equal than current year");
+            throw new IllegalArgumentException(
+                    "Wrong Birthday Year data: should be 4-digit integer, more or equal 1900 and less or equal than current year");
         }
     }
 
@@ -567,7 +571,8 @@ public class Utils {
         if (appVersion == null) {
             try {
                 PackageManager packageManager = context.getPackageManager();
-                PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+                PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(),
+                                                                        0);
                 if ((packageInfo.versionName) != null) {
                     appVersion = packageInfo.versionName;
                 }

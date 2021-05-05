@@ -115,6 +115,7 @@ public abstract class AdView<
     @Override
     public void setVisibility(int visibility) {
         super.setVisibility(visibility);
+
         if (getVisibility() == View.VISIBLE) {
             performShow();
         }
@@ -123,6 +124,7 @@ public abstract class AdView<
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+
         isAttachedToWindow = true;
         performShow();
     }
@@ -130,6 +132,7 @@ public abstract class AdView<
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+
         isAttachedToWindow = false;
         isShowPending = true;
     }
@@ -221,4 +224,3 @@ public abstract class AdView<
     };
 
 }
-

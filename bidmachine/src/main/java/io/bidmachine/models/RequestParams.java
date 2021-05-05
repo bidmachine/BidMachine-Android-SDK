@@ -7,7 +7,8 @@ public abstract class RequestParams<SelfType extends RequestParams<SelfType>> {
 
     public abstract void merge(@NonNull SelfType instance);
 
-    public static <T extends RequestParams<T>> T resolveParams(@Nullable T primary, @Nullable T secondary) {
+    public static <T extends RequestParams<T>> T resolveParams(@Nullable T primary,
+                                                               @Nullable T secondary) {
         if (primary == null) {
             return secondary;
         }
@@ -16,4 +17,5 @@ public abstract class RequestParams<SelfType extends RequestParams<SelfType>> {
         }
         return primary;
     }
+
 }

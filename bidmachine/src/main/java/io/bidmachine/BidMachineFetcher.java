@@ -66,12 +66,12 @@ public class BidMachineFetcher {
             @Override
             public void onRequestSuccess(@NonNull AdRequest adRequest,
                                          @NonNull AuctionResult auctionResult) {
-                //ignore
+                // ignore
             }
 
             @Override
             public void onRequestFailed(@NonNull AdRequest adRequest, @NonNull BMError bmError) {
-                //ignore
+                // ignore
             }
 
             @Override

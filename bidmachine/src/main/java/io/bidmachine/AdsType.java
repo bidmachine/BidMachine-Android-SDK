@@ -96,14 +96,11 @@ public enum AdsType {
     }
 
     @SuppressWarnings("unchecked")
-    AdObjectParams createAdObjectParams(@NonNull ContextProvider contextProvider,
-                                        @NonNull UnifiedAdRequestParams adRequestParams,
-                                        @NonNull Response.Seatbid seatbid,
+    AdObjectParams createAdObjectParams(@NonNull Response.Seatbid seatbid,
                                         @NonNull Response.Seatbid.Bid bid,
                                         @NonNull Ad ad) {
         for (PlacementBuilder builder : placementBuilders) {
-            AdObjectParams params = builder.createAdObjectParams(
-                    contextProvider, adRequestParams, seatbid, bid, ad);
+            AdObjectParams params = builder.createAdObjectParams(seatbid, bid, ad);
             if (params != null) {
                 return params;
             }
@@ -134,24 +131,23 @@ public enum AdsType {
                     @Override
                     public void run() {
                         try {
-                            placementBuilder.createPlacement(
-                                    contextProvider,
-                                    adRequestParams,
-                                    AdsType.this,
-                                    networkConfigMap != null
-                                            ? networkConfigMap.values()
-                                            : networkConfigs.values(),
-                                    new PlacementBuilder.PlacementCreateCallback() {
-                                        @Override
-                                        public void onCreated(@Nullable Message.Builder placement) {
-                                            if (placement != null) {
-                                                synchronized (outList) {
-                                                    outList.add(placement);
-                                                }
-                                            }
-                                            syncLock.countDown();
-                                        }
-                                    });
+                            placementBuilder.createPlacement(contextProvider,
+                                                             adRequestParams,
+                                                             AdsType.this,
+                                                             networkConfigMap != null
+                                                                     ? networkConfigMap.values()
+                                                                     : networkConfigs.values(),
+                                                             new PlacementBuilder.PlacementCreateCallback() {
+                                                                 @Override
+                                                                 public void onCreated(@Nullable Message.Builder placement) {
+                                                                     if (placement != null) {
+                                                                         synchronized (outList) {
+                                                                             outList.add(placement);
+                                                                         }
+                                                                     }
+                                                                     syncLock.countDown();
+                                                                 }
+                                                             });
                         } catch (Exception e) {
                             Logger.log(e);
                             syncLock.countDown();
@@ -174,5 +170,3 @@ public enum AdsType {
     }
 
 }
-
-

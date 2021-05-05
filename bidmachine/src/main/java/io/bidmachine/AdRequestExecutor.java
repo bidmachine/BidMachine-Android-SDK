@@ -29,9 +29,7 @@ class AdRequestExecutor extends ThreadPoolExecutor {
 
     @VisibleForTesting
     AdRequestExecutor(int nThreads) {
-        super(nThreads, nThreads,
-              0L, TimeUnit.MILLISECONDS,
-              new LinkedBlockingQueue<Runnable>());
+        super(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }
 
     @Override
@@ -66,4 +64,5 @@ class AdRequestExecutor extends ThreadPoolExecutor {
             }
         }
     }
+
 }

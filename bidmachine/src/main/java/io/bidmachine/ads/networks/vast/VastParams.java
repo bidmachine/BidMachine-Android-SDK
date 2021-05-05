@@ -21,6 +21,7 @@ class VastParams extends UnifiedParams {
 
     VastParams(@NonNull UnifiedMediationParams mediationParams) {
         super(mediationParams);
+
         creativeAdm = mediationParams.getString(IabUtils.KEY_CREATIVE_ADM);
         loadSkipOffset = mediationParams.getInt(IabUtils.KEY_LOAD_SKIP_OFFSET);
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);

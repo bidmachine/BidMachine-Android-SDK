@@ -339,6 +339,7 @@ public class VastOMSDKAdMeasurer extends OMSDKAdMeasurer<View> implements VastAd
                 mediaEvents = null;
             }
         });
+
         super.destroy();
     }
 

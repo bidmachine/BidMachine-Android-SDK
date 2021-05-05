@@ -34,4 +34,5 @@ class DeviceInfoImpl implements DeviceInfo {
     public boolean isLimitAdTrackingEnabled() {
         return AdvertisingPersonalData.isLimitAdTrackingEnabled();
     }
+
 }

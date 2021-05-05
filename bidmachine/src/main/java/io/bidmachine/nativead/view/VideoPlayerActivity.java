@@ -41,6 +41,7 @@ public class VideoPlayerActivity extends Activity implements MediaPlayer.OnCompl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Intent intent = getIntent();
         String fileUri = intent.getStringExtra(FILE_URI);
@@ -52,12 +53,12 @@ public class VideoPlayerActivity extends Activity implements MediaPlayer.OnCompl
         listener = MediaView.listener;
         RelativeLayout rootLayout = new RelativeLayout(this);
         RelativeLayout.LayoutParams rootViewParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+                                                                                     ViewGroup.LayoutParams.MATCH_PARENT);
         rootLayout.setLayoutParams(rootViewParams);
 
         videoView = new VideoView(this);
         RelativeLayout.LayoutParams videoViewParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+                                                                                      ViewGroup.LayoutParams.MATCH_PARENT);
         videoViewParams.addRule(RelativeLayout.CENTER_IN_PARENT);
         videoView.setLayoutParams(videoViewParams);
         videoView.setOnCompletionListener(this);
@@ -69,7 +70,9 @@ public class VideoPlayerActivity extends Activity implements MediaPlayer.OnCompl
         int margin = Math.round(8 * getScreenDensity(this));
         CircleCountdownView closeButton = new CircleCountdownView(this);
         closeButton.setColors(Assets.mainAssetsColor, Assets.backgroundColor);
-        RelativeLayout.LayoutParams closeButtonParams = new RelativeLayout.LayoutParams(closeButtonSize, closeButtonSize);
+        RelativeLayout.LayoutParams closeButtonParams =
+                new RelativeLayout.LayoutParams(closeButtonSize,
+                                                closeButtonSize);
         closeButtonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         closeButtonParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
         closeButtonParams.setMargins(margin, margin, margin, margin);

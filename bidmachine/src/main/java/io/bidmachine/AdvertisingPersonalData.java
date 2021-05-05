@@ -25,11 +25,11 @@ class AdvertisingPersonalData {
     static void updateInfo(@NonNull Context context) {
         try {
             Class<?> advertisingClientClass = Class.forName(ADVERTISING_CLIENT_CLASS);
-            Object advertisingIdInfoObject = Utils.invokeMethodByName(
-                    advertisingClientClass,
-                    advertisingClientClass,
-                    "getAdvertisingIdInfo",
-                    new Pair<Class<?>, Object>(Context.class, context));
+            Object advertisingIdInfoObject =
+                    Utils.invokeMethodByName(advertisingClientClass,
+                                             advertisingClientClass,
+                                             "getAdvertisingIdInfo",
+                                             new Pair<Class<?>, Object>(Context.class, context));
             if (advertisingIdInfoObject != null) {
                 deviceAdvertisingId = (String) Utils.invokeMethodByName(advertisingIdInfoObject,
                                                                         "getId");

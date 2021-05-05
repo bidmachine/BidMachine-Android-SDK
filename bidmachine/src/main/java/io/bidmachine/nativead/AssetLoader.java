@@ -29,10 +29,10 @@ class AssetLoader {
 
     private final List<Runnable> pendingTasks = new CopyOnWriteArrayList<>();
 
-    private NativeRequest adRequest;
-    private AdProcessCallback callback;
-    private NativeData nativeData;
-    private NativeMediaPrivateData nativeMediaData;
+    private final NativeRequest adRequest;
+    private final AdProcessCallback callback;
+    private final NativeData nativeData;
+    private final NativeMediaPrivateData nativeMediaData;
 
     AssetLoader(@NonNull NativeRequest request,
                 @NonNull AdProcessCallback callback,

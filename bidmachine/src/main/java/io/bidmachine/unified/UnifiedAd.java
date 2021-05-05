@@ -14,21 +14,27 @@ public abstract class UnifiedAd<
                               @NonNull UnifiedMediationParams mediationParams) throws Throwable;
 
     public void onShown() {
+
     }
 
     public void onShowFailed() {
+
     }
 
     public void onImpression() {
+
     }
 
     public void onClicked() {
+
     }
 
     public void onExpired() {
+
     }
 
     public void onDestroy() {
+
     }
 
 }

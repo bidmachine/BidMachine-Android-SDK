@@ -14,6 +14,7 @@ import io.bidmachine.utils.BMError;
 class SessionTrackerImpl extends SessionTracker {
 
     private static class EventsHolder {
+
         @Nullable
         private final EventsHolder referenceHolder;
 
@@ -39,6 +40,7 @@ class SessionTrackerImpl extends SessionTracker {
         public int getCount(TrackEventType eventType) {
             return trackingMap.containsKey(eventType) ? trackingMap.get(eventType).get() : 0;
         }
+
     }
 
     @VisibleForTesting
@@ -52,8 +54,7 @@ class SessionTrackerImpl extends SessionTracker {
     @Override
     public void trackEventStart(@Nullable TrackingObject trackingObject,
                                 @Nullable TrackEventType trackEventType,
-                                @Nullable TrackEventInfo trackEventInfo,
-                                @Nullable AdsType adsType) {
+                                @Nullable TrackEventInfo trackEventInfo) {
         if (trackingObject == null || trackEventType == null) {
             return;
         }
@@ -67,7 +68,8 @@ class SessionTrackerImpl extends SessionTracker {
             intervalHolders.put(key, eventsMap);
         }
         if (!eventsMap.containsKey(trackEventType)) {
-            eventsMap.put(trackEventType, trackEventInfo != null ? trackEventInfo : new TrackEventInfo());
+            eventsMap.put(trackEventType,
+                          trackEventInfo != null ? trackEventInfo : new TrackEventInfo());
         }
     }
 
@@ -144,4 +146,5 @@ class SessionTrackerImpl extends SessionTracker {
         }
         return holder;
     }
+
 }

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 public class VisibilityTracker {
 
     private static final int NO_TRACK = -1;
-
     private static final ArrayList<TrackingHolder> holders = new ArrayList<>();
 
     private static class TrackingHolder {
@@ -304,10 +303,13 @@ public class VisibilityTracker {
         }
     }
 
+
     public interface VisibilityChangeCallback {
+
         void onViewShown();
 
         void onViewTrackingFinished();
+
     }
 
 }

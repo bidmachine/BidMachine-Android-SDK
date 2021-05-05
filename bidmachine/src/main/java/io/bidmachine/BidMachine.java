@@ -11,7 +11,6 @@ public class BidMachine {
 
     public static final String NAME = "BidMachine";
     public static final String VERSION = BuildConfig.VERSION_NAME;
-    public static final int VERSION_CODE = BuildConfig.VERSION_CODE;
 
     static {
         Logger.setTag(NAME);
@@ -145,7 +144,7 @@ public class BidMachine {
     /**
      * Adds 3rd party network configuration, which will be used for mediation, loading and displaying ads
      *
-     * @param context - your application context
+     * @param context  - your application context
      * @param jsonData - Json array which contains info about required networks
      */
     public static void registerNetworks(@NonNull Context context, @NonNull String jsonData) {

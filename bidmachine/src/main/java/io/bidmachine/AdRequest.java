@@ -160,7 +160,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     RequestParams.resolveParams(this.sessionAdParams,
                                                 bidMachineSessionAdParams);
 
-            //PriceFloor params
+            // PriceFloor params
             final PriceFloorParams priceFloorParams = Utils.oneOf(this.priceFloorParams,
                                                                   bidMachine.getPriceFloorParams());
             final Map<String, Double> priceFloorsMap =
@@ -198,14 +198,15 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             placementBuilder.setSsai(0);
             placementBuilder.setSdk(BidMachine.NAME);
             placementBuilder.setSdkver(BidMachine.VERSION);
-            placementBuilder.setSecure(!io.bidmachine.core.Utils.canUseCleartextTraffic());
+            placementBuilder.setSecure(!Utils.canUseCleartextTraffic());
             for (Message.Builder displayBuilder : placements) {
                 if (displayBuilder instanceof Placement.DisplayPlacement.Builder) {
                     placementBuilder.setDisplay((Placement.DisplayPlacement.Builder) displayBuilder);
                 } else if (displayBuilder instanceof Placement.VideoPlacement.Builder) {
                     placementBuilder.setVideo((Placement.VideoPlacement.Builder) displayBuilder);
                 } else {
-                    throw new IllegalArgumentException("Unsupported display type: " + displayBuilder);
+                    throw new IllegalArgumentException("Unsupported display type: "
+                                                               + displayBuilder);
                 }
             }
             // Request -> Item -> Spec -> Placement -> Extension
@@ -220,10 +221,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
             requestBuilder.addItem(itemBuilder.build());
 
-            //Context
+            // Context
             final Context.Builder contextBuilder = Context.newBuilder();
 
-            //Context -> App
+            // Context -> App
             final Context.App.Builder appBuilder = Context.App.newBuilder();
             Publisher publisher = bidMachine.getPublisher();
             if (publisher != null) {
@@ -231,7 +232,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             }
             targetingParams.build(context, appBuilder);
 
-            //Context -> App -> Extension
+            // Context -> App -> Extension
             Struct.Builder appExtBuilder = Struct.newBuilder();
             targetingParams.fillAppExtension(appExtBuilder);
             if (appExtBuilder.getFieldsCount() > 0) {
@@ -240,7 +241,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
             contextBuilder.setApp(appBuilder);
 
-            //Context -> Restrictions
+            // Context -> Restrictions
             final BlockedParams blockedParams = targetingParams.getBlockedParams();
             if (blockedParams != null) {
                 final Context.Restrictions.Builder restrictionsBuilder = Context.Restrictions.newBuilder();
@@ -248,14 +249,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 contextBuilder.setRestrictions(restrictionsBuilder);
             }
 
-            //Context -> User
+            // Context -> User
             final Context.User.Builder userBuilder = Context.User.newBuilder();
             userRestrictionParams.build(userBuilder);
             if (userRestrictionParams.canSendUserInfo()) {
                 targetingParams.build(userBuilder);
             }
 
-            //Context -> User -> Extension
+            // Context -> User -> Extension
             Struct.Builder userExtBuilder = Struct.newBuilder();
             sessionAdParams.fillUserExtension(userExtBuilder);
             if (userExtBuilder.getFieldsCount() > 0) {
@@ -265,12 +266,12 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
             contextBuilder.setUser(userBuilder);
 
-            //Context -> Regs
+            // Context -> Regs
             final Context.Regs.Builder regsBuilder = Context.Regs.newBuilder();
             userRestrictionParams.build(regsBuilder);
             contextBuilder.setRegs(regsBuilder);
 
-            //Context -> Device
+            // Context -> Device
             final Context.Device.Builder deviceBuilder = Context.Device.newBuilder();
             bidMachine.getDeviceParams().build(context,
                                                deviceBuilder,
@@ -278,7 +279,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                                bidMachine.getTargetingParams(),
                                                userRestrictionParams);
 
-            //Context -> Device -> Extension
+            // Context -> Device -> Extension
             Struct.Builder deviceExtBuilder = Struct.newBuilder();
             bidMachine.getDeviceParams().fillDeviceExtension(context,
                                                              deviceExtBuilder,
@@ -296,7 +297,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             requestBuilder.setAt(2);
             requestBuilder.setTmax(10000);
 
-            //Request
+            // Request
             final RequestExtension.Builder requestExtensionBuilder = RequestExtension.newBuilder();
             requestExtensionBuilder.setSellerId(sellerId);
             requestExtensionBuilder.setBmIfv(bidMachine.obtainIFV(context));
@@ -351,7 +352,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             processRequestFail(verifyError);
             return;
         }
-        BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest, getType());
+        BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest);
         try {
             isAdWasShown = false;
             unsubscribeExpireTracker();
@@ -371,7 +372,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 }
             });
             if (timeOut > 0) {
-                io.bidmachine.core.Utils.onBackgroundThread(timeOutRunnable, timeOut);
+                Utils.onBackgroundThread(timeOutRunnable, timeOut);
             }
         } catch (Exception e) {
             Logger.log(e);
@@ -402,7 +403,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 return;
             }
             String url = responsePayload.getResponseCacheUrl();
-            if (!TextUtils.isEmpty(url) && io.bidmachine.core.Utils.isHttpUrl(url)) {
+            if (!TextUtils.isEmpty(url) && Utils.isHttpUrl(url)) {
                 retrieveBody(url);
                 return;
             }
@@ -566,11 +567,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
         unifiedAdRequestParams = null;
 
-        BidMachineEvents.eventFinish(
-                trackingObject,
-                TrackEventType.AuctionRequestDestroy,
-                getType(),
-                null);
+        BidMachineEvents.eventFinish(trackingObject,
+                                     TrackEventType.AuctionRequestDestroy,
+                                     getType(),
+                                     null);
     }
 
     void cancel() {
@@ -598,11 +598,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         for (AdRequestListener adRequestListener : BidMachineImpl.get().getAdRequestListeners()) {
             adRequestListener.onRequestExpired(this);
         }
-        BidMachineEvents.eventFinish(
-                trackingObject,
-                TrackEventType.AuctionRequestExpired,
-                getType(),
-                null);
+        BidMachineEvents.eventFinish(trackingObject,
+                                     TrackEventType.AuctionRequestExpired,
+                                     getType(),
+                                     null);
     }
 
     /**
@@ -681,13 +680,13 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         final long expTime = expirationTime * 1000;
         if (expTime > 0 && !isExpireTrackerSubscribed) {
             isExpireTrackerSubscribed = true;
-            io.bidmachine.core.Utils.onBackgroundThread(expiredRunnable, expTime);
+            Utils.onBackgroundThread(expiredRunnable, expTime);
         }
     }
 
     private void unsubscribeExpireTracker() {
         isExpireTrackerSubscribed = false;
-        io.bidmachine.core.Utils.cancelBackgroundThreadTask(expiredRunnable);
+        Utils.cancelBackgroundThreadTask(expiredRunnable);
     }
 
     @SuppressWarnings("unchecked")
@@ -698,7 +697,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         isApiRequestCompleted.set(true);
         currentApiRequest = null;
-        io.bidmachine.core.Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        Utils.cancelBackgroundThreadTask(timeOutRunnable);
         Logger.log(toString() + ": api request success");
 
         if (response != null && response.getSeatbidCount() > 0) {
@@ -732,7 +731,11 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     adResult = ad;
                     bidResult = bid;
                     seatBidResult = seatbid;
-                    auctionResult = new AuctionResultImpl(getType(), seatbid, bid, ad, networkConfig);
+                    auctionResult = new AuctionResultImpl(getType(),
+                                                          seatbid,
+                                                          bid,
+                                                          ad,
+                                                          networkConfig);
                     expirationTime = Utils.getOrDefault(bid.getExp(),
                                                         Response.Seatbid.Bid.getDefaultInstance()
                                                                 .getExp(),
@@ -749,11 +752,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             .getAdRequestListeners()) {
                         listener.onRequestSuccess(this, auctionResult);
                     }
-                    BidMachineEvents.eventFinish(
-                            trackingObject,
-                            TrackEventType.AuctionRequest,
-                            getType(),
-                            null);
+                    BidMachineEvents.eventFinish(trackingObject,
+                                                 TrackEventType.AuctionRequest,
+                                                 getType(),
+                                                 null);
                     return;
                 } else {
                     Logger.log(toString() + ": Ad not found or not valid");
@@ -773,7 +775,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         isApiRequestCompleted.set(true);
         currentApiRequest = null;
-        io.bidmachine.core.Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        Utils.cancelBackgroundThreadTask(timeOutRunnable);
         Logger.log(toString() + ": api request fail - " + error);
 
         if (error == null) {
@@ -796,22 +798,20 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         for (AdRequestListener adRequestListener : BidMachineImpl.get().getAdRequestListeners()) {
             adRequestListener.onRequestFailed(this, error);
         }
-        BidMachineEvents.eventFinish(
-                trackingObject,
-                TrackEventType.AuctionRequest,
-                getType(),
-                error);
+        BidMachineEvents.eventFinish(trackingObject,
+                                     TrackEventType.AuctionRequest,
+                                     getType(),
+                                     error);
     }
 
     private void processApiRequestCancel() {
         isApiRequestCanceled.set(true);
-        io.bidmachine.core.Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        Utils.cancelBackgroundThreadTask(timeOutRunnable);
 
-        BidMachineEvents.eventFinish(
-                trackingObject,
-                TrackEventType.AuctionRequestCancel,
-                getType(),
-                null);
+        BidMachineEvents.eventFinish(trackingObject,
+                                     TrackEventType.AuctionRequestCancel,
+                                     getType(),
+                                     null);
         BidMachineEvents.clearEvent(trackingObject, TrackEventType.AuctionRequest);
     }
 
@@ -841,7 +841,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         return getClass().getSimpleName() + "[@" + Integer.toHexString(hashCode()) + "]";
     }
 
+
     public interface AdRequestListener<AdRequestType extends AdRequest> {
+
         /**
          * Called when AdRequest was obtained successfully
          *
@@ -864,6 +866,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
          * @param request - AdRequest instance
          */
         void onRequestExpired(@NonNull AdRequestType request);
+
     }
 
     interface InternalAdRequestListener<AdRequestType extends AdRequest> {
@@ -962,12 +965,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 prepareRequest();
 
                 params.networkConfigMap = new HashMap<String, NetworkConfig>();
-                for (NetworkConfig networkConfig : BidMachineImpl.get().getInitNetworkConfigList()) {
+                for (NetworkConfig networkConfig
+                        : BidMachineImpl.get().getInitNetworkConfigList()) {
                     params.networkConfigMap.put(networkConfig.getKey(), networkConfig);
                 }
                 for (NetworkConfig networkConfig : networkConfigList) {
                     String networkKey = networkConfig.getKey();
-                    if (NetworkRegistry.isNetworkInitialized(networkKey, RegisterSource.Publisher)) {
+                    if (NetworkRegistry.isNetworkInitialized(networkKey,
+                                                             RegisterSource.Publisher)) {
                         params.networkConfigMap.put(networkConfig.getKey(), networkConfig);
                     } else {
                         Logger.log(String.format(
@@ -1043,6 +1048,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public AdRequest getAdRequest() {
             return AdRequest.this;
         }
+
     }
 
 }

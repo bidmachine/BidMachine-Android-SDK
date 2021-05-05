@@ -30,8 +30,8 @@ public class BidMachineImplAdRequestListenersTest extends MultiThreadingTest {
 
     @Override
     void readAction(int actionNumber, int totalActions) {
-        for (AdRequest.AdRequestListener adRequest : bidMachine.getAdRequestListeners()) {
-
+        for (AdRequest.AdRequestListener<?> adRequest : bidMachine.getAdRequestListeners()) {
+            System.out.println(adRequest.toString());
         }
     }
 

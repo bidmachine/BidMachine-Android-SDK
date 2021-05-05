@@ -36,4 +36,5 @@ public abstract class FullScreenAd<
     public boolean canShow() {
         return super.canShow() && Utils.isNetworkAvailable(getContext());
     }
+
 }

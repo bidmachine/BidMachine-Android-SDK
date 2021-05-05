@@ -1,6 +1,7 @@
 package io.bidmachine.nativead;
 
 public interface NativeInteractor {
+
     /**
      * Should be called when Native Ads was shown
      */
@@ -20,4 +21,5 @@ public interface NativeInteractor {
      * Should be called when Native Ads video was finished (optional)
      */
     void dispatchVideoPlayFinished();
+
 }

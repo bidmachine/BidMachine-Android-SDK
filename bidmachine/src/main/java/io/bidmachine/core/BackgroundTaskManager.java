@@ -30,9 +30,13 @@ public class BackgroundTaskManager implements Executor {
         BlockingQueue<Runnable> mServiceTaskQueue = new LinkedBlockingQueue<>();
         RejectedExecutionHandler rejectedExecutionHandlerForServiceTask = new BidMachineRejectedExecutionHandler();
         ThreadFactory threadFactory = new ProcessPriorityThreadFactory(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        serviceTaskThreadPool = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE,
-                KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, mServiceTaskQueue, threadFactory,
-                rejectedExecutionHandlerForServiceTask);
+        serviceTaskThreadPool = new ThreadPoolExecutor(CORE_POOL_SIZE,
+                                                       MAXIMUM_POOL_SIZE,
+                                                       KEEP_ALIVE_TIME,
+                                                       KEEP_ALIVE_TIME_UNIT,
+                                                       mServiceTaskQueue,
+                                                       threadFactory,
+                                                       rejectedExecutionHandlerForServiceTask);
     }
 
     @Override
@@ -40,11 +44,12 @@ public class BackgroundTaskManager implements Executor {
         serviceTaskThreadPool.execute(task);
     }
 
+
     private final static class BidMachineRejectedExecutionHandler implements RejectedExecutionHandler {
 
         @Override
         public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
-            //ignore
+            // ignore
         }
 
     }

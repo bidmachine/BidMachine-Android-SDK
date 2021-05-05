@@ -26,8 +26,8 @@ public final class ViewAdObject<
 
     private View adView;
 
-    private MeasureMode widthMeasureMode = MeasureMode.Direct;
-    private MeasureMode heightMeasureMode = MeasureMode.Direct;
+    private final MeasureMode widthMeasureMode = MeasureMode.Direct;
+    private final MeasureMode heightMeasureMode = MeasureMode.Direct;
 
     private int width;
     private int height;
@@ -64,32 +64,34 @@ public final class ViewAdObject<
         container.removeAllViews();
         final ViewGroup.LayoutParams params;
         if (container instanceof FrameLayout) {
-            params = new FrameLayout.LayoutParams(getScaledWidth(context), getScaledHeight(context), Gravity.CENTER);
+            params = new FrameLayout.LayoutParams(getScaledWidth(context),
+                                                  getScaledHeight(context),
+                                                  Gravity.CENTER);
         } else {
             params = new ViewGroup.LayoutParams(getScaledWidth(context), getScaledHeight(context));
         }
         container.addView(adView, params);
-        VisibilityTracker.startTracking(
-                adView,
-                getParams().getViewabilityTimeThresholdMs(),
-                getParams().getViewabilityPixelThreshold(),
-                getParams().isViewabilityIgnoreWindowFocus(),
-                new VisibilityTracker.VisibilityChangeCallback() {
-                    @Override
-                    public void onViewShown() {
-                        getProcessCallback().processShown();
-                    }
+        VisibilityTracker.startTracking(adView,
+                                        getParams().getViewabilityTimeThresholdMs(),
+                                        getParams().getViewabilityPixelThreshold(),
+                                        getParams().isViewabilityIgnoreWindowFocus(),
+                                        new VisibilityTracker.VisibilityChangeCallback() {
+                                            @Override
+                                            public void onViewShown() {
+                                                getProcessCallback().processShown();
+                                            }
 
-                    @Override
-                    public void onViewTrackingFinished() {
-                        getProcessCallback().processImpression();
-                    }
-                });
+                                            @Override
+                                            public void onViewTrackingFinished() {
+                                                getProcessCallback().processImpression();
+                                            }
+                                        });
     }
 
     @Override
     public void onImpression() {
         super.onImpression();
+
         VisibilityTracker.stopTracking(adView);
     }
 
@@ -101,6 +103,7 @@ public final class ViewAdObject<
             }
             VisibilityTracker.stopTracking(adView);
         }
+
         super.onDestroy();
     }
 
@@ -129,6 +132,7 @@ public final class ViewAdObject<
     }
 
     protected enum MeasureMode {
+
         Match, Wrap, Direct;
 
         int getSize(Context context, int directSize) {
@@ -143,6 +147,7 @@ public final class ViewAdObject<
                     return ViewGroup.LayoutParams.MATCH_PARENT;
             }
         }
+
     }
 
     private final class UnifiedViewAdCallbackImpl extends BaseUnifiedAdCallback implements UnifiedBannerAdCallback {
@@ -159,6 +164,7 @@ public final class ViewAdObject<
             ViewAdObject.this.adView = adView;
             processCallback.processLoadSuccess();
         }
+
     }
 
 }

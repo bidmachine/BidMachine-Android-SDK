@@ -35,4 +35,5 @@ public class ExtraParams extends RequestParams<ExtraParams> implements IExtraPar
             }
         }
     }
+
 }

@@ -17,7 +17,7 @@ public abstract class Condition {
 
     static class ByText extends Condition {
 
-        private String text;
+        private final String text;
 
         ByText(String text) {
             this.text = text;
@@ -36,7 +36,7 @@ public abstract class Condition {
 
     static class ByClassName extends Condition {
 
-        private String className;
+        private final String className;
 
         ByClassName(String className) {
             this.className = className;

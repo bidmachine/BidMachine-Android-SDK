@@ -1,7 +1,5 @@
 package io.bidmachine.displays;
 
-import android.text.TextUtils;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -58,30 +56,27 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                 if (mediationConfigs != null) {
                     for (Map<String, String> config : mediationConfigs) {
                         preloadTasks.add(
-                                new AdUnitPreloadTask<>(
-                                        contextProvider,
-                                        (HeaderBiddingAdapter) adapter,
-                                        adsType,
-                                        adContentType,
-                                        adRequestParams,
-                                        config));
+                                new AdUnitPreloadTask<>(contextProvider,
+                                                        (HeaderBiddingAdapter) adapter,
+                                                        adsType,
+                                                        adContentType,
+                                                        adRequestParams,
+                                                        config));
                     }
                 }
             }
         }
         if (!preloadTasks.isEmpty()) {
             TrackingObject trackingObject = new TrackingObject() {
-                private String key = UUID.randomUUID().toString();
+                private final String key = UUID.randomUUID().toString();
 
                 @Override
                 public Object getTrackingKey() {
                     return key;
                 }
             };
-            BidMachineEvents.eventStart(
-                    trackingObject,
-                    TrackEventType.HeaderBiddingNetworksPrepare,
-                    adsType);
+            BidMachineEvents.eventStart(trackingObject,
+                                        TrackEventType.HeaderBiddingNetworksPrepare);
             try {
                 CountDownLatch syncLock = new CountDownLatch(preloadTasks.size());
                 for (AdUnitPreloadTask task : preloadTasks) {
@@ -111,19 +106,16 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                     return placementBuilder;
                 }
             } finally {
-                BidMachineEvents.eventFinish(
-                        trackingObject,
-                        TrackEventType.HeaderBiddingNetworksPrepare,
-                        adsType,
-                        null);
+                BidMachineEvents.eventFinish(trackingObject,
+                                             TrackEventType.HeaderBiddingNetworksPrepare,
+                                             adsType,
+                                             null);
             }
         }
         return null;
     }
 
-    AdObjectParams createAdObjectParams(@NonNull ContextProvider contextProvider,
-                                        @NonNull UnifiedAdRequestParamsType adRequestParams,
-                                        @NonNull Response.Seatbid seatbid,
+    AdObjectParams createAdObjectParams(@NonNull Response.Seatbid seatbid,
                                         @NonNull Response.Seatbid.Bid bid,
                                         @NonNull Ad ad) {
         HeaderBiddingAd headerBiddingAd = obtainHeaderBiddingAd(ad);
@@ -164,24 +156,25 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
         return null;
     }
 
+
     private static final class AdUnitPreloadTask<UnifiedAdRequestParamsType extends UnifiedAdRequestParams>
             implements Runnable, HeaderBiddingAdRequestParams, HeaderBiddingCollectParamsCallback {
 
-        private static Executor executor = Executors.newFixedThreadPool(
+        private static final Executor executor = Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors() * 2);
 
         @NonNull
-        private ContextProvider contextProvider;
+        private final ContextProvider contextProvider;
         @NonNull
-        private HeaderBiddingAdapter adapter;
+        private final HeaderBiddingAdapter adapter;
         @NonNull
-        private AdsType adsType;
+        private final AdsType adsType;
         @NonNull
-        private AdContentType adContentType;
+        private final AdContentType adContentType;
         @NonNull
-        private UnifiedAdRequestParamsType adRequestParams;
+        private final UnifiedAdRequestParamsType adRequestParams;
         @NonNull
-        private Map<String, String> mediationConfig;
+        private final Map<String, String> mediationConfig;
 
         private CountDownLatch syncLock;
         private HeaderBiddingPlacement.AdUnit adUnit;
@@ -189,7 +182,7 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
         private boolean isFinished = false;
 
         private final TrackingObject trackingObject = new TrackingObject() {
-            private String key = UUID.randomUUID().toString();
+            private final String key = UUID.randomUUID().toString();
 
             @Override
             public Object getTrackingKey() {
@@ -252,11 +245,10 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                                      adapter.getKey(),
                                      adsType));
             finish();
-            BidMachineEvents.eventFinish(
-                    trackingObject,
-                    TrackEventType.HeaderBiddingNetworkPrepare,
-                    adsType,
-                    null);
+            BidMachineEvents.eventFinish(trackingObject,
+                                         TrackEventType.HeaderBiddingNetworkPrepare,
+                                         adsType,
+                                         null);
         }
 
         @Override
@@ -270,21 +262,18 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                                          error.getMessage()));
             }
             finish();
-            BidMachineEvents.eventFinish(
-                    trackingObject,
-                    TrackEventType.HeaderBiddingNetworkPrepare,
-                    adsType,
-                    error);
+            BidMachineEvents.eventFinish(trackingObject,
+                                         TrackEventType.HeaderBiddingNetworkPrepare,
+                                         adsType,
+                                         error);
         }
 
         void execute(@NonNull CountDownLatch syncLock) {
-            BidMachineEvents.eventStart(
-                    trackingObject,
-                    TrackEventType.HeaderBiddingNetworkPrepare,
-                    new TrackEventInfo()
-                            .withParameter("HB_NETWORK", adapter.getKey())
-                            .withParameter("BM_AD_TYPE", adsType.getName()),
-                    adsType);
+            BidMachineEvents.eventStart(trackingObject,
+                                        TrackEventType.HeaderBiddingNetworkPrepare,
+                                        new TrackEventInfo()
+                                                .withParameter("HB_NETWORK", adapter.getKey())
+                                                .withParameter("BM_AD_TYPE", adsType.getName()));
             this.syncLock = syncLock;
             executor.execute(this);
         }
@@ -309,6 +298,7 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             isFinished = true;
             syncLock.countDown();
         }
+
     }
 
 }

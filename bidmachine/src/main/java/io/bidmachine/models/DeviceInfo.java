@@ -14,4 +14,5 @@ public interface DeviceInfo {
     String getIfa(@NonNull Context context);
 
     boolean isLimitAdTrackingEnabled();
+
 }

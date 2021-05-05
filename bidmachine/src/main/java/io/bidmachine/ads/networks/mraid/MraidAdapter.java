@@ -35,6 +35,7 @@ public class MraidAdapter extends NetworkAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
+
         OMSDKSettings.initialize(contextProvider.getContext());
     }
 

@@ -35,17 +35,21 @@ final class BannerAd extends ViewAd<
             @NonNull BannerRequest adRequest,
             @NonNull NetworkAdapter adapter,
             @NonNull AdObjectParams adObjectParams,
-            @NonNull AdProcessCallback processCallback
-    ) {
+            @NonNull AdProcessCallback processCallback) {
         UnifiedBannerAd unifiedAd = adapter.createBanner();
         if (unifiedAd == null) {
             return null;
         }
         ViewAdObject<BannerRequest, UnifiedBannerAd, UnifiedBannerAdRequestParams> adObject =
-                new ViewAdObject<>(contextProvider, processCallback, adRequest, adObjectParams, unifiedAd);
+                new ViewAdObject<>(contextProvider,
+                                   processCallback,
+                                   adRequest,
+                                   adObjectParams,
+                                   unifiedAd);
         BannerSize bannerSize = adRequest.getSize();
         adObject.setWidth(bannerSize.width);
         adObject.setHeight(bannerSize.height);
         return adObject;
     }
+
 }

@@ -41,7 +41,7 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
     private static final Placement.DisplayPlacement.NativeFormat.AssetFormat.Builder ratingAsset;
 
     static {
-        //Title
+        // Title
         titleAsset = Placement.DisplayPlacement.NativeFormat.AssetFormat.newBuilder();
         titleAsset.setId(TITLE_ASSET_ID);
         titleAsset.setReq(true);
@@ -49,7 +49,7 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
                                     .setLen(104)
                                     .build());
 
-        //Data
+        // Data
         descAsset = Placement.DisplayPlacement.NativeFormat.AssetFormat.newBuilder();
         descAsset.setId(DESC_ASSET_ID);
         descAsset.setReq(true);
@@ -57,7 +57,7 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
                                   .setType(NativeDataAssetType.NATIVE_DATA_ASSET_TYPE_DESC)
                                   .build());
 
-        //Call to Action
+        // Call to Action
         ctaAsset = Placement.DisplayPlacement.NativeFormat.AssetFormat.newBuilder();
         ctaAsset.setId(CTA_ASSET_ID);
         ctaAsset.setReq(true);
@@ -65,7 +65,7 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
                                  .setType(NativeDataAssetType.NATIVE_DATA_ASSET_TYPE_CTA_TEXT)
                                  .build());
 
-        //Rating
+        // Rating
         ratingAsset = Placement.DisplayPlacement.NativeFormat.AssetFormat.newBuilder();
         ratingAsset.setId(RATING_ASSET_ID);
         ratingAsset.setReq(false);
@@ -131,7 +131,7 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
                                 @NonNull UnifiedNativeAdRequestParams adRequestParams,
                                 @NonNull AdsType adsType,
                                 @NonNull Collection<NetworkConfig> networkConfigs,
-                                @NonNull PlacementCreateCallback callback) throws Exception{
+                                @NonNull PlacementCreateCallback callback) throws Exception {
         Placement.DisplayPlacement.Builder builder = Placement.DisplayPlacement.newBuilder();
         builder.setInstl(false);
         builder.setUnit(SizeUnit.SIZE_UNIT_DIPS);
@@ -150,11 +150,10 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
         builder.addAllMime(Arrays.asList(Constants.IMAGE_MIME_TYPES));
         builder.addAllMime(Arrays.asList(Constants.VIDEO_MIME_TYPES));
 
-        Message.Builder headerBiddingPlacement = createHeaderBiddingPlacement(
-                contextProvider,
-                adRequestParams,
-                adsType,
-                networkConfigs);
+        Message.Builder headerBiddingPlacement = createHeaderBiddingPlacement(contextProvider,
+                                                                              adRequestParams,
+                                                                              adsType,
+                                                                              networkConfigs);
         if (headerBiddingPlacement != null) {
             builder.addExtProto(Any.pack(headerBiddingPlacement.build()));
         }
@@ -162,16 +161,10 @@ public class NativePlacementBuilder extends PlacementBuilder<UnifiedNativeAdRequ
     }
 
     @Override
-    public AdObjectParams createAdObjectParams(@NonNull ContextProvider contextProvider,
-                                               @NonNull UnifiedNativeAdRequestParams adRequest,
-                                               @NonNull Response.Seatbid seatbid,
+    public AdObjectParams createAdObjectParams(@NonNull Response.Seatbid seatbid,
                                                @NonNull Response.Seatbid.Bid bid,
                                                @NonNull Ad ad) {
-        AdObjectParams params = createHeaderBiddingAdObjectParams(contextProvider,
-                                                                  adRequest,
-                                                                  seatbid,
-                                                                  bid,
-                                                                  ad);
+        AdObjectParams params = createHeaderBiddingAdObjectParams(seatbid, bid, ad);
         if (params == null && (ad.hasDisplay() && ad.getDisplay().hasNative())) {
             params = new NativeAdObjectParams(seatbid, bid, ad);
         }

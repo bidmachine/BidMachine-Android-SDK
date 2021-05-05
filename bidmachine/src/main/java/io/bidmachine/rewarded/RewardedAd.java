@@ -20,17 +20,20 @@ public final class RewardedAd extends FullScreenAd<RewardedAd, RewardedRequest, 
     }
 
     @Override
-    protected FullScreenAdObject<RewardedRequest> createAdObject(
-            @NonNull ContextProvider contextProvider,
-            @NonNull RewardedRequest adRequest,
-            @NonNull NetworkAdapter adapter,
-            @NonNull AdObjectParams adObjectParams,
-            @NonNull AdProcessCallback processCallback
-    ) {
+    protected FullScreenAdObject<RewardedRequest> createAdObject(@NonNull ContextProvider contextProvider,
+                                                                 @NonNull RewardedRequest adRequest,
+                                                                 @NonNull NetworkAdapter adapter,
+                                                                 @NonNull AdObjectParams adObjectParams,
+                                                                 @NonNull AdProcessCallback processCallback) {
         UnifiedFullscreenAd unifiedAd = adapter.createRewarded();
         if (unifiedAd == null) {
             return null;
         }
-        return new FullScreenAdObject<>(contextProvider, processCallback, adRequest, adObjectParams, unifiedAd);
+        return new FullScreenAdObject<>(contextProvider,
+                                        processCallback,
+                                        adRequest,
+                                        adObjectParams,
+                                        unifiedAd);
     }
+
 }

@@ -36,4 +36,5 @@ final class SimpleContextProvider implements ContextProvider {
         }
         return BidMachineImpl.get().getTopActivity();
     }
+
 }

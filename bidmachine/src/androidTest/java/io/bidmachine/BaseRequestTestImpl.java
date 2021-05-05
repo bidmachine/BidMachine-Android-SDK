@@ -116,18 +116,24 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
     Tests
      */
 
-    abstract class ResponseBuildCallback {
+    abstract static class ResponseBuildCallback {
+
         void onCreatePlacementDisplayBuilder(PlacementDisplayBuilder builder) {
+
         }
 
         void onCreateAd(Ad.Builder builder) {
+
         }
 
         void onCreateSeatbid(Response.Seatbid.Builder builder) {
+
         }
 
         void onCreateBid(Response.Seatbid.Bid.Builder builder) {
+
         }
+
     }
 
     protected Response.Builder buildResponse() {
@@ -428,6 +434,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         testExpiration(ad, true, 1500);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void testExpiration(AdType ad, boolean expired, long delay) {
         try {
             Thread.sleep(delay);
@@ -454,6 +461,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         testDestroy(ad, true);
     }
 
+    @SuppressWarnings("SameParameterValue")
     protected void testDestroy(final AdType ad, boolean success) {
         if (success) {
             ad.destroy();
@@ -539,6 +547,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         loadRequest(response, null);
     }
 
+    @SuppressWarnings("SameParameterValue")
     protected void loadRequest(@NonNull Response.Builder response,
                                @Nullable final LoadRequestResponseCallback callback) {
         loadRequest(createAd(), createAdRequest(), response, callback);
@@ -554,20 +563,19 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     MockResponse mockResponse = new MockResponse();
-                    switch (request.getPath()) {
-                        case "/mock_request": {
-                            Openrtb.Builder openrtb = Openrtb.newBuilder();
-                            openrtb.setVer("3.0");
-                            openrtb.setDomainspec("adcom");
-                            openrtb.setDomainver("1.0");
-                            openrtb.setResponse(response.build());
+                    if ("/mock_request".equals(request.getPath())) {
+                        Openrtb.Builder openrtb = Openrtb.newBuilder();
+                        openrtb.setVer("3.0");
+                        openrtb.setDomainspec("adcom");
+                        openrtb.setDomainver("1.0");
+                        openrtb.setResponse(response.build());
 
-                            Buffer bufferRequest = new Buffer();
-                            bufferRequest.write(openrtb.build().toByteArray());
+                        Buffer bufferRequest = new Buffer();
+                        bufferRequest.write(openrtb.build().toByteArray());
 
-                            mockResponse.setResponseCode(200).setBody(bufferRequest);
-                            if (callback != null) callback.onBuild(mockResponse);
-                            break;
+                        mockResponse.setResponseCode(200).setBody(bufferRequest);
+                        if (callback != null) {
+                            callback.onBuild(mockResponse);
                         }
                     }
 
@@ -632,6 +640,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
             return state;
         }
 
+        @SuppressWarnings("SameParameterValue")
         void setState(boolean state) {
             this.state = state;
             settingTime = System.currentTimeMillis();
@@ -668,19 +677,19 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         SelfType setSize(int width, int height);
     }
 
-    public class MraidDisplayBuilder extends DisplayBuilder {
+    public static class MraidDisplayBuilder extends DisplayBuilder {
         public MraidDisplayBuilder() {
             setAdm(TestHelper.getTestMraidAdm());
         }
     }
 
-    public class VastVideoDisplayBuilder extends VideoDisplayBuilder {
+    public static class VastVideoDisplayBuilder extends VideoDisplayBuilder {
         public VastVideoDisplayBuilder() {
             setAdm(TestHelper.getAdFoxTestVastAdm());
         }
     }
 
-    public class DisplayBuilder implements PlacementDisplayBuilder<DisplayBuilder, Ad.Display.Builder> {
+    public static class DisplayBuilder implements PlacementDisplayBuilder<DisplayBuilder, Ad.Display.Builder> {
 
         Ad.Display.Builder builder = Ad.Display.newBuilder();
 
@@ -712,7 +721,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         }
     }
 
-    public class VideoDisplayBuilder implements PlacementDisplayBuilder<VideoDisplayBuilder, Ad.Video.Builder> {
+    public static class VideoDisplayBuilder implements PlacementDisplayBuilder<VideoDisplayBuilder, Ad.Video.Builder> {
 
         Ad.Video.Builder builder = Ad.Video.newBuilder();
 
@@ -746,7 +755,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         Ad.Builder createAd();
     }
 
-    class DefaultOrtbAdCreator implements OrtbAdCreator {
+    static class DefaultOrtbAdCreator implements OrtbAdCreator {
         @Override
         public Ad.Builder createAd() {
             return Ad.newBuilder()
@@ -758,7 +767,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         Response.Seatbid.Builder createSeatbid();
     }
 
-    class DefaultSeatbidCreator implements OrtbSeatbidCreator {
+    static class DefaultSeatbidCreator implements OrtbSeatbidCreator {
 
         @Override
         public Response.Seatbid.Builder createSeatbid() {
@@ -772,7 +781,7 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
         Response.Seatbid.Bid.Builder createBid();
     }
 
-    class DefaultBidCreator implements OrtbBidCreator {
+    static class DefaultBidCreator implements OrtbBidCreator {
 
         @Override
         public Response.Seatbid.Bid.Builder createBid() {
@@ -783,12 +792,13 @@ public abstract class BaseRequestTestImpl<AdType extends BidMachineAd, AdRequest
 
     }
 
-    protected abstract class AwaitHelper {
+    protected abstract static class AwaitHelper {
 
         private boolean isCanceled;
 
         public abstract boolean isReady();
 
+        @SuppressWarnings({"BusyWait", "UnusedReturnValue"})
         public AwaitHelper start(final long timeout) {
             final Thread awaitThread = new Thread() {
                 @Override

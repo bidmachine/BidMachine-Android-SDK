@@ -40,4 +40,5 @@ public interface TargetingInfo {
 
     @Nullable
     Boolean isPaid();
+
 }

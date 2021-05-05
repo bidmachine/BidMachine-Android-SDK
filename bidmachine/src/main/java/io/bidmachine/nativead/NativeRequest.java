@@ -19,10 +19,11 @@ import io.bidmachine.utils.ProtoUtils;
 
 public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeAdRequestParams> {
 
-    private final List<MediaAssetType> mediaAssetTypes = new ArrayList<MediaAssetType>(MediaAssetType.values().length) {{
-        add(MediaAssetType.Icon);
-        add(MediaAssetType.Image);
-    }};
+    private final List<MediaAssetType> mediaAssetTypes =
+            new ArrayList<MediaAssetType>(MediaAssetType.values().length) {{
+                add(MediaAssetType.Icon);
+                add(MediaAssetType.Image);
+            }};
 
     private NativeRequest() {
         super(AdsType.Native);
@@ -68,6 +69,7 @@ public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeA
     }
 
     public interface AdRequestListener extends AdRequest.AdRequestListener<NativeRequest> {
+
     }
 
     private class NativeUnifiedAdRequestParams extends BaseUnifiedAdRequestParams
@@ -82,6 +84,7 @@ public final class NativeRequest extends AdRequest<NativeRequest, UnifiedNativeA
         public boolean containsAssetType(MediaAssetType assetType) {
             return NativeRequest.this.containsAssetType(assetType);
         }
+
     }
 
 }

@@ -32,16 +32,14 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
     private static final Executor executor = Executors.newFixedThreadPool(2);
 
     public enum Method {
-        Get("GET"), Post("POST");
 
-        private String methodString;
+        Get("GET"),
+        Post("POST");
 
-        Method(String methodString) {
+        private final String methodString;
+
+        Method(@NonNull String methodString) {
             this.methodString = methodString;
-        }
-
-        public String getMethodString() {
-            return methodString;
         }
 
         public void apply(URLConnection connection) throws ProtocolException {
@@ -49,18 +47,22 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                 ((HttpURLConnection) connection).setRequestMethod(methodString);
             }
         }
+
     }
 
     public enum State {
+
         Idle, Running, Success, Fail, Canceled
+
     }
 
-    @Nullable
-    private String path;
     @NonNull
-    private Method method;
+    private final Method method;
     @Nullable
-    private RequestDataType requestData;
+    private final String path;
+    @Nullable
+    private final RequestDataType requestData;
+
     @Nullable
     private RequestResultType requestResult;
     @Nullable
@@ -84,10 +86,11 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
     private State currentState = State.Idle;
 
-    public NetworkRequest(@Nullable String path, @NonNull Method method,
+    public NetworkRequest(@NonNull Method method,
+                          @Nullable String path,
                           @Nullable RequestDataType requestData) {
-        this.path = path;
         this.method = method;
+        this.path = path;
         this.requestData = requestData;
     }
 
@@ -118,13 +121,13 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
     }
 
     @NonNull
-    public String getPath() {
-        return path;
-    }
-
-    @NonNull
     public Method getMethod() {
         return method;
+    }
+
+    @Nullable
+    public String getPath() {
+        return path;
     }
 
     public void request() {
@@ -136,9 +139,10 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
         URLConnection connection = null;
         try {
-            currentConnection = connection =
-                    (path != null ? new URL(String.format("%s/%s", getBaseUrl(), path))
-                            : new URL(getBaseUrl())).openConnection();
+            URL url = path != null
+                    ? new URL(String.format("%s/%s", getBaseUrl(), path))
+                    : new URL(getBaseUrl());
+            currentConnection = connection = url.openConnection();
 
             method.apply(connection);
             prepareRequestParams(connection);
@@ -154,10 +158,8 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                     writer = new BufferedOutputStream(connection.getOutputStream());
                     writer.write(contentBytes);
                 } finally {
-                    if (writer != null) {
-                        writer.flush();
-                        writer.close();
-                    }
+                    Utils.flush(writer);
+                    Utils.close(writer);
                 }
             }
 
@@ -167,8 +169,9 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
             try {
                 int responseCode = obtainResponseCode(connection);
                 if (responseCode != HttpURLConnection.HTTP_OK) {
-                    errorResult = obtainError(connection, obtainErrorStream(connection),
-                            responseCode);
+                    errorResult = obtainError(connection,
+                                              obtainErrorStream(connection),
+                                              responseCode);
                 } else {
                     isResponse = connection.getInputStream();
                     osBytes = new ByteArrayOutputStream();
@@ -182,24 +185,25 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                         responseBytes = decodeResponseData(connection, responseBytes);
                     }
                     if (responseBytes == null || responseBytes.length == 0) {
-                        errorResult = obtainError(connection, (RequestResultType) null, responseCode);
+                        errorResult = obtainError(connection,
+                                                  (RequestResultType) null,
+                                                  responseCode);
                     } else if (dataBinder != null) {
-                        requestResult = dataBinder.createSuccessResult(this, connection,
-                                responseBytes);
+                        requestResult = dataBinder.createSuccessResult(this,
+                                                                       connection,
+                                                                       responseBytes);
                         if (requestResult == null) {
-                            errorResult = dataBinder.createFailResult(this, connection,
-                                    responseBytes);
+                            errorResult = dataBinder.createFailResult(this,
+                                                                      connection,
+                                                                      responseBytes);
                         }
                     }
                 }
             } finally {
-                if (osBytes != null) {
-                    osBytes.flush();
-                    osBytes.close();
-                }
-                if (isResponse != null) {
-                    isResponse.close();
-                }
+                Utils.flush(osBytes);
+                Utils.close(osBytes);
+
+                Utils.close(isResponse);
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -229,7 +233,8 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
         return null;
     }
 
-    protected byte[] encodeRequestData(URLConnection connection, byte[] requestData) throws Exception {
+    protected byte[] encodeRequestData(URLConnection connection,
+                                       byte[] requestData) throws Exception {
         byte[] result = requestData;
         if (dataEncoders != null) {
             for (RequestDataEncoder<RequestDataType, RequestResultType, ErrorResultType> encoder
@@ -248,7 +253,8 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
         return result;
     }
 
-    protected byte[] decodeResponseData(URLConnection connection, byte[] responseData) throws Exception {
+    protected byte[] decodeResponseData(URLConnection connection,
+                                        byte[] responseData) throws Exception {
         byte[] result = responseData;
         if (contentEncoders != null) {
             for (RequestDataEncoder<RequestDataType, RequestResultType, ErrorResultType> encoder
@@ -265,9 +271,13 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
         return result;
     }
 
-    protected abstract ErrorResultType obtainError(URLConnection connection, @Nullable RequestResultType resultType, int responseCode);
+    protected abstract ErrorResultType obtainError(URLConnection connection,
+                                                   @Nullable RequestResultType resultType,
+                                                   int responseCode);
 
-    protected abstract ErrorResultType obtainError(URLConnection connection, @Nullable InputStream errorStream, int responseCode);
+    protected abstract ErrorResultType obtainError(URLConnection connection,
+                                                   @Nullable InputStream errorStream,
+                                                   int responseCode);
 
     protected abstract ErrorResultType obtainError(URLConnection connection, @Nullable Throwable t);
 
@@ -280,7 +290,8 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
     private InputStream obtainErrorStream(URLConnection connection) {
         return connection instanceof HttpURLConnection
-                ? ((HttpURLConnection) connection).getErrorStream() : null;
+                ? ((HttpURLConnection) connection).getErrorStream()
+                : null;
     }
 
     protected String getBaseUrl() throws Exception {
@@ -301,14 +312,19 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
         return currentState == State.Canceled;
     }
 
+
     public interface Callback<RequestResultType, ErrorResultType> {
+
         void onSuccess(@Nullable RequestResultType result);
 
         void onFail(@Nullable ErrorResultType result);
+
     }
 
     public interface CancelCallback {
+
         void onCanceled();
+
     }
     
     /*
@@ -319,6 +335,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
         protected void prepareRequest(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
                                       URLConnection connection) {
+
         }
 
         protected abstract void prepareHeaders(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
@@ -326,13 +343,16 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
         @Nullable
         protected abstract byte[] obtainData(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
-                                             URLConnection connection, @Nullable RequestDataType requestData) throws Exception;
+                                             URLConnection connection,
+                                             @Nullable RequestDataType requestData) throws Exception;
 
         protected abstract RequestResultType createSuccessResult(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
-                                                                 URLConnection connection, byte[] resultData) throws Exception;
+                                                                 URLConnection connection,
+                                                                 byte[] resultData) throws Exception;
 
         protected ErrorResultType createFailResult(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
-                                                   URLConnection connection, byte[] resultData) throws Exception {
+                                                   URLConnection connection,
+                                                   byte[] resultData) throws Exception {
             return null;
         }
 
@@ -345,7 +365,8 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
         protected void prepareHeaders(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
                                       URLConnection connection) {
             if (BuildConfig.DEBUG) {
-                connection.setRequestProperty("Content-Type", "application/x-protobuf; messageType=\"com.appodeal.ads.Request\";");
+                connection.setRequestProperty("Content-Type",
+                                              "application/x-protobuf; messageType=\"com.appodeal.ads.Request\";");
             } else {
                 connection.setRequestProperty("Content-Type", "application/x-protobuf");
             }
@@ -364,23 +385,29 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
             extends RequestDataBinder<JSONObject, RequestResultType, ErrorResultType> {
 
         @Override
-        protected void prepareHeaders(NetworkRequest<JSONObject, RequestResultType, ErrorResultType> request, URLConnection connection) {
+        protected void prepareHeaders(NetworkRequest<JSONObject, RequestResultType, ErrorResultType> request,
+                                      URLConnection connection) {
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         }
 
         @Nullable
         @Override
         protected byte[] obtainData(NetworkRequest<JSONObject, RequestResultType, ErrorResultType> request,
-                                    URLConnection connection, @Nullable JSONObject requestData) throws Exception {
-            return requestData != null ? requestData.toString().getBytes("UTF-8") : null;
+                                    URLConnection connection,
+                                    @Nullable JSONObject requestData) throws Exception {
+            return requestData != null
+                    ? requestData.toString().getBytes("UTF-8")
+                    : null;
         }
+
     }
 
     public static class SimpleJsonObjectDataBinder<ErrorResultType> extends JsonDataBinder<JSONObject, ErrorResultType> {
 
         @Override
         protected JSONObject createSuccessResult(NetworkRequest<JSONObject, JSONObject, ErrorResultType> request,
-                                                 URLConnection connection, byte[] resultData) throws Exception {
+                                                 URLConnection connection,
+                                                 byte[] resultData) throws Exception {
             return new JSONObject(new String(resultData));
         }
 
@@ -390,7 +417,8 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
         @Override
         protected JSONArray createSuccessResult(NetworkRequest<JSONObject, JSONArray, ErrorResultType> request,
-                                                URLConnection connection, byte[] resultData) throws Exception {
+                                                URLConnection connection,
+                                                byte[] resultData) throws Exception {
             return new JSONArray(new String(resultData));
         }
 
@@ -404,6 +432,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
         protected void prepareHeaders(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
                                       URLConnection connection) {
+
         }
 
         protected abstract byte[] encode(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
@@ -411,6 +440,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
         protected abstract byte[] decode(NetworkRequest<RequestDataType, RequestResultType, ErrorResultType> request,
                                          URLConnection connection, byte[] data) throws Exception;
+
     }
 
     public static class Base64RequestDataEncoder extends RequestDataEncoder {
@@ -446,19 +476,16 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                 osBytes = new ByteArrayOutputStream();
                 osGzip = new GZIPOutputStream(osBytes);
                 osGzip.write(data);
-                //required for write all pending bytes
-                osGzip.close();
+                // required for write all pending bytes
+                Utils.close(osGzip);
                 osGzip = null;
                 return osBytes.toByteArray();
             } finally {
-                if (osBytes != null) {
-                    osBytes.flush();
-                    osBytes.close();
-                }
-                if (osGzip != null) {
-                    osGzip.flush();
-                    osGzip.close();
-                }
+                Utils.flush(osBytes);
+                Utils.close(osBytes);
+
+                Utils.flush(osGzip);
+                Utils.close(osGzip);
             }
         }
 
@@ -480,16 +507,11 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                     }
                     return osBytes.toByteArray();
                 } finally {
-                    if (osBytes != null) {
-                        osBytes.flush();
-                        osBytes.close();
-                    }
-                    if (isBytes != null) {
-                        isBytes.close();
-                    }
-                    if (isGzip != null) {
-                        isGzip.close();
-                    }
+                    Utils.flush(osBytes);
+                    Utils.close(osBytes);
+
+                    Utils.close(isBytes);
+                    Utils.close(isGzip);
                 }
             }
             return data;
@@ -498,6 +520,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
     }
 
     private final class NetworkRequestRunner implements Runnable {
+
         @Override
         public void run() {
             process();
@@ -509,6 +532,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                 }
             }
         }
+
     }
 
 }

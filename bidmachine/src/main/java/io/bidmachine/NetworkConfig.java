@@ -42,7 +42,7 @@ public abstract class NetworkConfig {
     @Nullable
     private AdsType[] mergedAdsTypes;
     @NonNull
-    private NetworkConfigParams networkConfigParams = new NetworkConfigParams() {
+    private final NetworkConfigParams networkConfigParams = new NetworkConfigParams() {
         @Nullable
         @Override
         public Map<String, String> obtainNetworkParams() {
@@ -302,7 +302,7 @@ public abstract class NetworkConfig {
     }
 
     /**
-     * Method which returns array of merged {@link NetworkAdapter#getSupportedTypes()} and {@link NetworkConfig#getSupportedAdsTypes()}.
+     * Method which returns array of merged {@link NetworkAdapter#getSupportedTypes()} and itself.
      * Will be called only once per app session.
      *
      * @return array of supported {@link AdsType}s
@@ -362,4 +362,5 @@ public abstract class NetworkConfig {
     public int hashCode() {
         return getKey().hashCode();
     }
+
 }

@@ -41,24 +41,28 @@ public final class FullScreenAdObject<AdRequestType extends FullScreenAdRequest<
     @Override
     public void onShown() {
         super.onShown();
+
         startImpressionThresholdTask();
     }
 
     @Override
     public void onImpression() {
         super.onImpression();
+
         cancelImpressionThresholdTask();
     }
 
     @Override
     public void onClosed(boolean finished) {
         super.onClosed(finished);
+
         cancelImpressionThresholdTask();
     }
 
     @Override
     public void onFinished() {
         super.onFinished();
+
         cancelImpressionThresholdTask();
     }
 
@@ -70,7 +74,7 @@ public final class FullScreenAdObject<AdRequestType extends FullScreenAdRequest<
         thresholdTask.cancel();
     }
 
-    private abstract class ImpressionThresholdTask implements Runnable {
+    private abstract static class ImpressionThresholdTask implements Runnable {
 
         void start(long threshold) {
             Utils.onBackgroundThread(this, threshold);
@@ -89,7 +93,7 @@ public final class FullScreenAdObject<AdRequestType extends FullScreenAdRequest<
 
     }
 
-    private final class UnifiedFullscreenAdCallbackImpl extends BaseUnifiedAdCallback implements UnifiedFullscreenAdCallback {
+    private static final class UnifiedFullscreenAdCallbackImpl extends BaseUnifiedAdCallback implements UnifiedFullscreenAdCallback {
 
         UnifiedFullscreenAdCallbackImpl(@NonNull AdProcessCallback processCallback) {
             super(processCallback);
