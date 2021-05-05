@@ -28,7 +28,8 @@ public enum Gender {
         return serverValue;
     }
 
-    public static Gender fromInt(@Nullable Integer genderInt) {
+    @Nullable
+    public static Gender fromInt(Integer genderInt) {
         if (genderInt == null) {
             return null;
         }
