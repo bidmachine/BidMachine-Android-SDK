@@ -13,7 +13,6 @@ import io.bidmachine.utils.IabUtils;
 class VastParams extends UnifiedParams {
 
     final String creativeAdm;
-    final int loadSkipOffset;
     final int skipOffset;
     final int companionSkipOffset;
     final boolean useNativeClose;
@@ -23,7 +22,6 @@ class VastParams extends UnifiedParams {
         super(mediationParams);
 
         creativeAdm = mediationParams.getString(IabUtils.KEY_CREATIVE_ADM);
-        loadSkipOffset = mediationParams.getInt(IabUtils.KEY_LOAD_SKIP_OFFSET);
         skipOffset = mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET);
         companionSkipOffset = mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET);
         useNativeClose = mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE);

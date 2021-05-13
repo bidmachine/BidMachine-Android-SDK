@@ -27,10 +27,7 @@ import static io.bidmachine.utils.IabUtils.KEY_COUNTDOWN_STYLE;
 import static io.bidmachine.utils.IabUtils.KEY_CREATIVE_ADM;
 import static io.bidmachine.utils.IabUtils.KEY_CREATIVE_ID;
 import static io.bidmachine.utils.IabUtils.KEY_HEIGHT;
-import static io.bidmachine.utils.IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE;
-import static io.bidmachine.utils.IabUtils.KEY_LOAD_SKIP_OFFSET;
 import static io.bidmachine.utils.IabUtils.KEY_OM_SDK_ENABLED;
-import static io.bidmachine.utils.IabUtils.KEY_PRELOAD;
 import static io.bidmachine.utils.IabUtils.KEY_PROGRESS_DURATION;
 import static io.bidmachine.utils.IabUtils.KEY_PROGRESS_STYLE;
 import static io.bidmachine.utils.IabUtils.KEY_R1;
@@ -72,14 +69,11 @@ abstract class IabAdObjectParams
                                      @NonNull AdExtension extension) {
         super.prepareExtensions(seatbid, bid, extension);
 
-        getData().put(KEY_PRELOAD, extension.getPreload());
-        getData().put(KEY_LOAD_SKIP_OFFSET, extension.getLoadSkipoffset());
         getData().put(KEY_USE_NATIVE_CLOSE, extension.getUseNativeClose());
         getData().put(KEY_SKIP_OFFSET, extension.getSkipoffset());
         getData().put(KEY_COMPANION_SKIP_OFFSET, extension.getCompanionSkipoffset());
         getData().put(KEY_R1, extension.getR1());
         getData().put(KEY_R2, extension.getR2());
-        getData().put(KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE, extension.getIgnoresSafeAreaLayoutGuide());
         getData().put(KEY_STORE_URL, extension.getStoreUrl());
         getData().put(KEY_PROGRESS_DURATION, extension.getProgressDuration());
 
@@ -154,7 +148,7 @@ abstract class IabAdObjectParams
             iabElementStyle.setOpacity(extensionControlView.getOpacity());
             iabElementStyle.setOutlined(extensionControlView.getOutlined());
             iabElementStyle.setStrokeColor(parseColor(extensionControlView.getStroke()));
-            iabElementStyle.setStrokeWidth((float) extensionControlView.getStrokeWidth());
+            iabElementStyle.setStrokeWidth(extensionControlView.getStrokeWidth());
             iabElementStyle.setStyle(extensionControlView.getStyle());
             iabElementStyle.setVisible(extensionControlView.getVisible());
             return iabElementStyle;
