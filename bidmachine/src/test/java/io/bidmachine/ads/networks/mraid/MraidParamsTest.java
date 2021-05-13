@@ -37,14 +37,10 @@ public class MraidParamsTest {
         unifiedAdRequestParams.put(IabUtils.KEY_CREATIVE_ADM, "test_creative");
         unifiedAdRequestParams.put(IabUtils.KEY_WIDTH, 320);
         unifiedAdRequestParams.put(IabUtils.KEY_HEIGHT, 50);
-        unifiedAdRequestParams.put(IabUtils.KEY_PRELOAD, true);
-        unifiedAdRequestParams.put(IabUtils.KEY_LOAD_SKIP_OFFSET, 10);
         unifiedAdRequestParams.put(IabUtils.KEY_SKIP_OFFSET, 15);
-        unifiedAdRequestParams.put(IabUtils.KEY_COMPANION_SKIP_OFFSET, 20);
         unifiedAdRequestParams.put(IabUtils.KEY_USE_NATIVE_CLOSE, true);
         unifiedAdRequestParams.put(IabUtils.KEY_R1, true);
         unifiedAdRequestParams.put(IabUtils.KEY_R2, true);
-        unifiedAdRequestParams.put(IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE, true);
         unifiedAdRequestParams.put(IabUtils.KEY_STORE_URL, "test_store_url");
         unifiedAdRequestParams.put(IabUtils.KEY_PROGRESS_DURATION, 25);
         unifiedAdRequestParams.put(IabUtils.KEY_CLOSABLE_VIEW_STYLE, closeableViewStyle);
@@ -56,27 +52,15 @@ public class MraidParamsTest {
         assertEquals("test_creative", mraidParams.creativeAdm);
         assertEquals(320, mraidParams.width);
         assertEquals(50, mraidParams.height);
-        assertTrue(mraidParams.canPreload);
-        assertEquals(10, mraidParams.loadSkipOffset);
         assertEquals(15, mraidParams.skipOffset);
-        assertEquals(20, mraidParams.companionSkipOffset);
         assertTrue(mraidParams.useNativeClose);
         assertTrue(mraidParams.r1);
         assertTrue(mraidParams.r2);
-        assertTrue(mraidParams.ignoresSafeAreaLayoutGuide);
         assertEquals("test_store_url", mraidParams.storeUrl);
         assertEquals(25, mraidParams.progressDuration);
         assertEquals(closeableViewStyle, mraidParams.closeableViewStyle);
         assertEquals(countDownStyle, mraidParams.countDownStyle);
         assertEquals(progressStyle, mraidParams.progressStyle);
-    }
-
-    @Test
-    public void obtainParams_preloadTrue_resultTrue() {
-        unifiedAdRequestParams.put(IabUtils.KEY_PRELOAD, true);
-        MraidParams mraidParams = new MraidParams(unifiedAdRequestParams);
-
-        assertTrue(mraidParams.canPreload);
     }
 
     @Test
@@ -101,14 +85,6 @@ public class MraidParamsTest {
         MraidParams mraidParams = new MraidParams(unifiedAdRequestParams);
 
         assertTrue(mraidParams.r2);
-    }
-
-    @Test
-    public void obtainParams_ignoreSafeAreaLayoutGuideTrue_resultTrue() {
-        unifiedAdRequestParams.put(IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE, true);
-        MraidParams mraidParams = new MraidParams(unifiedAdRequestParams);
-
-        assertTrue(mraidParams.ignoresSafeAreaLayoutGuide);
     }
 
     @Test

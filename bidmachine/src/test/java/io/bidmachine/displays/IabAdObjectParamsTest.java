@@ -112,14 +112,11 @@ public class IabAdObjectParamsTest {
         iabAdObjectParams.prepareExtensions(seatBid, bid, adExtension);
         UnifiedMediationParams mediationParams = iabAdObjectParams.toMediationParams();
 
-        assertFalse(mediationParams.getBool(IabUtils.KEY_PRELOAD));
-        assertEquals(0, mediationParams.getInt(IabUtils.KEY_LOAD_SKIP_OFFSET));
         assertFalse(mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE));
         assertEquals(0, mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET));
         assertEquals(0, mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET));
         assertFalse(mediationParams.getBool(IabUtils.KEY_R1));
         assertFalse(mediationParams.getBool(IabUtils.KEY_R2));
-        assertFalse(mediationParams.getBool(IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE));
         assertEquals("", mediationParams.getString(IabUtils.KEY_STORE_URL));
         assertEquals(0, mediationParams.getInt(IabUtils.KEY_PROGRESS_DURATION));
         assertNotNull(mediationParams.getObject(IabUtils.KEY_CLOSABLE_VIEW_STYLE));
@@ -134,14 +131,11 @@ public class IabAdObjectParamsTest {
         Ad ad = Ad.newBuilder().build();
 
         AdExtension adExtension = AdExtension.newBuilder()
-                .setPreload(true)
-                .setLoadSkipoffset(1)
                 .setUseNativeClose(true)
                 .setSkipoffset(2)
                 .setCompanionSkipoffset(3)
                 .setR1(true)
                 .setR2(true)
-                .setIgnoresSafeAreaLayoutGuide(true)
                 .setStoreUrl("test_store_url")
                 .setProgressDuration(4)
                 .setCloseButton(AdExtension.ControlAsset.newBuilder().build())
@@ -153,14 +147,11 @@ public class IabAdObjectParamsTest {
         iabAdObjectParams.prepareExtensions(seatBid, bid, adExtension);
         UnifiedMediationParams mediationParams = iabAdObjectParams.toMediationParams();
 
-        assertTrue(mediationParams.getBool(IabUtils.KEY_PRELOAD));
-        assertEquals(1, mediationParams.getInt(IabUtils.KEY_LOAD_SKIP_OFFSET));
         assertTrue(mediationParams.getBool(IabUtils.KEY_USE_NATIVE_CLOSE));
         assertEquals(2, mediationParams.getInt(IabUtils.KEY_SKIP_OFFSET));
         assertEquals(3, mediationParams.getInt(IabUtils.KEY_COMPANION_SKIP_OFFSET));
         assertTrue(mediationParams.getBool(IabUtils.KEY_R1));
         assertTrue(mediationParams.getBool(IabUtils.KEY_R2));
-        assertTrue(mediationParams.getBool(IabUtils.KEY_IGNORE_SAFE_AREA_LAYOUT_GUIDE));
         assertEquals("test_store_url", mediationParams.getString(IabUtils.KEY_STORE_URL));
         assertEquals(4, mediationParams.getInt(IabUtils.KEY_PROGRESS_DURATION));
         assertNotNull(mediationParams.getObject(IabUtils.KEY_CLOSABLE_VIEW_STYLE));
