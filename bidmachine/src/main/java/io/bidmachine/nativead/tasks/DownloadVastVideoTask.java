@@ -11,6 +11,7 @@ import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.processor.VastAd;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
@@ -25,8 +26,7 @@ public class DownloadVastVideoTask implements Runnable {
 
     private final Handler handler;
 
-    // TODO: Not safe
-    private Context context;
+    private WeakReference<Context> weakContext;
     private OnLoadedListener listener;
     private String videoTag;
     private File cacheDir;
@@ -42,7 +42,6 @@ public class DownloadVastVideoTask implements Runnable {
     }
 
     public DownloadVastVideoTask(Context context, OnLoadedListener listener, String tag) {
-        this.context = context;
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
@@ -69,6 +68,7 @@ public class DownloadVastVideoTask implements Runnable {
             return;
         }
 
+        this.weakContext = new WeakReference<>(context);
         this.listener = listener;
         videoTag = tag;
         if (Utils.canUseExternalFilesDir(context)) {
@@ -83,6 +83,11 @@ public class DownloadVastVideoTask implements Runnable {
     @Override
     public void run() {
         if (!initialized) {
+            sendFail();
+            return;
+        }
+        Context context = weakContext.get();
+        if (context == null) {
             sendFail();
             return;
         }
