@@ -111,12 +111,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
     };
 
-    private final TrackingObject trackingObject = new TrackingObject() {
-        @Override
-        public Object getTrackingKey() {
-            return trackingId;
-        }
-
+    private final TrackingObject trackingObject = new SimpleTrackingObject(trackingId) {
         @Nullable
         @Override
         List<String> getTrackingUrls(@NonNull TrackEventType eventType) {

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -28,6 +27,7 @@ import io.bidmachine.HeaderBiddingAdapter;
 import io.bidmachine.HeaderBiddingCollectParamsCallback;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfig;
+import io.bidmachine.SimpleTrackingObject;
 import io.bidmachine.TrackEventInfo;
 import io.bidmachine.TrackEventType;
 import io.bidmachine.TrackingObject;
@@ -67,14 +67,7 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             }
         }
         if (!preloadTasks.isEmpty()) {
-            TrackingObject trackingObject = new TrackingObject() {
-                private final String key = UUID.randomUUID().toString();
-
-                @Override
-                public Object getTrackingKey() {
-                    return key;
-                }
-            };
+            TrackingObject trackingObject = new SimpleTrackingObject();
             BidMachineEvents.eventStart(trackingObject,
                                         TrackEventType.HeaderBiddingNetworksPrepare);
             try {
@@ -181,14 +174,7 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
 
         private boolean isFinished = false;
 
-        private final TrackingObject trackingObject = new TrackingObject() {
-            private final String key = UUID.randomUUID().toString();
-
-            @Override
-            public Object getTrackingKey() {
-                return key;
-            }
-        };
+        private final TrackingObject trackingObject = new SimpleTrackingObject();
 
         AdUnitPreloadTask(@NonNull ContextProvider contextProvider,
                           @NonNull HeaderBiddingAdapter adapter,

@@ -237,12 +237,7 @@ class NetworkRegistry {
 
         private void process() {
             String networkName = networkConfig.getKey();
-            TrackingObject trackingObject = new TrackingObject() {
-                @Override
-                public Object getTrackingKey() {
-                    return networkConfig.getKey() + "_initialize";
-                }
-            };
+            TrackingObject trackingObject = new SimpleTrackingObject(networkName + "_initialize");
             Logger.log(String.format("Load network from config start: %s", networkName));
             try {
                 BidMachineEvents.eventStart(trackingObject,

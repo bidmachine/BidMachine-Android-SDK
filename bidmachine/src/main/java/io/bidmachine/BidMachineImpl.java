@@ -120,12 +120,7 @@ final class BidMachineImpl {
         }
     };
 
-    private final TrackingObject trackingObject = new TrackingObject() {
-        @Override
-        public Object getTrackingKey() {
-            return BidMachineImpl.class.getSimpleName();
-        }
-    };
+    private final TrackingObject trackingObject = new SimpleTrackingObject(BidMachineImpl.class.getSimpleName());
 
     private final List<AdRequest.AdRequestListener> adRequestListeners = new CopyOnWriteArrayList<>();
 
