@@ -28,7 +28,11 @@ public abstract class FullScreenAd<
         if (!Utils.isNetworkAvailable(getContext())) {
             processCallback.processShowFail(BMError.Connection);
         } else {
-            loadedObject.show(getContext());
+            try {
+                loadedObject.show(getContext());
+            } catch (Throwable t) {
+                processCallback.processShowFail(BMError.catchError("Failed to show loaded ad"));
+            }
         }
     }
 

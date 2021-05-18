@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 public abstract class UnifiedFullscreenAd extends UnifiedAd<UnifiedFullscreenAdCallback, UnifiedFullscreenAdRequestParams> {
 
     public abstract void show(@NonNull Context context,
-                              @NonNull UnifiedFullscreenAdCallback callback);
+                              @NonNull UnifiedFullscreenAdCallback callback) throws Throwable;
 
     public void onFinished() {
 

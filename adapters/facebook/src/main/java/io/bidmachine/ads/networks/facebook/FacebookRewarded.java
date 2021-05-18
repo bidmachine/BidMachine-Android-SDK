@@ -41,7 +41,8 @@ class FacebookRewarded extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
+    public void show(@NonNull Context context,
+                     @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (rewardedVideoAd != null
                 && rewardedVideoAd.isAdLoaded()
                 && !rewardedVideoAd.isAdInvalidated()) {

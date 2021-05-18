@@ -23,7 +23,8 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
 
     @Nullable
     private VastRequest vastRequest;
-    private VastFullScreenAdapterListener vastListener;
+    private VastFullScreenAdLoadListener vastAdLoadListener;
+    private VastFullScreenAdShowListener vastAdShowListener;
     @Nullable
     private VastOMSDKAdMeasurer vastOMSDKAdMeasurer;
 
@@ -45,7 +46,7 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         if (vastParams.omsdkEnabled) {
             vastOMSDKAdMeasurer = new VastOMSDKAdMeasurer();
         }
-        vastListener = new VastFullScreenAdapterListener(callback, vastOMSDKAdMeasurer);
+        vastAdLoadListener = new VastFullScreenAdLoadListener(callback, vastOMSDKAdMeasurer);
         vastRequest = VastRequest.newBuilder()
                 .setPreCache(true)
                 .setVideoCloseTime(vastParams.skipOffset)
@@ -55,15 +56,17 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
         assert vastRequest != null;
         vastRequest.loadVideoWithData(contextProvider.getContext(),
                                       vastParams.creativeAdm,
-                                      vastListener);
+                                      vastAdLoadListener);
     }
 
     @Override
-    public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
+    public void show(@NonNull Context context,
+                     @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (vastRequest != null && vastRequest.checkFile()) {
+            vastAdShowListener = new VastFullScreenAdShowListener(callback, vastOMSDKAdMeasurer);
             vastRequest.display(context,
                                 videoType,
-                                vastListener,
+                                vastAdShowListener,
                                 vastOMSDKAdMeasurer,
                                 vastOMSDKAdMeasurer);
         } else {
@@ -73,6 +76,8 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
 
     @Override
     public void onDestroy() {
+        vastAdLoadListener = null;
+        vastAdShowListener = null;
         if (vastOMSDKAdMeasurer != null) {
             vastOMSDKAdMeasurer.destroy();
             vastOMSDKAdMeasurer = null;

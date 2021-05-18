@@ -34,7 +34,7 @@ public final class FullScreenAdObject<AdRequestType extends FullScreenAdRequest<
         return new UnifiedFullscreenAdCallbackImpl(processCallback);
     }
 
-    public void show(@NonNull Context context) {
+    public void show(@NonNull Context context) throws Throwable {
         getUnifiedAd().show(context, getUnifiedAdCallback());
     }
 
