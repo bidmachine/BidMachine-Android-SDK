@@ -1,3 +1,10 @@
+## Version 1.7.3 (May 18, 2021)
+**Features**:
+* SDK improvement
+* Added ```TargetingParams#setExternalUserIds``` to pass external user ids
+* Removed ```AdRequest.Builder#disableHeaderBidding``` and ```AdRequest.Builder#enableHeaderBidding```
+* Removed client-side price rounding. At the same time, some deprecated methods were removed that were responsible for the price rounding from ```BidMachineFetcher```
+
 ## Version 1.7.2 (April 20, 2021)
 **Features**:
 * SDK improvement
