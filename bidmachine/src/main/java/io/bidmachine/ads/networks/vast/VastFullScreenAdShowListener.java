@@ -10,42 +10,23 @@ import com.explorestack.iab.utils.Utils;
 import com.explorestack.iab.vast.VastActivityListener;
 import com.explorestack.iab.vast.VastError;
 import com.explorestack.iab.vast.VastRequest;
-import com.explorestack.iab.vast.VastRequestListener;
 import com.explorestack.iab.vast.activity.VastActivity;
-import com.explorestack.iab.vast.processor.VastAd;
-import com.explorestack.iab.vast.tags.AdVerificationsExtensionTag;
-
-import java.util.List;
 
 import io.bidmachine.measurer.VastOMSDKAdMeasurer;
 import io.bidmachine.unified.UnifiedFullscreenAdCallback;
 import io.bidmachine.utils.BMError;
 
-class VastFullScreenAdapterListener implements VastRequestListener, VastActivityListener {
+class VastFullScreenAdShowListener implements VastActivityListener {
 
     @NonNull
     private final UnifiedFullscreenAdCallback callback;
     @Nullable
     private final VastOMSDKAdMeasurer vastOMSDKAdMeasurer;
 
-    VastFullScreenAdapterListener(@NonNull UnifiedFullscreenAdCallback callback,
-                                  @Nullable VastOMSDKAdMeasurer vastOMSDKAdMeasurer) {
+    VastFullScreenAdShowListener(@NonNull UnifiedFullscreenAdCallback callback,
+                                 @Nullable VastOMSDKAdMeasurer vastOMSDKAdMeasurer) {
         this.callback = callback;
         this.vastOMSDKAdMeasurer = vastOMSDKAdMeasurer;
-    }
-
-    @Override
-    public void onVastLoaded(@NonNull VastRequest vastRequest) {
-        if (vastOMSDKAdMeasurer != null) {
-            VastAd vastAd = vastRequest.getVastAd();
-            List<AdVerificationsExtensionTag> adVerificationsExtensionTagList = vastAd != null
-                    ? vastAd.getAdVerificationsExtensionList()
-                    : null;
-            vastOMSDKAdMeasurer.addVerificationScriptResourceList(adVerificationsExtensionTagList);
-            vastOMSDKAdMeasurer.setSkipOffset(vastRequest.getVideoCloseTime());
-        }
-
-        callback.onAdLoaded();
     }
 
     @Override
@@ -53,11 +34,11 @@ class VastFullScreenAdapterListener implements VastRequestListener, VastActivity
         //TODO: implement vast error mapping
         switch (error) {
             case VastError.ERROR_CODE_NO_NETWORK: {
-                callback.onAdLoadFailed(BMError.noFillError(BMError.Connection));
+                callback.onAdShowFailed(BMError.noFillError(BMError.Connection));
                 break;
             }
             default: {
-                callback.onAdLoadFailed(BMError.noFillError(null));
+                callback.onAdShowFailed(BMError.noFillError(null));
                 break;
             }
         }

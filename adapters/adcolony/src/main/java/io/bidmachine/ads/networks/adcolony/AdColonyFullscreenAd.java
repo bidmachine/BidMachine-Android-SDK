@@ -49,7 +49,7 @@ class AdColonyFullscreenAd extends UnifiedFullscreenAd {
 
     @Override
     public void show(@NonNull Context context,
-                     @NonNull UnifiedFullscreenAdCallback callback) {
+                     @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (adColonyInterstitial != null && !adColonyInterstitial.isExpired()) {
             adColonyInterstitial.show();
         } else {

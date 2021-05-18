@@ -38,7 +38,8 @@ public class MyTargetInterstitial extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
+    public void show(@NonNull Context context,
+                     @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (interstitialAd != null) {
             interstitialAd.show(context);
         } else {

@@ -86,7 +86,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
 
     @Override
     public void show(@NonNull Context context,
-                     @NonNull UnifiedFullscreenAdCallback callback) {
+                     @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (mraidInterstitial != null && mraidInterstitial.isReady()) {
             MraidActivity.show(context, mraidInterstitial, mraidType);
         } else {

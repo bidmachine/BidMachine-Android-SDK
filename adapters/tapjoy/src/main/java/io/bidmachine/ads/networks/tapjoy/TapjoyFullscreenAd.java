@@ -52,7 +52,8 @@ public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context, @NonNull UnifiedFullscreenAdCallback callback) {
+    public void show(@NonNull Context context,
+                     @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (tjPlacement != null && tjPlacement.isContentReady()) {
             tjPlacement.showContent();
         } else {
