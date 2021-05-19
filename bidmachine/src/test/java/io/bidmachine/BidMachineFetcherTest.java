@@ -36,7 +36,7 @@ public class BidMachineFetcherTest {
         Map<String, String> params = BidMachineFetcher.fetch(adRequest);
         assertNotNull(params);
         assertEquals("test_banner_id_1", params.get(BidMachineFetcher.KEY_ID));
-        assertEquals("0.001000001", params.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("0.01", params.get(BidMachineFetcher.KEY_PRICE));
         assertEquals(1, BidMachineFetcher.cachedRequests.size());
         Map<String, AdRequest> requestMap = BidMachineFetcher.cachedRequests.get(AdsType.Banner);
         assertNotNull(requestMap);
@@ -49,7 +49,7 @@ public class BidMachineFetcherTest {
         params = BidMachineFetcher.fetch(adRequest);
         assertNotNull(params);
         assertEquals("test_banner_id_2", params.get(BidMachineFetcher.KEY_ID));
-        assertEquals("120.002", params.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("120.01", params.get(BidMachineFetcher.KEY_PRICE));
         assertEquals(1, BidMachineFetcher.cachedRequests.size());
         requestMap = BidMachineFetcher.cachedRequests.get(AdsType.Banner);
         assertNotNull(requestMap);
@@ -62,7 +62,7 @@ public class BidMachineFetcherTest {
         params = BidMachineFetcher.fetch(adRequest);
         assertNotNull(params);
         assertEquals("test_interstitial_id_1", params.get(BidMachineFetcher.KEY_ID));
-        assertEquals("100000.0", params.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("100000.00", params.get(BidMachineFetcher.KEY_PRICE));
         assertEquals(2, BidMachineFetcher.cachedRequests.size());
         requestMap = BidMachineFetcher.cachedRequests.get(AdsType.Interstitial);
         assertNotNull(requestMap);
@@ -312,19 +312,19 @@ public class BidMachineFetcherTest {
                 .setAuctionPrice(1000000)
                 .build();
         Map<String, String> result = BidMachineFetcher.toMap(adRequest);
-        assertEquals("1000000.0", result.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("1000000.00", result.get(BidMachineFetcher.KEY_PRICE));
 
         adRequest = new TestAdRequest.Builder(AdsType.Banner)
                 .setAuctionPrice(0)
                 .build();
         result = BidMachineFetcher.toMap(adRequest);
-        assertEquals("0.0", result.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("0.00", result.get(BidMachineFetcher.KEY_PRICE));
 
         adRequest = new TestAdRequest.Builder(AdsType.Banner)
                 .setAuctionPrice(00.00)
                 .build();
         result = BidMachineFetcher.toMap(adRequest);
-        assertEquals("0.0", result.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("0.00", result.get(BidMachineFetcher.KEY_PRICE));
 
         adRequest = new TestAdRequest.Builder(AdsType.Banner)
                 .setAuctionPrice(0.01)
@@ -336,25 +336,25 @@ public class BidMachineFetcherTest {
                 .setAuctionPrice(0.001)
                 .build();
         result = BidMachineFetcher.toMap(adRequest);
-        assertEquals("0.001", result.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("0.01", result.get(BidMachineFetcher.KEY_PRICE));
 
         adRequest = new TestAdRequest.Builder(AdsType.Banner)
                 .setAuctionPrice(0.050000001)
                 .build();
         result = BidMachineFetcher.toMap(adRequest);
-        assertEquals("0.050000001", result.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("0.06", result.get(BidMachineFetcher.KEY_PRICE));
 
         adRequest = new TestAdRequest.Builder(AdsType.Banner)
                 .setAuctionPrice(1000000.050000001)
                 .build();
         result = BidMachineFetcher.toMap(adRequest);
-        assertEquals("1000000.050000001", result.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("1000000.06", result.get(BidMachineFetcher.KEY_PRICE));
 
         adRequest = new TestAdRequest.Builder(AdsType.Banner)
                 .setAuctionPrice(0001000000.050000001)
                 .build();
         result = BidMachineFetcher.toMap(adRequest);
-        assertEquals("1000000.050000001", result.get(BidMachineFetcher.KEY_PRICE));
+        assertEquals("1000000.06", result.get(BidMachineFetcher.KEY_PRICE));
     }
 
 
