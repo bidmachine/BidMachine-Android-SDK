@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +26,9 @@ public class BidMachineFetcher {
     public static final String AD_TYPE_DISPLAY = "display";
     public static final String AD_TYPE_VIDEO = "video";
     public static final String AD_TYPE_NATIVE = "native";
+
+    private static final BigDecimal PRICE_ROUNDING = new BigDecimal("0.01");
+    private static final RoundingMode PRICE_ROUNDING_MODE = RoundingMode.CEILING;
 
     @VisibleForTesting
     static EnumMap<AdsType, Map<String, AdRequest>> cachedRequests = new EnumMap<>(AdsType.class);
@@ -110,7 +115,8 @@ public class BidMachineFetcher {
             return result;
         }
         result.put(BidMachineFetcher.KEY_ID, auctionResult.getId());
-        result.put(BidMachineFetcher.KEY_PRICE, String.valueOf(auctionResult.getPrice()));
+        result.put(BidMachineFetcher.KEY_PRICE,
+                   BidMachineFetcher.roundPrice(auctionResult.getPrice()));
         result.put(BidMachineFetcher.KEY_NETWORK_KEY, auctionResult.getNetworkKey());
         String adType = identifyAdType(auctionResult.getCreativeFormat());
         if (adType != null) {
@@ -136,6 +142,14 @@ public class BidMachineFetcher {
             default:
                 return null;
         }
+    }
+
+    private static String roundPrice(double price) {
+        BigDecimal value = new BigDecimal(String.valueOf(price));
+        BigDecimal roundedValue = PRICE_ROUNDING.signum() == 0
+                ? value
+                : (value.divide(PRICE_ROUNDING, 0, PRICE_ROUNDING_MODE)).multiply(PRICE_ROUNDING);
+        return roundedValue.setScale(PRICE_ROUNDING.scale(), RoundingMode.HALF_UP).toString();
     }
 
 }
