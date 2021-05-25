@@ -57,7 +57,7 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     @Override
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
-                                @NonNull NetworkConfigParams networkConfigParams) {
+                                @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
         EnumMap<AdsFormat, List<Map<String, String>>> mediationConfigs =
                 networkConfigParams.obtainNetworkMediationConfigs(AdsFormat.values());

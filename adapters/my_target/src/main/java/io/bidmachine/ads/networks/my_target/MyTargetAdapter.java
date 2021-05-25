@@ -59,7 +59,7 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     @Override
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
-                                @NonNull NetworkConfigParams networkConfig) {
+                                @NonNull NetworkConfigParams networkConfig) throws Throwable {
         updateRestrictions(adRequestParams);
     }
 

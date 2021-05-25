@@ -26,14 +26,14 @@ public class MraidAdapter extends NetworkAdapter {
     }
 
     @Override
-    public void setLogging(boolean enabled) {
+    public void setLogging(boolean enabled) throws Throwable {
         MraidLog.setLoggingLevel(enabled ? Logger.LogLevel.debug : Logger.LogLevel.none);
     }
 
     @Override
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
-                                @NonNull NetworkConfigParams networkConfigParams) {
+                                @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
 
         OMSDKSettings.initialize(contextProvider.getContext());

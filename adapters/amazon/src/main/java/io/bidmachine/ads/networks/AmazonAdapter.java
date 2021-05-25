@@ -47,15 +47,14 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     }
 
     @Override
-    public void setLogging(boolean enabled) {
-        super.setLogging(enabled);
+    public void setLogging(boolean enabled) throws Throwable {
         AdRegistration.enableLogging(enabled);
     }
 
     @Override
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
-                                @NonNull NetworkConfigParams networkConfigParams) {
+                                @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             Log.e(TAG, "Initialize failed: minSdkVersion for Amazon is 19");

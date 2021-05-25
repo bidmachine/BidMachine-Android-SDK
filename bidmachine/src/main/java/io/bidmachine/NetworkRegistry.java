@@ -296,7 +296,11 @@ class NetworkRegistry {
 
     static void setLoggingEnabled(boolean enabled) {
         for (Map.Entry<String, NetworkConfig> entry : cache.entrySet()) {
-            entry.getValue().obtainNetworkAdapter().setLogging(enabled);
+            try {
+                entry.getValue().obtainNetworkAdapter().setLogging(enabled);
+            } catch (Throwable t) {
+                Logger.log(t);
+            }
         }
     }
 
