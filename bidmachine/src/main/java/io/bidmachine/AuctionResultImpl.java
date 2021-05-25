@@ -26,6 +26,7 @@ final class AuctionResultImpl implements AuctionResult {
     private final double price;
     @Nullable
     private final String deal;
+    @Deprecated
     @Nullable
     private final String seat;
     @NonNull
@@ -89,6 +90,7 @@ final class AuctionResultImpl implements AuctionResult {
         return deal;
     }
 
+    @Deprecated
     @Override
     @Nullable
     public String getSeat() {
