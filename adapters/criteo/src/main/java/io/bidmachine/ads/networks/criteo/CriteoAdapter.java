@@ -84,7 +84,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     @Override
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
-                                @NonNull NetworkConfigParams networkConfigParams) {
+                                @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             Log.e(TAG, "Initialize failed: minSdkVersion for Criteo is 16");

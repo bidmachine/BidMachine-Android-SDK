@@ -71,7 +71,8 @@ public abstract class NetworkAdapter {
 
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
-                                @NonNull NetworkConfigParams networkConfigParams) {
+                                @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
+
     }
 
     /**
@@ -107,7 +108,8 @@ public abstract class NetworkAdapter {
      *
      * @param enabled {@code true} to enable logging
      */
-    public void setLogging(boolean enabled) {
+    public void setLogging(boolean enabled) throws Throwable {
+
     }
 
 }
