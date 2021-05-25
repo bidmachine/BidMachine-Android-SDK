@@ -45,6 +45,7 @@ public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestPara
                 return builder.auctionDeal;
             }
 
+            @Deprecated
             @Override
             public String getSeat() {
                 return builder.auctionSeat;

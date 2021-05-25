@@ -35,6 +35,7 @@ public interface AuctionResult {
     /**
      * @return ID of the buyer seat who made a bid
      */
+    @Deprecated
     String getSeat();
 
     /**
