@@ -299,7 +299,7 @@ class NetworkRegistry {
             try {
                 entry.getValue().obtainNetworkAdapter().setLogging(enabled);
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logger.log(t);
             }
         }
     }
