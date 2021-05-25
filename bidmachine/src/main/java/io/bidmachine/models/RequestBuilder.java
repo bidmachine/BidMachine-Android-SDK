@@ -33,6 +33,9 @@ public interface RequestBuilder<SelfType extends RequestBuilder, ReturnType exte
     @SuppressWarnings("UnusedReturnValue")
     SelfType setBidPayload(@Nullable String bidPayload);
 
+    @SuppressWarnings("UnusedReturnValue")
+    SelfType setPlacementId(@Nullable String placementId);
+
 //    SelfType setExtraParams(ExtraParams extraParams);
 
     @SuppressWarnings("UnusedReturnValue")

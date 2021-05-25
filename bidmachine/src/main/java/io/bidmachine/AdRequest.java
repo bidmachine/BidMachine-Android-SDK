@@ -61,6 +61,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     Map<String, NetworkConfig> networkConfigMap;
     int timeOut = -1;
     String bidPayload;
+    String placementId;
 
     @VisibleForTesting
     UserRestrictionParams userRestrictionParams;
@@ -189,11 +190,15 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 itemBuilder.addDeal(dealBuilder);
             }
 
+            // Request -> Item -> Spec -> Placement
             final Placement.Builder placementBuilder = Placement.newBuilder();
             placementBuilder.setSsai(0);
             placementBuilder.setSdk(BidMachine.NAME);
             placementBuilder.setSdkver(BidMachine.VERSION);
             placementBuilder.setSecure(!Utils.canUseCleartextTraffic());
+            if (!TextUtils.isEmpty(placementId)) {
+                placementBuilder.setTagid(placementId);
+            }
             for (Message.Builder displayBuilder : placements) {
                 if (displayBuilder instanceof Placement.DisplayPlacement.Builder) {
                     placementBuilder.setDisplay((Placement.DisplayPlacement.Builder) displayBuilder);
@@ -204,6 +209,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                                                + displayBuilder);
                 }
             }
+
             // Request -> Item -> Spec -> Placement -> Extension
             Struct.Builder placementExtBuilder = Struct.newBuilder();
             OMSDKSettings.fillExtension(placementExtBuilder);
@@ -992,6 +998,14 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         public SelfType setBidPayload(@Nullable String bidPayload) {
             prepareRequest();
             params.bidPayload = bidPayload;
+            return (SelfType) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public SelfType setPlacementId(@Nullable String placementId) {
+            prepareRequest();
+            params.placementId = placementId;
             return (SelfType) this;
         }
 

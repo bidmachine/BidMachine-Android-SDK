@@ -165,6 +165,53 @@ public class AdRequestTest {
     }
 
     @Test
+    public void build_placementIdNotSet_tagIdNotPresent() throws Exception {
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner).build();
+        Request request = (Request) testAdRequest.build(context, testAdRequest.getType());
+
+        assertNotNull(request);
+        Placement placement = request.getItem(0).getSpec().unpack(Placement.class);
+        assertEquals(Placement.getDefaultInstance().getTagid(), placement.getTagid());
+    }
+
+    @Test
+    public void build_placementIdIsNull_tagIdNotPresent() throws Exception {
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setPlacementId(null)
+                .build();
+        Request request = (Request) testAdRequest.build(context, testAdRequest.getType());
+
+        assertNotNull(request);
+        Placement placement = request.getItem(0).getSpec().unpack(Placement.class);
+        assertEquals(Placement.getDefaultInstance().getTagid(), placement.getTagid());
+    }
+
+    @Test
+    public void build_placementIdIsEmpty_tagIdNotPresent() throws Exception {
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setPlacementId("")
+                .build();
+        Request request = (Request) testAdRequest.build(context, testAdRequest.getType());
+
+        assertNotNull(request);
+        Placement placement = request.getItem(0).getSpec().unpack(Placement.class);
+        assertEquals(Placement.getDefaultInstance().getTagid(), placement.getTagid());
+    }
+
+    @Test
+    public void build_placementIdSet_tagIdIsPresent() throws Exception {
+        String placementId = "test_placement_id";
+        TestAdRequest testAdRequest = new TestAdRequest.Builder(AdsType.Banner)
+                .setPlacementId(placementId)
+                .build();
+        Request request = (Request) testAdRequest.build(context, testAdRequest.getType());
+
+        assertNotNull(request);
+        Placement placement = request.getItem(0).getSpec().unpack(Placement.class);
+        assertEquals(placementId, placement.getTagid());
+    }
+
+    @Test
     public void adRequestListeners() {
         AdRequest.AdRequestListener adRequestListener1 = mock(AdRequest.AdRequestListener.class);
         AdRequest.AdRequestListener adRequestListener2 = mock(AdRequest.AdRequestListener.class);

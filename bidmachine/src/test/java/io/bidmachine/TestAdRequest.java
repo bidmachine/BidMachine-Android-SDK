@@ -119,7 +119,7 @@ public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestPara
         return new BaseUnifiedAdRequestParams(targetingParams, dataRestrictions);
     }
 
-    public static class Builder {
+    public static class Builder extends AdRequestBuilderImpl<Builder, TestAdRequest> {
 
         AdsType adsType;
         String auctionId;
@@ -219,7 +219,8 @@ public class TestAdRequest extends AdRequest<TestAdRequest, UnifiedAdRequestPara
             return this;
         }
 
-        public TestAdRequest build() {
+        @Override
+        protected TestAdRequest createRequest() {
             return new TestAdRequest(this);
         }
 
