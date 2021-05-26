@@ -7,8 +7,10 @@ import io.bidmachine.unified.UnifiedNativeAd;
 
 public class NastAdapter extends NetworkAdapter {
 
+    public static final String KEY = "nast";
+
     public NastAdapter() {
-        super("nast",
+        super(KEY,
               "1.0",
               BuildConfig.VERSION_NAME + ".1",
               new AdsType[]{AdsType.Native});

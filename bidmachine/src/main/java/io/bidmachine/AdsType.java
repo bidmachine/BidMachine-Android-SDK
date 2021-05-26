@@ -16,6 +16,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import io.bidmachine.ads.networks.mraid.MraidAdapter;
+import io.bidmachine.ads.networks.nast.NastAdapter;
+import io.bidmachine.ads.networks.vast.VastAdapter;
 import io.bidmachine.banner.BannerSize;
 import io.bidmachine.core.Logger;
 import io.bidmachine.displays.DisplayPlacementBuilder;
@@ -81,11 +84,11 @@ public enum AdsType {
                 : null;
         if (networkConfig == null) {
             if (this == AdsType.Native) {
-                networkConfig = NetworkRegistry.getConfig(NetworkRegistry.Nast);
+                networkConfig = NetworkRegistry.getConfig(NastAdapter.KEY);
             } else if (ad.hasDisplay()) {
-                networkConfig = NetworkRegistry.getConfig(NetworkRegistry.Mraid);
+                networkConfig = NetworkRegistry.getConfig(MraidAdapter.KEY);
             } else if (ad.hasVideo()) {
-                networkConfig = NetworkRegistry.getConfig(NetworkRegistry.Vast);
+                networkConfig = NetworkRegistry.getConfig(VastAdapter.KEY);
             }
         }
         return networkConfig;
