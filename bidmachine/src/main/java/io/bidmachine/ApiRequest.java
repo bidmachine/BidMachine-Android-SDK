@@ -163,9 +163,9 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         }
 
         public ApiRequest<RequestDataType, ResponseDataType> request() {
-            ApiRequest<RequestDataType, ResponseDataType> request = build();
-            build().request();
-            return request;
+            ApiRequest<RequestDataType, ResponseDataType> apiRequest = build();
+            apiRequest.request();
+            return apiRequest;
         }
     }
 
