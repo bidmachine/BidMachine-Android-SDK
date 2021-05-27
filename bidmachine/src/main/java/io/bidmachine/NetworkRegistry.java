@@ -12,55 +12,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import io.bidmachine.ads.networks.mraid.MraidAdapter;
-import io.bidmachine.ads.networks.nast.NastAdapter;
-import io.bidmachine.ads.networks.vast.VastAdapter;
 import io.bidmachine.core.Logger;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.utils.BMError;
 
 class NetworkRegistry {
 
-    static {
-        NetworkRegistry.registerNetworks(
-                new NetworkConfig(null) {
-                    @NonNull
-                    @Override
-                    protected NetworkAdapter createNetworkAdapter() {
-                        return new MraidAdapter();
-                    }
-                },
-                new NetworkConfig(null) {
-                    @NonNull
-                    @Override
-                    protected NetworkAdapter createNetworkAdapter() {
-                        return new VastAdapter();
-                    }
-                },
-                new NetworkConfig(null) {
-                    @NonNull
-                    @Override
-                    protected NetworkAdapter createNetworkAdapter() {
-                        return new NastAdapter();
-                    }
-                });
-    }
-
-    static final String Mraid = "mraid";
-    static final String Vast = "vast";
-    static final String Nast = "nast";
-
     @VisibleForTesting
-    static Set<NetworkConfig> pendingNetworks;
+    static final Map<String, NetworkConfig> pendingNetworks = new ConcurrentHashMap<>();
     @VisibleForTesting
     static final Map<String, NetworkConfig> cache = new ConcurrentHashMap<>();
 
@@ -75,20 +41,11 @@ class NetworkRegistry {
     }
 
     static boolean isNetworkRegistered(@NonNull String name) {
-        return isNetworkRegistered(name, null);
-    }
-
-    static boolean isNetworkRegistered(@NonNull String name,
-                                       @Nullable RegisterSource registerSource) {
         try {
-            if (pendingNetworks != null) {
-                for (NetworkConfig networkConfig : pendingNetworks) {
-                    if (isNetworkConfigEquals(networkConfig, name, registerSource)) {
-                        return true;
-                    }
-                }
+            if (pendingNetworks.get(name) != null) {
+                return true;
             }
-            if (isNetworkInitialized(name, registerSource)) {
+            if (isNetworkInitialized(name, null)) {
                 return true;
             }
         } catch (Throwable ignore) {
@@ -145,10 +102,7 @@ class NetworkRegistry {
         if (networkConfig == null) {
             return;
         }
-        if (pendingNetworks == null) {
-            pendingNetworks = new HashSet<>();
-        }
-        pendingNetworks.add(networkConfig);
+        pendingNetworks.put(networkConfig.getKey(), networkConfig);
     }
 
     static boolean isNetworksInitialized() {
@@ -168,12 +122,10 @@ class NetworkRegistry {
                 super.run();
 
                 final List<NetworkLoadTask> loadTasks = new ArrayList<>();
-                if (pendingNetworks != null) {
-                    for (NetworkConfig networkConfig : pendingNetworks) {
-                        loadTasks.add(new NetworkLoadTask(contextProvider,
-                                                          unifiedAdRequestParams,
-                                                          networkConfig));
-                    }
+                for (NetworkConfig networkConfig : pendingNetworks.values()) {
+                    loadTasks.add(new NetworkLoadTask(contextProvider,
+                                                      unifiedAdRequestParams,
+                                                      networkConfig));
                 }
                 if (loadTasks.size() > 0) {
                     final CountDownLatch latch = new CountDownLatch(loadTasks.size());
@@ -198,6 +150,17 @@ class NetworkRegistry {
             }
         }.start();
     }
+
+    static void setLoggingEnabled(boolean enabled) {
+        for (Map.Entry<String, NetworkConfig> entry : cache.entrySet()) {
+            try {
+                entry.getValue().obtainNetworkAdapter().setLogging(enabled);
+            } catch (Throwable t) {
+                Logger.log(t);
+            }
+        }
+    }
+
 
     private static final class NetworkLoadTask implements Runnable {
 
@@ -236,32 +199,31 @@ class NetworkRegistry {
         }
 
         private void process() {
-            String networkName = networkConfig.getKey();
-            TrackingObject trackingObject = new SimpleTrackingObject(networkName + "_initialize");
-            Logger.log(String.format("Load network from config start: %s", networkName));
+            String networkKey = networkConfig.getKey();
+            TrackingObject trackingObject = new SimpleTrackingObject(networkKey + "_initialize");
+            Logger.log(String.format("Load network from config start: %s", networkKey));
             try {
                 BidMachineEvents.eventStart(trackingObject,
                                             TrackEventType.HeaderBiddingNetworkInitialize,
                                             new TrackEventInfo()
-                                                    .withParameter("HB_NETWORK", networkName));
+                                                    .withParameter("HB_NETWORK", networkKey));
                 NetworkAdapter networkAdapter = networkConfig.obtainNetworkAdapter();
                 networkAdapter.setLogging(Logger.isLoggingEnabled());
                 networkAdapter.initialize(contextProvider,
                                           adRequestParams,
                                           networkConfig.getNetworkConfigParams());
 
-                String key = networkConfig.getKey();
-                if (!cache.containsKey(key)) {
-                    cache.put(key, networkConfig);
-                    pendingNetworks.remove(networkConfig);
+                if (!cache.containsKey(networkKey)) {
+                    cache.put(networkKey, networkConfig);
+                    pendingNetworks.remove(networkKey);
                 }
                 for (AdsType type : networkConfig.getSupportedAdsTypes()) {
-                    type.addNetworkConfig(key, networkConfig);
+                    type.addNetworkConfig(networkKey, networkConfig);
                 }
                 Logger.log(
                         String.format(
                                 "Load network from config finish: %s, %s, %s. Register source - %s",
-                                networkName,
+                                networkKey,
                                 networkAdapter.getVersion(),
                                 networkAdapter.getAdapterVersion(),
                                 networkConfig.getRegisterSource()));
@@ -275,7 +237,7 @@ class NetworkRegistry {
                                                 TrackEventType.HeaderBiddingNetworkInitialize);
                 }
             } catch (Throwable throwable) {
-                Logger.log(String.format("Network (%s) load fail!", networkName));
+                Logger.log(String.format("Network (%s) load fail!", networkKey));
                 Logger.log(throwable);
                 BidMachineEvents.eventFinish(trackingObject,
                                              TrackEventType.HeaderBiddingNetworkInitialize,
@@ -288,20 +250,11 @@ class NetworkRegistry {
             executor.execute(this);
         }
 
+
         interface NetworkLoadCallback {
             void onNetworkLoadingFinished();
         }
 
-    }
-
-    static void setLoggingEnabled(boolean enabled) {
-        for (Map.Entry<String, NetworkConfig> entry : cache.entrySet()) {
-            try {
-                entry.getValue().obtainNetworkAdapter().setLogging(enabled);
-            } catch (Throwable t) {
-                Logger.log(t);
-            }
-        }
     }
 
     interface NetworksInitializeCallback {

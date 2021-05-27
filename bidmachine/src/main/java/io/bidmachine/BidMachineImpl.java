@@ -21,6 +21,9 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
+import io.bidmachine.ads.networks.mraid.MraidAdapter;
+import io.bidmachine.ads.networks.nast.NastAdapter;
+import io.bidmachine.ads.networks.vast.VastAdapter;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.NetworkRequest;
 import io.bidmachine.core.Utils;
@@ -289,6 +292,27 @@ final class BidMachineImpl {
                 }
             }
         }
+        NetworkRegistry.registerNetwork(new NetworkConfig(null) {
+            @NonNull
+            @Override
+            protected NetworkAdapter createNetworkAdapter() {
+                return new MraidAdapter();
+            }
+        });
+        NetworkRegistry.registerNetwork(new NetworkConfig(null) {
+            @NonNull
+            @Override
+            protected NetworkAdapter createNetworkAdapter() {
+                return new VastAdapter();
+            }
+        });
+        NetworkRegistry.registerNetwork(new NetworkConfig(null) {
+            @NonNull
+            @Override
+            protected NetworkAdapter createNetworkAdapter() {
+                return new NastAdapter();
+            }
+        });
         NetworkRegistry.initializeNetworks(new SimpleContextProvider(context),
                                            new UnifiedAdRequestParamsImpl(targetingParams,
                                                                           dataRestrictions),
