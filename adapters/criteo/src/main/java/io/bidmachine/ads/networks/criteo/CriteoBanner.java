@@ -27,12 +27,12 @@ public class CriteoBanner extends UnifiedBannerAd {
                      @NonNull UnifiedBannerAdRequestParams requestParams,
                      @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         String adUnitId = mediationParams.getString(CriteoConfig.AD_UNIT_ID);
-        final BannerAdUnit bannerAdUnit = (BannerAdUnit) CriteoAdUnitController.getAdUnit(adUnitId);
+        final BannerAdUnit bannerAdUnit = (BannerAdUnit) CriteoAdUnitStorage.getAdUnit(adUnitId);
         if (bannerAdUnit == null) {
             callback.onAdLoadFailed(BMError.requestError("AdUnit not found"));
             return;
         }
-        final Bid bid = CriteoBidTokenController.takeBid(requestParams.getAdRequest());
+        final Bid bid = CriteoBidTokenStorage.takeBid(requestParams.getAdRequest());
         if (bid == null) {
             callback.onAdLoadFailed(BMError.requestError("Bid not found"));
             return;
@@ -56,6 +56,7 @@ public class CriteoBanner extends UnifiedBannerAd {
             criteoBannerView = null;
         }
     }
+
 
     private static final class Listener implements CriteoBannerAdListener {
 

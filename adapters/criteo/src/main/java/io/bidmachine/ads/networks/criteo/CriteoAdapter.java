@@ -46,18 +46,18 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             public void onRequestSuccess(@NonNull AdRequest adRequest,
                                          @NonNull AuctionResult auctionResult) {
                 if (!isCriteoNetwork(getKey(), auctionResult)) {
-                    CriteoBidTokenController.takeBid(adRequest);
+                    CriteoBidTokenStorage.takeBid(adRequest);
                 }
             }
 
             @Override
             public void onRequestFailed(@NonNull AdRequest adRequest, @NonNull BMError error) {
-                CriteoBidTokenController.takeBid(adRequest);
+                CriteoBidTokenStorage.takeBid(adRequest);
             }
 
             @Override
             public void onRequestExpired(@NonNull AdRequest adRequest) {
-                CriteoBidTokenController.takeBid(adRequest);
+                CriteoBidTokenStorage.takeBid(adRequest);
             }
 
             private boolean isCriteoNetwork(@Nullable String networkKey,
@@ -86,6 +86,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             Log.e(TAG, "Initialize failed: minSdkVersion for Criteo is 16");
             return;
@@ -104,7 +105,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             return;
         }
         assert publisherId != null;
-        List<AdUnit> adUnitList = CriteoAdUnitController.extractAdUnits(networkConfigParams);
+        List<AdUnit> adUnitList = CriteoAdUnitStorage.extractAdUnits(networkConfigParams);
         if (adUnitList == null || adUnitList.size() == 0) {
             Log.e(TAG, "Initialize failed: adUnits not found");
             return;
@@ -131,7 +132,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             return;
         }
         assert adUnitId != null;
-        AdUnit adUnit = CriteoAdUnitController.getAdUnit(adUnitId);
+        AdUnit adUnit = CriteoAdUnitStorage.getAdUnit(adUnitId);
         if (adUnit == null) {
             collectCallback.onCollectFail(BMError.requestError("AdUnit not found"));
             return;
@@ -139,7 +140,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         Criteo criteo = Criteo.getInstance();
         criteo.loadBid(adUnit, bid -> {
             if (bid != null) {
-                CriteoBidTokenController.storeBid(adRequestParams.getAdRequest(), bid);
+                CriteoBidTokenStorage.storeBid(adRequestParams.getAdRequest(), bid);
 
                 Map<String, String> params = new HashMap<>();
                 params.put(CriteoConfig.AD_UNIT_ID, adUnitId);

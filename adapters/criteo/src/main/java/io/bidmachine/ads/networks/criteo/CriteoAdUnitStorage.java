@@ -20,7 +20,7 @@ import java.util.Map;
 import io.bidmachine.AdsFormat;
 import io.bidmachine.NetworkConfigParams;
 
-class CriteoAdUnitController {
+class CriteoAdUnitStorage {
 
     private static final Map<String, AdUnit> adUnitMap = new HashMap<>();
 
