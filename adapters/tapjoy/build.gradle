@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     defaultConfig {
-        versionCode 6
+        versionCode 7
     }
 }
 
@@ -19,6 +19,5 @@ rootProject.allprojects {
 }
 
 dependencies {
-    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.8.0@aar'
-    adapterDependency 'com.google.android.gms:play-services-ads-identifier:17.0.0'
+    adapterDependency 'com.tapjoy:tapjoy-android-sdk:12.8.1'
 }

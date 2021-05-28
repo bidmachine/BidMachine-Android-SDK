@@ -36,16 +36,20 @@ public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
             callback.onAdLoadFailed(BMError.Internal);
             return;
         }
+        String placementName = mediationParams.getString(TapjoyConfig.KEY_PLACEMENT_NAME);
+        String auctionId = mediationParams.getString(TapjoyAuctionFlags.AUCTION_ID);
+        String auctionData = mediationParams.getString(TapjoyAuctionFlags.AUCTION_DATA);
+
         Tapjoy.setActivity(activity);
         TapjoyFullscreenAdListener listener = new TapjoyFullscreenAdListener(callback);
-        tjPlacement = Tapjoy.getLimitedPlacement(mediationParams.getString(TapjoyConfig.KEY_PLACEMENT_NAME), listener);
+        tjPlacement = Tapjoy.getLimitedPlacement(placementName, listener);
         tjPlacement.setVideoListener(listener);
         tjPlacement.setMediationName(BidMachine.NAME);
         tjPlacement.setAdapterVersion(BuildConfig.VERSION_NAME);
 
         HashMap<String, String> auctionParams = new HashMap<>();
-        auctionParams.put(TapjoyAuctionFlags.AUCTION_ID, mediationParams.getString(TapjoyAuctionFlags.AUCTION_ID));
-        auctionParams.put(TapjoyAuctionFlags.AUCTION_DATA, mediationParams.getString(TapjoyAuctionFlags.AUCTION_DATA));
+        auctionParams.put(TapjoyAuctionFlags.AUCTION_ID, auctionId);
+        auctionParams.put(TapjoyAuctionFlags.AUCTION_DATA, auctionData);
         tjPlacement.setAuctionData(auctionParams);
 
         tjPlacement.requestContent();
@@ -68,4 +72,5 @@ public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
             tjPlacement = null;
         }
     }
+
 }
