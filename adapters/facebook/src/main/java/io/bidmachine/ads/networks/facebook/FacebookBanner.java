@@ -62,6 +62,7 @@ class FacebookBanner extends UnifiedBannerAd {
         }
     }
 
+
     private static final class FacebookListener extends BaseFacebookListener<UnifiedBannerAdCallback> {
 
         FacebookListener(@NonNull UnifiedBannerAdCallback callback) {

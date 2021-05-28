@@ -59,8 +59,9 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfig) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfig);
+
         configure(adRequestParams);
-        AudienceNetworkAds.initialize(contextProvider.getContext());
+        AudienceNetworkAds.initialize(contextProvider.getApplicationContext());
         initializeFacebook(contextProvider.getContext(), null);
     }
 
@@ -94,8 +95,7 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         assert appId != null;
         final String placementId = mediationConfig.get(FacebookConfig.KEY_PLACEMENT_ID);
         if (TextUtils.isEmpty(placementId)) {
-            collectCallback.onCollectFail(
-                    BMError.requestError("placement_id (facebook_key) not provided"));
+            collectCallback.onCollectFail(BMError.requestError("placement_id not provided"));
             return;
         }
         assert placementId != null;
@@ -156,9 +156,13 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
     }
 
+
     private interface FacebookInitializeListener {
+
         void onInitialized(@NonNull String bidderToken);
 
         void onInitializationFailed();
+
     }
+
 }

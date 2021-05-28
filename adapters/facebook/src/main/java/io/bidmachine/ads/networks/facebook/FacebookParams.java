@@ -32,4 +32,5 @@ class FacebookParams extends UnifiedParams {
         }
         return true;
     }
+
 }
