@@ -1,5 +1,6 @@
 package io.bidmachine.ads.networks.tapjoy;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,6 @@ import io.bidmachine.HeaderBiddingCollectParamsCallback;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
 import io.bidmachine.models.DataRestrictions;
-import io.bidmachine.models.TargetingInfo;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.utils.BMError;
@@ -30,9 +30,9 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     TapjoyAdapter() {
         super("tapjoy",
-                Tapjoy.getVersion(),
-                BuildConfig.VERSION_NAME,
-                new AdsType[]{AdsType.Interstitial, AdsType.Rewarded});
+              Tapjoy.getVersion(),
+              BuildConfig.VERSION_NAME,
+              new AdsType[]{AdsType.Interstitial, AdsType.Rewarded});
     }
 
     @Override
@@ -97,18 +97,14 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     }
 
     private static void configure(@NonNull UnifiedAdRequestParams adRequestParams) {
+        Tapjoy.setDebugEnabled(adRequestParams.isTestMode());
+
         DataRestrictions dataRestrictions = adRequestParams.getDataRestrictions();
         TJPrivacyPolicy tjPrivacyPolicy = TJPrivacyPolicy.getInstance();
         tjPrivacyPolicy.setBelowConsentAge(dataRestrictions.isUserAgeRestricted());
         tjPrivacyPolicy.setSubjectToGDPR(dataRestrictions.isUserInGdprScope());
         tjPrivacyPolicy.setUserConsent(dataRestrictions.getIABGDPRString());
         tjPrivacyPolicy.setUSPrivacy(dataRestrictions.getUSPrivacyString());
-
-        TargetingInfo targetingInfo = adRequestParams.getTargetingParams();
-        String userId = targetingInfo.getUserId();
-        if (userId != null) {
-            Tapjoy.setUserID(userId);
-        }
     }
 
     private static synchronized void initializeTapjoy(@NonNull final ContextProvider contextProvider,
@@ -117,16 +113,18 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         if (finalizeInitialization(listener)) {
             return;
         }
+        final Context applicationContext = contextProvider.getApplicationContext();
         new Thread() {
             @Override
             public void run() {
                 super.run();
+
                 synchronized (TapjoyAdapter.class) {
                     if (finalizeInitialization(listener)) {
                         return;
                     }
                     final CountDownLatch syncLock = new CountDownLatch(1);
-                    Tapjoy.limitedConnect(contextProvider.getContext(), sdkKey, new TJConnectListener() {
+                    Tapjoy.limitedConnect(applicationContext, sdkKey, new TJConnectListener() {
                         @Override
                         public void onConnectSuccess() {
                             if (listener != null) {
@@ -163,10 +161,13 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         return false;
     }
 
+
     private interface TapjoyInitializeListener {
+
         void onInitialized();
 
         void onInitializationFail(BMError error);
+
     }
 
 }

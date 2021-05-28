@@ -81,4 +81,5 @@ class TapjoyFullscreenAdListener implements TJPlacementListener, TJPlacementVide
     public void onVideoComplete(TJPlacement tjPlacement) {
         callback.onAdFinished();
     }
+
 }
