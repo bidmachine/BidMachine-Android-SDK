@@ -19,11 +19,11 @@ import static org.junit.Assert.assertNull;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
-public class CriteoBidTokenControllerTest {
+public class CriteoBidTokenStorageTest {
 
     @Before
     public void setUp() throws Exception {
-        CriteoBidTokenController.bidMap.clear();
+        CriteoBidTokenStorage.bidMap.clear();
     }
 
     @Test
@@ -33,11 +33,11 @@ public class CriteoBidTokenControllerTest {
         Bid bid3 = CriteoUtils.createBidToken();
         AdRequest<?, ?> adRequest1 = new BannerRequest.Builder().build();
         AdRequest<?, ?> adRequest2 = new BannerRequest.Builder().build();
-        CriteoBidTokenController.storeBid(null, bid1);
-        CriteoBidTokenController.storeBid(adRequest1, bid2);
-        CriteoBidTokenController.storeBid(adRequest2, bid3);
+        CriteoBidTokenStorage.storeBid(null, bid1);
+        CriteoBidTokenStorage.storeBid(adRequest1, bid2);
+        CriteoBidTokenStorage.storeBid(adRequest2, bid3);
 
-        Map<AdRequest, Bid> bidMap = CriteoBidTokenController.bidMap;
+        Map<AdRequest, Bid> bidMap = CriteoBidTokenStorage.bidMap;
         assertEquals(2, bidMap.size());
         assertEquals(bid2, bidMap.get(adRequest1));
         assertEquals(bid3, bidMap.get(adRequest2));
@@ -45,15 +45,15 @@ public class CriteoBidTokenControllerTest {
 
     @Test
     public void takeBidToken() {
-        Bid bid1 = CriteoBidTokenController.takeBid(null);
-        Bid bid2 = CriteoBidTokenController.takeBid(new BannerRequest.Builder().build());
+        Bid bid1 = CriteoBidTokenStorage.takeBid(null);
+        Bid bid2 = CriteoBidTokenStorage.takeBid(new BannerRequest.Builder().build());
         assertNull(bid1);
         assertNull(bid2);
 
         Bid bid3 = CriteoUtils.createBidToken();
         AdRequest<?, ?> adRequest1 = new BannerRequest.Builder().build();
-        CriteoBidTokenController.storeBid(adRequest1, bid3);
-        assertEquals(bid3, CriteoBidTokenController.takeBid(adRequest1));
+        CriteoBidTokenStorage.storeBid(adRequest1, bid3);
+        assertEquals(bid3, CriteoBidTokenStorage.takeBid(adRequest1));
     }
 
 }

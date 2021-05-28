@@ -41,12 +41,11 @@ public class CriteoConfig extends NetworkConfig {
     public CriteoConfig withMediationConfig(@NonNull AdsFormat adsFormat,
                                             @NonNull final String adUnitId,
                                             @Nullable Orientation orientation) {
-        return withMediationConfig(
-                adsFormat,
-                new HashMap<String, String>() {{
-                    put(AD_UNIT_ID, adUnitId);
-                }},
-                orientation);
+        return withMediationConfig(adsFormat,
+                                   new HashMap<String, String>() {{
+                                       put(AD_UNIT_ID, adUnitId);
+                                   }},
+                                   orientation);
     }
 
 }

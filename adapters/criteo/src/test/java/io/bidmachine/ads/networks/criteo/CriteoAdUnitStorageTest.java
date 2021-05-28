@@ -27,20 +27,20 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
-public class CriteoAdUnitControllerTest {
+public class CriteoAdUnitStorageTest {
 
     @Before
     public void setUp() throws Exception {
-        CriteoAdUnitController.getAdUnitMap().clear();
+        CriteoAdUnitStorage.getAdUnitMap().clear();
     }
 
     @Test
     public void extractAdUnits_obtainedMediationConfigIsNull_resultListIsNull() {
         BidMachineNetworkConfigParams networkConfigParams = new BidMachineNetworkConfigParams();
-        List<AdUnit> adUnitList = CriteoAdUnitController.extractAdUnits(networkConfigParams);
+        List<AdUnit> adUnitList = CriteoAdUnitStorage.extractAdUnits(networkConfigParams);
         assertNull(adUnitList);
-        assertNotNull(CriteoAdUnitController.getAdUnitMap());
-        assertEquals(0, CriteoAdUnitController.getAdUnitMap().size());
+        assertNotNull(CriteoAdUnitStorage.getAdUnitMap());
+        assertEquals(0, CriteoAdUnitStorage.getAdUnitMap().size());
     }
 
     @Test
@@ -51,11 +51,11 @@ public class CriteoAdUnitControllerTest {
             put("key_2", "ad_unit_id_2");
             put("key_3", "ad_unit_id_3");
         }});
-        List<AdUnit> adUnitList = CriteoAdUnitController.extractAdUnits(networkConfigParams);
+        List<AdUnit> adUnitList = CriteoAdUnitStorage.extractAdUnits(networkConfigParams);
         assertNotNull(adUnitList);
         assertEquals(0, adUnitList.size());
-        assertNotNull(CriteoAdUnitController.getAdUnitMap());
-        assertEquals(0, CriteoAdUnitController.getAdUnitMap().size());
+        assertNotNull(CriteoAdUnitStorage.getAdUnitMap());
+        assertEquals(0, CriteoAdUnitStorage.getAdUnitMap().size());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class CriteoAdUnitControllerTest {
         networkConfigParams.addMap(AdsFormat.InterstitialVideo, new HashMap<String, String>() {{
             put(CriteoConfig.AD_UNIT_ID, "ad_unit_interstitial_video_id");
         }});
-        List<AdUnit> adUnitList = CriteoAdUnitController.extractAdUnits(networkConfigParams);
+        List<AdUnit> adUnitList = CriteoAdUnitStorage.extractAdUnits(networkConfigParams);
         assertNotNull(adUnitList);
         assertEquals(7, adUnitList.size());
 
@@ -127,9 +127,9 @@ public class CriteoAdUnitControllerTest {
 
     @Test
     public void getAdUnit_negativeTests() {
-        AdUnit adUnit1 = CriteoAdUnitController.getAdUnit(null);
-        AdUnit adUnit2 = CriteoAdUnitController.getAdUnit("");
-        AdUnit adUnit3 = CriteoAdUnitController.getAdUnit("ad_unit_id");
+        AdUnit adUnit1 = CriteoAdUnitStorage.getAdUnit(null);
+        AdUnit adUnit2 = CriteoAdUnitStorage.getAdUnit("");
+        AdUnit adUnit3 = CriteoAdUnitStorage.getAdUnit("ad_unit_id");
         assertNull(adUnit1);
         assertNull(adUnit2);
         assertNull(adUnit3);
@@ -139,10 +139,10 @@ public class CriteoAdUnitControllerTest {
     public void getAdUnit() {
         AdUnit adUnit1 = mock(AdUnit.class);
         AdUnit adUnit2 = mock(AdUnit.class);
-        CriteoAdUnitController.getAdUnitMap().put("ad_unit_1", adUnit1);
-        CriteoAdUnitController.getAdUnitMap().put("ad_unit_2", adUnit2);
-        assertEquals(adUnit1, CriteoAdUnitController.getAdUnit("ad_unit_1"));
-        assertEquals(adUnit2, CriteoAdUnitController.getAdUnit("ad_unit_2"));
+        CriteoAdUnitStorage.getAdUnitMap().put("ad_unit_1", adUnit1);
+        CriteoAdUnitStorage.getAdUnitMap().put("ad_unit_2", adUnit2);
+        assertEquals(adUnit1, CriteoAdUnitStorage.getAdUnit("ad_unit_1"));
+        assertEquals(adUnit2, CriteoAdUnitStorage.getAdUnit("ad_unit_2"));
     }
 
     @SuppressWarnings("unchecked")

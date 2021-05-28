@@ -27,12 +27,12 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
                      @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         String adUnitId = mediationParams.getString(CriteoConfig.AD_UNIT_ID);
         InterstitialAdUnit interstitialAdUnit =
-                (InterstitialAdUnit) CriteoAdUnitController.getAdUnit(adUnitId);
+                (InterstitialAdUnit) CriteoAdUnitStorage.getAdUnit(adUnitId);
         if (interstitialAdUnit == null) {
             callback.onAdLoadFailed(BMError.requestError("AdUnit not found"));
             return;
         }
-        Bid bid = CriteoBidTokenController.takeBid(requestParams.getAdRequest());
+        Bid bid = CriteoBidTokenStorage.takeBid(requestParams.getAdRequest());
         if (bid == null) {
             callback.onAdLoadFailed(BMError.requestError("Bid not found"));
             return;
@@ -59,6 +59,7 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
             criteoInterstitial = null;
         }
     }
+
 
     private static final class Listener implements CriteoInterstitialAdListener {
 

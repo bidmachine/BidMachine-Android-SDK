@@ -11,7 +11,7 @@ import java.util.WeakHashMap;
 
 import io.bidmachine.AdRequest;
 
-class CriteoBidTokenController {
+class CriteoBidTokenStorage {
 
     @VisibleForTesting
     static final Map<AdRequest, Bid> bidMap = new WeakHashMap<>();
