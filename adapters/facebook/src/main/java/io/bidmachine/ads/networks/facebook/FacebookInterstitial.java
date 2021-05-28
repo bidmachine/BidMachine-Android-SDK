@@ -60,6 +60,7 @@ class FacebookInterstitial extends UnifiedFullscreenAd {
         }
     }
 
+
     private static final class FacebookListener
             extends BaseFacebookListener<UnifiedFullscreenAdCallback>
             implements InterstitialAdListener {

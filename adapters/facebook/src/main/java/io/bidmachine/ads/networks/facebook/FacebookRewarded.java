@@ -61,6 +61,7 @@ class FacebookRewarded extends UnifiedFullscreenAd {
         }
     }
 
+
     private static final class FacebookListener
             extends BaseFacebookListener<UnifiedFullscreenAdCallback>
             implements RewardedVideoAdListener {

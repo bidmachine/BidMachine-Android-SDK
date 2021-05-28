@@ -41,7 +41,9 @@ abstract class BaseFacebookListener<UnifiedAdCallbackType extends UnifiedAdCallb
      */
     @Nullable
     private static BMError mapError(@Nullable AdError error) {
-        if (error == null) return null;
+        if (error == null) {
+            return null;
+        }
         switch (error.getErrorCode()) {
             case AdError.NETWORK_ERROR_CODE:
                 return BMError.Connection;

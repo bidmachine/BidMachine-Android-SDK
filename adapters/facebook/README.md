@@ -5,15 +5,18 @@ This folder contains mediation adapter used to mediate `Facebook`.
 ## Integration
 
 [<img src="https://img.shields.io/badge/Min%20SDK%20version-1.7.3-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
-[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.7.3.6-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.facebook/1.7.3.6/)
-[<img src="https://img.shields.io/badge/Network%20version-6.3.0-blue">](https://developers.facebook.com/docs/android/)
+[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.7.3.7-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.facebook/1.7.3.7/)
+[<img src="https://img.shields.io/badge/Network%20version-6.5.0-blue">](https://developers.facebook.com/docs/android/)
 
 Add next dependency to you `build.gradle`:
 
 ```groovy
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    // ... other dependencies
-    implementation 'io.bidmachine:ads.networks.facebook:1.7.3.6'
+    implementation 'io.bidmachine:ads.networks.facebook:1.7.3.7'
 }
 ```
 
