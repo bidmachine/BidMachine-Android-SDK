@@ -1,3 +1,9 @@
+## Version 1.7.4 (May 31, 2021)
+**Features**:
+* SDK improvement
+* Added API method ```AdRequest.Builder#setPlacementId``` to set placement id
+* Deprecated ```AuctionResult#getSeat```
+
 ## Version 1.7.3 (May 18, 2021)
 **Features**:
 * SDK improvement

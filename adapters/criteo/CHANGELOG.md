@@ -1,4 +1,4 @@
-## Version 1.7.3.9
+## Version 1.7.4.9
 * Updated Criteo version to 4.4.0
 
 ## Version 1.7.0.8
