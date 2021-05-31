@@ -4,16 +4,14 @@ This folder contains mediation adapter used to mediate `Amazon`.
 
 ## Integration
 
-[<img src="https://img.shields.io/badge/Min%20SDK%20version-1.7.3-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
-[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.7.3.5-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.amazon/1.7.3.5/)
+[<img src="https://img.shields.io/badge/Min%20SDK%20version-1.7.4-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
+[<img src="https://img.shields.io/badge/Network%20Adapter%20version-1.7.4.5-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads.networks.amazon/1.7.4.5/)
 [<img src="https://img.shields.io/badge/Network%20version-8.4.3-blue">](https://ams.amazon.com/webpublisher/uam/docs/mobile-integration-documentation/other-ad-server-integration.html)
 
 Add next configuration to your app level `build.gradle`:
 
 ```groovy
 android {
-    //... other configuration options
-    
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
@@ -25,8 +23,7 @@ Add next dependency to you `build.gradle`:
 
 ```groovy
 dependencies {
-    // ... other dependencies
-    implementation 'io.bidmachine:ads.networks.amazon:1.7.3.5'
+    implementation 'io.bidmachine:ads.networks.amazon:1.7.4.5'
 }
 ```
 
