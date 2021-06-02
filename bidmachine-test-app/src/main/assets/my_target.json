@@ -1,0 +1,29 @@
+{
+    "network": "my_target",
+    "ad_units": [
+        {
+            "format": "banner",
+            "slot_id": "437933"
+        },
+        {
+            "format": "banner_320x50",
+            "slot_id": "437933"
+        },
+        {
+            "format": "banner_300x250",
+            "slot_id": "64526"
+        },
+        {
+            "format": "banner_728x90",
+            "slot_id": "81620"
+        },
+        {
+            "format": "interstitial_static",
+            "slot_id": "365991"
+        },
+        {
+            "format": "rewarded_video",
+            "slot_id": "482205"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "network": "tapjoy",
+    "sdk_key": "tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y",
+    "ad_units": [
+        {
+            "format": "interstitial_video",
+            "placement_name": "video_without_cap_pb"
+        },
+        {
+            "format": "rewarded_video",
+            "placement_name": "rewarded_video_without_cap_pb"
+        }
+    ]
+}

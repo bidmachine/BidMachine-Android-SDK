@@ -2,40 +2,45 @@ package io.bidmachine.test.app;
 
 import androidx.annotation.NonNull;
 
-import java.util.Arrays;
+import java.util.UUID;
 
 import io.bidmachine.NetworkConfig;
 
 class OptionalNetwork {
 
-    final int id;
     @NonNull
     final String displayName;
     @NonNull
     final NetworkConfig networkConfig;
     @NonNull
-    final String jsonData;
+    final String assetFile;
 
-    OptionalNetwork(int id,
-                    @NonNull String displayName,
+    private final int hashCode;
+
+    OptionalNetwork(@NonNull String displayName,
                     @NonNull NetworkConfig networkConfig,
-                    @NonNull String jsonData) {
-        this.id = id;
+                    @NonNull String assetFile) {
         this.displayName = displayName;
         this.networkConfig = networkConfig;
-        this.jsonData = jsonData;
+        this.assetFile = assetFile;
+        this.hashCode = UUID.randomUUID().hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         OptionalNetwork network = (OptionalNetwork) o;
-        return id == network.id;
+        return hashCode == network.hashCode;
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new long[]{id});
+        return hashCode;
     }
+
 }

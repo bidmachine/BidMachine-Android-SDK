@@ -1,0 +1,26 @@
+{
+    "network": "facebook",
+    "app_id": "1525692904128549",
+    "ad_units": [
+        {
+            "format": "banner",
+            "facebook_key": "1525692904128549_2386746951356469"
+        },
+        {
+            "format": "banner_320x50",
+            "facebook_key": "1525692904128549_2386746951356469"
+        },
+        {
+            "format": "banner_300x250",
+            "facebook_key": "1525692904128549_2386746951356469"
+        },
+        {
+            "format": "interstitial_static",
+            "facebook_key": "1525692904128549_2386743441356820"
+        },
+        {
+            "format": "rewarded_video",
+            "facebook_key": "1525692904128549_2386753464689151"
+        }
+    ]
+}
