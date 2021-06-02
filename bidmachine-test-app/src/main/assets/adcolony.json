@@ -1,0 +1,16 @@
+{
+    "network": "adcolony",
+    "app_id": "app185a7e71e1714831a49ec7",
+    "ad_units": [
+        {
+            "format": "interstitial_video",
+            "zone_id": "vz06e8c32a037749699e7050",
+            "store_id": "google"
+        },
+        {
+            "format": "rewarded_video",
+            "zone_id": "vz1fd5a8b2bf6841a0a4b826",
+            "store_id": "google"
+        }
+    ]
+}

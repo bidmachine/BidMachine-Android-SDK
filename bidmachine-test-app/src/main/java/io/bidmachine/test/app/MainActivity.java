@@ -2,7 +2,6 @@ package io.bidmachine.test.app;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -20,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,14 +35,14 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import com.wefika.flowlayout.FlowLayout;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +55,6 @@ import io.bidmachine.AdContentType;
 import io.bidmachine.AdsFormat;
 import io.bidmachine.BidMachine;
 import io.bidmachine.BuildConfig;
-import io.bidmachine.InitializationCallback;
 import io.bidmachine.MediaAssetType;
 import io.bidmachine.ads.networks.AmazonConfig;
 import io.bidmachine.ads.networks.adcolony.AdColonyConfig;
@@ -93,12 +90,77 @@ public class MainActivity extends AppCompatActivity {
     private boolean isStaticMode;
     private boolean isResumed;
 
+    private static final OptionalNetwork[] optionalNetworks = {
+
+            new OptionalNetwork("AdColony",
+                                new AdColonyConfig("app185a7e71e1714831a49ec7")
+                                        .withMediationConfig(AdsFormat.InterstitialVideo,
+                                                             "vz06e8c32a037749699e7050")
+                                        .withMediationConfig(AdsFormat.RewardedVideo,
+                                                             "vz1fd5a8b2bf6841a0a4b826"),
+                                "adcolony.json"),
+
+            new OptionalNetwork("Amazon",
+                                new AmazonConfig("a9_onboarding_app_id")
+                                        .withMediationConfig(AdsFormat.Banner_320x50,
+                                                             "5ab6a4ae-4aa5-43f4-9da4-e30755f2b295")
+                                        .withMediationConfig(AdsFormat.Banner_300x250,
+                                                             "54fb2d08-c222-40b1-8bbe-4879322dc04b")
+                                        .withMediationConfig(AdsFormat.Banner_728x90,
+                                                             "bed17ec3-b185-453e-b2a8-4a3c6bb9234d")
+                                        .withMediationConfig(AdsFormat.InterstitialStatic,
+                                                             "4e918ac0-5c68-4fe1-8d26-4e76e8f74831")
+                                        .withMediationConfig(AdsFormat.InterstitialVideo,
+                                                             "4acc26e6-3ada-4ee8-bae0-753c1e0ad278"),
+                                "amazon.json"),
+
+            new OptionalNetwork("Criteo",
+                                new CriteoConfig("B-000000")
+                                        .withMediationConfig(AdsFormat.Banner_320x50,
+                                                             "30s6zt3ayypfyemwjvmp")
+                                        .withMediationConfig(AdsFormat.Interstitial,
+                                                             "6yws53jyfjgoq1ghnuqb"),
+                                "criteo.json"),
+
+            new OptionalNetwork("Facebook",
+                                new FacebookConfig("1525692904128549")
+                                        .withMediationConfig(AdsFormat.Banner,
+                                                             "1525692904128549_2386746951356469")
+                                        .withMediationConfig(AdsFormat.Banner_300x250,
+                                                             "1525692904128549_2386746951356469")
+                                        .withMediationConfig(AdsFormat.InterstitialStatic,
+                                                             "1525692904128549_2386743441356820")
+                                        .withMediationConfig(AdsFormat.RewardedVideo,
+                                                             "1525692904128549_2386753464689151"),
+                                "facebook.json"),
+
+            new OptionalNetwork("myTarget",
+                                new MyTargetConfig()
+                                        .withMediationConfig(AdsFormat.Banner, "437933")
+                                        .withMediationConfig(AdsFormat.Banner_320x50, "437933")
+                                        .withMediationConfig(AdsFormat.Banner_300x250, "64526")
+                                        .withMediationConfig(AdsFormat.Banner_728x90, "81620")
+                                        .withMediationConfig(AdsFormat.InterstitialStatic, "365991")
+                                        .withMediationConfig(AdsFormat.RewardedVideo, "482205"),
+                                "my_target.json"),
+
+            new OptionalNetwork("Tapjoy",
+                                new TapjoyConfig(
+                                        "tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y")
+                                        .withMediationConfig(AdsFormat.InterstitialVideo,
+                                                             "video_without_cap_pb")
+                                        .withMediationConfig(AdsFormat.RewardedVideo,
+                                                             "rewarded_video_without_cap_pb"),
+                                "tapjoy.json")
+    };
+
     private final Collection<OptionalNetwork> checkedOptionalNetworks =
             new HashSet<>(Arrays.asList(optionalNetworks));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         final SpannableStringBuilder appInfoBuilder = new SpannableStringBuilder();
@@ -107,17 +169,13 @@ public class MainActivity extends AppCompatActivity {
         appInfoBuilder.append("Build: ");
         appendBold(appInfoBuilder, BuildConfig.VERSION_CODE);
 
-        this.<TextView>findViewById(R.id.txtAppInfo).setText(appInfoBuilder);
+        ((TextView) findViewById(R.id.txtAppInfo)).setText(appInfoBuilder);
         bannerFrame = findViewById(R.id.bannerFrame);
         nativeAdParent = findViewById(R.id.nativeAdParent);
 
-        this.<SwitchCompat>findViewById(R.id.switchTestMode).setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        BidMachine.setTestMode(isChecked);
-                    }
-                });
+        ((SwitchCompat) findViewById(R.id.switchTestMode))
+                .setOnCheckedChangeListener((buttonView, isChecked) ->
+                                                    BidMachine.setTestMode(isChecked));
 
         bannerSizesParent = findViewById(R.id.bannerSizesParent);
         for (BannerSize size : BannerSize.values()) {
@@ -166,13 +224,8 @@ public class MainActivity extends AppCompatActivity {
                                                    ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
-        this.<SwitchCompat>findViewById(R.id.switchStaticMode).setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        setStaticMode(isChecked);
-                    }
-                });
+        ((SwitchCompat) findViewById(R.id.switchStaticMode))
+                .setOnCheckedChangeListener((buttonView, isChecked) -> setStaticMode(isChecked));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             final ArrayList<String> requiredPermissions = new ArrayList<String>() {{
@@ -195,20 +248,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         txtLocation = findViewById(R.id.txtLocation);
-        txtLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateCurrentLocation();
-            }
-        });
+        txtLocation.setOnClickListener(v -> updateCurrentLocation());
 
-        getSupportFragmentManager().addOnBackStackChangedListener(
-                new FragmentManager.OnBackStackChangedListener() {
-                    @Override
-                    public void onBackStackChanged() {
-                        syncBackIcon();
-                    }
-                });
+        getSupportFragmentManager().addOnBackStackChangedListener(this::syncBackIcon);
         syncBackIcon();
 
         if (savedInstanceState != null) {
@@ -218,14 +260,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
+
         outState.putBoolean(SAVED_StaticMode, isStaticMode);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         isResumed = true;
         //Required for display toast only!!!
         requestHelper.setActivity(this);
@@ -235,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
         isResumed = false;
         //Required for display toast only!!!
         requestHelper.setActivity(null);
@@ -377,8 +422,10 @@ public class MainActivity extends AppCompatActivity {
             if (nativeAd.isLoaded() && nativeAd.canShow()) {
                 inflateNativeAdWithBind(nativeAd);
             } else {
-                Utils.showToast(this, "Can't show native: isLoaded - " + nativeAd.isLoaded()
-                        + ", canShow - " + nativeAd.canShow());
+                Utils.showToast(this,
+                                String.format("Can't show native: isLoaded - %s, canShow - %s",
+                                              nativeAd.isLoaded(),
+                                              nativeAd.canShow()));
             }
         } else {
             Utils.showToast(this, "NativeAd is null");
@@ -398,9 +445,8 @@ public class MainActivity extends AppCompatActivity {
         if (ad == null) {
             return;
         }
-        final NativeAdContentLayout nativeAdContentLayout =
-                (NativeAdContentLayout) getLayoutInflater().inflate(
-                        R.layout.include_native_ads, nativeAdParent, false);
+        final NativeAdContentLayout nativeAdContentLayout = (NativeAdContentLayout) getLayoutInflater()
+                .inflate(R.layout.include_native_ads, nativeAdParent, false);
 
         final TextView tvTitle = nativeAdContentLayout.findViewById(R.id.txtTitle);
         tvTitle.setText(ad.getTitle());
@@ -477,7 +523,6 @@ public class MainActivity extends AppCompatActivity {
         if (nativeAdParent.getChildCount() > 0) {
             isRegistered = ((NativeAdContentLayout) nativeAdParent.getChildAt(0)).isRegistered();
         }
-
         Utils.showToast(this, String.valueOf(isRegistered));
     }
 
@@ -504,9 +549,13 @@ public class MainActivity extends AppCompatActivity {
     private SpannableStringBuilder appendBold(SpannableStringBuilder builder, Object text) {
         int startLength = builder.length();
         builder.append(String.valueOf(text));
-        builder.setSpan(new StyleSpan(Typeface.BOLD), startLength, builder.length(),
+        builder.setSpan(new StyleSpan(Typeface.BOLD),
+                        startLength,
+                        builder.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        builder.setSpan(new ForegroundColorSpan(Color.BLACK), startLength, builder.length(),
+        builder.setSpan(new ForegroundColorSpan(Color.BLACK),
+                        startLength,
+                        builder.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return builder;
     }
@@ -514,7 +563,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!isStaticMode) requestHelper.destroy();
+
+        if (!isStaticMode) {
+            requestHelper.destroy();
+        }
     }
 
     @Override
@@ -522,20 +574,26 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         updateCurrentLocation();
     }
 
     public void initSdk(View view) {
-        if (this.<SwitchCompat>findViewById(R.id.switchUseNetworksJson).isChecked()) {
-            JSONArray array = new JSONArray();
+        if (((SwitchCompat) findViewById(R.id.switchUseNetworksJson)).isChecked()) {
+            JSONArray networkArray = new JSONArray();
             for (OptionalNetwork network : checkedOptionalNetworks) {
+                InputStream inputStream = null;
                 try {
-                    array.put(new JSONObject(network.jsonData));
-                } catch (JSONException e) {
+                    inputStream = getAssets().open(network.assetFile);
+                    String networkConfig = io.bidmachine.core.Utils.streamToString(inputStream);
+                    networkArray.put(new JSONObject(networkConfig));
+                } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    io.bidmachine.core.Utils.close(inputStream);
                 }
             }
-            BidMachine.registerNetworks(this, array.toString());
+            BidMachine.registerNetworks(this, networkArray.toString());
         } else {
             for (OptionalNetwork network : checkedOptionalNetworks) {
                 BidMachine.registerNetworks(network.networkConfig);
@@ -545,15 +603,9 @@ public class MainActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(initUrl)) {
             BidMachine.setEndpoint(initUrl);
         }
-        BidMachine.initialize(
-                new TestActivityWrapper(this),
-                ParamsHelper.getInstance(this).getSellerId(),
-                new InitializationCallback() {
-                    @Override
-                    public void onInitialized() {
-                        Utils.showToast(MainActivity.this, "onInitialized");
-                    }
-                });
+        BidMachine.initialize(new TestActivityWrapper(this),
+                              ParamsHelper.getInstance(this).getSellerId(),
+                              () -> Utils.showToast(this, "onInitialized"));
     }
 
     public void showAppParams(View view) {
@@ -611,173 +663,16 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Select networks")
                 .setMultiChoiceItems(titles,
                                      checkedItems,
-                                     new DialogInterface.OnMultiChoiceClickListener() {
-                                         @Override
-                                         public void onClick(DialogInterface dialog,
-                                                             int which,
-                                                             boolean isChecked) {
-                                             OptionalNetwork network = optionalNetworks[which];
-                                             if (isChecked) {
-                                                 checkedOptionalNetworks.add(network);
-                                             } else {
-                                                 checkedOptionalNetworks.remove(network);
-                                             }
+                                     (dialog, which, isChecked) -> {
+                                         OptionalNetwork network = optionalNetworks[which];
+                                         if (isChecked) {
+                                             checkedOptionalNetworks.add(network);
+                                         } else {
+                                             checkedOptionalNetworks.remove(network);
                                          }
                                      })
-                .setPositiveButton("Done", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
+                .setPositiveButton("Done", null)
                 .show();
     }
-
-    private static final OptionalNetwork[] optionalNetworks = {
-            new OptionalNetwork(
-                    1, "AdColony",
-                    new AdColonyConfig("app185a7e71e1714831a49ec7")
-                            .withMediationConfig(AdsFormat.InterstitialVideo, "vz06e8c32a037749699e7050")
-                            .withMediationConfig(AdsFormat.RewardedVideo, "vz1fd5a8b2bf6841a0a4b826"),
-                    "{"
-                            + "    \"network\": \"adcolony\","
-                            + "    \"app_id\": \"app185a7e71e1714831a49ec7\","
-                            + "    \"ad_units\": [{"
-                            + "        \"format\": \"interstitial_video\","
-                            + "        \"zone_id\": \"vz06e8c32a037749699e7050\","
-                            + "        \"store_id\": \"google\"" // optional
-                            + "    }, {"
-                            + "        \"format\": \"rewarded_video\","
-                            + "        \"zone_id\": \"vz1fd5a8b2bf6841a0a4b826\","
-                            + "        \"store_id\": \"google\"" // optional
-                            + "    }]"
-                            + "}"),
-            new OptionalNetwork(
-                    2, "myTarget",
-                    new MyTargetConfig()
-                            .withMediationConfig(AdsFormat.Banner, "437933")
-                            .withMediationConfig(AdsFormat.Banner_320x50, "437933")
-                            .withMediationConfig(AdsFormat.Banner_300x250, "64526")
-                            .withMediationConfig(AdsFormat.Banner_728x90, "81620")
-                            .withMediationConfig(AdsFormat.InterstitialStatic, "365991")
-                            .withMediationConfig(AdsFormat.RewardedVideo, "482205"),
-                    "{"
-                            + "    \"network\": \"my_target\","
-                            + "    \"ad_units\": [{"
-                            + "        \"format\": \"banner\","
-                            + "        \"slot_id\": \"437933\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_320x50\","
-                            + "        \"slot_id\": \"437933\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_300x250\","
-                            + "        \"slot_id\": \"64526\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_728x90\","
-                            + "        \"slot_id\": \"81620\""
-                            + "    }, {"
-                            + "        \"format\": \"interstitial_static\","
-                            + "        \"slot_id\": \"365991\""
-                            + "    }, {"
-                            + "        \"format\": \"rewarded_video\","
-                            + "        \"slot_id\": \"482205\""
-                            + "    }]"
-                            + "}"),
-            new OptionalNetwork(
-                    3, "Tapjoy",
-                    new TapjoyConfig("tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y")
-                            .withMediationConfig(AdsFormat.InterstitialVideo, "video_without_cap_pb")
-                            .withMediationConfig(AdsFormat.RewardedVideo, "rewarded_video_without_cap_pb"),
-                    "{"
-                            + "    \"network\": \"tapjoy\","
-                            + "    \"sdk_key\": \"tmyN5ZcXTMyjeJNJmUD5ggECAbnEGtJREmLDd0fvqKBXcIr7e1dvboNKZI4y\","
-                            + "    \"ad_units\": [{"
-                            + "        \"format\": \"interstitial_video\","
-                            + "        \"placement_name\": \"video_without_cap_pb\""
-                            + "    }, {"
-                            + "        \"format\": \"rewarded_video\","
-                            + "        \"placement_name\": \"rewarded_video_without_cap_pb\""
-                            + "    }]"
-                            + "}"),
-            new OptionalNetwork(
-                    4, "Facebook",
-                    new FacebookConfig("1525692904128549")
-                            .withMediationConfig(AdsFormat.Banner, "1525692904128549_2386746951356469")
-                            .withMediationConfig(AdsFormat.Banner_300x250, "1525692904128549_2386746951356469")
-                            .withMediationConfig(AdsFormat.InterstitialStatic, "1525692904128549_2386743441356820")
-                            .withMediationConfig(AdsFormat.RewardedVideo, "1525692904128549_2386753464689151"),
-                    "{"
-                            + "    \"network\": \"facebook\","
-                            + "    \"app_id\": \"1525692904128549\","
-                            + "    \"ad_units\": [{"
-                            + "        \"format\": \"banner\","
-                            + "        \"facebook_key\": \"1525692904128549_2386746951356469\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_320x50\","
-                            + "        \"facebook_key\": \"1525692904128549_2386746951356469\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_300x250\","
-                            + "        \"facebook_key\": \"1525692904128549_2386746951356469\""
-                            + "    }, {"
-                            + "        \"format\": \"interstitial_static\","
-                            + "        \"facebook_key\": \"1525692904128549_2386743441356820\""
-                            + "    }, {"
-                            + "        \"format\": \"rewarded_video\","
-                            + "        \"facebook_key\": \"1525692904128549_2386753464689151\""
-                            + "    }]"
-                            + "}"),
-            new OptionalNetwork(
-                    5, "Amazon",
-                    new AmazonConfig("a9_onboarding_app_id")
-                            .withMediationConfig(AdsFormat.Banner_320x50, "5ab6a4ae-4aa5-43f4-9da4-e30755f2b295")
-                            .withMediationConfig(AdsFormat.Banner_300x250, "54fb2d08-c222-40b1-8bbe-4879322dc04b")
-                            .withMediationConfig(AdsFormat.Banner_728x90, "bed17ec3-b185-453e-b2a8-4a3c6bb9234d")
-                            .withMediationConfig(AdsFormat.InterstitialStatic, "4e918ac0-5c68-4fe1-8d26-4e76e8f74831")
-                            .withMediationConfig(AdsFormat.InterstitialVideo, "4acc26e6-3ada-4ee8-bae0-753c1e0ad278"),
-                    "{"
-                            + "    \"network\": \"amazon\","
-                            + "    \"app_key\": \"a9_onboarding_app_id\","
-                            + "    \"ad_units\": [{"
-                            + "        \"format\": \"banner\","
-                            + "        \"slot_uuid\": \"5ab6a4ae-4aa5-43f4-9da4-e30755f2b295\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_320x50\","
-                            + "        \"slot_uuid\": \"5ab6a4ae-4aa5-43f4-9da4-e30755f2b295\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_300x250\","
-                            + "        \"slot_uuid\": \"54fb2d08-c222-40b1-8bbe-4879322dc04b\""
-                            + "    }, {"
-                            + "        \"format\": \"banner_728x90\","
-                            + "        \"slot_uuid\": \"bed17ec3-b185-453e-b2a8-4a3c6bb9234d\""
-                            + "    }, {"
-                            + "        \"format\": \"interstitial_static\","
-                            + "        \"slot_uuid\": \"4e918ac0-5c68-4fe1-8d26-4e76e8f74831\""
-                            + "    }, {"
-                            + "        \"format\": \"interstitial_video\","
-                            + "        \"slot_uuid\": \"4acc26e6-3ada-4ee8-bae0-753c1e0ad278\""
-                            + "    }]"
-                            + "}"),
-            new OptionalNetwork(
-                    6, "Criteo",
-                    new CriteoConfig("B-000000")
-                            .withMediationConfig(AdsFormat.Banner_320x50, "30s6zt3ayypfyemwjvmp")
-                            .withMediationConfig(AdsFormat.Interstitial, "6yws53jyfjgoq1ghnuqb"),
-                    "{"
-                            + "    \"network\": \"criteo\","
-                            + "    \"publisher_id\": \"B-057601\","
-                            + "    \"ad_units\": [{"
-                            + "        \"ad_unit_id\": \"30s6zt3ayypfyemwjvmp\","
-                            + "        \"format\": \"banner_320x50\""
-                            + "    }, {"
-                            + "        \"orientation\": \"portrait\","
-                            + "        \"ad_unit_id\": \"6yws53jyfjgoq1ghnuqb\","
-                            + "        \"format\": \"interstitial_static\""
-                            + "    }, {"
-                            + "        \"orientation\": \"landscape\","
-                            + "        \"ad_unit_id\": \"6yws53jyfjgoq1ghnuqb\","
-                            + "        \"format\": \"interstitial_video\""
-                            + "    }]"
-                            + "}")
-    };
 
 }
