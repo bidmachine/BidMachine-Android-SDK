@@ -29,7 +29,7 @@ public abstract class FullScreenAd<
             processCallback.processShowFail(BMError.Connection);
         } else {
             try {
-                loadedObject.show(getContext());
+                loadedObject.show(getContextProvider());
             } catch (Throwable t) {
                 processCallback.processShowFail(BMError.catchError("Failed to show loaded ad"));
             }

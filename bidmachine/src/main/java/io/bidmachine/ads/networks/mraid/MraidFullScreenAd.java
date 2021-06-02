@@ -1,7 +1,6 @@
 package io.bidmachine.ads.networks.mraid;
 
 import android.app.Activity;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -85,10 +84,10 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (mraidInterstitial != null && mraidInterstitial.isReady()) {
-            mraidInterstitial.show(context, mraidType);
+            mraidInterstitial.show(contextProvider.getContext(), mraidType);
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }

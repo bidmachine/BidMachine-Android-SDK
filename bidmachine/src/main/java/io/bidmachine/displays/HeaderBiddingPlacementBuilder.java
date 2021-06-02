@@ -210,8 +210,8 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                                                    this,
                                                    this,
                                                    mediationConfig);
-            } catch (Exception e) {
-                Logger.log(e);
+            } catch (Throwable t) {
+                Logger.log(t);
                 onCollectFail(BMError.Internal);
             }
         }

@@ -1,7 +1,5 @@
 package io.bidmachine.ads.networks.vast;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -60,11 +58,11 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (vastRequest != null && vastRequest.checkFile()) {
             vastAdShowListener = new VastFullScreenAdShowListener(callback, vastOMSDKAdMeasurer);
-            vastRequest.display(context,
+            vastRequest.display(contextProvider.getContext(),
                                 videoType,
                                 vastAdShowListener,
                                 vastOMSDKAdMeasurer,

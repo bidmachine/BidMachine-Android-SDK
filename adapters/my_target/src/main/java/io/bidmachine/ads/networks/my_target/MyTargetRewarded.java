@@ -1,7 +1,5 @@
 package io.bidmachine.ads.networks.my_target;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -39,10 +37,10 @@ public class MyTargetRewarded extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (rewardedAd != null) {
-            rewardedAd.show(context);
+            rewardedAd.show(contextProvider.getContext());
         } else {
             callback.onAdShowFailed(BMError.NotLoaded);
         }

@@ -34,6 +34,9 @@ public abstract class BidMachineAd<
     private final Context context;
     @NonNull
     private final AdsType adsType;
+    @NonNull
+    private final ContextProvider contextProvider;
+
     @Nullable
     @VisibleForTesting
     AdRequestType adRequest;
@@ -49,9 +52,6 @@ public abstract class BidMachineAd<
     private boolean isClickTracked;
     private boolean isFinishTracked;
     private boolean isCloseTracked;
-
-    @NonNull
-    private final ContextProvider contextProvider;
 
     @NonNull
     @VisibleForTesting
@@ -73,12 +73,23 @@ public abstract class BidMachineAd<
     public BidMachineAd(@NonNull Context context, @NonNull AdsType adsType) {
         this.context = context;
         this.adsType = adsType;
+
         contextProvider = new SimpleContextProvider(context);
     }
 
     @NonNull
     Context getContext() {
         return context;
+    }
+
+    @NonNull
+    AdsType getAdsType() {
+        return adsType;
+    }
+
+    @NonNull
+    ContextProvider getContextProvider() {
+        return contextProvider;
     }
 
     @Nullable
@@ -96,11 +107,6 @@ public abstract class BidMachineAd<
     public SelfType setListener(@Nullable AdListenerType listener) {
         this.listener = listener;
         return (SelfType) this;
-    }
-
-    @NonNull
-    protected final AdsType getType() {
-        return adsType;
     }
 
     @Nullable
@@ -211,7 +217,7 @@ public abstract class BidMachineAd<
             return;
         }
         currentState = State.Requesting;
-        request.request(getContext());
+        request.request(context);
     }
 
     private void processRequestSuccess(@Nullable AdRequestType request,
@@ -254,9 +260,9 @@ public abstract class BidMachineAd<
                                            @NonNull Ad ad) {
         try {
             UnifiedAdRequestParamsType adRequestParams = adRequest.obtainUnifiedRequestParams();
-            NetworkConfig networkConfig = getType().obtainNetworkConfig(ad);
+            NetworkConfig networkConfig = getAdsType().obtainNetworkConfig(ad);
             if (networkConfig != null) {
-                AdObjectParams adObjectParams = getType().createAdObjectParams(seatbid, bid, ad);
+                AdObjectParams adObjectParams = getAdsType().createAdObjectParams(seatbid, bid, ad);
                 if (adObjectParams != null && adObjectParams.isValid()) {
                     loadedObject = createAdObject(contextProvider,
                                                   adRequest,
@@ -626,7 +632,7 @@ public abstract class BidMachineAd<
     };
 
     private void trackEvent(TrackEventType eventType, @Nullable BMError error) {
-        BidMachineEvents.eventFinish(trackingObject, eventType, getType(), error);
+        BidMachineEvents.eventFinish(trackingObject, eventType, getAdsType(), error);
     }
 
     @NonNull

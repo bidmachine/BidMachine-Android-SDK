@@ -16,6 +16,6 @@ public interface HeaderBiddingAdapter {
                                     @NonNull UnifiedAdRequestParams adRequestParams,
                                     @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
                                     @NonNull HeaderBiddingCollectParamsCallback collectCallback,
-                                    @NonNull Map<String, String> mediationConfig) throws Exception;
+                                    @NonNull Map<String, String> mediationConfig) throws Throwable;
 
 }

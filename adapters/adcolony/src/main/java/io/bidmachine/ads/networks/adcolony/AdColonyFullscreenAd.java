@@ -1,7 +1,5 @@
 package io.bidmachine.ads.networks.adcolony;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.adcolony.sdk.AdColony;
@@ -48,7 +46,7 @@ class AdColonyFullscreenAd extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (adColonyInterstitial != null && !adColonyInterstitial.isExpired()) {
             adColonyInterstitial.show();

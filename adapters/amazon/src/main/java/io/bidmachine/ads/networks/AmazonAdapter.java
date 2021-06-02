@@ -70,7 +70,7 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull UnifiedAdRequestParams adRequestParams,
                                            @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
                                            @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
-                                           @NonNull Map<String, String> mediationConfig) throws Exception {
+                                           @NonNull Map<String, String> mediationConfig) throws Throwable {
         if (!isInitialized()) {
             collectCallback.onCollectFail(BMError.NotInitialized);
             return;
