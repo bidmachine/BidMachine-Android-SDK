@@ -1,7 +1,5 @@
 package io.bidmachine;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import io.bidmachine.core.Utils;
@@ -34,8 +32,8 @@ public final class FullScreenAdObject<AdRequestType extends FullScreenAdRequest<
         return new UnifiedFullscreenAdCallbackImpl(processCallback);
     }
 
-    public void show(@NonNull Context context) throws Throwable {
-        getUnifiedAd().show(context, getUnifiedAdCallback());
+    public void show(@NonNull ContextProvider contextProvider) throws Throwable {
+        getUnifiedAd().show(contextProvider, getUnifiedAdCallback());
     }
 
     @Override
@@ -92,6 +90,7 @@ public final class FullScreenAdObject<AdRequestType extends FullScreenAdRequest<
         abstract void onTracked();
 
     }
+
 
     private static final class UnifiedFullscreenAdCallbackImpl extends BaseUnifiedAdCallback implements UnifiedFullscreenAdCallback {
 

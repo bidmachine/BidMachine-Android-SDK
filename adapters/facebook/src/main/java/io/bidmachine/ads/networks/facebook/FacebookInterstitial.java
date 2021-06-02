@@ -1,7 +1,5 @@
 package io.bidmachine.ads.networks.facebook;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -40,7 +38,7 @@ class FacebookInterstitial extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (interstitialAd != null
                 && interstitialAd.isAdLoaded()

@@ -34,7 +34,7 @@ public class SessionTrackerTest {
 
         for (BidMachineAd request : testRequests) {
             for (TrackEventType type : TrackEventType.values()) {
-                tracker.trackEventFinish(request.trackingObject, type, request.getType(), null);
+                tracker.trackEventFinish(request.trackingObject, type, request.getAdsType(), null);
             }
         }
 

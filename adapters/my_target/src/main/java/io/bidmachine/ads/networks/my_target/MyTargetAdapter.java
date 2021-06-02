@@ -68,7 +68,7 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull UnifiedAdRequestParams adRequestParams,
                                            @NonNull HeaderBiddingAdRequestParams hbAdRequestParams,
                                            @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
-                                           @NonNull Map<String, String> mediationConfig) throws Exception {
+                                           @NonNull Map<String, String> mediationConfig) throws Throwable {
         final String slotId = mediationConfig.get(MyTargetConfig.KEY_SLOT_ID);
         if (TextUtils.isEmpty(slotId)) {
             collectCallback.onCollectFail(BMError.requestError("slot_id not provided"));

@@ -1,7 +1,6 @@
 package io.bidmachine.ads.networks.tapjoy;
 
 import android.app.Activity;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,7 +55,7 @@ public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (tjPlacement != null && tjPlacement.isContentReady()) {
             tjPlacement.showContent();

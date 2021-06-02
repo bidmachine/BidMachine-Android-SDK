@@ -1,7 +1,5 @@
 package io.bidmachine.ads.networks.criteo;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.criteo.publisher.Bid;
@@ -43,7 +41,7 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         if (criteoInterstitial.isAdLoaded()) {
             criteoInterstitial.show();
