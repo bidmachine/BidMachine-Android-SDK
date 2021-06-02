@@ -19,7 +19,7 @@ public class BMError {
     public static final BMError NotInitialized =
             new BMError(ERROR_NOT_INITIALIZED,
                         "SDK not initialized",
-                        "Sdk not initialized properly, see docs: https://wiki.appodeal.com/display/BID/BidMachine+Android+SDK+Documentation");
+                        "Sdk not initialized properly");
 
     public static final BMError Connection =
             new BMError(ErrorReason.ERROR_REASON_NO_CONNECTION_VALUE,
