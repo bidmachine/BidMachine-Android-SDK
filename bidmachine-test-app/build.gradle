@@ -57,7 +57,7 @@ repositories {
 
 dependencies {
     //for play service v15+
-    implementation('com.google.android.gms:play-services-ads-identifier:15.0.0') {
+    implementation("com.google.android.gms:play-services-ads-identifier:15.0.0") {
         exclude module: 'support-v4'
         exclude module: 'support-v7'
     }
@@ -88,10 +88,10 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:1.1.2"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.1.0"
 
-    localImplementation project(':bidmachine')
+    localImplementation project(":bidmachine")
 
-    remoteImplementation "io.bidmachine:ads:${project(':bidmachine').android.defaultConfig.versionName}"
-    localRemoteImplementation "io.bidmachine:ads:${project(':bidmachine').android.defaultConfig.versionName}"
+    remoteImplementation "io.bidmachine:ads:${project(":bidmachine").android.defaultConfig.versionName}"
+    localRemoteImplementation "io.bidmachine:ads:${project(":bidmachine").android.defaultConfig.versionName}"
 }
 
 gradle.projectsEvaluated {
@@ -99,7 +99,7 @@ gradle.projectsEvaluated {
         collectAdapters().forEach { adapterProject ->
             println("register dependency: ${adapterProject.name}")
             localImplementation(adapterProject)
-            remoteImplementation "io.bidmachine:ads.networks.${adapterProject.name}:${adapterProject.minBidMachineSdkVersion}.${adapterProject.android.defaultConfig.versionCode}"
+            remoteImplementation "io.bidmachine:ads.networks.${adapterProject.name}:${adapterProject.android.defaultConfig.versionName}"
         }
     }
 }

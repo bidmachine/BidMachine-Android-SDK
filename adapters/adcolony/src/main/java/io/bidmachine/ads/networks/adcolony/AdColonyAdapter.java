@@ -33,14 +33,13 @@ import io.bidmachine.utils.BMError;
 
 class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
-    private static final String AD_COLONY_VERSION = "4.5.0";
     private static HashSet<String> zonesCache = new HashSet<>();
     private boolean isAdapterInitialized = false;
 
     AdColonyAdapter() {
         super("adcolony",
-              obtainAdColonyVersion(),
-              BuildConfig.VERSION_NAME,
+              BuildConfig.ADAPTER_SDK_VERSION_NAME,
+              BuildConfig.ADAPTER_VERSION_NAME,
               new AdsType[]{AdsType.Interstitial, AdsType.Rewarded});
     }
 
@@ -163,14 +162,6 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
         options.setTestModeEnabled(adRequestParams.isTestMode());
         return options;
-    }
-
-    private static String obtainAdColonyVersion() {
-        String version = AdColony.getSDKVersion();
-        if (TextUtils.isEmpty(version)) {
-            return AD_COLONY_VERSION;
-        }
-        return version;
     }
 
     private String extractZoneId(Map<String, String> mediationConfig) {

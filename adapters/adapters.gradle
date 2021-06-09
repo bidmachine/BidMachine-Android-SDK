@@ -4,15 +4,13 @@
  */
 apply from: "$rootProject.projectDir/config.gradle"
 
-if (!hasProperty('minBidMachineSdkVersion')) {
-    ext {
-        minBidMachineSdkVersion = '1.7.4'
-    }
+ext {
+    adapterVersionCode = 1
+    adapterSdkVersionName = '1.0.0'
 }
 
 android {
     defaultConfig {
-        versionName "${minBidMachineSdkVersion}.${versionCode}"
         consumerProguardFiles 'proguard-rules.pro', '../adapter-proguard-rules.pro'
     }
 
@@ -27,7 +25,7 @@ android {
 dependencies {
     api "androidx.annotation:annotation:1.1.0"
 
-    api project(':bidmachine')
+    api project(":bidmachine")
 
     testImplementation "junit:junit:$jUnitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
@@ -35,5 +33,17 @@ dependencies {
     testImplementation "com.squareup.okhttp3:mockwebserver:$mockwebserver"
 }
 
-apply from: '../builder.gradle'
+afterEvaluate {
+    String adapterVersionName = "${bidMachineVersionName}.${adapterVersionCode}"
+    android {
+        defaultConfig {
+            versionCode adapterVersionCode
+            versionName adapterVersionName
+            buildConfigField "String", "ADAPTER_SDK_VERSION_NAME", "\"${adapterSdkVersionName}\""
+            buildConfigField "String", "ADAPTER_VERSION_NAME", "\"$adapterVersionName\""
+        }
+    }
+}
+
+apply from: "../builder.gradle"
 apply from: "../publish.gradle"

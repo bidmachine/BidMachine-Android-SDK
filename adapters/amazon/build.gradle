@@ -1,16 +1,12 @@
 apply plugin: 'com.android.library'
+apply from: "../adapters.gradle"
 
-android {
-    defaultConfig {
-        versionCode 5
-    }
-}
-
-apply from: '../adapters.gradle'
+adapterSdkVersionName = '8.4.3'
+adapterVersionCode = 5
 
 dependencies {
-    adapterDependency 'com.amazon.android:aps-sdk:8.4.3@aar'
-    adapterDependency("com.google.android.gms:play-services-ads:15.0.0") {
+    implementation "com.amazon.android:aps-sdk:$adapterSdkVersionName@aar"
+    implementation("com.google.android.gms:play-services-ads:15.0.0") {
         exclude module: 'support-v4'
         exclude module: 'support-v7'
     }
