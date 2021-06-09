@@ -1,12 +1,8 @@
 apply plugin: 'com.android.library'
+apply from: "../adapters.gradle"
 
-android {
-    defaultConfig {
-        versionCode 7
-    }
-}
-
-apply from: '../adapters.gradle'
+adapterSdkVersionName = '6.5.0'
+adapterVersionCode = 7
 
 rootProject.allprojects {
     repositories {
@@ -15,5 +11,5 @@ rootProject.allprojects {
 }
 
 dependencies {
-    adapterDependency 'com.facebook.android:audience-network-sdk:6.5.0'
+    implementation "com.facebook.android:audience-network-sdk:$adapterSdkVersionName"
 }

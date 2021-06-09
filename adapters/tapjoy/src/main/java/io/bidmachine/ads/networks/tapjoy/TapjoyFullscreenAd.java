@@ -45,7 +45,7 @@ public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
         tjPlacement = Tapjoy.getLimitedPlacement(placementName, listener);
         tjPlacement.setVideoListener(listener);
         tjPlacement.setMediationName(BidMachine.NAME);
-        tjPlacement.setAdapterVersion(BuildConfig.VERSION_NAME);
+        tjPlacement.setAdapterVersion(BuildConfig.ADAPTER_VERSION_NAME);
 
         HashMap<String, String> auctionParams = new HashMap<>();
         auctionParams.put(TapjoyAuctionFlags.AUCTION_ID, auctionId);
