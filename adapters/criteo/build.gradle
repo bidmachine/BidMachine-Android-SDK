@@ -1,16 +1,8 @@
 apply plugin: 'com.android.library'
+apply from: "../adapters.gradle"
 
-android {
-    defaultConfig {
-        versionCode 9
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-}
-
-apply from: '../adapters.gradle'
+adapterSdkVersionName = '4.4.0'
+adapterVersionCode = 9
 
 rootProject.allprojects {
     repositories {
@@ -19,12 +11,19 @@ rootProject.allprojects {
     }
 }
 
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
 configurations {
     compile.exclude group: 'org.jetbrains', module: 'annotations'
 }
 
 dependencies {
-    adapterDependency 'com.criteo.publisher:criteo-publisher-sdk:4.4.0'
-    adapterDependency 'com.google.android.gms:play-services-ads-identifier:17.0.0'
-    adapterDependency 'com.google.android.gms:play-services-base:17.0.0'
+    implementation "com.criteo.publisher:criteo-publisher-sdk:$adapterSdkVersionName"
+    implementation "com.google.android.gms:play-services-ads-identifier:17.0.0"
+    implementation "com.google.android.gms:play-services-base:17.0.0"
 }

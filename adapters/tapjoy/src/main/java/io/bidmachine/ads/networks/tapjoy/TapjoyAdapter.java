@@ -30,8 +30,8 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     TapjoyAdapter() {
         super("tapjoy",
-              Tapjoy.getVersion(),
-              BuildConfig.VERSION_NAME,
+              BuildConfig.ADAPTER_SDK_VERSION_NAME,
+              BuildConfig.ADAPTER_VERSION_NAME,
               new AdsType[]{AdsType.Interstitial, AdsType.Rewarded});
     }
 

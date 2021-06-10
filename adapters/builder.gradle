@@ -12,33 +12,35 @@ def generateAdapterAsset(variant) {
         source.javaDirectories.forEach { file ->
             if (!file.isFile()) {
                 fileTree(file)
-                        .findAll { it.isFile() && it.name.endsWith(".java") }
+                        .findAll {
+                            it.isFile() && it.name.endsWith(".java")
+                        }
                         .forEach { f ->
-                    def javaFile = new File(f.path)
-                    if (!javaFile.canRead()) {
-                        throw new GradleException("Java file can't be readed")
-                    }
-                    if (f.name.endsWith(".java") && !javaFile.isDirectory()) {
-                        def javaFileContent = javaFile.text
+                            def javaFile = new File(f.path)
+                            if (!javaFile.canRead()) {
+                                throw new GradleException("Java file can't be readed")
+                            }
+                            if (f.name.endsWith(".java") && !javaFile.isDirectory()) {
+                                def javaFileContent = javaFile.text
 
-                        if (javaFileContent.contains("extends NetworkConfig")) {
-                            println("--- Found network builder: " + javaFile.path)
-                            String packageRegExp = "(?:\\s*)(?:package)(?:\\s*)([\\w-_.]*)?(?:\\s*)(?:;)"
-                            String classRegExp = "(?:.*)(?:class)(?:\\s)([\\w-_.]*)(?:\\s)(?:.*?)(?:extends(.*))(?:.*)(\\{)"
+                                if (javaFileContent.contains("extends NetworkConfig")) {
+                                    println("--- Found network builder: " + javaFile.path)
+                                    String packageRegExp = "(?:\\s*)(?:package)(?:\\s*)([\\w-_.]*)?(?:\\s*)(?:;)"
+                                    String classRegExp = "(?:.*)(?:class)(?:\\s)([\\w-_.]*)(?:\\s)(?:.*?)(?:extends(.*))(?:.*)(\\{)"
 
-                            Matcher packageMatcher = Pattern.compile(packageRegExp).matcher(javaFileContent)
-                            Matcher classMatcher = Pattern.compile(classRegExp).matcher(javaFileContent)
+                                    Matcher packageMatcher = Pattern.compile(packageRegExp).matcher(javaFileContent)
+                                    Matcher classMatcher = Pattern.compile(classRegExp).matcher(javaFileContent)
 
-                            if (packageMatcher.find() && classMatcher.find()) {
-                                def classPackage = packageMatcher.group(1)
-                                def className = classMatcher.group(1)
+                                    if (packageMatcher.find() && classMatcher.find()) {
+                                        def classPackage = packageMatcher.group(1)
+                                        def className = classMatcher.group(1)
 
-                                println("classPackage: " + classPackage + ", className: " + className)
-                                configClassPath = classPackage + "." + className
+                                        println("classPackage: " + classPackage + ", className: " + className)
+                                        configClassPath = classPackage + "." + className
+                                    }
+                                }
                             }
                         }
-                    }
-                }
             }
         }
     }
@@ -61,11 +63,15 @@ def generateAdapterAsset(variant) {
     })
     jsonOutput.insert(0, "{")
     jsonOutput.append("}")
-    println("variant ${variant.name} data: " + jsonOutput.toString())
 
-    def outFile = file("${variant.mergeAssets.outputDir}/bm_networks/${project.name}.bmnetwork")
-    outFile.parentFile.mkdirs()
-    outFile.text = jsonOutput.toString()
+    String networkConfig = jsonOutput.toString()
+    println("variant ${variant.name} data: " + networkConfig)
+
+    variant.getMergeAssetsProvider().get().outputs.getFiles().each { outputFile ->
+        def networkOutputFile = file("$outputFile/bm_networks/${project.name}.bmnetwork")
+        networkOutputFile.parentFile.mkdirs()
+        networkOutputFile.text = networkConfig
+    }
 }
 
 gradle.projectsEvaluated {

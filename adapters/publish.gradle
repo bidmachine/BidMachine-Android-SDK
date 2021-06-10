@@ -7,11 +7,10 @@
  *
  * Example: 'YOUR_REQUIRED_TASK_NAME' -Partifactory_repo='YOUR_REPOSITORY_NAME' -Partifactory_username='YOUR_USER_NAME" -Partifactory_password='YOUR_ARTIFACTORY_USER_NAME'
  */
-apply plugin: 'com.android.library'
+
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
-/** Define primary artifacts group */
 def libGroupId = "io.bidmachine"
 
 artifactory {
@@ -36,35 +35,40 @@ artifactory {
     }
 }
 
-publishing {
-    publications {
-        "_${project.name}_"(MavenPublication) {
-            groupId = libGroupId
-            artifactId = "ads.networks.${project.name}"
-            version = project.android.defaultConfig.versionName
-            artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-                def dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', libGroupId)
-                dependencyNode.appendNode('artifactId', "ads")
-                dependencyNode.appendNode('version', minBidMachineSdkVersion)
-                project.configurations.adapterDependency.getDependencies().each { dep ->
-                    if (dep instanceof ExternalModuleDependency) {
-                        println("dep: " + dep.properties)
-                        dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', dep.group)
-                        dependencyNode.appendNode('artifactId', dep.name)
-                        dependencyNode.appendNode('version', dep.version)
-                        if (dep.artifacts != null && !dep.artifacts.isEmpty()) {
-                            def type = dep.artifacts.first().type
-                            // We are interested only in 'aar' types
-                            if ("aar" == type) {
-                                dependencyNode.appendNode('type', type)
+afterEvaluate {
+    publishing {
+        publications {
+            "_${project.name}_"(MavenPublication) {
+                groupId = libGroupId
+                artifactId = "ads.networks.${project.name}"
+                version = project.android.defaultConfig.versionName
+                artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', libGroupId)
+                    dependencyNode.appendNode('artifactId', "ads")
+                    dependencyNode.appendNode('version', bidMachineVersionName)
+
+                    project.configurations.implementation.getDependencies().each { dependency ->
+                        if (dependency instanceof ExternalModuleDependency) {
+                            println("implementation dependency: " + dependency.properties)
+
+                            dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', dependency.group)
+                            dependencyNode.appendNode('artifactId', dependency.name)
+                            dependencyNode.appendNode('version', dependency.version)
+                            if (dependency.artifacts != null && !dependency.artifacts.isEmpty()) {
+                                def type = dependency.artifacts.first().type
+                                // We are interested only in 'aar' types
+                                if ("aar" == type) {
+                                    dependencyNode.appendNode('type', type)
+                                }
                             }
+                        } else {
+                            throw new GradleException("implementation dependency can be used only for ExternalModuleDependencies")
                         }
-                    } else {
-                        throw new GradleException("adapterDependency can be used only for ExternalModuleDependencies")
                     }
                 }
             }
@@ -72,20 +76,5 @@ publishing {
     }
 }
 
-/**
- * Function for publish adapter to artifactory
- */
-task publishAdapterToArtifactory(dependsOn: "assemble") {
-    finalizedBy artifactoryPublish
-}
-
-/**
- * Custom configuration for automatic dependencies merge
- */
-configurations {
-    adapterDependency
-}
-
-dependencies {
-    implementation project.configurations.adapterDependency
-}
+task uploadAarToArtifactory(dependsOn: [assemble, artifactoryPublish], group: 'aar')
+artifactoryPublish.mustRunAfter(assemble)
