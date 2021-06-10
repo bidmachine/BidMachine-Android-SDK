@@ -1,12 +1,8 @@
 apply plugin: 'com.android.library'
+apply from: "../adapters.gradle"
 
-android {
-    defaultConfig {
-        versionCode 9
-    }
-}
-
-apply from: '../adapters.gradle'
+adapterSdkVersionName = '4.5.0'
+adapterVersionCode = 9
 
 rootProject.allprojects {
     repositories {
@@ -16,6 +12,6 @@ rootProject.allprojects {
 }
 
 dependencies {
-    adapterDependency 'com.adcolony:sdk:4.5.0'
-    adapterDependency 'com.google.android.gms:play-services-ads-identifier:17.0.0'
+    implementation "com.adcolony:sdk:$adapterSdkVersionName"
+    implementation "com.google.android.gms:play-services-ads-identifier:17.0.0"
 }

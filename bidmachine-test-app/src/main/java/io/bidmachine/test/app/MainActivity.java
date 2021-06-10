@@ -54,7 +54,6 @@ import java.util.List;
 import io.bidmachine.AdContentType;
 import io.bidmachine.AdsFormat;
 import io.bidmachine.BidMachine;
-import io.bidmachine.BuildConfig;
 import io.bidmachine.MediaAssetType;
 import io.bidmachine.ads.networks.AmazonConfig;
 import io.bidmachine.ads.networks.adcolony.AdColonyConfig;
@@ -166,8 +165,6 @@ public class MainActivity extends AppCompatActivity {
         final SpannableStringBuilder appInfoBuilder = new SpannableStringBuilder();
         appInfoBuilder.append("Version: ");
         appendBold(appInfoBuilder, BidMachine.VERSION).append("   ");
-        appInfoBuilder.append("Build: ");
-        appendBold(appInfoBuilder, BuildConfig.VERSION_CODE);
 
         ((TextView) findViewById(R.id.txtAppInfo)).setText(appInfoBuilder);
         bannerFrame = findViewById(R.id.bannerFrame);

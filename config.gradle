@@ -6,11 +6,13 @@ ext {
     mockitoVersion = '3.7.7'
     jUnitVersion = '4.13.1'
     mockwebserver = '3.3.0'
+    bidMachineVersionCode = 100100042
+    bidMachineVersionName = '1.7.4'
 }
 
 android {
     compileSdkVersion androidCompileSdkVersion
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
         minSdkVersion androidMinSdkVersion

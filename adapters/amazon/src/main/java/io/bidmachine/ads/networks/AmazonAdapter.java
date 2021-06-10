@@ -41,8 +41,8 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
     AmazonAdapter() {
         super("amazon",
-              AdRegistration.getVersion(),
-              BuildConfig.VERSION_NAME,
+              BuildConfig.ADAPTER_SDK_VERSION_NAME,
+              BuildConfig.ADAPTER_VERSION_NAME,
               new AdsType[]{AdsType.Banner, AdsType.Interstitial});
     }
 
