@@ -8,4 +8,5 @@ Supported networks:
 * [Criteo](criteo)
 * [Facebook](facebook)
 * [myTarget](my_target)
+* [Pangle](pangle)
 * [Tapjoy](tapjoy)
