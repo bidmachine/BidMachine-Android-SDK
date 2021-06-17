@@ -1,0 +1,2 @@
+-keep class com.bytedance.sdk.** { *; }
+-keep class com.pgl.sys.ces.* {*;}

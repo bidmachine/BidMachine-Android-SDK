@@ -1,0 +1,18 @@
+apply plugin: 'com.android.library'
+apply from: "../adapters.gradle"
+
+adapterSdkVersionName = '3.5.1.0'
+adapterVersionCode = 1
+
+rootProject.allprojects {
+    repositories {
+        maven {
+            url 'https://artifact.bytedance.com/repository/pangle'
+        }
+    }
+}
+
+dependencies {
+    implementation "com.pangle.global:ads-sdk:$adapterSdkVersionName"
+    implementation "com.google.android.gms:play-services-ads-identifier:17.0.0"
+}
