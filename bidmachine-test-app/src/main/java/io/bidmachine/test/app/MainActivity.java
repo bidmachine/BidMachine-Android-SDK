@@ -60,6 +60,7 @@ import io.bidmachine.ads.networks.adcolony.AdColonyConfig;
 import io.bidmachine.ads.networks.criteo.CriteoConfig;
 import io.bidmachine.ads.networks.facebook.FacebookConfig;
 import io.bidmachine.ads.networks.my_target.MyTargetConfig;
+import io.bidmachine.ads.networks.pangle.PangleConfig;
 import io.bidmachine.ads.networks.tapjoy.TapjoyConfig;
 import io.bidmachine.banner.BannerSize;
 import io.bidmachine.banner.BannerView;
@@ -142,6 +143,14 @@ public class MainActivity extends AppCompatActivity {
                                         .withMediationConfig(AdsFormat.InterstitialStatic, "365991")
                                         .withMediationConfig(AdsFormat.RewardedVideo, "482205"),
                                 "my_target.json"),
+
+            new OptionalNetwork("Pangle",
+                                new PangleConfig("5177307")
+                                        .withMediationConfig(AdsFormat.Banner_320x50, "946221813")
+                                        .withMediationConfig(AdsFormat.Banner_300x250, "946200492")
+                                        .withMediationConfig(AdsFormat.Interstitial, "946185883")
+                                        .withMediationConfig(AdsFormat.Rewarded, "946185890"),
+                                "pangle.json"),
 
             new OptionalNetwork("Tapjoy",
                                 new TapjoyConfig(

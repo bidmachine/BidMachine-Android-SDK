@@ -1,0 +1,22 @@
+{
+    "network": "pangle",
+    "app_id": "5177307",
+    "ad_units": [
+        {
+            "format": "banner_320x50",
+            "slot_id": "946221813"
+        },
+        {
+            "format": "banner_300x250",
+            "slot_id": "946200492"
+        },
+        {
+            "format": "interstitial",
+            "slot_id": "946185883"
+        },
+        {
+            "format": "rewarded",
+            "slot_id": "946185890"
+        }
+    ]
+}
