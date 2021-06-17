@@ -1,7 +1,6 @@
 package io.bidmachine.ads.networks.pangle;
 
 import android.app.Activity;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,8 +20,6 @@ import io.bidmachine.utils.BMError;
 class PangleRewardedAd extends UnifiedFullscreenAd {
 
     @Nullable
-    private ContextProvider contextProvider;
-    @Nullable
     private LoadListener loadListener;
     @Nullable
     private TTAdNative ttAdNative;
@@ -41,8 +38,6 @@ class PangleRewardedAd extends UnifiedFullscreenAd {
         assert params.slotId != null;
         assert params.bidPayload != null;
 
-        contextProvider = context;
-
         AdSlot adSlot = new AdSlot.Builder()
                 .setCodeId(params.slotId)
                 .withBid(params.bidPayload)
@@ -58,9 +53,9 @@ class PangleRewardedAd extends UnifiedFullscreenAd {
     }
 
     @Override
-    public void show(@NonNull Context context,
+    public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
-        Activity activity = contextProvider != null ? contextProvider.getActivity() : null;
+        Activity activity = contextProvider.getActivity();
         if (activity == null) {
             callback.onAdShowFailed(BMError.Internal);
             return;
@@ -76,7 +71,6 @@ class PangleRewardedAd extends UnifiedFullscreenAd {
 
     @Override
     public void onDestroy() {
-        contextProvider = null;
         ttAdNative = null;
         if (loadListener != null) {
             loadListener.destroy();
