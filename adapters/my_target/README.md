@@ -26,7 +26,7 @@ BidMachine.registerNetworks(
                .withMediationConfig(AdsFormat.Banner_300x250, "YOUR_SLOT_ID")
                .withMediationConfig(AdsFormat.Banner_728x90, "YOUR_SLOT_ID")
                .withMediationConfig(AdsFormat.InterstitialStatic, "YOUR_SLOT_ID")
-               .withMediationConfig(AdsFormat.RewardedVideo, "YOUR_SLOT_ID");
+               .withMediationConfig(AdsFormat.RewardedVideo, "YOUR_SLOT_ID"));
 ```
 
 ## What's new in this version

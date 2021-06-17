@@ -28,7 +28,7 @@ Configure `Tapjoy` network:
 
 ```java
 BidMachine.registerNetworks(
-        new TapJoyConfig("YOUR_SDK_KEY")
+        new TapjoyConfig("YOUR_SDK_KEY")
                .withMediationConfig(AdsFormat.InterstitialVideo, "YOUR_PLACEMENT_NAME")
                .withMediationConfig(AdsFormat.RewardedVideo, "YOUR_PLACEMENT_NAME"));
 ```
