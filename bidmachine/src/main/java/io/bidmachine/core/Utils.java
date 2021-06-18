@@ -88,31 +88,39 @@ public class Utils {
     private static String defaultHttpAgentString = "";
     private static String httpAgentString;
 
-    public static void onUiThread(Runnable runnable) {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+    public static boolean isUiThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
+
+    public static void onUiThread(@NonNull Runnable runnable) {
+        if (isUiThread()) {
             runnable.run();
         } else {
             uiHandler.post(runnable);
         }
     }
 
-    public static void onUiThread(Runnable runnable, long delayMillis) {
+    public static void onUiThread(@NonNull Runnable runnable, long delayMillis) {
         uiHandler.postDelayed(runnable, delayMillis);
     }
 
-    public static void cancelUiThreadTask(Runnable runnable) {
+    public static void cancelUiThreadTask(@NonNull Runnable runnable) {
         uiHandler.removeCallbacks(runnable);
     }
 
-    public static void onBackgroundThread(Runnable runnable) {
-        onBackgroundThread(runnable, 0);
+    public static void onBackgroundThread(@NonNull Runnable runnable) {
+        if (isUiThread()) {
+            backgroundHandler.post(runnable);
+        } else {
+            runnable.run();
+        }
     }
 
-    public static void onBackgroundThread(Runnable runnable, long delay) {
+    public static void onBackgroundThread(@NonNull Runnable runnable, long delay) {
         backgroundHandler.postDelayed(runnable, delay);
     }
 
-    public static void cancelBackgroundThreadTask(Runnable runnable) {
+    public static void cancelBackgroundThreadTask(@NonNull Runnable runnable) {
         backgroundHandler.removeCallbacks(runnable);
     }
 
