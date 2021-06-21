@@ -134,9 +134,14 @@ public class Utils {
                   "Manifest permission not found: android.permission.ACCESS_NETWORK_STATE. Check the integration.");
             return null;
         }
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        try {
+            ConnectivityManager connectivityManager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            return connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        } catch (Throwable t) {
+            Logger.log(t);
+        }
+        return null;
     }
 
     @SuppressLint("MissingPermission")
