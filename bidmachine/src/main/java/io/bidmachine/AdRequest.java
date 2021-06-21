@@ -761,8 +761,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 } else {
                     Logger.log(toString() + ": Ad not found or not valid");
                 }
-            } catch (InvalidProtocolBufferException e) {
-                Logger.log(e);
+            } catch (Throwable t) {
+                Logger.log(t);
             }
         } else {
             Logger.log(toString() + ": Response not found or not valid");
