@@ -61,7 +61,11 @@ public final class ViewAdObject<
         if (adView != null) {
             VisibilityTracker.stopTracking(adView);
         }
-        container.removeAllViews();
+        try {
+            container.removeAllViews();
+        } catch (Exception e) {
+            Logger.log(e);
+        }
         final ViewGroup.LayoutParams params;
         if (container instanceof FrameLayout) {
             params = new FrameLayout.LayoutParams(getScaledWidth(context),
