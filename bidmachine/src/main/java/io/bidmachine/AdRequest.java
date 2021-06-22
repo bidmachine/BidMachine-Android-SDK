@@ -105,9 +105,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     private final Runnable timeOutRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!isApiRequestCompleted.get()) {
-                cancel();
+            if (!isCompleted()) {
                 processRequestFail(BMError.TimeoutError);
+                cancel();
             }
         }
     };
@@ -353,32 +353,32 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             processRequestFail(verifyError);
             return;
         }
-        BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest);
-        try {
-            isAdWasShown = false;
-            unsubscribeExpireTracker();
-            if (currentApiRequest != null) {
-                currentApiRequest.cancel();
-            }
-            Logger.log(toString() + ": api request start");
-            AdRequestExecutor.get().execute(new Runnable() {
-                @Override
-                public void run() {
+        AdRequestExecutor.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    cancel();
+                    isAdWasShown = false;
+                    unsubscribeExpireTracker();
+                    isApiRequestCanceled.set(false);
+                    isApiRequestCompleted.set(false);
+
+                    Logger.log(toString() + ": api request start");
+                    BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest);
                     if (!TextUtils.isEmpty(bidPayload)) {
                         processBidPayload(bidPayload);
                         return;
                     }
-
                     processRequestObject(context);
+                    if (timeOut > 0) {
+                        Utils.onBackgroundThread(timeOutRunnable, timeOut);
+                    }
+                } catch (Throwable t) {
+                    Logger.log(t);
+                    processRequestFail(BMError.Internal);
                 }
-            });
-            if (timeOut > 0) {
-                Utils.onBackgroundThread(timeOutRunnable, timeOut);
             }
-        } catch (Exception e) {
-            Logger.log(e);
-            processRequestFail(BMError.Internal);
-        }
+        });
     }
 
     private void processBidPayload(@NonNull String bidPayload) {
@@ -490,7 +490,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     public void notifyMediationWin() {
-        if (!isApiRequestCompleted.get()) {
+        if (!isCompleted()) {
             return;
         }
 
@@ -511,7 +511,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     public void notifyMediationLoss() {
-        if (!isApiRequestCompleted.get()) {
+        if (!isCompleted()) {
             return;
         }
 
@@ -529,6 +529,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                      TrackEventType.MediationLoss,
                                      getType(),
                                      bmError);
+    }
+
+    boolean isCompleted() {
+        return isApiRequestCompleted.get();
     }
 
     boolean isCanceled() {
@@ -575,15 +579,24 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     void cancel() {
-        if (isApiRequestCompleted.get() || isCanceled()) {
+        if (isCompleted() || isCanceled()) {
             return;
         }
-        if (currentApiRequest != null) {
-            currentApiRequest.cancel();
-            currentApiRequest = null;
-        } else {
-            processApiRequestCancel();
-        }
+        Utils.onBackgroundThread(new Runnable() {
+            @Override
+            public void run() {
+                if (currentApiRequest != null) {
+                    try {
+                        currentApiRequest.cancel();
+                    } catch (Throwable t) {
+                        Logger.log(t);
+                    }
+                    currentApiRequest = null;
+                } else {
+                    processApiRequestCancel();
+                }
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
