@@ -34,7 +34,7 @@ public class Logger {
 
     public static void log(Throwable t) {
         if (isLoggingEnabled) {
-            t.printStackTrace();
+            sendWarning(t);
         }
     }
 
@@ -91,6 +91,10 @@ public class Logger {
 
     private static void sendLog(String message) {
         Log.d(TAG, messageBuilder.buildMessage(message));
+    }
+
+    private static void sendWarning(Throwable throwable) {
+        Log.w(TAG, throwable);
     }
 
 

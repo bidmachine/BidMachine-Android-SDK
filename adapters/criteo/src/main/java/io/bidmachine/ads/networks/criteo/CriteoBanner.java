@@ -9,7 +9,7 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.model.BannerAdUnit;
 
 import io.bidmachine.ContextProvider;
-import io.bidmachine.core.Logger;
+import io.bidmachine.core.AdapterLogger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.unified.UnifiedBannerAd;
 import io.bidmachine.unified.UnifiedBannerAdCallback;
@@ -43,7 +43,7 @@ public class CriteoBanner extends UnifiedBannerAd {
                 criteoBannerView.setCriteoBannerAdListener(new Listener(callback));
                 criteoBannerView.loadAd(bid);
             } catch (Throwable t) {
-                Logger.log(t);
+                AdapterLogger.log(t);
                 callback.onAdLoadFailed(BMError.Internal);
             }
         });

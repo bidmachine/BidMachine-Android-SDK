@@ -18,7 +18,7 @@ import io.bidmachine.HeaderBiddingAdapter;
 import io.bidmachine.HeaderBiddingCollectParamsCallback;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
-import io.bidmachine.core.Logger;
+import io.bidmachine.core.AdapterLogger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedBannerAd;
@@ -55,16 +55,12 @@ class PangleAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull NetworkConfigParams networkConfig) throws Throwable {
         Map<String, String> networkParams = networkConfig.obtainNetworkParams();
         if (networkParams == null) {
-            Logger.log(String.format("[%s] %s",
-                                     getKey(),
-                                     "Initialize failed: network parameters not found"));
+            AdapterLogger.log(getKey(), "Initialize failed: network parameters not found");
             return;
         }
         String appId = networkParams.get(PangleConfig.KEY_APP_ID);
         if (TextUtils.isEmpty(appId)) {
-            Logger.log(String.format("[%s] %s",
-                                     getKey(),
-                                     "Initialize failed: app_id not provided"));
+            AdapterLogger.log(getKey(), "Initialize failed: app_id not provided");
             return;
         }
         assert appId != null;
@@ -83,7 +79,7 @@ class PangleAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                     // Need to call init on the main thread
                     TTAdSdk.init(context, ttAdConfig, null);
                 } catch (Throwable t) {
-                    Logger.log(t);
+                    AdapterLogger.log(t);
                 }
             }
         });
