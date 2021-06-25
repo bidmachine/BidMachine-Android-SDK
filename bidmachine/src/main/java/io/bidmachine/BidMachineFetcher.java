@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.bidmachine.AdRequest.AdRequestListener;
+import io.bidmachine.core.Logger;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.utils.BMError;
 
@@ -27,6 +28,7 @@ public class BidMachineFetcher {
     public static final String AD_TYPE_VIDEO = "video";
     public static final String AD_TYPE_NATIVE = "native";
 
+    private static final String TAG = BidMachineFetcher.class.getSimpleName();
     private static final BigDecimal PRICE_ROUNDING = new BigDecimal("0.01");
     private static final RoundingMode PRICE_ROUNDING_MODE = RoundingMode.CEILING;
 
@@ -36,6 +38,8 @@ public class BidMachineFetcher {
     @Nullable
     @SuppressWarnings({"unchecked"})
     public static Map<String, String> fetch(@NonNull AdRequest adRequest) {
+        Logger.log(TAG, String.format("fetch - %s", adRequest));
+
         final Map<String, String> result = toMap(adRequest);
         final String id = result.get(KEY_ID);
         if (TextUtils.isEmpty(id)) {
@@ -94,6 +98,8 @@ public class BidMachineFetcher {
         if (TextUtils.isEmpty(requestId)) {
             return null;
         }
+        Logger.log(TAG, String.format("release - %s", requestId));
+
         synchronized (BidMachineFetcher.class) {
             Map<String, AdRequest> cached = cachedRequests.get(adsType);
             if (cached != null) {
@@ -109,6 +115,8 @@ public class BidMachineFetcher {
 
     @NonNull
     public static Map<String, String> toMap(@NonNull AdRequest adRequest) {
+        Logger.log(TAG, String.format("toMap - %s", adRequest));
+
         Map<String, String> result = new HashMap<>();
         AuctionResult auctionResult = adRequest.getAuctionResult();
         if (auctionResult == null) {

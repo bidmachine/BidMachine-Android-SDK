@@ -12,9 +12,7 @@ public class BidMachine {
     public static final String NAME = "BidMachine";
     public static final String VERSION = BuildConfig.VERSION_NAME;
 
-    static {
-        Logger.setTag(NAME);
-    }
+    private static final String TAG = BidMachine.class.getSimpleName();
 
     /**
      * Initializes BidMachine SDK
@@ -36,6 +34,7 @@ public class BidMachine {
     public static void initialize(@NonNull Context context,
                                   @NonNull String sellerId,
                                   @Nullable InitializationCallback callback) {
+        Logger.log(TAG, String.format("initialize - %s", sellerId));
         BidMachineImpl.get().initialize(context, sellerId, callback);
     }
 
@@ -54,6 +53,7 @@ public class BidMachine {
      * @param url - BidMachine endpoint URL
      */
     public static void setEndpoint(@NonNull String url) {
+        Logger.log(TAG, String.format("setEndpoint - %s", url));
         BidMachineImpl.get().setEndpoint(url);
     }
 
@@ -63,7 +63,13 @@ public class BidMachine {
      * @param enabled - if {@code true} SDK will print all information about ad requests
      */
     public static void setLoggingEnabled(boolean enabled) {
-        Logger.setLoggingEnabled(enabled);
+        if (enabled) {
+            Logger.setLoggingEnabled(true);
+            Logger.log(TAG, "setLoggingEnabled - true");
+        } else {
+            Logger.log(TAG, "setLoggingEnabled - false");
+            Logger.setLoggingEnabled(false);
+        }
         NetworkRegistry.setLoggingEnabled(enabled);
     }
 
@@ -73,6 +79,7 @@ public class BidMachine {
      * @param testMode = if {@code true} SDK will run in test mode
      */
     public static void setTestMode(boolean testMode) {
+        Logger.log(TAG, String.format("setTestMode - %s", testMode));
         BidMachineImpl.get().setTestMode(testMode);
     }
 
@@ -80,6 +87,7 @@ public class BidMachine {
      * Sets default {@link TargetingParams} for all ad requests
      */
     public static void setTargetingParams(@Nullable TargetingParams targetingParams) {
+        Logger.log(TAG, "setTargetingParams");
         BidMachineImpl.get().setTargetingParams(targetingParams);
     }
 
@@ -92,6 +100,7 @@ public class BidMachine {
      *                      in the <a href="https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework">Transparency and Consent Framework</a> technical specifications
      */
     public static void setConsentConfig(boolean hasConsent, @Nullable String consentString) {
+        Logger.log(TAG, String.format("setConsentConfig - %s, %s", hasConsent, consentString));
         BidMachineImpl.get().getUserRestrictionParams().setConsentConfig(hasConsent, consentString);
     }
 
@@ -101,6 +110,7 @@ public class BidMachine {
      * @param subject - Flag indicating if GDPR regulations should be applied. <a href="https://wikipedia.org/wiki/General_Data_Protection_Regulation">The  General Data Protection Regulation (GDPR)</a> is a regulation of the European Union
      */
     public static void setSubjectToGDPR(@Nullable Boolean subject) {
+        Logger.log(TAG, String.format("setSubjectToGDPR - %s", subject));
         BidMachineImpl.get().getUserRestrictionParams().setSubjectToGDPR(subject);
     }
 
@@ -110,6 +120,7 @@ public class BidMachine {
      * @param coppa - Flag indicating if COPPA regulations should be applied. <a href="https://wikipedia.org/wiki/Children%27s_Online_Privacy_Protection_Act">The Children's Online Privacy Protection Act (COPPA)</a> was established by the U.S. Federal Trade Commission
      */
     public static void setCoppa(@Nullable Boolean coppa) {
+        Logger.log(TAG, String.format("setCoppa - %s", coppa));
         BidMachineImpl.get().getUserRestrictionParams().setCoppa(coppa);
     }
 
@@ -120,6 +131,7 @@ public class BidMachine {
      *                        <a href="https://github.com/InteractiveAdvertisingBureau/USPrivacy/blob/master/CCPA/US%20Privacy%20String.md">CCPA String Format</a>
      */
     public static void setUSPrivacyString(@Nullable String usPrivacyString) {
+        Logger.log(TAG, String.format("setUSPrivacyString - %s", usPrivacyString));
         BidMachineImpl.get().getUserRestrictionParams().setUSPrivacyString(usPrivacyString);
     }
 
@@ -129,6 +141,7 @@ public class BidMachine {
      * @param publisher instance of {@link Publisher} which contains all information about publisher
      */
     public static void setPublisher(@Nullable Publisher publisher) {
+        Logger.log(TAG, "setPublisher");
         BidMachineImpl.get().setPublisher(publisher);
     }
 
@@ -138,6 +151,7 @@ public class BidMachine {
      * @param networkConfigs - Custom configuration object per network
      */
     public static void registerNetworks(@NonNull NetworkConfig... networkConfigs) {
+        Logger.log(TAG, "registerNetworks with NetworkConfig array");
         NetworkRegistry.registerNetworks(networkConfigs);
     }
 
@@ -148,14 +162,17 @@ public class BidMachine {
      * @param jsonData - Json array which contains info about required networks
      */
     public static void registerNetworks(@NonNull Context context, @NonNull String jsonData) {
+        Logger.log(TAG, "registerNetworks with JSON string");
         NetworkRegistry.registerNetworks(context, jsonData);
     }
 
     public static void registerAdRequestListener(@NonNull AdRequest.AdRequestListener adRequestListener) {
+        Logger.log(TAG, "registerAdRequestListener");
         BidMachineImpl.get().registerAdRequestListener(adRequestListener);
     }
 
     public static void unregisterAdRequestListener(@NonNull AdRequest.AdRequestListener adRequestListener) {
+        Logger.log(TAG, "unregisterAdRequestListener");
         BidMachineImpl.get().unregisterAdRequestListener(adRequestListener);
     }
 

@@ -52,7 +52,6 @@ final class BidMachineImpl {
     }
 
     static {
-        Logger.setTag("BidMachine");
         Logger.setMessageBuilder(new Logger.LoggerMessageBuilder() {
             @Override
             public String buildMessage(String origin) {

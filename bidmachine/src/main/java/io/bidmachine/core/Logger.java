@@ -9,16 +9,12 @@ import java.util.Map;
 
 public class Logger {
 
-    private static String TAG = "Logger";
+    private static final String TAG = "BidMachineLog";
 
     private static boolean isLoggingEnabled = false;
 
     @NonNull
     private static LoggerMessageBuilder messageBuilder = new RegularMessageBuilder();
-
-    public static void setTag(String tag) {
-        TAG = tag;
-    }
 
     public static void setLoggingEnabled(boolean enabled) {
         isLoggingEnabled = enabled;
@@ -36,6 +32,10 @@ public class Logger {
         if (isLoggingEnabled) {
             sendWarning(t);
         }
+    }
+
+    public static void log(String subTag, String message) {
+        log(String.format("[%s] %s", subTag, message));
     }
 
     public static void log(String message) {
