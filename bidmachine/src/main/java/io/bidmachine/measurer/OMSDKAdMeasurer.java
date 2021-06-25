@@ -125,7 +125,7 @@ public abstract class OMSDKAdMeasurer<AdView extends View> implements AdMeasurer
     }
 
     protected void log(@NonNull String message) {
-        Logger.log(String.format("[%s] %s", TAG, message));
+        Logger.log(TAG, message);
     }
 
 
