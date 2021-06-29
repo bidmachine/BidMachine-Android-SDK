@@ -55,12 +55,12 @@ class PangleAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull NetworkConfigParams networkConfig) throws Throwable {
         Map<String, String> networkParams = networkConfig.obtainNetworkParams();
         if (networkParams == null) {
-            AdapterLogger.log(getKey(), "Initialize failed: network parameters not found");
+            AdapterLogger.logMessage(getKey(), "Initialize failed: network parameters not found");
             return;
         }
         String appId = networkParams.get(PangleConfig.KEY_APP_ID);
         if (TextUtils.isEmpty(appId)) {
-            AdapterLogger.log(getKey(), "Initialize failed: app_id not provided");
+            AdapterLogger.logMessage(getKey(), "Initialize failed: app_id not provided");
             return;
         }
         assert appId != null;
@@ -79,7 +79,7 @@ class PangleAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                     // Need to call init on the main thread
                     TTAdSdk.init(context, ttAdConfig, null);
                 } catch (Throwable t) {
-                    AdapterLogger.log(t);
+                    AdapterLogger.logThrowable(t);
                 }
             }
         });

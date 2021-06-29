@@ -3,7 +3,6 @@ package io.bidmachine.ads.networks;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,14 +29,13 @@ import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
 import io.bidmachine.ads.networks.amazon.BuildConfig;
 import io.bidmachine.banner.BannerSize;
+import io.bidmachine.core.AdapterLogger;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedBannerAdRequestParams;
 import io.bidmachine.utils.BMError;
 
 class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
-
-    private static final String TAG = "AmazonAdapter";
 
     AmazonAdapter() {
         super("amazon",
@@ -57,7 +55,7 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            Log.e(TAG, "Initialize failed: minSdkVersion for Amazon is 19");
+            AdapterLogger.logError(getKey(), "Initialize failed: minSdkVersion for Amazon is 19");
             return;
         }
         initialize(contextProvider, adRequestParams, networkConfigParams.obtainNetworkParams());

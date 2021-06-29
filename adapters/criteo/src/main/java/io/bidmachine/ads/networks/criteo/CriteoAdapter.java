@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +25,7 @@ import io.bidmachine.HeaderBiddingAdapter;
 import io.bidmachine.HeaderBiddingCollectParamsCallback;
 import io.bidmachine.NetworkAdapter;
 import io.bidmachine.NetworkConfigParams;
+import io.bidmachine.core.AdapterLogger;
 import io.bidmachine.models.AuctionResult;
 import io.bidmachine.unified.UnifiedAdRequestParams;
 import io.bidmachine.unified.UnifiedBannerAd;
@@ -33,8 +33,6 @@ import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.utils.BMError;
 
 class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
-
-    private static final String TAG = "CriteoAdapter";
 
     CriteoAdapter() {
         super("criteo",
@@ -88,7 +86,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            Log.e(TAG, "Initialize failed: minSdkVersion for Criteo is 16");
+            AdapterLogger.logError(getKey(), "Initialize failed: minSdkVersion for Criteo is 16");
             return;
         }
         if (isInitialized()) {
@@ -96,18 +94,18 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
         Map<String, String> networkParams = networkConfigParams.obtainNetworkParams();
         if (networkParams == null) {
-            Log.e(TAG, "Initialize failed: network parameters not found");
+            AdapterLogger.logError(getKey(), "Initialize failed: network parameters not found");
             return;
         }
         String publisherId = networkParams.get(CriteoConfig.PUBLISHER_ID);
         if (TextUtils.isEmpty(publisherId)) {
-            Log.e(TAG, "Initialize failed: publisher_id not provided");
+            AdapterLogger.logError(getKey(), "Initialize failed: publisher_id not provided");
             return;
         }
         assert publisherId != null;
         List<AdUnit> adUnitList = CriteoAdUnitStorage.extractAdUnits(networkConfigParams);
         if (adUnitList == null || adUnitList.size() == 0) {
-            Log.e(TAG, "Initialize failed: adUnits not found");
+            AdapterLogger.logError(getKey(), "Initialize failed: adUnits not found");
             return;
         }
         configure(contextProvider.getContext(),
@@ -172,10 +170,10 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                         .adUnits(adUnitList)
                         .init();
             } else {
-                Log.e(TAG, "Criteo failed to initialize");
+                AdapterLogger.logError(getKey(), "Initialize failed: application is null");
             }
         } catch (Throwable t) {
-            Log.e(TAG, "Criteo failed to initialize");
+            AdapterLogger.logThrowable(t);
         }
     }
 

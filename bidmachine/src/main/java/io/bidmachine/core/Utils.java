@@ -29,7 +29,6 @@ import android.os.Process;
 import android.security.NetworkSecurityPolicy;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
 import android.view.View;
@@ -138,8 +137,7 @@ public class Utils {
     @SuppressLint("MissingPermission")
     public static NetworkInfo getActiveNetworkInfo(@NonNull Context context) {
         if (!Utils.isPermissionGranted(context, Manifest.permission.ACCESS_NETWORK_STATE)) {
-            Log.e("BidMachine",
-                  "Manifest permission not found: android.permission.ACCESS_NETWORK_STATE. Check the integration.");
+            Logger.logError("Manifest permission not found: android.permission.ACCESS_NETWORK_STATE. Check the integration.");
             return null;
         }
         try {
