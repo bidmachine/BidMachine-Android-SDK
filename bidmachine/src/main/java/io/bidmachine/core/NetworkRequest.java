@@ -168,6 +168,9 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
             try {
                 int responseCode = obtainResponseCode(connection);
+                if (isCanceled()) {
+                    return;
+                }
                 if (responseCode != HttpURLConnection.HTTP_OK) {
                     errorResult = obtainError(connection,
                                               obtainErrorStream(connection),
@@ -300,9 +303,6 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
 
     public void cancel() {
         currentState = State.Canceled;
-        if (currentConnection instanceof HttpURLConnection) {
-            ((HttpURLConnection) currentConnection).disconnect();
-        }
         if (cancelCallback != null) {
             cancelCallback.onCanceled();
         }

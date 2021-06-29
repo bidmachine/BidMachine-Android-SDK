@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import com.explorestack.protobuf.Any;
-import com.explorestack.protobuf.InvalidProtocolBufferException;
 import com.explorestack.protobuf.Message;
 import com.explorestack.protobuf.Struct;
 import com.explorestack.protobuf.adcom.Ad;
@@ -105,10 +104,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     private final Runnable timeOutRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!isCompleted()) {
-                processRequestFail(BMError.TimeoutError);
-                cancel();
-            }
+            processApiRequestFail(BMError.TimeoutError);
         }
     };
 
@@ -344,7 +340,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             processRequestFail(BMError.NotInitialized);
             return;
         }
-        if (isDestroyed) {
+        if (isDestroyed()) {
             processRequestFail(BMError.RequestDestroyed);
             return;
         }
@@ -358,8 +354,8 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             public void run() {
                 try {
                     cancel();
-                    isAdWasShown = false;
                     unsubscribeExpireTracker();
+                    isAdWasShown = false;
                     isApiRequestCanceled.set(false);
                     isApiRequestCompleted.set(false);
 
@@ -370,9 +366,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                         return;
                     }
                     processRequestObject(context);
-                    if (timeOut > 0) {
-                        Utils.onBackgroundThread(timeOutRunnable, timeOut);
-                    }
                 } catch (Throwable t) {
                     Logger.log(t);
                     processRequestFail(BMError.Internal);
@@ -427,25 +420,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     void retrieveBody(@NonNull String url) {
         ApiRequest.Builder<Request, Response> requestBuilder = new ApiRequest.Builder<Request, Response>()
                 .url(url)
-                .setLoadingTimeOut(timeOut)
-                .setDataBinder(new ApiRequest.ApiResponseAuctionDataBinder())
-                .setCallback(new NetworkRequest.Callback<Response, BMError>() {
-                    @Override
-                    public void onSuccess(@Nullable Response result) {
-                        processApiRequestSuccess(result);
-                    }
-
-                    @Override
-                    public void onFail(@Nullable BMError result) {
-                        processApiRequestFail(result);
-                    }
-                })
-                .setCancelCallback(new NetworkRequest.CancelCallback() {
-                    @Override
-                    public void onCanceled() {
-                        processApiRequestCancel();
-                    }
-                });
+                .setDataBinder(new ApiRequest.ApiResponseAuctionDataBinder());
         processRequestBuilder(requestBuilder);
     }
 
@@ -455,25 +430,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             ApiRequest.Builder<Request, Response> requestBuilder = new ApiRequest.Builder<Request, Response>()
                     .url(BidMachineImpl.get().getAuctionUrl())
                     .setRequestData((Request) requestObject)
-                    .setLoadingTimeOut(timeOut)
-                    .setDataBinder(getType().getBinder())
-                    .setCallback(new NetworkRequest.Callback<Response, BMError>() {
-                        @Override
-                        public void onSuccess(@Nullable Response result) {
-                            processApiRequestSuccess(result);
-                        }
-
-                        @Override
-                        public void onFail(@Nullable BMError result) {
-                            processApiRequestFail(result);
-                        }
-                    })
-                    .setCancelCallback(new NetworkRequest.CancelCallback() {
-                        @Override
-                        public void onCanceled() {
-                            processApiRequestCancel();
-                        }
-                    });
+                    .setDataBinder(getType().getBinder());
             processRequestBuilder(requestBuilder);
         } else {
             processRequestFail(requestObject instanceof BMError
@@ -483,10 +440,39 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     private void processRequestBuilder(@NonNull ApiRequest.Builder<Request, Response> requestBuilder) {
-        if (isCanceled()) {
+        if (!canSendApiRequest()) {
             return;
         }
+        requestBuilder.setLoadingTimeOut(timeOut);
+        requestBuilder.setCallback(new NetworkRequest.Callback<Response, BMError>() {
+            @Override
+            public void onSuccess(@Nullable Response result) {
+                processApiRequestSuccess(result);
+            }
+
+            @Override
+            public void onFail(@Nullable BMError result) {
+                processApiRequestFail(result);
+            }
+        });
+        requestBuilder.setCancelCallback(new NetworkRequest.CancelCallback() {
+            @Override
+            public void onCanceled() {
+                processApiRequestCancel();
+            }
+        });
         currentApiRequest = requestBuilder.request();
+        if (timeOut > 0) {
+            Utils.onBackgroundThread(timeOutRunnable, timeOut);
+        }
+    }
+
+    private boolean canSendApiRequest() {
+        return !isDestroyed();
+    }
+
+    private boolean canProcessApiRequestResult() {
+        return !isCompleted() && !isCanceled() && !isDestroyed();
     }
 
     public void notifyMediationWin() {
@@ -497,7 +483,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         Logger.log(toString() + ": notifyMediationWin");
 
         BMError bmError;
-        if (isDestroyed) {
+        if (isDestroyed()) {
             bmError = BMError.RequestDestroyed;
         } else if (isExpired) {
             bmError = BMError.RequestExpired;
@@ -518,7 +504,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         Logger.log(toString() + ": notifyMediationLoss");
 
         BMError bmError;
-        if (isDestroyed) {
+        if (isDestroyed()) {
             bmError = BMError.RequestDestroyed;
         } else if (isExpired) {
             bmError = BMError.RequestExpired;
@@ -579,9 +565,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     void cancel() {
-        if (isCompleted() || isCanceled()) {
-            return;
-        }
         Utils.onBackgroundThread(new Runnable() {
             @Override
             public void run() {
@@ -592,8 +575,6 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                         Logger.log(t);
                     }
                     currentApiRequest = null;
-                } else {
-                    processApiRequestCancel();
                 }
             }
         });
@@ -706,7 +687,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     @SuppressWarnings("unchecked")
     @VisibleForTesting
     void processApiRequestSuccess(@Nullable Response response) {
-        if (isCanceled()) {
+        if (!canProcessApiRequestResult()) {
             return;
         }
         isApiRequestCompleted.set(true);
@@ -784,7 +765,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     private void processApiRequestFail(@Nullable BMError error) {
-        if (isCanceled()) {
+        if (!canProcessApiRequestResult()) {
             return;
         }
         isApiRequestCompleted.set(true);
@@ -819,6 +800,9 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     }
 
     private void processApiRequestCancel() {
+        if (!canProcessApiRequestResult()) {
+            return;
+        }
         isApiRequestCanceled.set(true);
         Utils.cancelBackgroundThreadTask(timeOutRunnable);
 
