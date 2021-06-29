@@ -10,6 +10,7 @@ import java.util.Map;
 public class Logger {
 
     private static final String TAG = "BidMachineLog";
+    private static final int MAX_CHAR_COUNT = 1000;
 
     private static boolean isLoggingEnabled = false;
 
@@ -34,20 +35,33 @@ public class Logger {
         }
     }
 
+    public static void logError(String subTag, String message) {
+        logError(String.format("[%s] %s", subTag, message));
+    }
+
+    public static void logError(String message) {
+        log(message, true);
+    }
+
     public static void log(String subTag, String message) {
         log(String.format("[%s] %s", subTag, message));
     }
 
     public static void log(String message) {
+        log(message, false);
+    }
+
+    public static void log(String message, boolean isError) {
         if (isLoggingEnabled) {
-            int size = 1000;
-            if (message.length() > size) {
-                int length = (message.length() + size - 1) / size;
-                for (int i = 0, pos = 0; i < length; i++, pos += size) {
-                    sendLog(message.substring(pos, Math.min(message.length(), pos + size)));
+            if (message.length() > MAX_CHAR_COUNT) {
+                int length = (message.length() + MAX_CHAR_COUNT - 1) / MAX_CHAR_COUNT;
+                for (int i = 0, pos = 0; i < length; i++, pos += MAX_CHAR_COUNT) {
+                    sendLog(message.substring(pos,
+                                              Math.min(message.length(), pos + MAX_CHAR_COUNT)),
+                            isError);
                 }
             } else {
-                sendLog(message);
+                sendLog(message, isError);
             }
         }
     }
@@ -85,12 +99,17 @@ public class Logger {
                 }
             }
             builder.insert(0, "\n").insert(0, key);
-            sendLog(builder.toString());
+            sendLog(builder.toString(), false);
         }
     }
 
-    private static void sendLog(String message) {
-        Log.d(TAG, messageBuilder.buildMessage(message));
+    private static void sendLog(String message, boolean isError) {
+        String buildMessage = messageBuilder.buildMessage(message);
+        if (isError) {
+            Log.e(TAG, buildMessage);
+        } else {
+            Log.d(TAG, buildMessage);
+        }
     }
 
     private static void sendWarning(Throwable throwable) {

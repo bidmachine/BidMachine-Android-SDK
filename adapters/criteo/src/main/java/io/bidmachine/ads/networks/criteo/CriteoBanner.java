@@ -43,7 +43,7 @@ public class CriteoBanner extends UnifiedBannerAd {
                 criteoBannerView.setCriteoBannerAdListener(new Listener(callback));
                 criteoBannerView.loadAd(bid);
             } catch (Throwable t) {
-                AdapterLogger.log(t);
+                AdapterLogger.logThrowable(t);
                 callback.onAdLoadFailed(BMError.Internal);
             }
         });
