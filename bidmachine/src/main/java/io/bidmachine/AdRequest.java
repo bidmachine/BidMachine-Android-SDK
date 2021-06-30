@@ -58,7 +58,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     TargetingParams targetingParams;
     SessionAdParams sessionAdParams;
     Map<String, NetworkConfig> networkConfigMap;
-    int timeOut = -1;
+    int timeOutMs = -1;
     String bidPayload;
     String placementId;
 
@@ -105,6 +105,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         @Override
         public void run() {
             processApiRequestFail(BMError.TimeoutError);
+            cancel();
         }
     };
 
@@ -354,6 +355,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             public void run() {
                 try {
                     cancel();
+                    unsubscribeTimeOut();
                     unsubscribeExpireTracker();
                     isAdWasShown = false;
                     isApiRequestCanceled.set(false);
@@ -443,7 +445,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         if (!canSendApiRequest()) {
             return;
         }
-        requestBuilder.setLoadingTimeOut(timeOut);
+        requestBuilder.setLoadingTimeOut(timeOutMs);
         requestBuilder.setCallback(new NetworkRequest.Callback<Response, BMError>() {
             @Override
             public void onSuccess(@Nullable Response result) {
@@ -462,9 +464,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             }
         });
         currentApiRequest = requestBuilder.request();
-        if (timeOut > 0) {
-            Utils.onBackgroundThread(timeOutRunnable, timeOut);
-        }
+        subscribeTimeOut();
     }
 
     private boolean canSendApiRequest() {
@@ -538,6 +538,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         Logger.log(toString() + ": destroy");
 
         cancel();
+        unsubscribeTimeOut();
         unsubscribeExpireTracker();
         BidMachineEvents.clear(trackingObject);
         BidMachineFetcher.release(this);
@@ -684,6 +685,16 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         Utils.cancelBackgroundThreadTask(expiredRunnable);
     }
 
+    private void subscribeTimeOut() {
+        if (timeOutMs > 0) {
+            Utils.onBackgroundThread(timeOutRunnable, timeOutMs);
+        }
+    }
+
+    private void unsubscribeTimeOut() {
+        Utils.cancelBackgroundThreadTask(timeOutRunnable);
+    }
+
     @SuppressWarnings("unchecked")
     @VisibleForTesting
     void processApiRequestSuccess(@Nullable Response response) {
@@ -692,7 +703,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         isApiRequestCompleted.set(true);
         currentApiRequest = null;
-        Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        unsubscribeTimeOut();
         Logger.log(toString() + ": api request success");
 
         if (response != null && response.getSeatbidCount() > 0) {
@@ -770,7 +781,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         isApiRequestCompleted.set(true);
         currentApiRequest = null;
-        Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        unsubscribeTimeOut();
         Logger.log(toString() + ": api request fail - " + error);
 
         if (error == null) {
@@ -804,7 +815,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             return;
         }
         isApiRequestCanceled.set(true);
-        Utils.cancelBackgroundThreadTask(timeOutRunnable);
+        unsubscribeTimeOut();
 
         BidMachineEvents.eventFinish(trackingObject,
                                      TrackEventType.AuctionRequestCancel,
@@ -986,7 +997,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         @SuppressWarnings("unchecked")
         public SelfType setLoadingTimeOut(int timeOutMs) {
             prepareRequest();
-            params.timeOut = timeOutMs;
+            params.timeOutMs = timeOutMs;
             return (SelfType) this;
         }
 
