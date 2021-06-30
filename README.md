@@ -5,7 +5,7 @@ __Get more information about SDK integration and usage in our Wiki:__
 __[BidMachine Android SDK Documentation](https://docs.bidmachine.io/docs/in-house-mediation)__
 
 ## Integration
-[<img src="https://img.shields.io/badge/SDK%20version-1.7.4-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads/)
+[<img src="https://img.shields.io/badge/SDK%20version-1.7.5-brightgreen">](https://artifactory.bidmachine.io/bidmachine/io/bidmachine/ads/)
 
 Add this to Module-level or App-level `build.gradle` before dependencies:
 
@@ -22,7 +22,7 @@ Add next dependency to you build.gradle:
 
 ```groovy
 dependencies {
-    implementation 'io.bidmachine:ads:1.7.4'
+    implementation 'io.bidmachine:ads:1.7.5'
 }
 ```
 

@@ -1,3 +1,7 @@
+## Version 1.7.5 (June 30, 2021)
+**Features**:
+* SDK improvement
+
 ## Version 1.7.4 (May 31, 2021)
 **Features**:
 * SDK improvement

@@ -46,16 +46,11 @@ afterEvaluate {
                 pom.withXml {
                     def dependenciesNode = asNode().appendNode('dependencies')
 
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', libGroupId)
-                    dependencyNode.appendNode('artifactId', "ads")
-                    dependencyNode.appendNode('version', bidMachineVersionName)
-
                     project.configurations.implementation.getDependencies().each { dependency ->
                         if (dependency instanceof ExternalModuleDependency) {
                             println("implementation dependency: " + dependency.properties)
 
-                            dependencyNode = dependenciesNode.appendNode('dependency')
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
                             dependencyNode.appendNode('groupId', dependency.group)
                             dependencyNode.appendNode('artifactId', dependency.name)
                             dependencyNode.appendNode('version', dependency.version)
