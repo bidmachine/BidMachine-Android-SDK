@@ -28,6 +28,7 @@ import io.bidmachine.AdObjectImpl;
 import io.bidmachine.AdProcessCallback;
 import io.bidmachine.ContextProvider;
 import io.bidmachine.MediaAssetType;
+import io.bidmachine.TrackEventType;
 import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.core.VisibilityTracker;
@@ -260,6 +261,7 @@ public final class NativeAdObject
                                                         dispatchImpression();
                                                     }
                                                 });
+                getProcessCallback().trackEvent(TrackEventType.FillAd, null);
             }
             if (mediaView != null) {
                 mediaView.onViewAppearOnScreen();

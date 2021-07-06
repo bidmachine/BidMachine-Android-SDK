@@ -90,6 +90,7 @@ public final class ViewAdObject<
                                                 getProcessCallback().processImpression();
                                             }
                                         });
+        getProcessCallback().trackEvent(TrackEventType.FillAd, null);
     }
 
     @Override

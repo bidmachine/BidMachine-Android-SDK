@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    implementation "io.bidmachine:protobuf-models:1.2.0"
+    implementation "io.bidmachine:protobuf-models:1.2.1"
     implementation "com.explorestack:iab:0.9.4"
     implementation "io.bidmachine.libs:omsdk:1.3.15"
 
