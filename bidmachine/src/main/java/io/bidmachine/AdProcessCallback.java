@@ -1,16 +1,19 @@
 package io.bidmachine;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import io.bidmachine.utils.BMError;
 
 public interface AdProcessCallback {
 
     void processLoadSuccess();
 
-    void processLoadFail(BMError error);
+    void processLoadFail(@NonNull BMError error);
 
     void processShown();
 
-    void processShowFail(BMError error);
+    void processShowFail(@NonNull BMError error);
 
     void processClicked();
 
@@ -23,6 +26,8 @@ public interface AdProcessCallback {
     void processExpired();
 
     void processDestroy();
+
+    void trackEvent(@NonNull TrackEventType eventType, @Nullable BMError error);
 
     void log(String message);
 

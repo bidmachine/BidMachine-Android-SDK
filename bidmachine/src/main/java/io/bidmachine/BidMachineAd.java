@@ -365,7 +365,7 @@ public abstract class BidMachineAd<
 
         @Override
         @SuppressWarnings("unchecked")
-        public void processLoadFail(final BMError error) {
+        public void processLoadFail(final @NonNull BMError error) {
             log("processLoadFail - " + error.getMessage());
             currentState = State.Failed;
             trackEvent(TrackEventType.Load, error);
@@ -437,7 +437,7 @@ public abstract class BidMachineAd<
 
         @Override
         @SuppressWarnings("unchecked")
-        public void processShowFail(final BMError error) {
+        public void processShowFail(@NonNull final BMError error) {
             if (loadedObject != null) {
                 loadedObject.onShowFailed();
             }
@@ -618,6 +618,12 @@ public abstract class BidMachineAd<
         }
 
         @Override
+        public void trackEvent(@NonNull TrackEventType eventType,
+                               @Nullable BMError error) {
+            BidMachineEvents.eventFinish(trackingObject, eventType, getAdsType(), error);
+        }
+
+        @Override
         public void log(String message) {
             if (Logger.isLoggingEnabled()) {
                 String selfMessage = toStringShort();
@@ -630,10 +636,6 @@ public abstract class BidMachineAd<
         }
 
     };
-
-    private void trackEvent(TrackEventType eventType, @Nullable BMError error) {
-        BidMachineEvents.eventFinish(trackingObject, eventType, getAdsType(), error);
-    }
 
     @NonNull
     @Override
