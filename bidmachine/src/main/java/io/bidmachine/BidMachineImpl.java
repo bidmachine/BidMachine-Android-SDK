@@ -4,9 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,12 +61,9 @@ final class BidMachineImpl {
         });
     }
 
-    private static final String BID_MACHINE_SHARED_PREF = "BidMachinePref";
     @VisibleForTesting
     static String DEF_INIT_URL = BuildConfig.BM_API_URL + "/init";
     private static final String DEF_AUCTION_URL = BuildConfig.BM_API_URL + "/openrtb3/auction";
-    private static final String PREF_INIT_DATA = "initData";
-    private static final String PREF_IFV = "bid_machine_ifv";
 
     @Nullable
     @VisibleForTesting
@@ -169,16 +164,7 @@ final class BidMachineImpl {
         if (!TextUtils.isEmpty(ifv)) {
             return ifv;
         }
-        SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
-                                                                     Context.MODE_PRIVATE);
-        ifv = preferences.getString(PREF_IFV, null);
-        if (!TextUtils.isEmpty(ifv)) {
-            return ifv;
-        }
-        ifv = UUID.randomUUID().toString();
-        preferences.edit()
-                .putString(PREF_IFV, ifv)
-                .apply();
+        ifv = BidMachineSharedPreference.obtainIFV(context);
         return ifv;
     }
 
@@ -205,7 +191,7 @@ final class BidMachineImpl {
                                 currentInitRequest = null;
                                 if (result != null) {
                                     handleInitResponse(result);
-                                    storeInitResponse(context, result);
+                                    BidMachineSharedPreference.storeInitResponse(context, result);
 
                                     initializeNetworks(context, result.getAdNetworksList());
                                 }
@@ -230,7 +216,8 @@ final class BidMachineImpl {
                                     }
                                 }
                                 if (!NetworkRegistry.isNetworksInitialized()) {
-                                    InitResponse initResponse = getInitResponseFromPref(context);
+                                    InitResponse initResponse =
+                                            BidMachineSharedPreference.getInitResponse(context);
                                     if (initResponse != null) {
                                         initializeNetworks(context,
                                                            initResponse.getAdNetworksList());
@@ -325,38 +312,11 @@ final class BidMachineImpl {
                                            });
     }
 
-    private void storeInitResponse(@NonNull Context context, @NonNull InitResponse response) {
-        SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
-                                                                     Context.MODE_PRIVATE);
-        try {
-            String initResponse = Base64.encodeToString(response.toByteArray(), Base64.DEFAULT);
-            preferences.edit()
-                    .putString(PREF_INIT_DATA, initResponse)
-                    .apply();
-        } catch (Exception ignore) {
-        }
-    }
-
     private void loadStoredInitResponse(@NonNull Context context) {
-        InitResponse initResponse = getInitResponseFromPref(context);
+        InitResponse initResponse = BidMachineSharedPreference.getInitResponse(context);
         if (initResponse != null) {
             handleInitResponse(initResponse);
         }
-    }
-
-    @Nullable
-    private InitResponse getInitResponseFromPref(@NonNull Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(BID_MACHINE_SHARED_PREF,
-                                                                     Context.MODE_PRIVATE);
-        if (preferences.contains(PREF_INIT_DATA)) {
-            try {
-                String initResponse = preferences.getString(PREF_INIT_DATA, null);
-                return InitResponse.parseFrom(Base64.decode(initResponse, Base64.DEFAULT));
-            } catch (Exception ignore) {
-                preferences.edit().remove(PREF_INIT_DATA).apply();
-            }
-        }
-        return null;
     }
 
     @Nullable
