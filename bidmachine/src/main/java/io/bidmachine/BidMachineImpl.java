@@ -143,6 +143,8 @@ final class BidMachineImpl {
             Logger.log("Initialization fail: Seller id is not provided");
             return;
         }
+        Debugger.setup(context);
+
         this.sellerId = sellerId;
         appContext = context.getApplicationContext();
         sessionTracker = new SessionTrackerImpl();
