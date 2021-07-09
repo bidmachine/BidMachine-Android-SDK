@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import io.bidmachine.core.Utils;
-
 public class DeviceUtils {
 
     public static int getOrientation(@Nullable Context context) {
@@ -107,27 +105,22 @@ public class DeviceUtils {
         return null;
     }
 
-    @Nullable
-    public static Integer getBatteryLevel(@NonNull Context context) {
-        float batteryPercent = Utils.getBatteryPercent(context);
-        if (batteryPercent >= 85) {
-            return 8;
-        } else if (batteryPercent >= 70 && batteryPercent < 85) {
-            return 7;
-        } else if (batteryPercent >= 55 && batteryPercent < 70) {
-            return 6;
-        } else if (batteryPercent >= 40 && batteryPercent < 55) {
-            return 5;
-        } else if (batteryPercent >= 25 && batteryPercent < 40) {
-            return 4;
-        } else if (batteryPercent >= 10 && batteryPercent < 25) {
-            return 3;
-        } else if (batteryPercent >= 5 && batteryPercent < 10) {
-            return 2;
-        } else if (batteryPercent < 5) {
-            return 1;
+    public static double getBatteryLevel(@NonNull Context context) {
+        try {
+            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = context.registerReceiver(null, intentFilter);
+            if (batteryStatus != null) {
+                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                if (level >= 0 && scale > 0) {
+                    double value = level / (double) scale;
+                    value = Math.round(value * 100) / 100D;
+                    return value;
+                }
+            }
+        } catch (Exception ignore) {
         }
-        return null;
+        return -1;
     }
 
     @Nullable
@@ -208,13 +201,13 @@ public class DeviceUtils {
     }
 
     @Nullable
-    public static Float getScreenBrightnessRatio(@NonNull Context context) {
+    public static Double getScreenBrightnessRatio(@NonNull Context context) {
         Integer brightness = getScreenBrightness(context);
         if (brightness == null) {
             return null;
         }
-        float value = brightness / 255F;
-        value = Math.round(value * 100F) / 100F;
+        double value = brightness / 255D;
+        value = Math.round(value * 100) / 100D;
         return value;
     }
 
