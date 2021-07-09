@@ -4,8 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -19,7 +17,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -279,29 +276,6 @@ public class Utils {
         double width = metrics.widthPixels / metrics.xdpi;
         double height = metrics.heightPixels / metrics.ydpi;
         return Math.sqrt(width * width + height * height) >= 6.6d;
-    }
-
-    /*
-    Device info utils
-     */
-
-    public static float getBatteryPercent(Context context) {
-        try {
-            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            Intent batteryStatus = context.registerReceiver(null, intentFilter);
-            if (batteryStatus != null) {
-                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                if (level == -1 || scale == -1) {
-                    return -1;
-                } else {
-                    return level / (float) scale * 100;
-                }
-            }
-        } catch (Exception e) {
-            Logger.log(e);
-        }
-        return -1;
     }
 
     public static boolean canUseExternalFilesDir(Context context) {

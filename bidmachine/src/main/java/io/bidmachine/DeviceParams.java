@@ -136,13 +136,11 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                                .setNumberValue(isHeadsetConnected ? 1 : 0)
                                                .build());
         }
-        Integer batteryLevel = DeviceUtils.getBatteryLevel(context);
-        if (batteryLevel != null) {
-            deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.BATTERY_LEVEL,
-                                       Value.newBuilder()
-                                               .setNumberValue(batteryLevel)
-                                               .build());
-        }
+        double batteryLevel = DeviceUtils.getBatteryLevel(context);
+        deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.BATTERY_LEVEL,
+                                   Value.newBuilder()
+                                           .setNumberValue(batteryLevel)
+                                           .build());
         Boolean isBatterySaverEnabled = DeviceUtils.isBatterySaverEnabled(context);
         if (isBatterySaverEnabled != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.BATTERY_SAVER,
@@ -182,7 +180,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
                                    Value.newBuilder()
                                            .setNumberValue(System.currentTimeMillis())
                                            .build());
-        Float screenBrightnessRatio = DeviceUtils.getScreenBrightnessRatio(context);
+        Double screenBrightnessRatio = DeviceUtils.getScreenBrightnessRatio(context);
         if (screenBrightnessRatio != null) {
             deviceExtBuilder.putFields(ProtoExtConstants.Context.Device.SCREEN_BRIGHT,
                                        Value.newBuilder()
