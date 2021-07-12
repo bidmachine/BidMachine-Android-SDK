@@ -5,31 +5,31 @@ import androidx.annotation.Nullable;
 public interface NativeData extends NativePublicData {
 
     /**
-     * @return url of icon that should be cached and displayed in icon view
+     * @return URL of icon that should be cached and displayed in icon view.
      */
     @Nullable
     String getIconUrl();
 
     /**
-     * @return url of image that should be cached and displayed in {@link io.bidmachine.nativead.view.NativeMediaView}
+     * @return URL of image that should be cached and displayed in {@link io.bidmachine.nativead.view.NativeMediaView}.
      */
     @Nullable
     String getImageUrl();
 
     /**
-     * @return url that should be opened by browser after click
+     * @return URL that should be opened by browser after click.
      */
     @Nullable
     String getClickUrl();
 
     /**
-     * @return url of video that should be cached and displayed in {@link io.bidmachine.nativead.view.NativeMediaView}
+     * @return URL of video that should be cached and displayed in {@link io.bidmachine.nativead.view.NativeMediaView}.
      */
     @Nullable
     String getVideoUrl();
 
     /**
-     * @return video creative that should be cached and displayed in {@link io.bidmachine.nativead.view.NativeMediaView}
+     * @return Video creative that should be cached and displayed in {@link io.bidmachine.nativead.view.NativeMediaView}.
      */
     @Nullable
     String getVideoAdm();

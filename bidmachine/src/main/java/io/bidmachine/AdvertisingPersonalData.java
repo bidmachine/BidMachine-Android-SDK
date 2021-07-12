@@ -18,9 +18,9 @@ class AdvertisingPersonalData {
 
     /**
      * Updating current advertising information.
-     * Only execute this method on a background thread
+     * Only execute this method on a background thread.
      *
-     * @param context - your application context
+     * @param context Your application context.
      */
     static void updateInfo(@NonNull Context context) {
         try {

@@ -10,36 +10,36 @@ import io.bidmachine.CreativeFormat;
 public interface AuctionResult {
 
     /**
-     * @return Winner Bid Id provided in request
+     * @return Winner Bid Id provided in request.
      */
     @NonNull
     String getId();
 
     /**
-     * @return Winner advertising source name
+     * @return Winner advertising source name.
      */
     @Nullable
     String getDemandSource();
 
     /**
-     * @return Winner price as CPM
+     * @return Winner price as CPM.
      */
     double getPrice();
 
     /**
-     * @return ID of Price Floor
+     * @return ID of Price Floor.
      */
     @Nullable
     String getDeal();
 
     /**
-     * @return ID of the buyer seat who made a bid
+     * @return ID of the buyer seat who made a bid.
      */
     @Deprecated
     String getSeat();
 
     /**
-     * @return Winner creative Id
+     * @return Winner creative Id.
      */
     @NonNull
     String getCreativeId();
@@ -69,13 +69,13 @@ public interface AuctionResult {
     Map<String, String> getNetworkParams();
 
     /**
-     * @return {@link CreativeFormat} of winner ad
+     * @return {@link CreativeFormat} of winner ad.
      */
     @Nullable
     CreativeFormat getCreativeFormat();
 
     /**
-     * @return Map that contains additional information of response
+     * @return Map that contains additional information of response.
      */
     @NonNull
     Map<String, String> getCustomParams();

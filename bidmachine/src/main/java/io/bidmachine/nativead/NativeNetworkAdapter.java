@@ -16,7 +16,7 @@ public abstract class NativeNetworkAdapter implements NativeData {
      * Method to configure {@link NativeMediaView} to display media view from the AdNetwork.
      * Initially {@link NativeMediaView} is empty.
      *
-     * @param nativeMediaView {@link NativeMediaView} that should be filled by image or video assets
+     * @param nativeMediaView {@link NativeMediaView} that should be filled by image or video assets.
      * @return {@code true} if configureMediaView was overriden, otherwise false and
      * {@link NativeMediaView} will be configured by default.
      */
@@ -25,7 +25,7 @@ public abstract class NativeNetworkAdapter implements NativeData {
     }
 
     /**
-     * @return {@link View} that provides DAA(Digital Advertising Alliances) from the AdNetwork
+     * @return {@link View} that provides DAA(Digital Advertising Alliances) from the AdNetwork.
      */
     @Nullable
     public View configureProviderView() {
@@ -33,12 +33,12 @@ public abstract class NativeNetworkAdapter implements NativeData {
     }
 
     /**
-     * Method to register user interaction to native ad
+     * Method to register user interaction to native ad.
      *
-     * @param container       container that contains all necessary views to show native ad
-     * @param iconView        {@link android.widget.ImageView} which is filled with an icon asset
-     * @param nativeMediaView {@link NativeMediaView} which is filled with an image or video asset
-     * @param clickableViews  set of views that are clickable
+     * @param container       Container that contains all necessary views to show native ad.
+     * @param iconView        {@link android.widget.ImageView} which is filled with an icon asset.
+     * @param nativeMediaView {@link NativeMediaView} which is filled with an image or video asset.
+     * @param clickableViews  Set of views that are clickable.
      */
     public void registerNative(@NonNull View container,
                                @Nullable ImageView iconView,
@@ -48,14 +48,14 @@ public abstract class NativeNetworkAdapter implements NativeData {
     }
 
     /**
-     * Method to unregister user interaction from native ad
+     * Method to unregister user interaction from native ad.
      */
     public void unregisterNative() {
 
     }
 
     /**
-     * Method to destroy AdNetwork components
+     * Method to destroy AdNetwork components.
      */
     public void destroy() {
 

@@ -8,7 +8,7 @@ import io.bidmachine.unified.UnifiedFullscreenAd;
 import io.bidmachine.unified.UnifiedNativeAd;
 
 /**
- * Class for implement Network initialization and specific Ads types creation
+ * Class for implement Network initialization and specific Ads types creation.
  */
 public abstract class NetworkAdapter {
 
@@ -30,35 +30,35 @@ public abstract class NetworkAdapter {
     }
 
     /**
-     * @return unique Network key
+     * @return Unique Network key.
      */
     public String getKey() {
         return key;
     }
 
     /**
-     * @return Network version
+     * @return Network version.
      */
     public String getVersion() {
         return version;
     }
 
     /**
-     * @return Network adapter version
+     * @return Network adapter version.
      */
     public String getAdapterVersion() {
         return adapterVersion;
     }
 
     /**
-     * @return Network supported ads types
+     * @return Network supported ads types.
      */
     AdsType[] getSupportedTypes() {
         return supportedTypes;
     }
 
     /**
-     * Calls to initialize Network
+     * Calls to initialize Network.
      */
     public final void initialize(@NonNull ContextProvider contextProvider,
                                  @NonNull UnifiedAdRequestParams adRequestParams,
@@ -76,37 +76,37 @@ public abstract class NetworkAdapter {
     }
 
     /**
-     * Method to create Banner Ad for Network
+     * Method to create Banner Ad for Network.
      */
     public UnifiedBannerAd createBanner() {
         throw new IllegalArgumentException(getKey() + " adapter does not support banner");
     }
 
     /**
-     * Method for create Interstitial Ad for Network
+     * Method for create Interstitial Ad for Network.
      */
     public UnifiedFullscreenAd createInterstitial() {
         throw new IllegalArgumentException(getKey() + " adapter does not support static interstitial");
     }
 
     /**
-     * Method for create Rewarded Ad for Network
+     * Method for create Rewarded Ad for Network.
      */
     public UnifiedFullscreenAd createRewarded() {
         throw new IllegalArgumentException(getKey() + " adapter does not support rewarded interstitial");
     }
 
     /**
-     * Method for create Native Ad for Network
+     * Method for create Native Ad for Network.
      */
     public UnifiedNativeAd createNativeAd() {
         throw new IllegalArgumentException(getKey() + " adapter does not support native ads");
     }
 
     /**
-     * Enables logging in adapter. Will be called after this parameter was changed via {@link BidMachine#setLoggingEnabled(boolean)}
+     * Enables logging in adapter. Will be called after this parameter was changed via {@link BidMachine#setLoggingEnabled(boolean)}.
      *
-     * @param enabled {@code true} to enable logging
+     * @param enabled {@code true} to enable logging.
      */
     public void setLogging(boolean enabled) throws Throwable {
 
