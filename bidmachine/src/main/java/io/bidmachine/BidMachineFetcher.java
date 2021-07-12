@@ -35,6 +35,12 @@ public class BidMachineFetcher {
     @VisibleForTesting
     static EnumMap<AdsType, Map<String, AdRequest>> cachedRequests = new EnumMap<>(AdsType.class);
 
+    /**
+     * Saving an instance of {@link AdRequest} to the storage for future use.
+     *
+     * @param adRequest That will be saved and based on that the map with parameters will be generated.
+     * @return An instance of {@link Map} that contains parameters for header bidding.
+     */
     @Nullable
     @SuppressWarnings({"unchecked"})
     public static Map<String, String> fetch(@NonNull AdRequest adRequest) {
@@ -75,6 +81,12 @@ public class BidMachineFetcher {
         return result;
     }
 
+    /**
+     * Removing an instance of {@link AdRequest} from the storage by an instance of {@link AdRequest}.
+     *
+     * @param adRequest An instance of {@link AdRequest} that will be removed.
+     * @return An instance of {@link AdRequest} that was deleted.
+     */
     @Nullable
     public static <T extends AdRequest> T release(@NonNull T adRequest) {
         AuctionResult auctionResult = adRequest.getAuctionResult();
@@ -84,6 +96,13 @@ public class BidMachineFetcher {
         return null;
     }
 
+    /**
+     * Removing an instance of {@link AdRequest} from the storage by {@link AdsType} and {@link AdRequest} parameters.
+     *
+     * @param adsType       {@link AdRequest} ad type.
+     * @param fetchedParams An instance of {@link Map} which contains {@link AdRequest} parameters.
+     * @return An instance of {@link AdRequest} that was deleted.
+     */
     @Nullable
     public static <T extends AdRequest> T release(@NonNull AdsType adsType,
                                                   @NonNull Map<String, String> fetchedParams) {
@@ -91,6 +110,13 @@ public class BidMachineFetcher {
         return release(adsType, requestId);
     }
 
+    /**
+     * Removing an instance of {@link AdRequest} from the storage by {@link AdsType} and {@link AdRequest} ID.
+     *
+     * @param adsType   {@link AdRequest} ad type.
+     * @param requestId {@link AdRequest} ID.
+     * @return An instance of {@link AdRequest} that was deleted.
+     */
     @Nullable
     @SuppressWarnings("unchecked")
     public static <T extends AdRequest> T release(@NonNull AdsType adsType,
@@ -113,6 +139,12 @@ public class BidMachineFetcher {
         }
     }
 
+    /**
+     * Transform an instance of {@link AdRequest} to an instance of {@link Map} that contains parameters for header bidding.
+     *
+     * @param adRequest An instance of {@link AdRequest} that will be transformed.
+     * @return An instance of {@link Map} that contains parameters for header bidding.
+     */
     @NonNull
     public static Map<String, String> toMap(@NonNull AdRequest adRequest) {
         Logger.log(TAG, String.format("toMap - %s", adRequest));

@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
 /**
- * Used in native ads to show video content
+ * Used in native ads to show video content.
  */
 public class NativeMediaView extends RelativeLayout {
 

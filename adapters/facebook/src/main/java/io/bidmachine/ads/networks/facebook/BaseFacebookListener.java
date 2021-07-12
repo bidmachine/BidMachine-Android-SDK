@@ -36,8 +36,8 @@ abstract class BaseFacebookListener<UnifiedAdCallbackType extends UnifiedAdCallb
     }
 
     /**
-     * @param error Facebook loading error code {@link com.facebook.ads.AdError}
-     * @return Appodeal loading error {@link BMError} or null
+     * @param error Facebook loading error code {@link com.facebook.ads.AdError}.
+     * @return Appodeal loading error {@link BMError} or null.
      */
     @Nullable
     private static BMError mapError(@Nullable AdError error) {

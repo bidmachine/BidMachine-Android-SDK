@@ -50,21 +50,37 @@ public class Publisher {
         private String domain;
         private List<String> categories;
 
+        /**
+         * @param id Publisher ID
+         * @return Self instance
+         */
         public Builder setId(@Nullable String id) {
             this.id = id;
             return this;
         }
 
+        /**
+         * @param name Publisher name
+         * @return Self instance
+         */
         public Builder setName(@Nullable String name) {
             this.name = name;
             return this;
         }
 
+        /**
+         * @param domain Publisher domain
+         * @return Self instance
+         */
         public Builder setDomain(@Nullable String domain) {
             this.domain = domain;
             return this;
         }
 
+        /**
+         * @param category Publisher content category
+         * @return Self instance
+         */
         public Builder addCategory(@Nullable String category) {
             if (TextUtils.isEmpty(category)) {
                 return this;
@@ -76,6 +92,10 @@ public class Publisher {
             return this;
         }
 
+        /**
+         * @param categoryList Publisher content category list
+         * @return Self instance
+         */
         public Builder addCategories(@Nullable List<String> categoryList) {
             if (categoryList == null || categoryList.isEmpty()) {
                 return this;
@@ -86,6 +106,9 @@ public class Publisher {
             return this;
         }
 
+        /**
+         * @return Instance of {@link Publisher} with parameters from {@link Publisher.Builder}
+         */
         public Publisher build() {
             return new Publisher(id, name, domain, categories);
         }

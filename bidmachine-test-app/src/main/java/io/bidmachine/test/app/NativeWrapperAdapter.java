@@ -18,7 +18,7 @@ import static androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
 import static androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 /**
- * Wrapper adapter that used to show Native Ad in recycler view with fixed step
+ * Wrapper adapter that used to show Native Ad in recycler view with fixed step.
  */
 public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
 
@@ -31,8 +31,8 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final SparseArray<NativeAd> nativeAdList = new SparseArray<>();
 
     /**
-     * @param userAdapter user adapter
-     * @param nativeStep  show step {@link NativeAd}
+     * @param userAdapter User adapter.
+     * @param nativeStep  Show step {@link NativeAd}.
      */
     NativeWrapperAdapter(RecyclerView.Adapter<ViewHolder> userAdapter, int nativeStep) {
         this.userAdapter = userAdapter;
@@ -118,7 +118,7 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     /**
-     * Destroys all used native ads
+     * Destroys all used native ads.
      */
     void destroyNativeAds() {
         for (int i = 0; i < nativeAdList.size(); i++) {
@@ -142,7 +142,7 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     /**
-     * @return user items count
+     * @return User items count.
      */
     private int getPublisherItemCount() {
         if (userAdapter != null) {
@@ -152,18 +152,18 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     /**
-     * @param position index in wrapper adapter
-     * @return {@code true} if item's position is {@link io.bidmachine.nativead.NativeAd}
+     * @param position Index in wrapper adapter.
+     * @return {@code true} if item's position is {@link io.bidmachine.nativead.NativeAd}.
      */
     private boolean isNativeAdPosition(int position) {
         return nativeAdList.get(position) != null;
     }
 
     /**
-     * Method to search position in user adapter
+     * Method to search position in user adapter.
      *
-     * @param position index in wrapper adapter
-     * @return index in user adapter
+     * @param position Index in wrapper adapter.
+     * @return Index in user adapter.
      */
     private int getPositionInUserAdapter(int position) {
         int countOfShownNative = position / nativeStep;
@@ -171,9 +171,9 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     /**
-     * Method to find next suitable position for {@link io.bidmachine.nativead.NativeAd}
+     * Method to find next suitable position for {@link io.bidmachine.nativead.NativeAd}.
      *
-     * @return position for next native ad view
+     * @return Position for next native ad view.
      */
     private int findNextAdPosition() {
         if (nativeAdList.size() > 0) {
@@ -243,7 +243,7 @@ public class NativeWrapperAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     /**
-     * Abstract view holders to create NativeAdView
+     * Abstract view holders to create NativeAdView.
      */
     abstract static class NativeAdViewHolder extends ViewHolder {
 

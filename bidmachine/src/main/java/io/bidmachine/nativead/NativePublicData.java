@@ -1,40 +1,40 @@
 package io.bidmachine.nativead;
 
 /**
- * Interface to work with native ads
+ * Interface to work with native ads.
  */
 public interface NativePublicData {
 
     /**
-     * Gets title of native ad
+     * Gets title of native ad.
      *
-     * @return title string
+     * @return Title string.
      */
     String getTitle();
 
     /**
-     * Gets description of native ad
+     * Gets description of native ad.
      *
-     * @return description string
+     * @return Description string.
      */
     String getDescription();
 
     /**
-     * Gets call to action string of native ad, to show on the button
+     * Gets call to action string of native ad, to show on the button.
      *
-     * @return call to action string
+     * @return Call to action string.
      */
     String getCallToAction();
 
     /**
-     * Gets native ad rating
+     * Gets native ad rating.
      *
-     * @return ad rating
+     * @return Ad rating.
      */
     float getRating();
 
     /**
-     * @return {@code true} if native ad has video
+     * @return {@code true} if native ad has video.
      */
     boolean hasVideo();
 

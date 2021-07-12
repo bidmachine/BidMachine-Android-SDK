@@ -52,7 +52,7 @@ public abstract class OMSDKAdMeasurer<AdView extends View> implements AdMeasurer
     }
 
     /**
-     * Execute after ad has loaded
+     * Execute after ad has loaded.
      */
     @UiThread
     protected void prepareAdSession(@NonNull AdSession adSession) {

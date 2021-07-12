@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * Enum contains of supported user genders options
+ * Enum contains of supported user genders options.
  */
 public enum Gender {
 
