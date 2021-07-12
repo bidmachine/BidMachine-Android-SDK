@@ -51,8 +51,8 @@ public class Publisher {
         private List<String> categories;
 
         /**
-         * @param id Publisher ID
-         * @return Self instance
+         * @param id Publisher ID.
+         * @return Self instance.
          */
         public Builder setId(@Nullable String id) {
             this.id = id;
@@ -60,8 +60,8 @@ public class Publisher {
         }
 
         /**
-         * @param name Publisher name
-         * @return Self instance
+         * @param name Publisher name.
+         * @return Self instance.
          */
         public Builder setName(@Nullable String name) {
             this.name = name;
@@ -69,8 +69,8 @@ public class Publisher {
         }
 
         /**
-         * @param domain Publisher domain
-         * @return Self instance
+         * @param domain Publisher domain.
+         * @return Self instance.
          */
         public Builder setDomain(@Nullable String domain) {
             this.domain = domain;
@@ -78,8 +78,8 @@ public class Publisher {
         }
 
         /**
-         * @param category Publisher content category
-         * @return Self instance
+         * @param category Publisher content category.
+         * @return Self instance.
          */
         public Builder addCategory(@Nullable String category) {
             if (TextUtils.isEmpty(category)) {
@@ -93,8 +93,8 @@ public class Publisher {
         }
 
         /**
-         * @param categoryList Publisher content category list
-         * @return Self instance
+         * @param categoryList Publisher content category list.
+         * @return Self instance.
          */
         public Builder addCategories(@Nullable List<String> categoryList) {
             if (categoryList == null || categoryList.isEmpty()) {
@@ -107,7 +107,7 @@ public class Publisher {
         }
 
         /**
-         * @return Instance of {@link Publisher} with parameters from {@link Publisher.Builder}
+         * @return Instance of {@link Publisher} with parameters from {@link Publisher.Builder}.
          */
         public Publisher build() {
             return new Publisher(id, name, domain, categories);
