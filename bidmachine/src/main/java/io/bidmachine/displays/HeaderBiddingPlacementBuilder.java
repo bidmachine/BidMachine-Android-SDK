@@ -227,9 +227,10 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             builder.putAllClientParams(mediationConfig);
             builder.putAllClientParams(params);
             adUnit = builder.build();
-            Logger.log(String.format("[%s] %s - Header bidding collect finished",
+            Logger.log(String.format("[%s] %s(%s) - Header bidding collect finished",
                                      adapter.getKey(),
-                                     adsType));
+                                     adsType,
+                                     adContentType));
             finish();
             BidMachineEvents.eventFinish(trackingObject,
                                          TrackEventType.HeaderBiddingNetworkPrepare,
@@ -243,9 +244,10 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                 return;
             }
             if (error != null) {
-                Logger.log(String.format("[%s] %s - Header bidding collect fail - %s",
+                Logger.log(String.format("[%s] %s(%s) - Header bidding collect fail - %s",
                                          adapter.getKey(),
                                          adsType,
+                                         adContentType,
                                          error));
             }
             finish();
@@ -269,9 +271,10 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             if (isFinished) {
                 return;
             }
-            Logger.log(String.format("[%s] %s - Header bidding collect fail: timeout",
+            Logger.log(String.format("[%s] %s(%s) - Header bidding collect fail: timeout",
                                      adapter.getKey(),
-                                     adsType));
+                                     adsType,
+                                     adContentType));
             finish();
         }
 

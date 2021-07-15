@@ -48,8 +48,7 @@ public class BidMachineAdTest {
         interstitialAd.setListener(new SimpleInterstitialListener() {
             @Override
             public void onAdLoadFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
-                String message = error.getMessage();
-                if (message != null && message.contains("No Request")) {
+                if (error.equals(BMError.notFound("AdRequest"))) {
                     countDownLatch.countDown();
                 }
             }
@@ -78,7 +77,7 @@ public class BidMachineAdTest {
         bidMachineAd.setListener(new SimpleInterstitialListener() {
             @Override
             public void onAdLoadFailed(@NonNull InterstitialAd ad, @NonNull BMError error) {
-                if ("AdRequest already shown".equals(error.getBrief())) {
+                if (error == BMError.RequestAlreadyShown) {
                     countDownLatch.countDown();
                 }
             }

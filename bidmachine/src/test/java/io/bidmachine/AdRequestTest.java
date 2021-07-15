@@ -370,7 +370,7 @@ public class AdRequestTest {
         adRequest.processBidPayload(responsePayload);
         verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
         verify(adRequest, new Times(0)).retrieveBody(any(String.class));
-        verify(adRequest).processRequestFail(BMError.IncorrectContent);
+        verify(adRequest).processRequestFail(any(BMError.class));
     }
 
     @Test
@@ -379,7 +379,7 @@ public class AdRequestTest {
         adRequest.processBidPayload(responsePayload);
         verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
         verify(adRequest, new Times(0)).retrieveBody(any(String.class));
-        verify(adRequest).processRequestFail(BMError.IncorrectContent);
+        verify(adRequest).processRequestFail(any(BMError.class));
     }
 
     @Test
@@ -391,7 +391,6 @@ public class AdRequestTest {
         adRequest.processBidPayload(responsePayload);
         verify(adRequest).processApiRequestSuccess(openrtb.getResponse());
         verify(adRequest, new Times(0)).retrieveBody(any(String.class));
-        verify(adRequest, new Times(0)).processRequestFail(BMError.IncorrectContent);
     }
 
     @Test
@@ -403,7 +402,7 @@ public class AdRequestTest {
         adRequest.processBidPayload(responsePayload);
         verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
         verify(adRequest, new Times(0)).retrieveBody(any(String.class));
-        verify(adRequest).processRequestFail(BMError.IncorrectContent);
+        verify(adRequest).processRequestFail(any(BMError.class));
     }
 
     @Test
@@ -415,7 +414,7 @@ public class AdRequestTest {
         adRequest.processBidPayload(responsePayload);
         verify(adRequest, new Times(0)).processApiRequestSuccess(any(Response.class));
         verify(adRequest).retrieveBody(responseCacheUrl);
-        verify(adRequest, new Times(0)).processRequestFail(BMError.IncorrectContent);
+        verify(adRequest, new Times(0)).processRequestFail(any(BMError.class));
     }
 
 }

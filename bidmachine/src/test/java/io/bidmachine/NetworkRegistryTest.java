@@ -1,5 +1,6 @@
 package io.bidmachine;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -11,6 +12,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 public class NetworkRegistryTest {
+
+    @Before
+    public void setUp() throws Exception {
+        NetworkRegistry.cache.clear();
+        NetworkRegistry.pendingNetworks.clear();
+    }
 
     @Test
     public void isNetworkRegistered_networksNotRegistered_returnFalse() {
