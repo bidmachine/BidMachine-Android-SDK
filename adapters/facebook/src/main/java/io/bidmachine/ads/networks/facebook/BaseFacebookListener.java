@@ -46,23 +46,18 @@ abstract class BaseFacebookListener<UnifiedAdCallbackType extends UnifiedAdCallb
         }
         switch (error.getErrorCode()) {
             case AdError.NETWORK_ERROR_CODE:
-                return BMError.Connection;
+                return BMError.NoConnection;
             case AdError.NO_FILL_ERROR_CODE:
             case AdError.SERVER_ERROR_CODE:
             case AdError.INTERNAL_ERROR_CODE:
             case AdError.CACHE_ERROR_CODE:
             case AdError.MEDIATION_ERROR_CODE:
             case AdError.LOAD_TOO_FREQUENTLY_ERROR_CODE:
-                return BMError.NoContent;
+                return BMError.noFill();
             case AdError.INTERSTITIAL_AD_TIMEOUT:
                 return BMError.TimeoutError;
-            case AdError.NATIVE_AD_IS_NOT_LOADED:
-            case AdError.BROKEN_MEDIA_ERROR_CODE:
-            case AdError.ICONVIEW_MISSING_ERROR_CODE:
-            case AdError.AD_ASSETS_UNSUPPORTED_TYPE_ERROR_CODE:
-                return BMError.IncorrectAdUnit;
             default:
-                return BMError.Internal;
+                return BMError.internal("Unknown error");
         }
     }
 

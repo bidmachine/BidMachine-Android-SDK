@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.explorestack.iab.vast.VastError;
 import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.VastRequestListener;
 import com.explorestack.iab.vast.processor.VastAd;
@@ -46,17 +45,7 @@ class VastFullScreenAdLoadListener implements VastRequestListener {
 
     @Override
     public void onVastError(@NonNull Context context, @NonNull VastRequest vastRequest, int error) {
-        //TODO: implement vast error mapping
-        switch (error) {
-            case VastError.ERROR_CODE_NO_NETWORK: {
-                callback.onAdLoadFailed(BMError.noFillError(BMError.Connection));
-                break;
-            }
-            default: {
-                callback.onAdLoadFailed(BMError.noFillError(null));
-                break;
-            }
-        }
+        callback.onAdLoadFailed(BMError.noFill());
     }
 
 }

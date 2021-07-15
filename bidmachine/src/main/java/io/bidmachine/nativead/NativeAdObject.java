@@ -236,7 +236,7 @@ public final class NativeAdObject
                              @Nullable Set<View> clickableViews) {
         try {
             if (!isNativeAdViewValid(nativeAdView, imageView, nativeMediaView, clickableViews)) {
-                getProcessCallback().processShowFail(BMError.NoContent);
+                getProcessCallback().processShowFail(BMError.internal("Native ad views are invalid"));
                 return;
             }
             assert nativeAdView != null;
@@ -275,9 +275,10 @@ public final class NativeAdObject
             }
             viewRegistered = true;
         } catch (Throwable t) {
-            unregisterView();
-            getProcessCallback().processShowFail(BMError.catchError("Error during registerView"));
             Logger.log(t);
+            unregisterView();
+            getProcessCallback().processShowFail(BMError.internal(
+                    "Exception when registering view for native ad object"));
         }
     }
 
@@ -559,7 +560,7 @@ public final class NativeAdObject
                 loadAsset(getContext(), nativeNetworkAdapter);
             } catch (Exception e) {
                 Logger.log(e);
-                processCallback.processLoadFail(BMError.Internal);
+                processCallback.processLoadFail(BMError.internal("Exception when loading assets"));
             }
         }
 

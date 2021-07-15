@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.AdObjectParams;
 import io.bidmachine.unified.UnifiedFullscreenAdRequestParams;
@@ -26,12 +27,14 @@ public abstract class FullScreenAd<
             return;
         }
         if (!Utils.isNetworkAvailable(getContext())) {
-            processCallback.processShowFail(BMError.Connection);
+            processCallback.processShowFail(BMError.NoConnection);
         } else {
             try {
                 loadedObject.show(getContextProvider());
             } catch (Throwable t) {
-                processCallback.processShowFail(BMError.catchError("Failed to show loaded ad"));
+                Logger.log(t);
+                processCallback.processShowFail(BMError.internal(
+                        "Exception when showing fullscreen object"));
             }
         }
     }

@@ -23,11 +23,11 @@ class FacebookParams extends UnifiedParams {
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
         if (TextUtils.isEmpty(placementId)) {
-            callback.onAdLoadFailed(BMError.requestError("placement_id not provided"));
+            callback.onAdLoadFailed(BMError.notFound(FacebookConfig.KEY_PLACEMENT_ID));
             return false;
         }
         if (TextUtils.isEmpty(bidPayload)) {
-            callback.onAdLoadFailed(BMError.requestError("bid_payload not provided"));
+            callback.onAdLoadFailed(BMError.notFound(FacebookConfig.KEY_BID_PAYLOAD));
             return false;
         }
         return true;

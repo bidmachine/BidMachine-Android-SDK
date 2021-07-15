@@ -99,13 +99,15 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
         }
         String publisherId = networkParams.get(CriteoConfig.PUBLISHER_ID);
         if (TextUtils.isEmpty(publisherId)) {
-            AdapterLogger.logError(getKey(), "Initialize failed: publisher_id not provided");
+            AdapterLogger.logError(getKey(),
+                                   String.format("Initialize failed: %s not provided",
+                                                 CriteoConfig.PUBLISHER_ID));
             return;
         }
         assert publisherId != null;
         List<AdUnit> adUnitList = CriteoAdUnitStorage.extractAdUnits(networkConfigParams);
         if (adUnitList == null || adUnitList.size() == 0) {
-            AdapterLogger.logError(getKey(), "Initialize failed: adUnits not found");
+            AdapterLogger.logError(getKey(), "Initialize failed: AdUnits not found");
             return;
         }
         configure(contextProvider.getContext(),
@@ -121,18 +123,18 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull HeaderBiddingCollectParamsCallback collectCallback,
                                            @NonNull Map<String, String> mediationConfig) throws Throwable {
         if (!isInitialized()) {
-            collectCallback.onCollectFail(BMError.NotInitialized);
+            collectCallback.onCollectFail(BMError.adapterNotInitialized());
             return;
         }
         String adUnitId = mediationConfig.get(CriteoConfig.AD_UNIT_ID);
         if (TextUtils.isEmpty(adUnitId)) {
-            collectCallback.onCollectFail(BMError.IncorrectAdUnit);
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(CriteoConfig.AD_UNIT_ID));
             return;
         }
         assert adUnitId != null;
         AdUnit adUnit = CriteoAdUnitStorage.getAdUnit(adUnitId);
         if (adUnit == null) {
-            collectCallback.onCollectFail(BMError.requestError("AdUnit not found"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter("AdUnit"));
             return;
         }
         Criteo criteo = Criteo.getInstance();
@@ -145,7 +147,7 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                 params.put(CriteoConfig.PRICE, String.valueOf(bid.getPrice()));
                 collectCallback.onCollectFinished(params);
             } else {
-                collectCallback.onCollectFail(BMError.NotLoaded);
+                collectCallback.onCollectFail(BMError.adapterGetsParameter("Bid"));
             }
         });
     }
@@ -180,13 +182,11 @@ class CriteoAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     static BMError mapError(CriteoErrorCode criteoErrorCode) {
         switch (criteoErrorCode) {
             case ERROR_CODE_NO_FILL:
-            case ERROR_CODE_INTERNAL_ERROR:
-            case ERROR_CODE_INVALID_REQUEST:
-                return BMError.NoContent;
+                return BMError.noFill();
             case ERROR_CODE_NETWORK_ERROR:
-                return BMError.Connection;
+                return BMError.NoConnection;
             default:
-                return BMError.Internal;
+                return BMError.internal("Unknown error");
         }
     }
 

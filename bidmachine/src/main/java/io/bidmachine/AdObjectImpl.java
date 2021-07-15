@@ -185,11 +185,6 @@ public abstract class AdObjectImpl<
             processCallback.processExpired();
         }
 
-        @Override
-        public void log(String message) {
-            processCallback.log(message);
-        }
-
     }
 
 }

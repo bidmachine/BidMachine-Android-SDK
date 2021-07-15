@@ -39,9 +39,9 @@ class MraidFullScreenAdListener implements MraidInterstitialListener {
     @Override
     public void onError(@NonNull MraidInterstitial mraidInterstitial, int i) {
         if (i == MraidError.SHOW_ERROR) {
-            callback.onAdShowFailed(BMError.Internal);
+            callback.onAdShowFailed(BMError.internal("Error when showing interstitial object"));
         } else {
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
     }
 

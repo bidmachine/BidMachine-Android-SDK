@@ -46,7 +46,8 @@ class FacebookRewarded extends UnifiedFullscreenAd {
                 && !rewardedVideoAd.isAdInvalidated()) {
             rewardedVideoAd.show();
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal(
+                    "Rewarded object is null or not loaded or invalidated"));
         }
     }
 

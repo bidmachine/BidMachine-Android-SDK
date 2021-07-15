@@ -129,7 +129,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         try {
             final String sellerId = BidMachineImpl.get().getSellerId();
             if (TextUtils.isEmpty(sellerId)) {
-                return BMError.paramError("Seller Id not provided");
+                return BMError.notFound("SellerId");
             }
             assert sellerId != null;
 
@@ -163,7 +163,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                             : priceFloorParams.getPriceFloors();
 
             if (priceFloorsMap == null) {
-                return BMError.paramError("PriceFloors not provided");
+                return BMError.notFound("PriceFloors");
             }
 
             final ArrayList<Message.Builder> placements = new ArrayList<>();
@@ -338,7 +338,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
 
     public void request(@NonNull final android.content.Context context) {
         if (!BidMachineImpl.get().isInitialized()) {
-            processRequestFail(BMError.NotInitialized);
+            processRequestFail(BMError.internal("BidMachine not initialized"));
             return;
         }
         if (isDestroyed()) {
@@ -361,7 +361,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     isApiRequestCanceled.set(false);
                     isApiRequestCompleted.set(false);
 
-                    Logger.log(toString() + ": api request start");
+                    log("Request start");
                     BidMachineEvents.eventStart(trackingObject, TrackEventType.AuctionRequest);
                     if (!TextUtils.isEmpty(bidPayload)) {
                         processBidPayload(bidPayload);
@@ -370,7 +370,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                     processRequestObject(context);
                 } catch (Throwable t) {
                     Logger.log(t);
-                    processRequestFail(BMError.Internal);
+                    processRequestFail(BMError.internal("Exception when loading ad request"));
                 }
             }
         });
@@ -387,7 +387,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         } catch (Throwable t) {
             Logger.log(t);
         }
-        processRequestFail(BMError.IncorrectContent);
+        processRequestFail(BMError.incorrectContent("Incorrect BidPayload format"));
     }
 
     @VisibleForTesting
@@ -404,7 +404,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 return;
             }
         }
-        processRequestFail(BMError.IncorrectContent);
+        processRequestFail(BMError.incorrectContent("BidPayload does not contain Response or URL"));
     }
 
     @VisibleForTesting
@@ -437,7 +437,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         } else {
             processRequestFail(requestObject instanceof BMError
                                        ? (BMError) requestObject
-                                       : BMError.Internal);
+                                       : BMError.internal("Failed to create ad request"));
         }
     }
 
@@ -480,7 +480,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             return;
         }
 
-        Logger.log(toString() + ": notifyMediationWin");
+        log("notifyMediationWin");
 
         BMError bmError;
         if (isDestroyed()) {
@@ -501,7 +501,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
             return;
         }
 
-        Logger.log(toString() + ": notifyMediationLoss");
+        log("notifyMediationLoss");
 
         BMError bmError;
         if (isDestroyed()) {
@@ -535,7 +535,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         }
         isDestroyed = true;
 
-        Logger.log(toString() + ": destroy");
+        log("destroy");
 
         cancel();
         unsubscribeTimeOut();
@@ -704,25 +704,22 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         isApiRequestCompleted.set(true);
         currentApiRequest = null;
         unsubscribeTimeOut();
-        Logger.log(toString() + ": api request success");
+        log("Request success");
 
         if (response != null && response.getSeatbidCount() > 0) {
             final Response.Seatbid seatbid = response.getSeatbid(0);
             if (seatbid == null || seatbid.getBidCount() == 0) {
-                Logger.log(toString() + ": Seatbid not found or not valid");
-                processRequestFail(BMError.requestError("Seatbid not found or not valid"));
+                processRequestFail(BMError.notFound("Seatbid"));
                 return;
             }
             final Response.Seatbid.Bid bid = seatbid.getBid(0);
             if (bid == null) {
-                Logger.log(toString() + ": Bid not found or not valid");
-                processRequestFail(BMError.requestError("Bid not found or not valid"));
+                processRequestFail(BMError.notFound("Bid"));
                 return;
             }
             Any media = bid.getMedia();
             if (media == null || !media.is(Ad.class)) {
-                Logger.log(toString() + ": Media not found or not valid");
-                processRequestFail(BMError.requestError("Media not found or not valid"));
+                processRequestFail(BMError.incorrectContent("Media not found or not valid"));
                 return;
             }
             try {
@@ -730,8 +727,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 if (ad != null) {
                     NetworkConfig networkConfig = getType().obtainNetworkConfig(ad);
                     if (networkConfig == null) {
-                        Logger.log(toString() + ": NetworkConfig not found");
-                        processRequestFail(BMError.requestError("NetworkConfig not found"));
+                        processRequestFail(BMError.notFound("NetworkConfig"));
                         return;
                     }
                     adResult = ad;
@@ -748,7 +744,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                                         DEF_EXPIRATION_TIME);
                     extractTrackUrls(bid);
                     subscribeExpireTracker();
-                    Logger.log(toString() + ": Request finished (" + auctionResult + ")");
+                    log(String.format("Request finished (%s)", auctionResult));
                     if (adRequestListeners != null) {
                         for (AdRequestListener listener : adRequestListeners) {
                             listener.onRequestSuccess(this, auctionResult);
@@ -764,15 +760,15 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                                                  null);
                     return;
                 } else {
-                    Logger.log(toString() + ": Ad not found or not valid");
+                    log("Ad not found or not valid");
                 }
             } catch (Throwable t) {
                 Logger.log(t);
             }
         } else {
-            Logger.log(toString() + ": Response not found or not valid");
+            log("Response not found or not valid");
         }
-        processRequestFail(BMError.Internal);
+        processRequestFail(BMError.internal("Failed to process response"));
     }
 
     private void processApiRequestFail(@Nullable BMError error) {
@@ -782,13 +778,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         isApiRequestCompleted.set(true);
         currentApiRequest = null;
         unsubscribeTimeOut();
-        Logger.log(toString() + ": api request fail - " + error);
 
         if (error == null) {
-            error = BMError.noFillError(null);
+            error = BMError.noFill();
             error.setTrackError(false);
-        } else {
-            error.setTrackError(error != BMError.NoContent);
         }
         processRequestFail(error);
     }
@@ -796,6 +789,7 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
     @SuppressWarnings("unchecked")
     @VisibleForTesting
     void processRequestFail(@NonNull BMError error) {
+        log(String.format("Request fail - %s", error));
         if (adRequestListeners != null) {
             for (AdRequestListener listener : adRequestListeners) {
                 listener.onRequestFailed(this, error);
@@ -844,10 +838,16 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         return unifiedAdRequestParams;
     }
 
+    private void log(String message) {
+        Logger.log(String.format("%s: %s", toString(), message));
+    }
+
     @NonNull
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[@" + Integer.toHexString(hashCode()) + "]";
+        return String.format("%s[@%s]",
+                             getClass().getSimpleName(),
+                             Integer.toHexString(hashCode()));
     }
 
 

@@ -1,8 +1,6 @@
 package io.bidmachine.utils;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 import io.bidmachine.protobuf.ErrorReason;
 
@@ -10,158 +8,100 @@ public class BMError {
 
     public static final int NOT_SET = -1;
 
-    @VisibleForTesting
-    public static final int ERROR_NOT_LOADED = 98;
 
-    @VisibleForTesting
-    public static final int ERROR_NOT_INITIALIZED = 99;
-
-    public static final BMError NotInitialized =
-            new BMError(ERROR_NOT_INITIALIZED,
-                        "SDK not initialized",
-                        "Sdk not initialized properly");
-
-    public static final BMError Connection =
+    public static final BMError NoConnection =
             new BMError(ErrorReason.ERROR_REASON_NO_CONNECTION_VALUE,
-                        "Connection error",
-                        "BidMachine can't connect to server");
+                        "Can't connect to server");
 
     public static final BMError TimeoutError =
             new BMError(ErrorReason.ERROR_REASON_TIMEOUT_VALUE,
-                        "Timeout error",
-                        "BidMachine timeout reached");
+                        "Timeout reached");
 
-    public static final BMError NoContent =
-            new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
-                        "No content",
-                        "No content");
-
-    public static final BMError IncorrectAdUnit =
-            new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
-                        "Incorrect ad unit",
-                        "Incorrect ad unit");
-
-    public static final BMError IncorrectContent =
-            new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
-                        "Incorrect content",
-                        "Incorrect content");
-
-    public static final BMError Internal =
-            new BMError(ErrorReason.ERROR_REASON_INTERNAL_VALUE,
-                        "Internal error",
-                        "internal error acquired");
+    public static final BMError Request =
+            new BMError(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE,
+                        "Request contains bad syntax or cannot be fulfilled");
 
     public static final BMError Server =
             new BMError(ErrorReason.ERROR_REASON_HTTP_SERVER_ERROR_VALUE,
-                        "Server error",
-                        "server error, please contact support");
-
-    public static final BMError NotLoaded =
-            new BMError(ERROR_NOT_LOADED,
-                        "Ads not loaded",
-                        "Ads not loaded");
-
-    public static final BMError AlreadyShown =
-            new BMError(-1,
-                        "Ads already shown",
-                        "Ads was already shown, load new one please");
+                        "Server failed to fulfil an apparently valid request");
 
     public static final BMError RequestAlreadyShown =
-            new BMError(-1,
-                        "AdRequest already shown",
+            new BMError(NOT_SET,
                         "AdRequest that related with ad has already been shown, load new AdRequest please");
-
-    public static final BMError RequestDestroyed =
-            new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
-                        "AdRequest destroyed",
-                        "AdRequest destroyed, create new one please");
 
     public static final BMError RequestExpired =
             new BMError(ErrorReason.ERROR_REASON_WAS_EXPIRED_VALUE,
-                        "AdRequest expired",
                         "AdRequest expired, load new one please");
 
-    public static final BMError Destroyed =
+    public static final BMError RequestDestroyed =
             new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
-                        "Ads destroyed",
-                        "Ads destroyed, load new one please");
+                        "AdRequest destroyed, create new one please");
+
+    public static final BMError AlreadyShown =
+            new BMError(NOT_SET,
+                        "Ads was already shown, load new one please");
 
     public static final BMError Expired =
             new BMError(ErrorReason.ERROR_REASON_WAS_EXPIRED_VALUE,
-                        "Ads expired",
                         "Ads was expired, load new one please");
 
-    public static BMError noFillError(BMError origin) {
-        if (origin != null && origin.getCode() != ErrorReason.ERROR_REASON_NO_CONTENT_VALUE) {
-            return new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
-                               "No fill (" + origin.getBrief() + ")",
-                               "No ads fill (" + origin.getMessage() + ")",
-                               origin);
-        }
+    public static final BMError Destroyed =
+            new BMError(ErrorReason.ERROR_REASON_WAS_DESTROYED_VALUE,
+                        "Ads destroyed, load new one please");
+
+
+    public static BMError noFill() {
+        return new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE, "No ads fill");
+    }
+
+    public static BMError notFound(@NonNull String name) {
         return new BMError(ErrorReason.ERROR_REASON_NO_CONTENT_VALUE,
-                           "No fill",
-                           "No ads fill",
-                           origin);
+                           String.format("%s not found", name));
     }
 
-    public static BMError paramError(String message) {
-        return new BMError(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE,
-                           "Param error",
-                           "Param error: " + message);
+    public static BMError incorrectContent(@NonNull String message) {
+        return new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE, message);
     }
 
-    public static BMError adapterNotFoundError(String adapterName) {
-        return new BMError(ErrorReason.ERROR_REASON_BAD_CONTENT_VALUE,
-                           "Adapter not found",
-                           "Adapter not found (" + adapterName + ")");
+
+    public static BMError adapter(@NonNull String message) {
+        return new BMError(ErrorReason.ERROR_REASON_HB_NETWORK_VALUE, message);
     }
 
-    public static BMError requestError(String message) {
-        return new BMError(ErrorReason.ERROR_REASON_HTTP_BAD_REQUEST_VALUE,
-                           "Request Error",
-                           "Request error (" + message + ")");
+    public static BMError adapterNotInitialized() {
+        return adapter("Adapter SDK not initialized");
     }
 
-    public static BMError catchError(String message) {
-        return new BMError(ErrorReason.ERROR_REASON_HANDLED_EXCEPTION_VALUE,
-                           "Catch error",
-                           message);
+    public static BMError adapterInitialization() {
+        return adapter("Adapter SDK initialization error");
     }
+
+    public static BMError adapterGetsParameter(@NonNull String parameterName) {
+        return adapter(String.format("%s not found", parameterName));
+    }
+
+
+    public static BMError internal(@NonNull String message) {
+        return new BMError(ErrorReason.ERROR_REASON_INTERNAL_VALUE, message);
+    }
+
 
     private final int code;
-    private final String brief;
     private final String message;
-    @Nullable
-    private final BMError originError;
 
     private boolean trackError = true;
 
-    private BMError(int code, String brief, String message) {
-        this(code, brief, message, null);
-    }
-
-    private BMError(int code, String brief, String message, @Nullable BMError originError) {
+    private BMError(int code, @NonNull String message) {
         this.code = code;
-        this.brief = brief;
         this.message = message;
-        this.originError = originError;
     }
 
     public int getCode() {
         return code;
     }
 
-    public String getBrief() {
-        return brief;
-    }
-
     public String getMessage() {
         return message;
-    }
-
-    @Nullable
-    public BMError getOriginError() {
-        return originError;
     }
 
     public boolean isTrackError() {
@@ -185,24 +125,20 @@ public class BMError {
         if (code != bmError.code) {
             return false;
         }
-        if (brief != null ? !brief.equals(bmError.brief) : bmError.brief != null) {
-            return false;
-        }
-        return message != null ? message.equals(bmError.message) : bmError.message == null;
+        return message.equals(bmError.message);
     }
 
     @Override
     public int hashCode() {
         int result = code;
-        result = 31 * result + (brief != null ? brief.hashCode() : 0);
-        result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + message.hashCode();
         return result;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return String.format("(%s) %s - %s", code, brief, message);
+        return String.format("(%s) %s", code, message);
     }
 
 }

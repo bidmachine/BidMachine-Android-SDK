@@ -54,7 +54,7 @@ final class BidMachineImpl {
             @Override
             public String buildMessage(String origin) {
                 if (get().isTestMode()) {
-                    return "(TEST MODE) " + origin;
+                    return String.format("(TEST MODE) %s", origin);
                 }
                 return origin;
             }
@@ -223,7 +223,8 @@ final class BidMachineImpl {
                                                            initResponse.getAdNetworksList());
                                     }
                                 }
-                                Logger.log("reschedule init request (" + initRequestDelayMs + ")");
+                                Logger.log(String.format("reschedule init request (%s)",
+                                                         initRequestDelayMs));
                                 Utils.onBackgroundThread(rescheduleInitRunnable,
                                                          initRequestDelayMs);
                                 // According requirements we should notify that SDK is initialized event if init request fail

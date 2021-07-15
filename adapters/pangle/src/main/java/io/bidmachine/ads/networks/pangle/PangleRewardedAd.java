@@ -57,11 +57,11 @@ class PangleRewardedAd extends UnifiedFullscreenAd {
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         Activity activity = contextProvider.getActivity();
         if (activity == null) {
-            callback.onAdShowFailed(BMError.Internal);
+            callback.onAdShowFailed(BMError.internal("Activity is null"));
             return;
         }
         if (ttRewardVideoAd == null) {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Rewarded object is null"));
             return;
         }
 
@@ -120,7 +120,7 @@ class PangleRewardedAd extends UnifiedFullscreenAd {
                 return;
             }
 
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
 
         public void destroy() {

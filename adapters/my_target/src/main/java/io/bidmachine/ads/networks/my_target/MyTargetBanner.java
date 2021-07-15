@@ -80,7 +80,7 @@ class MyTargetBanner extends UnifiedBannerAd {
 
         @Override
         public void onNoAd(@NonNull String s, @NonNull MyTargetView myTargetView) {
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
 
         @Override

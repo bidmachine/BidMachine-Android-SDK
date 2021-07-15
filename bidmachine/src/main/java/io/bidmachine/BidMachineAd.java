@@ -123,7 +123,7 @@ public abstract class BidMachineAd<
     public SelfType load(AdRequestType request) {
         processCallback.log("load requested");
         if (!BidMachineImpl.get().isInitialized()) {
-            processRequestFail(BMError.NotInitialized);
+            processRequestFail(BMError.internal("BidMachine not initialized"));
             return (SelfType) this;
         }
         if (currentState != State.Idle) {
@@ -131,7 +131,7 @@ public abstract class BidMachineAd<
             return (SelfType) this;
         }
         if (request == null) {
-            processRequestFail(BMError.paramError("No Request"));
+            processRequestFail(BMError.notFound("AdRequest"));
             return (SelfType) this;
         }
         detachRequest(adRequest);
@@ -180,7 +180,7 @@ public abstract class BidMachineAd<
             processCallback.processShowFail(BMError.Expired);
             return false;
         } else if (!isLoaded() || loadedObject == null) {
-            processCallback.processShowFail(BMError.NotLoaded);
+            processCallback.processShowFail(BMError.internal("Ad not loaded"));
             return false;
         } else if (!isAdRequestCanShowAd()) {
             processCallback.processShowFail(BMError.RequestAlreadyShown);
@@ -230,7 +230,8 @@ public abstract class BidMachineAd<
         BidMachineEvents.eventStart(trackingObject, TrackEventType.Load);
         currentState = State.Loading;
         if (request == null || seatbid == null || bid == null || ad == null) {
-            processRequestFail(BMError.Internal);
+            processRequestFail(BMError.incorrectContent(
+                    "One of this object is null: AdRequest, Seatbid, Bid, Ad"));
         } else {
             BMError processResult = processResponseSuccess(request, seatbid, bid, ad);
             if (processResult != null) {
@@ -261,25 +262,32 @@ public abstract class BidMachineAd<
         try {
             UnifiedAdRequestParamsType adRequestParams = adRequest.obtainUnifiedRequestParams();
             NetworkConfig networkConfig = getAdsType().obtainNetworkConfig(ad);
-            if (networkConfig != null) {
-                AdObjectParams adObjectParams = getAdsType().createAdObjectParams(seatbid, bid, ad);
-                if (adObjectParams != null && adObjectParams.isValid()) {
-                    loadedObject = createAdObject(contextProvider,
-                                                  adRequest,
-                                                  networkConfig.obtainNetworkAdapter(),
-                                                  adObjectParams,
-                                                  processCallback);
-                    if (loadedObject != null) {
-                        loadedObject.load(contextProvider, adRequestParams);
-                        return null;
-                    }
-                }
-                return BMError.IncorrectAdUnit;
+            if (networkConfig == null) {
+                return BMError.incorrectContent(String.format(
+                        "[%s] Failed to get adapter by response",
+                        ad.getId()));
             }
-            return BMError.adapterNotFoundError("for Ad with id: " + ad.getId());
+            AdObjectParams adObjectParams = getAdsType().createAdObjectParams(seatbid, bid, ad);
+            if (adObjectParams == null || !adObjectParams.isValid()) {
+                return BMError.incorrectContent(String.format(
+                        "[%s] Failed to get adapter parameters by response",
+                        ad.getId()));
+            }
+            loadedObject = createAdObject(contextProvider,
+                                          adRequest,
+                                          networkConfig.obtainNetworkAdapter(),
+                                          adObjectParams,
+                                          processCallback);
+            if (loadedObject == null) {
+                return BMError.incorrectContent(String.format(
+                        "[%s] Failed to create ad object by response",
+                        ad.getId()));
+            }
+            loadedObject.load(contextProvider, adRequestParams);
+            return null;
         } catch (Throwable e) {
             Logger.log(e);
-            return BMError.Internal;
+            return BMError.internal("Exception when processing response");
         }
     }
 
@@ -366,7 +374,7 @@ public abstract class BidMachineAd<
         @Override
         @SuppressWarnings("unchecked")
         public void processLoadFail(final @NonNull BMError error) {
-            log("processLoadFail - " + error.getMessage());
+            log(String.format("processLoadFail - %s", error));
             currentState = State.Failed;
             trackEvent(TrackEventType.Load, error);
             Utils.onUiThread(new Runnable() {
@@ -441,7 +449,7 @@ public abstract class BidMachineAd<
             if (loadedObject != null) {
                 loadedObject.onShowFailed();
             }
-            log("processShowFail");
+            log(String.format("processShowFail - %s", error));
             trackEvent(TrackEventType.Show, error);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -553,7 +561,7 @@ public abstract class BidMachineAd<
             if (loadedObject != null) {
                 loadedObject.onClosed(isFinishTracked);
             }
-            log("processClosed (" + isFinishTracked + ")");
+            log(String.format("processClosed (%s)", isFinishTracked));
             trackEvent(TrackEventType.Close, null);
             Utils.onUiThread(new Runnable() {
                 @Override
@@ -629,7 +637,7 @@ public abstract class BidMachineAd<
                 String selfMessage = toStringShort();
                 AuctionResult auctionResult = getAuctionResult();
                 if (auctionResult != null) {
-                    selfMessage += "(demand: " + auctionResult.getDemandSource() + ")";
+                    selfMessage += String.format("(demand: %s)", auctionResult.getDemandSource());
                 }
                 Logger.log(String.format("%s: %s", selfMessage, message));
             }

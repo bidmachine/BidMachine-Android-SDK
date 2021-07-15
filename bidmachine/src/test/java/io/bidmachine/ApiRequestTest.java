@@ -1,5 +1,6 @@
 package io.bidmachine;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.junit.After;
@@ -14,7 +15,6 @@ import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.bidmachine.core.NetworkRequest;
 import io.bidmachine.utils.BMError;
@@ -23,9 +23,10 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = 16)
+@Config(manifest = Config.NONE, sdk = 16)
 public class ApiRequestTest {
 
     private MockWebServer mockServer;
@@ -42,47 +43,47 @@ public class ApiRequestTest {
     }
 
     @Test
-    public void request_success() throws InterruptedException {
+    public void request_success() throws Exception {
         mockServer.enqueue(new MockResponse().setBody("Success"));
-        performTest("Request", "Success");
+        performSuccessTest("Request", "Success");
     }
 
     @Test
-    public void request_fail_err204() throws InterruptedException {
+    public void request_fail_err204() throws Exception {
         mockServer.enqueue(new MockResponse().setResponseCode(HttpURLConnection.HTTP_NO_CONTENT));
-        performTest("Request", BMError.NoContent);
+        performFailTest("Request", BMError.noFill());
     }
 
     @Test
-    public void request_fail_err400() throws InterruptedException {
+    public void request_fail_err400() throws Exception {
         mockServer.enqueue(new MockResponse()
                                    .setHeader("ad-exchange-error-message", "Test error message")
                                    .setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST));
-        performTest("Request", BMError.requestError("Test error message"));
+        performFailTest("Request", BMError.Request);
     }
 
     @Test
-    public void request_fail_with_message() throws InterruptedException {
+    public void request_fail_with_message() throws Exception {
         mockServer.enqueue(new MockResponse()
                                    .setHeader("ad-exchange-error-message", "Test error message")
                                    .setResponseCode(HttpURLConnection.HTTP_NOT_FOUND));
-        performTest("Request", BMError.requestError("Test error message"));
+        performFailTest("Request", BMError.Request);
     }
 
     @Test
-    public void request_fail_timeout() throws InterruptedException {
+    public void request_fail_timeout() throws Exception {
         mockServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
-        performTest("Request", BMError.TimeoutError);
+        performFailTest("Request", BMError.TimeoutError);
     }
 
     @Test
-    public void request_fail_timeout_throttle() throws InterruptedException {
+    public void request_fail_timeout_throttle() throws Exception {
         ApiRequest.REQUEST_TIMEOUT = 2000;
         mockServer.enqueue(new MockResponse()
                                    .setResponseCode(200)
                                    .setBody("Success")
                                    .throttleBody(1, 1, TimeUnit.SECONDS));
-        performTest("Request", BMError.TimeoutError);
+        performFailTest("Request", BMError.TimeoutError);
     }
 
     @Test
@@ -112,19 +113,19 @@ public class ApiRequestTest {
         assertEquals(timeOut, apiRequest.timeOut);
     }
 
-    private static class ObjectContainer<ObjectType> {
 
-        ObjectType referenceObject;
+    static class Container<T> {
+
+        T object;
 
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private void performTest(String requestData,
-                             final Object responseResult) throws InterruptedException {
-        final CountDownLatch lock = new CountDownLatch(1);
-        final AtomicBoolean requestResult = new AtomicBoolean();
 
-        final ObjectContainer<Object> responseContainer = new ObjectContainer<>();
+    @SuppressWarnings("SameParameterValue")
+    private void performSuccessTest(@NonNull String requestData,
+                                    @NonNull String expectedResult) throws Exception {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final Container<String> container = new Container<>();
 
         ApiRequest<String, String> request = new ApiRequest.Builder<String, String>()
                 .setRequestData(requestData)
@@ -153,24 +154,71 @@ public class ApiRequestTest {
                 .setCallback(new NetworkRequest.Callback<String, BMError>() {
                     @Override
                     public void onSuccess(@Nullable String result) {
-                        responseContainer.referenceObject = result;
-                        requestResult.set(true);
-                        lock.countDown();
+                        container.object = result;
+                        countDownLatch.countDown();
                     }
 
                     @Override
                     public void onFail(@Nullable BMError result) {
-                        responseContainer.referenceObject = result;
-                        requestResult.set(false);
-                        lock.countDown();
+                        fail();
                     }
                 }).build();
 
         request.requiredUrl = mockServer.url("/test").toString();
         request.request();
-        lock.await();
+        countDownLatch.await();
 
-        assertEquals(responseResult, responseContainer.referenceObject);
+        assertEquals(expectedResult, container.object);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void performFailTest(@NonNull String requestData,
+                                 @NonNull BMError expectedResult) throws Exception {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final Container<BMError> container = new Container<>();
+
+        ApiRequest<String, String> request = new ApiRequest.Builder<String, String>()
+                .setRequestData(requestData)
+                .setDataBinder(new ApiRequest.ApiDataBinder<String, String>() {
+                    @Override
+                    protected void prepareHeaders(NetworkRequest<String, String, BMError> request,
+                                                  URLConnection connection) {
+
+                    }
+
+                    @Nullable
+                    @Override
+                    protected byte[] obtainData(NetworkRequest<String, String, BMError> request,
+                                                URLConnection connection,
+                                                @Nullable String requestData) {
+                        return requestData.getBytes();
+                    }
+
+                    @Override
+                    protected String createSuccessResult(NetworkRequest<String, String, BMError> request,
+                                                         URLConnection connection,
+                                                         byte[] resultData) {
+                        return new String(resultData);
+                    }
+                })
+                .setCallback(new NetworkRequest.Callback<String, BMError>() {
+                    @Override
+                    public void onSuccess(@Nullable String result) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onFail(@Nullable BMError result) {
+                        container.object = result;
+                        countDownLatch.countDown();
+                    }
+                }).build();
+
+        request.requiredUrl = mockServer.url("/test").toString();
+        request.request();
+        countDownLatch.await();
+
+        assertEquals(expectedResult, container.object);
     }
 
 }

@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import com.explorestack.iab.utils.IabClickCallback;
 import com.explorestack.iab.utils.Utils;
 import com.explorestack.iab.vast.VastActivityListener;
-import com.explorestack.iab.vast.VastError;
 import com.explorestack.iab.vast.VastRequest;
 import com.explorestack.iab.vast.activity.VastActivity;
 
@@ -31,17 +30,7 @@ class VastFullScreenAdShowListener implements VastActivityListener {
 
     @Override
     public void onVastError(@NonNull Context context, @NonNull VastRequest vastRequest, int error) {
-        //TODO: implement vast error mapping
-        switch (error) {
-            case VastError.ERROR_CODE_NO_NETWORK: {
-                callback.onAdShowFailed(BMError.noFillError(BMError.Connection));
-                break;
-            }
-            default: {
-                callback.onAdShowFailed(BMError.noFillError(null));
-                break;
-            }
-        }
+        callback.onAdShowFailed(BMError.internal("Error when showing interstitial object"));
     }
 
     @Override

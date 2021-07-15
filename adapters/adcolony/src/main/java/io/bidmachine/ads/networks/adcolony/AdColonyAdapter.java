@@ -58,6 +58,7 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
+
         EnumMap<AdsFormat, List<Map<String, String>>> mediationConfigs =
                 networkConfigParams.obtainNetworkMediationConfigs(AdsFormat.values());
         if (mediationConfigs != null) {
@@ -80,19 +81,19 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull Map<String, String> mediationConfig) throws Throwable {
         final String appId = mediationConfig.get(AdColonyConfig.KEY_APP_ID);
         if (TextUtils.isEmpty(appId)) {
-            collectCallback.onCollectFail(BMError.requestError("App id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(AdColonyConfig.KEY_APP_ID));
             return;
         }
         assert appId != null;
         final String zoneId = extractZoneId(mediationConfig);
         if (TextUtils.isEmpty(zoneId)) {
-            collectCallback.onCollectFail(BMError.requestError("Zone id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(AdColonyConfig.KEY_ZONE_ID));
             return;
         }
         assert zoneId != null;
         String storeId = mediationConfig.get(AdColonyConfig.KEY_STORE_ID);
         if (TextUtils.isEmpty(storeId)) {
-            collectCallback.onCollectFail(BMError.requestError("Store id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(AdColonyConfig.KEY_STORE_ID));
             return;
         }
         assert storeId != null;
@@ -104,7 +105,7 @@ class AdColonyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                         appId,
                         zonesCache.toArray(new String[0]));
                 if (!isAdColonyConfigured()) {
-                    collectCallback.onCollectFail(BMError.TimeoutError);
+                    collectCallback.onCollectFail(BMError.adapterNotInitialized());
                     return;
                 }
                 isAdapterInitialized = true;

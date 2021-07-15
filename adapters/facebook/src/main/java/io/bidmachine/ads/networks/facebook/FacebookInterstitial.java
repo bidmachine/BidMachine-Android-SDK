@@ -45,7 +45,8 @@ class FacebookInterstitial extends UnifiedFullscreenAd {
                 && !interstitialAd.isAdInvalidated()) {
             interstitialAd.show();
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal(
+                    "Interstitial object is null or not loaded or invalidated"));
         }
     }
 

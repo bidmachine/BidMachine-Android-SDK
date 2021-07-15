@@ -51,7 +51,7 @@ class AdColonyFullscreenAd extends UnifiedFullscreenAd {
         if (adColonyInterstitial != null && !adColonyInterstitial.isExpired()) {
             adColonyInterstitial.show();
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Interstitial object is null or expired"));
         }
     }
 

@@ -1,7 +1,5 @@
 package io.bidmachine;
 
-import android.text.TextUtils;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -56,14 +54,7 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
     protected BMError obtainError(URLConnection connection,
                                   @Nullable InputStream errorStream,
                                   int responseCode) {
-        Logger.log("Request error (" + responseCode + "), headers:", connection.getHeaderFields());
-        final String errorReason = connection.getHeaderField("ad-exchange-error-reason");
-        final String errorMessage = connection.getHeaderField("ad-exchange-error-message");
-        return !TextUtils.isEmpty(errorMessage) && !TextUtils.isEmpty(errorReason)
-                ? BMError.requestError(String.format("%s - %s", errorReason, errorMessage))
-                : !TextUtils.isEmpty(errorMessage) ? BMError.requestError(errorMessage)
-                        : !TextUtils.isEmpty(errorReason) ? BMError.requestError(errorReason)
-                                : getErrorFromCode(connection, responseCode);
+        return getErrorFromCode(connection, responseCode);
     }
 
     @Override
@@ -71,11 +62,11 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         Logger.log("obtainError: " + t + "(" + connection + ")");
         //TODO: not checked
         if (t instanceof UnknownHostException) {
-            return BMError.Connection;
+            return BMError.NoConnection;
         } else if (t instanceof SocketTimeoutException || t instanceof ConnectTimeoutException) {
             return BMError.TimeoutError;
         }
-        return BMError.Internal;
+        return BMError.internal("Unknown server error");
     }
 
     @Override
@@ -92,14 +83,18 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
     }
 
     private BMError getErrorFromCode(URLConnection connection, int responseCode) {
+        BMError bmError;
         if (responseCode >= 200 && responseCode < 300) {
-            return BMError.NoContent;
+            bmError = BMError.noFill();
+            bmError.setTrackError(false);
         } else if (responseCode >= 400 && responseCode < 500) {
-            return BMError.requestError(String.valueOf(responseCode));
+            bmError = BMError.Request;
         } else if (responseCode >= 500 && responseCode < 600) {
-            return BMError.Server;
+            bmError = BMError.Server;
+        } else {
+            bmError = BMError.internal("Unknown server error");
         }
-        return BMError.Internal;
+        return bmError;
     }
 
 

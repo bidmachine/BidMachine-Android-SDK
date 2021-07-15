@@ -49,6 +49,8 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfig) throws Throwable {
+        super.onInitialize(contextProvider, adRequestParams, networkConfig);
+
         configure(adRequestParams);
         Map<String, String> networkParams = networkConfig.obtainNetworkParams();
         if (networkParams != null) {
@@ -68,13 +70,13 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull Map<String, String> mediationConfig) throws Throwable {
         final String sdkKey = mediationConfig.get(TapjoyConfig.KEY_SDK);
         if (TextUtils.isEmpty(sdkKey)) {
-            collectCallback.onCollectFail(BMError.requestError("sdk_key not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(TapjoyConfig.KEY_SDK));
             return;
         }
         assert sdkKey != null;
         final String placementName = mediationConfig.get(TapjoyConfig.KEY_PLACEMENT_NAME);
         if (TextUtils.isEmpty(placementName)) {
-            collectCallback.onCollectFail(BMError.requestError("placement_name not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(TapjoyConfig.KEY_PLACEMENT_NAME));
             return;
         }
         assert placementName != null;
@@ -90,8 +92,8 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             }
 
             @Override
-            public void onInitializationFail(BMError error) {
-                collectCallback.onCollectFail(error);
+            public void onInitializationFail() {
+                collectCallback.onCollectFail(BMError.adapterInitialization());
             }
         });
     }
@@ -136,7 +138,7 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                         @Override
                         public void onConnectFailure() {
                             if (listener != null) {
-                                listener.onInitializationFail(BMError.IncorrectAdUnit);
+                                listener.onInitializationFail();
                             }
                             syncLock.countDown();
                         }
@@ -166,7 +168,7 @@ class TapjoyAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
         void onInitialized();
 
-        void onInitializationFail(BMError error);
+        void onInitializationFail();
 
     }
 

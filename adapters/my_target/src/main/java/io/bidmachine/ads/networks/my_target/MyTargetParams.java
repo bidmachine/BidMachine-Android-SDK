@@ -23,11 +23,11 @@ class MyTargetParams extends UnifiedParams {
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
         if (slotId == null) {
-            callback.onAdLoadFailed(BMError.requestError("slot_id not provided"));
+            callback.onAdLoadFailed(BMError.notFound(MyTargetConfig.KEY_SLOT_ID));
             return false;
         }
         if (TextUtils.isEmpty(bidId)) {
-            callback.onAdLoadFailed(BMError.requestError("bid_id not provided"));
+            callback.onAdLoadFailed(BMError.notFound(MyTargetConfig.KEY_BID_ID));
             return false;
         }
         return true;

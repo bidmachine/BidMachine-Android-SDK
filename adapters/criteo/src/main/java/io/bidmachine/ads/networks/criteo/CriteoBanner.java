@@ -29,12 +29,12 @@ public class CriteoBanner extends UnifiedBannerAd {
         String adUnitId = mediationParams.getString(CriteoConfig.AD_UNIT_ID);
         final BannerAdUnit bannerAdUnit = (BannerAdUnit) CriteoAdUnitStorage.getAdUnit(adUnitId);
         if (bannerAdUnit == null) {
-            callback.onAdLoadFailed(BMError.requestError("AdUnit not found"));
+            callback.onAdLoadFailed(BMError.notFound("AdUnit"));
             return;
         }
         final Bid bid = CriteoBidTokenStorage.takeBid(requestParams.getAdRequest());
         if (bid == null) {
-            callback.onAdLoadFailed(BMError.requestError("Bid not found"));
+            callback.onAdLoadFailed(BMError.notFound("Bid"));
             return;
         }
         Utils.onUiThread(() -> {
@@ -44,7 +44,7 @@ public class CriteoBanner extends UnifiedBannerAd {
                 criteoBannerView.loadAd(bid);
             } catch (Throwable t) {
                 AdapterLogger.logThrowable(t);
-                callback.onAdLoadFailed(BMError.Internal);
+                callback.onAdLoadFailed(BMError.internal("Exception when loading banner object"));
             }
         });
     }

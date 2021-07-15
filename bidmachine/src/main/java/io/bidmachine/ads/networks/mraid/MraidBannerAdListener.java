@@ -31,16 +31,17 @@ class MraidBannerAdListener implements MraidViewListener {
             mraidView.show(contextProvider.getActivity());
             callback.onAdLoaded(mraidView);
         } else {
-            callback.onAdLoadFailed(BMError.Internal);
+            callback.onAdLoadFailed(BMError.internal(
+                    "Activity is null or ad view already have parent"));
         }
     }
 
     @Override
     public void onError(@NonNull MraidView mraidView, int i) {
         if (i == MraidError.SHOW_ERROR) {
-            callback.onAdShowFailed(BMError.Internal);
+            callback.onAdShowFailed(BMError.internal("Error when showing banner object"));
         } else {
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
     }
 

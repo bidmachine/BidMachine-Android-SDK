@@ -197,7 +197,7 @@ class AssetLoader {
 
     private synchronized void notifyNativeCallback() {
         if (!isAssetsValid()) {
-            callback.processLoadFail(BMError.IncorrectAdUnit);
+            callback.processLoadFail(BMError.internal("Native assets are invalid"));
             callback.processDestroy();
         } else {
             callback.processLoadSuccess();

@@ -48,8 +48,16 @@ class MraidParams extends UnifiedParams {
 
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
-        if (TextUtils.isEmpty(creativeAdm) || width == 0 || height == 0) {
-            callback.onAdLoadFailed(BMError.IncorrectAdUnit);
+        if (TextUtils.isEmpty(creativeAdm)) {
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_CREATIVE_ADM));
+            return false;
+        }
+        if (width == 0) {
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_WIDTH));
+            return false;
+        }
+        if (height == 0) {
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_HEIGHT));
             return false;
         }
         return true;
