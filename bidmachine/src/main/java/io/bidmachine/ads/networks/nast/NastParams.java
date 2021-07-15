@@ -41,11 +41,11 @@ public class NastParams extends UnifiedParams {
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
         if (TextUtils.isEmpty(title)) {
-            callback.onAdLoadFailed(BMError.requestError("title not provided"));
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_TITLE));
             return false;
         }
         if (TextUtils.isEmpty(callToAction)) {
-            callback.onAdLoadFailed(BMError.requestError("callToAction not provided"));
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_CTA));
             return false;
         }
         return true;
@@ -58,21 +58,20 @@ public class NastParams extends UnifiedParams {
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Icon)
                 && TextUtils.isEmpty(iconUrl)) {
-            callback.onAdLoadFailed(BMError.requestError(
-                    "Your request settings require ICON, but it not provided in response"));
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_ICON_URL));
             return false;
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Image)
                 && TextUtils.isEmpty(imageUrl)) {
-            callback.onAdLoadFailed(BMError.requestError(
-                    "Your request settings require IMAGE, but it not provided in response"));
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_IMAGE_URL));
             return false;
         }
         if (adRequestParams.containsAssetType(MediaAssetType.Video)
                 && TextUtils.isEmpty(videoAdm)
                 && TextUtils.isEmpty(videoUrl)) {
-            callback.onAdLoadFailed(BMError.requestError(
-                    "Your request settings require VIDEO, but it not provided in response"));
+            callback.onAdLoadFailed(BMError.notFound(String.format("%s or %s",
+                                                                   IabUtils.KEY_VIDEO_ADM,
+                                                                   IabUtils.KEY_CLICK_URL)));
             return false;
         }
         return true;

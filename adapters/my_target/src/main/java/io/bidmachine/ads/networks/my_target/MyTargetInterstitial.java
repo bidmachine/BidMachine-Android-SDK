@@ -41,7 +41,7 @@ public class MyTargetInterstitial extends UnifiedFullscreenAd {
         if (interstitialAd != null) {
             interstitialAd.show(contextProvider.getContext());
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Interstitial object is null"));
         }
     }
 
@@ -70,7 +70,7 @@ public class MyTargetInterstitial extends UnifiedFullscreenAd {
 
         @Override
         public void onNoAd(@NonNull String s, @NonNull InterstitialAd interstitialAd) {
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
 
         @Override

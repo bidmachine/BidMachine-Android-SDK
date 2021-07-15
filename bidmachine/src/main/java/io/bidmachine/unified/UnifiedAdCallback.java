@@ -12,6 +12,4 @@ public interface UnifiedAdCallback {
 
     void onAdExpired();
 
-    void log(String message);
-
 }

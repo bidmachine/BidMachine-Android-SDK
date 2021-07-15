@@ -24,11 +24,11 @@ class PangleParams extends UnifiedParams {
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
         if (slotId == null) {
-            callback.onAdLoadFailed(BMError.requestError("slot_id not provided"));
+            callback.onAdLoadFailed(BMError.notFound(PangleConfig.KEY_SLOT_ID));
             return false;
         }
         if (TextUtils.isEmpty(bidPayload)) {
-            callback.onAdLoadFailed(BMError.requestError("bid_payload not provided"));
+            callback.onAdLoadFailed(BMError.notFound(PangleConfig.KEY_BID_PAYLOAD));
             return false;
         }
         return true;

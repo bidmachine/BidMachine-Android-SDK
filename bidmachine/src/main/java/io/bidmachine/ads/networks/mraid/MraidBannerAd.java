@@ -31,7 +31,7 @@ class MraidBannerAd extends UnifiedBannerAd {
                      @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         final Activity activity = contextProvider.getActivity();
         if (activity == null) {
-            callback.onAdLoadFailed(BMError.requestError("Activity not provided"));
+            callback.onAdLoadFailed(BMError.internal("Activity is null"));
             return;
         }
         final MraidParams mraidParams = new MraidParams(mediationParams);
@@ -59,7 +59,7 @@ class MraidBannerAd extends UnifiedBannerAd {
                     mraidView.load(creativeAdm);
                 } catch (Throwable t) {
                     Logger.log(t);
-                    callback.onAdLoadFailed(BMError.Internal);
+                    callback.onAdLoadFailed(BMError.internal("Exception when loading banner object"));
                 }
             }
         });

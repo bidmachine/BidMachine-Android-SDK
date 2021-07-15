@@ -48,13 +48,11 @@ public final class ViewAdObject<
 
     void show(@Nullable ViewGroup container) {
         if (container == null) {
-            Logger.log("Target container is null");
-            getUnifiedAdCallback().onAdShowFailed(BMError.Internal);
+            getUnifiedAdCallback().onAdShowFailed(BMError.notFound("Target container"));
             return;
         }
         if (getWidth() == 0 || getHeight() == 0) {
-            Logger.log("Width or height are not provided");
-            getUnifiedAdCallback().onAdShowFailed(BMError.Internal);
+            getUnifiedAdCallback().onAdShowFailed(BMError.incorrectContent("Width or height are not provided"));
             return;
         }
         Context context = container.getContext();

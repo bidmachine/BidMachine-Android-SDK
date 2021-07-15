@@ -142,9 +142,14 @@ final class AuctionResultImpl implements AuctionResult {
     @NonNull
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[@" + Integer.toHexString(hashCode()) + "]: "
-                + "id=" + id + ", demandSource=" + demandSource + ", price: " + price
-                + ", creativeId: " + creativeId + ", cid: " + cid;
+        return String.format("%s[@%s]: id=%s, demandSource=%s, price=%s, creativeId=%s, cid=%s",
+                             getClass().getSimpleName(),
+                             Integer.toHexString(hashCode()),
+                             id,
+                             demandSource,
+                             price,
+                             creativeId,
+                             cid);
     }
 
     @NonNull

@@ -24,11 +24,11 @@ class AdColonyParams extends UnifiedParams {
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
         if (TextUtils.isEmpty(zoneId)) {
-            callback.onAdLoadFailed(BMError.requestError("zone_id not provided"));
+            callback.onAdLoadFailed(BMError.notFound(AdColonyConfig.KEY_ZONE_ID));
             return false;
         }
         if (TextUtils.isEmpty(adm)) {
-            callback.onAdLoadFailed(BMError.requestError("adm not provided"));
+            callback.onAdLoadFailed(BMError.notFound(AdColonyConfig.KEY_ADM));
             return false;
         }
         return true;

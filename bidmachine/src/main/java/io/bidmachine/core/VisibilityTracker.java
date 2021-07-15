@@ -108,7 +108,7 @@ public class VisibilityTracker {
         private void release() {
             final View view = viewReference.get();
             if (view != null) {
-                Logger.log("Stop tracking - " + view.toString());
+                Logger.log(String.format("Stop tracking - %s", view.toString()));
 
                 if (isShownTracked
                         && !isFinishedTracked

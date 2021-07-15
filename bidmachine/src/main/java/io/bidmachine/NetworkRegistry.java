@@ -201,7 +201,7 @@ class NetworkRegistry {
         private void process() {
             String networkKey = networkConfig.getKey();
             TrackingObject trackingObject = new SimpleTrackingObject(networkKey + "_initialize");
-            Logger.log(String.format("Load network from config start: %s", networkKey));
+            Logger.log(String.format("[%s] Start loading network from config", networkKey));
             try {
                 BidMachineEvents.eventStart(trackingObject,
                                             TrackEventType.HeaderBiddingNetworkInitialize,
@@ -222,7 +222,7 @@ class NetworkRegistry {
                 }
                 Logger.log(
                         String.format(
-                                "Load network from config finish: %s, %s, %s. Register source - %s",
+                                "[%s] Finished loading network from config: %s, %s. Register source - %s",
                                 networkKey,
                                 networkAdapter.getVersion(),
                                 networkAdapter.getAdapterVersion(),
@@ -237,12 +237,12 @@ class NetworkRegistry {
                                                 TrackEventType.HeaderBiddingNetworkInitialize);
                 }
             } catch (Throwable throwable) {
-                Logger.log(String.format("Network (%s) load fail!", networkKey));
+                Logger.log(String.format("[%s] Failed to load network", networkKey));
                 Logger.log(throwable);
                 BidMachineEvents.eventFinish(trackingObject,
                                              TrackEventType.HeaderBiddingNetworkInitialize,
                                              null,
-                                             BMError.Internal);
+                                             BMError.internal("Exception when loading network"));
             }
         }
 

@@ -23,13 +23,13 @@ class TapjoyFullscreenAdListener implements TJPlacementListener, TJPlacementVide
     @Override
     public void onRequestSuccess(TJPlacement tjPlacement) {
         if (!tjPlacement.isContentAvailable()) {
-            callback.onAdLoadFailed(BMError.NoContent);
+            callback.onAdLoadFailed(BMError.noFill());
         }
     }
 
     @Override
     public void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {
-        callback.onAdLoadFailed(BMError.NoContent);
+        callback.onAdLoadFailed(BMError.noFill());
     }
 
     @Override

@@ -40,7 +40,7 @@ final class AdColonyFullscreenAdListener extends AdColonyInterstitialListener im
 
     @Override
     public void onRequestNotFilled(AdColonyZone zone) {
-        callback.onAdLoadFailed(BMError.NoContent);
+        callback.onAdLoadFailed(BMError.noFill());
     }
 
     @Override

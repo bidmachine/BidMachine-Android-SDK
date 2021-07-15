@@ -38,7 +38,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                      @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         final Activity activity = contextProvider.getActivity();
         if (activity == null) {
-            callback.onAdLoadFailed(BMError.requestError("Activity not provided"));
+            callback.onAdLoadFailed(BMError.internal("Activity is null"));
             return;
         }
         final MraidParams mraidParams = new MraidParams(mediationParams);
@@ -77,7 +77,8 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
                     mraidInterstitial.load(creativeAdm);
                 } catch (Throwable t) {
                     Logger.log(t);
-                    callback.onAdLoadFailed(BMError.Internal);
+                    callback.onAdLoadFailed(BMError.internal(
+                            "Exception when loading fullscreen object"));
                 }
             }
         });
@@ -89,7 +90,7 @@ class MraidFullScreenAd extends UnifiedFullscreenAd {
         if (mraidInterstitial != null && mraidInterstitial.isReady()) {
             mraidInterstitial.show(contextProvider.getContext(), mraidType);
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Fullscreen object is null or not ready"));
         }
     }
 

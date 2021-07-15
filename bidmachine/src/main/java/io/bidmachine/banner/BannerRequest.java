@@ -28,7 +28,7 @@ public final class BannerRequest extends AdRequest<BannerRequest, UnifiedBannerA
     @Override
     protected BMError verifyRequest() {
         if (bannerSize == null) {
-            return BMError.paramError("BannerSize not provided");
+            return BMError.notFound("BannerSize");
         }
         return super.verifyRequest();
     }

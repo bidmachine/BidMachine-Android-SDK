@@ -42,7 +42,7 @@ public class MyTargetRewarded extends UnifiedFullscreenAd {
         if (rewardedAd != null) {
             rewardedAd.show(contextProvider.getContext());
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Rewarded object is null"));
         }
     }
 
@@ -71,7 +71,7 @@ public class MyTargetRewarded extends UnifiedFullscreenAd {
 
         @Override
         public void onNoAd(@NonNull String s, @NonNull RewardedAd rewardedAd) {
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
 
         @Override

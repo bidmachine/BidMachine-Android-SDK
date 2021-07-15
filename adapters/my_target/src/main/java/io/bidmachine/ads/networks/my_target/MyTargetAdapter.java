@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import com.my.target.common.CustomParams;
 import com.my.target.common.MyTargetManager;
 import com.my.target.common.MyTargetPrivacy;
-import com.my.target.common.MyTargetVersion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +59,8 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfig) throws Throwable {
+        super.onInitialize(contextProvider, adRequestParams, networkConfig);
+
         updateRestrictions(adRequestParams);
     }
 
@@ -71,7 +72,7 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull Map<String, String> mediationConfig) throws Throwable {
         final String slotId = mediationConfig.get(MyTargetConfig.KEY_SLOT_ID);
         if (TextUtils.isEmpty(slotId)) {
-            collectCallback.onCollectFail(BMError.requestError("slot_id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(MyTargetConfig.KEY_SLOT_ID));
             return;
         }
         MyTargetManager.setDebugMode(adRequestParams.isTestMode());
@@ -87,7 +88,7 @@ class MyTargetAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
             @Override
             public void onInitializationFailed() {
-                collectCallback.onCollectFail(BMError.Internal);
+                collectCallback.onCollectFail(BMError.adapterGetsParameter(MyTargetConfig.KEY_BIDDER_TOKEN));
             }
         });
     }

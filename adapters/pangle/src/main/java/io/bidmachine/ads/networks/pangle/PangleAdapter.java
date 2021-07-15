@@ -53,14 +53,18 @@ class PangleAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     protected void onInitialize(@NonNull ContextProvider contextProvider,
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfig) throws Throwable {
+        super.onInitialize(contextProvider, adRequestParams, networkConfig);
+
         Map<String, String> networkParams = networkConfig.obtainNetworkParams();
         if (networkParams == null) {
-            AdapterLogger.logMessage(getKey(), "Initialize failed: network parameters not found");
+            AdapterLogger.logError(getKey(), "Initialize failed: network parameters not found");
             return;
         }
         String appId = networkParams.get(PangleConfig.KEY_APP_ID);
         if (TextUtils.isEmpty(appId)) {
-            AdapterLogger.logMessage(getKey(), "Initialize failed: app_id not provided");
+            AdapterLogger.logError(getKey(),
+                                   String.format("Initialize failed: %s not provided",
+                                                 PangleConfig.KEY_APP_ID));
             return;
         }
         assert appId != null;
@@ -92,18 +96,18 @@ class PangleAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
                                            @NonNull Map<String, String> mediationConfig) throws Exception {
         if (!TTAdSdk.isInitSuccess()) {
-            collectCallback.onCollectFail(BMError.NotInitialized);
+            collectCallback.onCollectFail(BMError.adapterNotInitialized());
             return;
         }
         final String appId = mediationConfig.get(PangleConfig.KEY_APP_ID);
         if (TextUtils.isEmpty(appId)) {
-            collectCallback.onCollectFail(BMError.requestError("app_id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(PangleConfig.KEY_APP_ID));
             return;
         }
         assert appId != null;
         final String slotId = mediationConfig.get(PangleConfig.KEY_SLOT_ID);
         if (TextUtils.isEmpty(slotId)) {
-            collectCallback.onCollectFail(BMError.requestError("slot_id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(PangleConfig.KEY_SLOT_ID));
             return;
         }
         assert slotId != null;
@@ -112,8 +116,7 @@ class PangleAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
         String biddingToken = TTAdSdk.getAdManager().getBiddingToken();
         if (TextUtils.isEmpty(biddingToken)) {
-            collectCallback.onCollectFail(
-                    BMError.paramError("BiddingToken from Pangle SDK is null or empty"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(PangleConfig.KEY_BID_TOKEN));
             return;
         }
 

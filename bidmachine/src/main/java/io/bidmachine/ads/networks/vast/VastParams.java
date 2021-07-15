@@ -31,7 +31,7 @@ class VastParams extends UnifiedParams {
     @Override
     public boolean isValid(@NonNull UnifiedAdCallback callback) {
         if (TextUtils.isEmpty(creativeAdm)) {
-            callback.onAdLoadFailed(BMError.IncorrectAdUnit);
+            callback.onAdLoadFailed(BMError.notFound(IabUtils.KEY_CREATIVE_ADM));
             return false;
         }
         return true;

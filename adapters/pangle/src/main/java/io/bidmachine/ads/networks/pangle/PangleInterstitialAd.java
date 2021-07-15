@@ -57,11 +57,11 @@ public class PangleInterstitialAd extends UnifiedFullscreenAd {
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
         Activity activity = contextProvider.getActivity();
         if (activity == null) {
-            callback.onAdShowFailed(BMError.Internal);
+            callback.onAdShowFailed(BMError.internal("Activity is null"));
             return;
         }
         if (ttFullScreenVideoAd == null) {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Interstitial object is null"));
             return;
         }
 
@@ -120,7 +120,7 @@ public class PangleInterstitialAd extends UnifiedFullscreenAd {
                 return;
             }
 
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
 
         public void destroy() {

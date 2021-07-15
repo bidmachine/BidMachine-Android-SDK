@@ -31,8 +31,7 @@ public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
                      @NonNull UnifiedMediationParams mediationParams) throws Throwable {
         Activity activity = context.getActivity();
         if (activity == null) {
-            callback.log("Activity not provided");
-            callback.onAdLoadFailed(BMError.Internal);
+            callback.onAdLoadFailed(BMError.internal("Activity is null"));
             return;
         }
         String placementName = mediationParams.getString(TapjoyConfig.KEY_PLACEMENT_NAME);
@@ -60,7 +59,7 @@ public class TapjoyFullscreenAd extends UnifiedFullscreenAd {
         if (tjPlacement != null && tjPlacement.isContentReady()) {
             tjPlacement.showContent();
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Fullscreen object is null or not ready"));
         }
     }
 

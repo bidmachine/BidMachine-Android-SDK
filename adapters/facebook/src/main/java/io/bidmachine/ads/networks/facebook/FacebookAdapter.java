@@ -89,13 +89,13 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull Map<String, String> mediationConfig) throws Throwable {
         final String appId = mediationConfig.get(FacebookConfig.KEY_APP_ID);
         if (TextUtils.isEmpty(appId)) {
-            collectCallback.onCollectFail(BMError.requestError("app_id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(FacebookConfig.KEY_APP_ID));
             return;
         }
         assert appId != null;
         final String placementId = mediationConfig.get(FacebookConfig.KEY_PLACEMENT_ID);
         if (TextUtils.isEmpty(placementId)) {
-            collectCallback.onCollectFail(BMError.requestError("placement_id not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(FacebookConfig.KEY_PLACEMENT_ID));
             return;
         }
         assert placementId != null;
@@ -111,7 +111,7 @@ class FacebookAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
 
             @Override
             public void onInitializationFailed() {
-                collectCallback.onCollectFail(BMError.Internal);
+                collectCallback.onCollectFail(BMError.adapterGetsParameter(FacebookConfig.KEY_TOKEN));
             }
         });
     }

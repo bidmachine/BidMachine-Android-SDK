@@ -212,7 +212,7 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                                                    mediationConfig);
             } catch (Throwable t) {
                 Logger.log(t);
-                onCollectFail(BMError.Internal);
+                onCollectFail(BMError.internal("Exception when collecting header bidding parameters"));
             }
         }
 
@@ -227,7 +227,7 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             builder.putAllClientParams(mediationConfig);
             builder.putAllClientParams(params);
             adUnit = builder.build();
-            Logger.log(String.format("%s: %s: Header bidding collect finished",
+            Logger.log(String.format("[%s] %s - Header bidding collect finished",
                                      adapter.getKey(),
                                      adsType));
             finish();
@@ -243,9 +243,10 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
                 return;
             }
             if (error != null) {
-                Logger.log(String.format("%s: Header bidding collect fail: %s",
+                Logger.log(String.format("[%s] %s - Header bidding collect fail - %s",
                                          adapter.getKey(),
-                                         error.getMessage()));
+                                         adsType,
+                                         error));
             }
             finish();
             BidMachineEvents.eventFinish(trackingObject,
@@ -268,7 +269,9 @@ class HeaderBiddingPlacementBuilder<UnifiedAdRequestParamsType extends UnifiedAd
             if (isFinished) {
                 return;
             }
-            Logger.log(String.format("%s: Header bidding collect fail: timeout", adapter.getKey()));
+            Logger.log(String.format("[%s] %s - Header bidding collect fail: timeout",
+                                     adapter.getKey(),
+                                     adsType));
             finish();
         }
 

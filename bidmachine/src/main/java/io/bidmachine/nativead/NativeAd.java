@@ -103,7 +103,7 @@ public final class NativeAd
 
     private boolean hasLoadedObject() {
         if (getLoadedObject() == null) {
-            Logger.log(toStringShort() + ": not loaded, please load ads first!");
+            Logger.log(String.format("%s: not loaded, please load ads first", toStringShort()));
             return false;
         }
         return true;

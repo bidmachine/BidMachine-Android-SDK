@@ -54,11 +54,26 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                 @NonNull UnifiedAdRequestParams adRequestParams,
                                 @NonNull NetworkConfigParams networkConfigParams) throws Throwable {
         super.onInitialize(contextProvider, adRequestParams, networkConfigParams);
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             AdapterLogger.logError(getKey(), "Initialize failed: minSdkVersion for Amazon is 19");
             return;
         }
-        initialize(contextProvider, adRequestParams, networkConfigParams.obtainNetworkParams());
+        Map<String, String> mediationConfig = networkConfigParams.obtainNetworkParams();
+        if (mediationConfig == null) {
+            AdapterLogger.logError(getKey(), "Initialize failed: network parameters not found");
+            return;
+        }
+        String appKey = mediationConfig.get(AmazonConfig.APP_KEY);
+        if (TextUtils.isEmpty(appKey)) {
+            AdapterLogger.logError(getKey(),
+                                   String.format("Initialize failed: %s not provided",
+                                                 AmazonConfig.APP_KEY));
+            return;
+        }
+        assert appKey != null;
+
+        initialize(contextProvider, adRequestParams, appKey);
         AdRegistration.setMRAIDSupportedVersions(new String[]{"1.0", "2.0"});
         AdRegistration.setMRAIDPolicy(MRAIDPolicy.CUSTOM);
     }
@@ -70,20 +85,23 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                                            @NonNull final HeaderBiddingCollectParamsCallback collectCallback,
                                            @NonNull Map<String, String> mediationConfig) throws Throwable {
         if (!isInitialized()) {
-            collectCallback.onCollectFail(BMError.NotInitialized);
+            collectCallback.onCollectFail(BMError.adapterNotInitialized());
             return;
         }
         final String slotUuid = mediationConfig.get(AmazonConfig.SLOT_UUID);
         if (TextUtils.isEmpty(slotUuid)) {
-            collectCallback.onCollectFail(
-                    BMError.paramError(AmazonConfig.SLOT_UUID + " not provided"));
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(AmazonConfig.SLOT_UUID));
             return;
         }
-        if (!initialize(contextProvider, adRequestParams, mediationConfig)) {
-            collectCallback.onCollectFail(
-                    BMError.paramError(AmazonConfig.APP_KEY + " not provided"));
+        final String appKey = mediationConfig.get(AmazonConfig.APP_KEY);
+        if (TextUtils.isEmpty(appKey)) {
+            collectCallback.onCollectFail(BMError.adapterGetsParameter(AmazonConfig.APP_KEY));
             return;
         }
+        assert appKey != null;
+
+        initialize(contextProvider, adRequestParams, appKey);
+
         final AdsType adsType = hbAdRequestParams.getAdsType();
         final AdContentType adContentType = hbAdRequestParams.getAdContentType();
         String usPrivacy = adRequestParams.getDataRestrictions().getUSPrivacyString();
@@ -108,34 +126,29 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                         .load(new DTBAdSize.DTBInterstitialAdSize(slotUuid));
             }
         } else {
-            collectCallback.onCollectFail(BMError.IncorrectAdUnit);
+            collectCallback.onCollectFail(BMError.adapter("Unsupported ads type"));
         }
     }
 
-    private boolean initialize(@NonNull ContextProvider contextProvider,
-                               @NonNull UnifiedAdRequestParams adRequestParams,
-                               @Nullable Map<String, String> params) {
-        String appKey = params != null ? params.get(AmazonConfig.APP_KEY) : null;
-        if (TextUtils.isEmpty(appKey)) {
-            return false;
-        }
-        assert appKey != null;
+    private void initialize(@NonNull ContextProvider contextProvider,
+                            @NonNull UnifiedAdRequestParams adRequestParams,
+                            @NonNull String appKey) {
         AdRegistration.getInstance(appKey, contextProvider.getContext().getApplicationContext());
         AdRegistration.enableTesting(adRequestParams.isTestMode());
         DataRestrictions dataRestrictions = adRequestParams.getDataRestrictions();
         if (dataRestrictions != null) {
             AdRegistration.useGeoLocation(dataRestrictions.canSendGeoPosition());
         }
-        return true;
     }
 
     private boolean isInitialized() {
         return AdRegistration.isInitialized();
     }
 
+
     private static abstract class AmazonLoader {
 
-        static AmazonLoader forDisplay(HeaderBiddingCollectParamsCallback callback) {
+        static AmazonLoader forDisplay(@NonNull HeaderBiddingCollectParamsCallback callback) {
             return new AmazonLoader(callback) {
                 @Override
                 void handleResponse(@NonNull DTBAdResponse adResponse,
@@ -154,7 +167,7 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             };
         }
 
-        static AmazonLoader forVideo(HeaderBiddingCollectParamsCallback callback) {
+        static AmazonLoader forVideo(@NonNull HeaderBiddingCollectParamsCallback callback) {
             return new AmazonLoader(callback) {
                 @Override
                 void handleResponse(@NonNull DTBAdResponse adResponse,
@@ -170,10 +183,10 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
             };
         }
 
-        private HeaderBiddingCollectParamsCallback collectCallback;
+        private final HeaderBiddingCollectParamsCallback collectCallback;
         private String usPrivacy;
 
-        private AmazonLoader(HeaderBiddingCollectParamsCallback collectCallback) {
+        private AmazonLoader(@NonNull HeaderBiddingCollectParamsCallback collectCallback) {
             this.collectCallback = collectCallback;
         }
 
@@ -199,8 +212,8 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
                     Map<String, String> resultMap = new HashMap<>();
                     handleResponse(dtbAdResponse, resultMap);
                     if (resultMap.isEmpty()) {
-                        collectCallback.onCollectFail(BMError.paramError(
-                                "Amazon: Response was successful but params not provided"));
+                        collectCallback.onCollectFail(BMError.adapter(
+                                "Response returned empty parameters"));
                     } else {
                         collectCallback.onCollectFinished(resultMap);
                     }
@@ -216,15 +229,13 @@ class AmazonAdapter extends NetworkAdapter implements HeaderBiddingAdapter {
     private static BMError mapError(@NonNull AdError error) {
         switch (error.getCode()) {
             case NO_FILL:
-                return BMError.NoContent;
+                return BMError.noFill();
             case NETWORK_ERROR:
-                return BMError.Connection;
-            case REQUEST_ERROR:
-                return BMError.requestError(error.getMessage());
+                return BMError.NoConnection;
             case NETWORK_TIMEOUT:
                 return BMError.TimeoutError;
             default:
-                return BMError.Internal;
+                return BMError.internal("Unknown error");
         }
     }
 

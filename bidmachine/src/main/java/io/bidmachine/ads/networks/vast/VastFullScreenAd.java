@@ -68,7 +68,8 @@ class VastFullScreenAd extends UnifiedFullscreenAd {
                                 vastOMSDKAdMeasurer,
                                 vastOMSDKAdMeasurer);
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal(
+                    "Fullscreen object is null or can not find video file"));
         }
     }
 

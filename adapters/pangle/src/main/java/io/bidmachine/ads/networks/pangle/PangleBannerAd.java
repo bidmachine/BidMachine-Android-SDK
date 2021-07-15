@@ -113,7 +113,7 @@ class PangleBannerAd extends UnifiedBannerAd {
 
         @Override
         public void onError(int errorCode, String message) {
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
 
     }
@@ -133,7 +133,7 @@ class PangleBannerAd extends UnifiedBannerAd {
 
         @Override
         public void onRenderFail(View view, String message, int errorCode) {
-            callback.onAdLoadFailed(BMError.noFillError(null));
+            callback.onAdLoadFailed(BMError.noFill());
         }
 
         @Override

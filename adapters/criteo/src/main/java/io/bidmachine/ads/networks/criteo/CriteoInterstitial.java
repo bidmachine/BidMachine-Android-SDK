@@ -27,12 +27,12 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
         InterstitialAdUnit interstitialAdUnit =
                 (InterstitialAdUnit) CriteoAdUnitStorage.getAdUnit(adUnitId);
         if (interstitialAdUnit == null) {
-            callback.onAdLoadFailed(BMError.requestError("AdUnit not found"));
+            callback.onAdLoadFailed(BMError.notFound("AdUnit"));
             return;
         }
         Bid bid = CriteoBidTokenStorage.takeBid(requestParams.getAdRequest());
         if (bid == null) {
-            callback.onAdLoadFailed(BMError.requestError("Bid not found"));
+            callback.onAdLoadFailed(BMError.notFound("Bid"));
             return;
         }
         criteoInterstitial = new com.criteo.publisher.CriteoInterstitial(interstitialAdUnit);
@@ -43,10 +43,10 @@ public class CriteoInterstitial extends UnifiedFullscreenAd {
     @Override
     public void show(@NonNull ContextProvider contextProvider,
                      @NonNull UnifiedFullscreenAdCallback callback) throws Throwable {
-        if (criteoInterstitial.isAdLoaded()) {
+        if (criteoInterstitial != null && criteoInterstitial.isAdLoaded()) {
             criteoInterstitial.show();
         } else {
-            callback.onAdShowFailed(BMError.NotLoaded);
+            callback.onAdShowFailed(BMError.internal("Interstitial object is null or not loaded"));
         }
     }
 
