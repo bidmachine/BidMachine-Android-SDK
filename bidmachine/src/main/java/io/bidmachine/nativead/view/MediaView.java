@@ -192,7 +192,7 @@ public class MediaView extends RelativeLayout implements
                                                                       nativeMediaData.getVideoUri()
                                                                               .getPath(),
                                                                       currentPosition);
-                        getContext().startActivity(intent);
+                        Utils.startActivity(getContext(), intent);
                     }
                 });
                 this.addView(textureView);
