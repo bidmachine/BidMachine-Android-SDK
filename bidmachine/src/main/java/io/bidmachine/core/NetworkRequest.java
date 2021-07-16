@@ -172,9 +172,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                     return;
                 }
                 if (responseCode != HttpURLConnection.HTTP_OK) {
-                    errorResult = obtainError(connection,
-                                              obtainErrorStream(connection),
-                                              responseCode);
+                    errorResult = obtainError(connection, responseCode);
                 } else {
                     isResponse = connection.getInputStream();
                     osBytes = new ByteArrayOutputStream();
@@ -187,11 +185,7 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
                     if (responseBytes != null) {
                         responseBytes = decodeResponseData(connection, responseBytes);
                     }
-                    if (responseBytes == null || responseBytes.length == 0) {
-                        errorResult = obtainError(connection,
-                                                  (RequestResultType) null,
-                                                  responseCode);
-                    } else if (dataBinder != null) {
+                    if (responseBytes != null && responseBytes.length > 0 && dataBinder != null) {
                         requestResult = dataBinder.createSuccessResult(this,
                                                                        connection,
                                                                        responseBytes);
@@ -274,14 +268,10 @@ public abstract class NetworkRequest<RequestDataType, RequestResultType, ErrorRe
         return result;
     }
 
-    protected abstract ErrorResultType obtainError(URLConnection connection,
-                                                   @Nullable RequestResultType resultType,
-                                                   int responseCode);
+    @NonNull
+    protected abstract ErrorResultType obtainError(URLConnection connection, int responseCode);
 
-    protected abstract ErrorResultType obtainError(URLConnection connection,
-                                                   @Nullable InputStream errorStream,
-                                                   int responseCode);
-
+    @NonNull
     protected abstract ErrorResultType obtainError(URLConnection connection, @Nullable Throwable t);
 
     private int obtainResponseCode(URLConnection connection) throws IOException {

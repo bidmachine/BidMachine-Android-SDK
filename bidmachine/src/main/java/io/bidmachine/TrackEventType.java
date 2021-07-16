@@ -1,5 +1,6 @@
 package io.bidmachine;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.explorestack.protobuf.adcom.EventType;
@@ -88,6 +89,12 @@ public enum TrackEventType {
 
     public int getOrtbActionValue() {
         return ortbActionValue;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", name(), ortbExtValue);
     }
 
 }

@@ -40,13 +40,11 @@ abstract class SessionTracker {
                             @Nullable TrackEventInfo eventInfo,
                             @Nullable BMError error) {
         if (error != null) {
-            if (error.isTrackError()) {
-                notifyError(collectTrackingUrls(trackingObject, TrackEventType.Error),
-                            collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
-                            eventInfo,
-                            eventType.getOrtbActionValue(),
-                            error);
-            }
+            notifyError(collectTrackingUrls(trackingObject, TrackEventType.Error),
+                        collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
+                        eventInfo,
+                        eventType.getOrtbActionValue(),
+                        error);
         } else {
             notifyTrack(collectTrackingUrls(trackingObject, eventType),
                         collectTrackingUrls(trackingObject, TrackEventType.TrackingError),
@@ -85,7 +83,7 @@ abstract class SessionTracker {
         if (urls == null) {
             return;
         }
-        Logger.log(String.format("dispatching event to server: %s", eventType));
+        Logger.log(String.format("Dispatching event to server - %s", eventType));
         for (String url : urls) {
             executeNotify(replaceMacros(url, eventInfo, eventType.getOrtbActionValue(), -1),
                           new NetworkRequest.Callback<String, BMError>() {
@@ -117,10 +115,10 @@ abstract class SessionTracker {
         if (urls == null) {
             return;
         }
-        if (error.getCode() == BMError.NOT_SET) {
+        if (error.getCode() == BMError.NOT_SET || !error.isTrackError()) {
             return;
         }
-        Logger.log(String.format("dispatching error event to server: (%s-%s) - %s",
+        Logger.log(String.format("Dispatching error event to server - (%s-%s) - %s",
                                  processCode,
                                  error.getCode(),
                                  error.getMessage()));
@@ -153,10 +151,10 @@ abstract class SessionTracker {
         if (urls == null) {
             return;
         }
-        if (error.getCode() == BMError.NOT_SET) {
+        if (error.getCode() == BMError.NOT_SET || !error.isTrackError()) {
             return;
         }
-        Logger.log(String.format("dispatching tracking fail to server: %s", error));
+        Logger.log(String.format("Dispatching tracking fail to server - %s", error));
         for (String url : urls) {
             executeNotify(replaceMacros(url, eventInfo, processCode, error.getCode()), null);
         }
