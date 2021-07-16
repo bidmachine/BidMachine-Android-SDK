@@ -10,8 +10,6 @@ import com.explorestack.protobuf.openrtb.Response;
 
 import org.apache.http.conn.ConnectTimeoutException;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -40,27 +38,27 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
         addContentEncoder(new GZIPRequestDataEncoder<RequestDataType, ResponseType, BMError>());
     }
 
+    @NonNull
     @Override
-    protected BMError obtainError(URLConnection connection,
-                                  @Nullable ResponseType adResponse,
-                                  int responseCode) {
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            return null;
+    protected BMError obtainError(URLConnection connection, int responseCode) {
+        BMError bmError;
+        if (responseCode >= 200 && responseCode < 300) {
+            bmError = BMError.noFill();
+            bmError.setTrackError(false);
+        } else if (responseCode >= 400 && responseCode < 500) {
+            bmError = BMError.Request;
+        } else if (responseCode >= 500 && responseCode < 600) {
+            bmError = BMError.Server;
+        } else {
+            bmError = BMError.internal("Unknown server error");
         }
-        return getErrorFromCode(connection, responseCode);
+        return bmError;
     }
 
-    @Override
-    protected BMError obtainError(URLConnection connection,
-                                  @Nullable InputStream errorStream,
-                                  int responseCode) {
-        return getErrorFromCode(connection, responseCode);
-    }
-
+    @NonNull
     @Override
     protected BMError obtainError(URLConnection connection, @Nullable Throwable t) {
         Logger.log("obtainError: " + t + "(" + connection + ")");
-        //TODO: not checked
         if (t instanceof UnknownHostException) {
             return BMError.NoConnection;
         } else if (t instanceof SocketTimeoutException || t instanceof ConnectTimeoutException) {
@@ -80,21 +78,6 @@ class ApiRequest<RequestDataType, ResponseType> extends NetworkRequest<RequestDa
 
         connection.setConnectTimeout(timeOut);
         connection.setReadTimeout(timeOut);
-    }
-
-    private BMError getErrorFromCode(URLConnection connection, int responseCode) {
-        BMError bmError;
-        if (responseCode >= 200 && responseCode < 300) {
-            bmError = BMError.noFill();
-            bmError.setTrackError(false);
-        } else if (responseCode >= 400 && responseCode < 500) {
-            bmError = BMError.Request;
-        } else if (responseCode >= 500 && responseCode < 600) {
-            bmError = BMError.Server;
-        } else {
-            bmError = BMError.internal("Unknown server error");
-        }
-        return bmError;
     }
 
 
