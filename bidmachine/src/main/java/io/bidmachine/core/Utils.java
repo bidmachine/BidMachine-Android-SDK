@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -585,6 +586,17 @@ public class Utils {
             }
         }
         return map;
+    }
+
+    public static void startActivity(@NonNull Context context, @NonNull Intent intent) {
+        try {
+            if (!(context instanceof Activity)) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+            context.startActivity(intent);
+        } catch (Throwable t) {
+            Logger.log(t);
+        }
     }
 
 }
