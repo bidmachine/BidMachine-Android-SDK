@@ -946,9 +946,10 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
         @Override
         @SuppressWarnings("unchecked")
         public SelfType setNetworks(@Nullable String jsonData) {
+            List<NetworkConfig> networkConfigList = null;
             if (!TextUtils.isEmpty(jsonData)) {
-                List<NetworkConfig> networkConfigList = new ArrayList<>();
                 try {
+                    networkConfigList = new ArrayList<>();
                     JSONArray networkConfigJsonArray = new JSONArray(jsonData);
                     for (int i = 0; i < networkConfigJsonArray.length(); i++) {
                         JSONObject networkConfigJsonObject = networkConfigJsonArray.getJSONObject(i);
@@ -962,22 +963,21 @@ public abstract class AdRequest<SelfType extends AdRequest, UnifiedAdRequestPara
                 } catch (Exception e) {
                     Logger.log(e);
                 }
-                fillNetworkConfigs(networkConfigList);
             }
+            fillNetworkConfigs(networkConfigList);
             return (SelfType) this;
         }
 
         @SuppressWarnings("unchecked")
         @VisibleForTesting
         void fillNetworkConfigs(@Nullable List<NetworkConfig> networkConfigList) {
-            if (networkConfigList != null && networkConfigList.size() > 0) {
-                prepareRequest();
+            prepareRequest();
+            params.networkConfigMap = new HashMap<String, NetworkConfig>();
+            for (NetworkConfig networkConfig : BidMachineImpl.get().getInitNetworkConfigList()) {
+                params.networkConfigMap.put(networkConfig.getKey(), networkConfig);
+            }
 
-                params.networkConfigMap = new HashMap<String, NetworkConfig>();
-                for (NetworkConfig networkConfig
-                        : BidMachineImpl.get().getInitNetworkConfigList()) {
-                    params.networkConfigMap.put(networkConfig.getKey(), networkConfig);
-                }
+            if (networkConfigList != null && networkConfigList.size() > 0) {
                 for (NetworkConfig networkConfig : networkConfigList) {
                     String networkKey = networkConfig.getKey();
                     if (NetworkRegistry.isNetworkInitialized(networkKey,
