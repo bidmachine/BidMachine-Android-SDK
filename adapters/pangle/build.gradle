@@ -1,8 +1,8 @@
 apply plugin: 'com.android.library'
 apply from: "../adapters.gradle"
 
-adapterSdkVersionName = '3.5.1.0'
-adapterVersionCode = 1
+adapterSdkVersionName = '3.7.1.4'
+adapterVersionCode = 2
 
 rootProject.allprojects {
     repositories {

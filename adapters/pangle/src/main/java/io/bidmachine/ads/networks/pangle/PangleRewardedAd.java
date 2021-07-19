@@ -169,7 +169,11 @@ class PangleRewardedAd extends UnifiedFullscreenAd {
         }
 
         @Override
-        public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName) {
+        public void onRewardVerify(boolean rewardVerify,
+                                   int rewardAmount,
+                                   String rewardName,
+                                   int errorCode,
+                                   String errorMsg) {
 
         }
 
