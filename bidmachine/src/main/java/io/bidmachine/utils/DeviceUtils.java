@@ -7,10 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -19,10 +22,14 @@ import android.view.inputmethod.InputMethodSubtype;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.explorestack.protobuf.adcom.ConnectionType;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
+import io.bidmachine.core.Utils;
 
 public class DeviceUtils {
 
@@ -209,6 +216,54 @@ public class DeviceUtils {
         double value = brightness / 255D;
         value = Math.round(value * 100) / 100D;
         return value;
+    }
+
+    @NonNull
+    public static ConnectionType getConnectionType(@NonNull android.content.Context context) {
+        NetworkInfo networkInfo = Utils.getActiveNetworkInfo(context);
+        if (networkInfo == null) {
+            return ConnectionType.CONNECTION_TYPE_INVALID;
+        }
+        switch (networkInfo.getType()) {
+            case ConnectivityManager.TYPE_MOBILE:
+                return getMobileNetworkType(networkInfo);
+            case ConnectivityManager.TYPE_WIFI:
+                return ConnectionType.CONNECTION_TYPE_WIFI;
+            case ConnectivityManager.TYPE_ETHERNET:
+                return ConnectionType.CONNECTION_TYPE_ETHERNET;
+            default:
+                return ConnectionType.CONNECTION_TYPE_INVALID;
+        }
+    }
+
+    @NonNull
+    private static ConnectionType getMobileNetworkType(@NonNull NetworkInfo networkInfo) {
+        switch (networkInfo.getSubtype()) {
+            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                return ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_UNKNOWN;
+            case TelephonyManager.NETWORK_TYPE_GPRS:
+            case TelephonyManager.NETWORK_TYPE_EDGE:
+            case TelephonyManager.NETWORK_TYPE_CDMA:
+            case TelephonyManager.NETWORK_TYPE_1xRTT:
+            case TelephonyManager.NETWORK_TYPE_IDEN:
+            case TelephonyManager.NETWORK_TYPE_GSM:
+                return ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_2G;
+            case TelephonyManager.NETWORK_TYPE_UMTS:
+            case TelephonyManager.NETWORK_TYPE_EVDO_0:
+            case TelephonyManager.NETWORK_TYPE_EVDO_A:
+            case TelephonyManager.NETWORK_TYPE_HSDPA:
+            case TelephonyManager.NETWORK_TYPE_HSUPA:
+            case TelephonyManager.NETWORK_TYPE_HSPA:
+            case TelephonyManager.NETWORK_TYPE_EVDO_B:
+            case TelephonyManager.NETWORK_TYPE_EHRPD:
+            case TelephonyManager.NETWORK_TYPE_HSPAP:
+            case TelephonyManager.NETWORK_TYPE_TD_SCDMA:
+                return ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_3G;
+            case TelephonyManager.NETWORK_TYPE_NR:
+                return ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_5G;
+            default:
+                return ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_4G;
+        }
     }
 
 }
