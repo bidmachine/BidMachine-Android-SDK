@@ -2,10 +2,7 @@ package io.bidmachine;
 
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -20,7 +17,6 @@ import com.explorestack.protobuf.TextFormat;
 import com.explorestack.protobuf.UnknownFieldSet;
 import com.explorestack.protobuf.WireFormat;
 import com.explorestack.protobuf.adcom.Ad;
-import com.explorestack.protobuf.adcom.ConnectionType;
 import com.explorestack.protobuf.adcom.Context;
 import com.explorestack.protobuf.adcom.DeviceType;
 import com.explorestack.protobuf.adcom.LocationType;
@@ -37,6 +33,7 @@ import io.bidmachine.core.Logger;
 import io.bidmachine.core.Utils;
 import io.bidmachine.models.DataRestrictions;
 import io.bidmachine.protobuf.InitRequest;
+import io.bidmachine.utils.DeviceUtils;
 
 import static com.explorestack.protobuf.TextFormat.escapeBytes;
 import static io.bidmachine.core.Utils.oneOf;
@@ -77,46 +74,6 @@ class OrtbUtils {
         }
     }
 
-    static ConnectionType getConnectionType(@NonNull android.content.Context context) {
-        NetworkInfo info = Utils.getActiveNetworkInfo(context);
-        ConnectionType connectionType;
-        if (info == null) {
-            connectionType = ConnectionType.CONNECTION_TYPE_INVALID;
-        } else {
-            switch (info.getType()) {
-                case ConnectivityManager.TYPE_MOBILE: {
-                    switch (info.getSubtype()) {
-                        case TelephonyManager.NETWORK_TYPE_UNKNOWN:
-                            connectionType = ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_UNKNOWN;
-                            break;
-                        case TelephonyManager.NETWORK_TYPE_GSM:
-                            connectionType = ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_2G;
-                            break;
-                        case TelephonyManager.NETWORK_TYPE_CDMA:
-                            connectionType = ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_3G;
-                            break;
-                        case TelephonyManager.NETWORK_TYPE_LTE:
-                            connectionType = ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_5G;
-                            break;
-                        default:
-                            connectionType = ConnectionType.CONNECTION_TYPE_CELLULAR_NETWORK_4G;
-                            break;
-                    }
-                    break;
-                }
-                case ConnectivityManager.TYPE_WIFI:
-                    connectionType = ConnectionType.CONNECTION_TYPE_WIFI;
-                    break;
-                case ConnectivityManager.TYPE_ETHERNET:
-                    connectionType = ConnectionType.CONNECTION_TYPE_ETHERNET;
-                    break;
-                default:
-                    connectionType = ConnectionType.CONNECTION_TYPE_INVALID;
-            }
-        }
-        return connectionType;
-    }
-
     static void dump(String key, MessageOrBuilder openrtb) {
         if (Logger.isLoggingEnabled()) {
             Logger.log(key + " dump:\n" + printToString(openrtb));
@@ -153,7 +110,7 @@ class OrtbUtils {
                                           ? DeviceType.DEVICE_TYPE_TABLET
                                           : DeviceType.DEVICE_TYPE_PHONE_DEVICE);
         if (restrictions.canSendDeviceInfo()) {
-            initRequest.setContype(OrtbUtils.getConnectionType(context));
+            initRequest.setContype(DeviceUtils.getConnectionType(context));
         }
         if (restrictions.canSendGeoPosition()) {
             final Context.Geo.Builder geoBuilder = Context.Geo.newBuilder();

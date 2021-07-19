@@ -49,7 +49,7 @@ final class DeviceParams extends RequestParams<DeviceParams> {
         builder.setLmt(AdvertisingPersonalData.isLimitAdTrackingEnabled());
 
         if (restrictions.canSendDeviceInfo()) {
-            builder.setContype(OrtbUtils.getConnectionType(context));
+            builder.setContype(DeviceUtils.getConnectionType(context));
             builder.setMake(Build.MANUFACTURER);
 
             if (deviceInfo.httpAgent != null) {
