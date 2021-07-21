@@ -6,8 +6,8 @@ ext {
     mockitoVersion = '3.7.7'
     jUnitVersion = '4.13.1'
     mockwebserver = '3.3.0'
-    bidMachineVersionCode = 100100043
-    bidMachineVersionName = '1.7.5'
+    bidMachineVersionCode = 100100044
+    bidMachineVersionName = '1.7.6'
 }
 
 android {
